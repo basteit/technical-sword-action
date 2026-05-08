@@ -18,6 +18,12 @@ public class PlayerMotor2D : MonoBehaviour
     [SerializeField] private float dashDuration = 0.18f;
     [SerializeField] private float dashCooldown = 0.8f;
 
+    [Header("Optional References")]
+    [SerializeField] private PlayerDamageReceiver2D damageReceiver;
+
+    [Header("Feel Tuning")]
+    [SerializeField] private bool applyRecommendedPhysicsSettings = true;
+
     private Rigidbody2D rb;
     private float moveInput;
     private bool jumpPressed;
@@ -35,11 +41,23 @@ public class PlayerMotor2D : MonoBehaviour
     public bool IsDashing => isDashing;
     public bool CanDash => dashCooldownTimer <= 0f;
     public Vector2 Velocity => rb != null ? rb.linearVelocity : Vector2.zero;
+    public float DashCooldownRemaining => Mathf.Max(0f, dashCooldownTimer);
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         originalGravityScale = rb.gravityScale;
+
+        if (applyRecommendedPhysicsSettings)
+        {
+            rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        }
+
+        if (damageReceiver == null)
+        {
+            damageReceiver = GetComponent<PlayerDamageReceiver2D>();
+        }
     }
 
     private void Update()
@@ -49,6 +67,13 @@ public class PlayerMotor2D : MonoBehaviour
         UpdateDashTimers();
 
         if (isDashing)
+        {
+            jumpPressed = false;
+            dashPressed = false;
+            return;
+        }
+
+        if (damageReceiver != null && damageReceiver.IsHitLocked)
         {
             jumpPressed = false;
             dashPressed = false;
@@ -74,6 +99,12 @@ public class PlayerMotor2D : MonoBehaviour
         if (isDashing)
         {
             rb.linearVelocity = dashDirection * dashSpeed;
+            return;
+        }
+
+        if (damageReceiver != null && damageReceiver.IsHitLocked)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             return;
         }
 

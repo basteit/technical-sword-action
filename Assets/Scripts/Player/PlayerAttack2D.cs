@@ -15,6 +15,11 @@ public class PlayerAttack2D : MonoBehaviour
     [SerializeField] private int attack1Damage = 1;
     [SerializeField] private int attack2Damage = 2;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip attackSwingClip;
+    [SerializeField] private AudioClip hitConfirmClip;
+
     private int comboStep;
     private float comboTimer;
     private float attackTimer;
@@ -22,6 +27,14 @@ public class PlayerAttack2D : MonoBehaviour
 
     public bool IsAttacking => isAttacking;
     public int ComboStep => comboStep;
+
+    private void Awake()
+    {
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+    }
 
     private void Update()
     {
@@ -73,17 +86,24 @@ public class PlayerAttack2D : MonoBehaviour
         isAttacking = true;
         attackTimer = step == 1 ? attack1Duration : attack2Duration;
 
+        PlayClip(attackSwingClip, 0.9f);
+
         int damage = step == 1 ? attack1Damage : attack2Damage;
-        ApplyHit(damage);
+        bool hitSomething = ApplyHit(damage);
+        if (hitSomething)
+        {
+            PlayClip(hitConfirmClip, 1f);
+        }
     }
 
-    private void ApplyHit(int damage)
+    private bool ApplyHit(int damage)
     {
         if (hitPoint == null)
         {
-            return;
+            return false;
         }
 
+        bool hitSomething = false;
         Collider2D[] hits = Physics2D.OverlapCircleAll(hitPoint.position, attackRadius, targetLayers);
         for (int i = 0; i < hits.Length; i++)
         {
@@ -96,8 +116,21 @@ public class PlayerAttack2D : MonoBehaviour
                 }
 
                 damageable.TakeHit(damage, knockbackDir);
+                hitSomething = true;
             }
         }
+
+        return hitSomething;
+    }
+
+    private void PlayClip(AudioClip clip, float volume)
+    {
+        if (audioSource == null || clip == null)
+        {
+            return;
+        }
+
+        audioSource.PlayOneShot(clip, volume);
     }
 
     private void OnDrawGizmosSelected()

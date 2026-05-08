@@ -15,6 +15,7 @@ public class PlayerStateMachine : MonoBehaviour
 {
     [SerializeField] private PlayerMotor2D motor;
     [SerializeField] private PlayerAttack2D attack;
+    [SerializeField] private PlayerDamageReceiver2D damageReceiver;
     [SerializeField] private bool debugLogStateChange;
 
     public PlayerState CurrentState { get; private set; } = PlayerState.Idle;
@@ -29,6 +30,11 @@ public class PlayerStateMachine : MonoBehaviour
         if (attack == null)
         {
             attack = GetComponent<PlayerAttack2D>();
+        }
+
+        if (damageReceiver == null)
+        {
+            damageReceiver = GetComponent<PlayerDamageReceiver2D>();
         }
     }
 
@@ -52,6 +58,11 @@ public class PlayerStateMachine : MonoBehaviour
 
     private PlayerState EvaluateState()
     {
+        if (damageReceiver != null && damageReceiver.IsHitLocked)
+        {
+            return PlayerState.Hit;
+        }
+
         if (motor.IsDashing)
         {
             return PlayerState.Dash;
