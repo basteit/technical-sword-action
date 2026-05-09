@@ -20,6 +20,9 @@ public class PlayerAttack2D : MonoBehaviour
     [SerializeField] private AudioClip attackSwingClip;
     [SerializeField] private AudioClip hitConfirmClip;
 
+    [Header("Optional References")]
+    [SerializeField] private PlayerParry2D parry;
+
     private int comboStep;
     private float comboTimer;
     private float attackTimer;
@@ -33,6 +36,11 @@ public class PlayerAttack2D : MonoBehaviour
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
+        }
+
+        if (parry == null)
+        {
+            parry = GetComponent<PlayerParry2D>();
         }
     }
 
@@ -54,6 +62,11 @@ public class PlayerAttack2D : MonoBehaviour
             {
                 comboStep = 0;
             }
+        }
+
+        if (parry != null && parry.IsFailLocked)
+        {
+            return;
         }
 
         if (Keyboard.current != null && Keyboard.current.jKey.wasPressedThisFrame)

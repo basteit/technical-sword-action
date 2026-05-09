@@ -14,10 +14,17 @@ public class Damageable2D : MonoBehaviour
     [SerializeField] private Color hitFlashColor = new Color(1f, 0.7f, 0.7f, 1f);
     [SerializeField] private float hitFlashDuration = 0.08f;
 
+    [Header("Parry Stun")]
+    [SerializeField] private float normalParryStunDuration = 0.22f;
+    [SerializeField] private float justParryStunDuration = 0.34f;
+
     private int currentHp;
     private float flashTimer;
     private Color defaultColor = Color.white;
     private Vector2 knockbackVelocity;
+    private float stunTimer;
+
+    public bool IsStunned => stunTimer > 0f;
 
     private void Awake()
     {
@@ -41,6 +48,11 @@ public class Damageable2D : MonoBehaviour
 
     private void Update()
     {
+        if (stunTimer > 0f)
+        {
+            stunTimer -= Time.deltaTime;
+        }
+
         if (flashTimer > 0f)
         {
             flashTimer -= Time.deltaTime;
@@ -88,6 +100,18 @@ public class Damageable2D : MonoBehaviour
         if (currentHp <= 0)
         {
             gameObject.SetActive(false);
+        }
+    }
+
+    public void ApplyParryStun(ParryResult result)
+    {
+        if (result == ParryResult.Just)
+        {
+            stunTimer = justParryStunDuration;
+        }
+        else if (result == ParryResult.Normal)
+        {
+            stunTimer = normalParryStunDuration;
         }
     }
 

@@ -15,8 +15,15 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
     [SerializeField] private float hitStopMoveDuration = 0.14f;
     [SerializeField] private float minKnockbackForce = 5.5f;
 
+    [Header("Parry Feedback")]
+    [SerializeField] private float normalParryHitStop = 0.04f;
+    [SerializeField] private float justParryHitStop = 0.07f;
+
     [Header("Collision Ghost During Invincible")]
     [SerializeField] private LayerMask ignoreCollisionLayersWhileInvincible;
+
+    [Header("References")]
+    [SerializeField] private PlayerParry2D parry;
 
     [Header("Feedback")]
     [SerializeField] private AudioSource audioSource;
@@ -33,12 +40,14 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
     private float invincibleTimer;
     private float hitLockTimer;
     private float flashTimer;
+    private float hitStopTimer;
     private Color defaultColor = Color.white;
     private readonly HashSet<Collider2D> ignoredColliders = new();
 
     public bool IsInvincible => invincibleTimer > 0f;
     public bool IsHitLocked => hitLockTimer > 0f;
     public int CurrentHp => currentHp;
+    public ParryResult LastParryResult { get; private set; } = ParryResult.None;
 
     private void Awake()
     {
@@ -46,6 +55,11 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
         ownCollider = GetComponent<Collider2D>();
         motor = GetComponent<PlayerMotor2D>();
         currentHp = maxHp;
+
+        if (parry == null)
+        {
+            parry = GetComponent<PlayerParry2D>();
+        }
 
         if (audioSource == null)
         {
@@ -65,6 +79,15 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
     private void Update()
     {
+        if (hitStopTimer > 0f)
+        {
+            hitStopTimer -= Time.unscaledDeltaTime;
+            if (hitStopTimer <= 0f)
+            {
+                Time.timeScale = 1f;
+            }
+        }
+
         if (invincibleTimer > 0f)
         {
             invincibleTimer -= Time.deltaTime;
@@ -91,6 +114,15 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
     public bool TryReceiveHit(int damage, Vector2 sourcePosition, float knockbackForce)
     {
+        LastParryResult = ParryResult.None;
+
+        if (parry != null && parry.TryResolveParry(out ParryResult parryResult))
+        {
+            LastParryResult = parryResult;
+            ApplyParryEffects(sourcePosition, parryResult);
+            return false;
+        }
+
         if (IsInvincible)
         {
             return false;
@@ -134,6 +166,26 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
         }
 
         return true;
+    }
+
+    private void ApplyParryEffects(Vector2 sourcePosition, ParryResult result)
+    {
+        float radius = 1.8f;
+        Collider2D[] hits = Physics2D.OverlapCircleAll(sourcePosition, radius);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].TryGetComponent(out Damageable2D damageable))
+            {
+                damageable.ApplyParryStun(result);
+            }
+        }
+
+        float stop = result == ParryResult.Just ? justParryHitStop : normalParryHitStop;
+        if (stop > 0f)
+        {
+            Time.timeScale = 0f;
+            hitStopTimer = stop;
+        }
     }
 
     private void IgnoreCurrentOverlaps()
@@ -183,6 +235,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
     private void OnDisable()
     {
+        Time.timeScale = 1f;
         RestoreIgnoredCollisions();
     }
 }

@@ -236,7 +236,7 @@ Transform:
   m_GameObject: {fileID: 352447355}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -2, z: 0}
   m_LocalScale: {x: 20, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -557,6 +557,8 @@ GameObject:
   - component: {fileID: 1408528523}
   - component: {fileID: 1408528524}
   - component: {fileID: 1408528525}
+  - component: {fileID: 1408528529}
+  - component: {fileID: 1408528528}
   - component: {fileID: 1408528526}
   m_Layer: 7
   m_Name: Player
@@ -578,6 +580,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMotor2D
   moveSpeed: 6.5
+  flipSpriteByMoveInput: 1
   jumpForce: 12
   groundCheck: {fileID: 717229082}
   groundCheckRadius: 0.15
@@ -587,7 +590,11 @@ MonoBehaviour:
   dashSpeed: 18
   dashDuration: 0.18
   dashCooldown: 0.8
+  ignoreCollisionLayersWhileDashing:
+    serializedVersion: 2
+    m_Bits: 64
   damageReceiver: {fileID: 1408528525}
+  parry: {fileID: 1408528529}
   applyRecommendedPhysicsSettings: 1
 --- !u!50 &1408528519
 Rigidbody2D:
@@ -754,6 +761,7 @@ MonoBehaviour:
   audioSource: {fileID: 1408528526}
   attackSwingClip: {fileID: 8300000, guid: 1095409cfd91d8a48b9893b051a1eda1, type: 3}
   hitConfirmClip: {fileID: 8300000, guid: 784c45d7be21ee94fb504fdcd4e3a387, type: 3}
+  parry: {fileID: 0}
 --- !u!114 &1408528524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -769,6 +777,7 @@ MonoBehaviour:
   motor: {fileID: 1408528518}
   attack: {fileID: 1408528523}
   damageReceiver: {fileID: 1408528525}
+  parry: {fileID: 1408528529}
   debugLogStateChange: 1
 --- !u!114 &1408528525
 MonoBehaviour:
@@ -785,6 +794,13 @@ MonoBehaviour:
   maxHp: 5
   invincibleDuration: 0.45
   hitStopMoveDuration: 0.1
+  minKnockbackForce: 5.5
+  normalParryHitStop: 0.04
+  justParryHitStop: 0.07
+  ignoreCollisionLayersWhileInvincible:
+    serializedVersion: 2
+    m_Bits: 64
+  parry: {fileID: 1408528529}
   audioSource: {fileID: 1408528526}
   hitClip: {fileID: 8300000, guid: 50cfbacf7f8677246ad28c29b2e66f84, type: 3}
   spriteRenderer: {fileID: 1408528520}
@@ -902,7 +918,47 @@ MonoBehaviour:
   motor: {fileID: 1408528518}
   stateMachine: {fileID: 1408528524}
   damageReceiver: {fileID: 1408528525}
+  parry: {fileID: 1408528529}
   visible: 1
+  fontSize: 20
+--- !u!114 &1408528528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408528517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5fce31b3785b184998b99e2affc1613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GroundSnapOnStart
+  snapOnStart: 1
+  rayDistance: 10
+  yOffset: 1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+--- !u!114 &1408528529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408528517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2af2b00e86e497940a8c41487d969b38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerParry2D
+  parryWindowDuration: 0.18
+  justParryDuration: 0.06
+  parryCooldown: 0.12
+  failLockDuration: 0.5
+  audioSource: {fileID: 1408528526}
+  normalParryClip: {fileID: 8300000, guid: 784c45d7be21ee94fb504fdcd4e3a387, type: 3}
+  justParryClip: {fileID: 8300000, guid: e3f191bbeba52c04c9ae8396c4ec259f, type: 3}
+  parryMissClip: {fileID: 8300000, guid: 1095409cfd91d8a48b9893b051a1eda1, type: 3}
 --- !u!1 &1464564059
 GameObject:
   m_ObjectHideFlags: 0
@@ -953,6 +1009,7 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 192
+  repeatInterval: 0.15
 --- !u!61 &1464564062
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1012,6 +1069,8 @@ GameObject:
   - component: {fileID: 1591399429}
   - component: {fileID: 1591399428}
   - component: {fileID: 1591399427}
+  - component: {fileID: 1591399433}
+  - component: {fileID: 1591399432}
   m_Layer: 6
   m_Name: EnemyDummy
   m_TagString: Untagged
@@ -1032,12 +1091,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Damageable2D
   maxHp: 5
+  blockContactPushFromPlayer: 1
+  playerBodyLayers:
+    serializedVersion: 2
+    m_Bits: 128
   knockbackPower: 3
-  audioSource: {fileID: 0}
-  hitClip: {fileID: 0}
-  spriteRenderer: {fileID: 0}
+  knockbackDamping: 18
+  audioSource: {fileID: 1591399432}
+  hitClip: {fileID: 8300000, guid: 784c45d7be21ee94fb504fdcd4e3a387, type: 3}
+  spriteRenderer: {fileID: 1591399430}
   hitFlashColor: {r: 1, g: 0.7, b: 0.7, a: 1}
   hitFlashDuration: 0.08
+  normalParryStunDuration: 0.22
+  justParryStunDuration: 0.34
 --- !u!50 &1591399428
 Rigidbody2D:
   serializedVersion: 5
@@ -1186,6 +1252,121 @@ Transform:
   - {fileID: 1464564060}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1591399432
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1591399426}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1591399433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1591399426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5fce31b3785b184998b99e2affc1613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GroundSnapOnStart
+  snapOnStart: 1
+  rayDistance: 10
+  yOffset: 1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

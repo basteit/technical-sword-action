@@ -7,6 +7,8 @@ public enum PlayerState
     Jump,
     Fall,
     Dash,
+    Parry,
+    ParryFail,
     Attack,
     Hit
 }
@@ -16,6 +18,7 @@ public class PlayerStateMachine : MonoBehaviour
     [SerializeField] private PlayerMotor2D motor;
     [SerializeField] private PlayerAttack2D attack;
     [SerializeField] private PlayerDamageReceiver2D damageReceiver;
+    [SerializeField] private PlayerParry2D parry;
     [SerializeField] private bool debugLogStateChange;
 
     public PlayerState CurrentState { get; private set; } = PlayerState.Idle;
@@ -35,6 +38,11 @@ public class PlayerStateMachine : MonoBehaviour
         if (damageReceiver == null)
         {
             damageReceiver = GetComponent<PlayerDamageReceiver2D>();
+        }
+
+        if (parry == null)
+        {
+            parry = GetComponent<PlayerParry2D>();
         }
     }
 
@@ -63,9 +71,19 @@ public class PlayerStateMachine : MonoBehaviour
             return PlayerState.Hit;
         }
 
+        if (parry != null && parry.IsFailLocked)
+        {
+            return PlayerState.ParryFail;
+        }
+
         if (motor.IsDashing)
         {
             return PlayerState.Dash;
+        }
+
+        if (parry != null && parry.IsParryActive)
+        {
+            return PlayerState.Parry;
         }
 
         if (attack != null && attack.IsAttacking)
