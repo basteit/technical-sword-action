@@ -11,12 +11,15 @@ public enum ParryResult
 public class PlayerParry2D : MonoBehaviour
 {
     [Header("Parry Window")]
-    [SerializeField] private float parryWindowDuration = 0.18f;
-    [SerializeField] private float justParryDuration = 0.06f;
-    [SerializeField] private float parryCooldown = 0.12f;
+    [SerializeField] private float parryWindowDuration = 0.16f;
+    [SerializeField] private float justParryDuration = 0.05f;
+    [SerializeField] private float parryCooldown = 0.14f;
 
     [Header("Parry Fail")]
-    [SerializeField] private float failLockDuration = 0.2f;
+    [SerializeField] private float failLockDuration = 0.24f;
+
+    [Header("References")]
+    [SerializeField] private PlayerSpecialSkill2D specialSkill;
 
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
@@ -45,12 +48,23 @@ public class PlayerParry2D : MonoBehaviour
         {
             audioSource = GetComponent<AudioSource>();
         }
+
+        if (specialSkill == null)
+        {
+            specialSkill = GetComponent<PlayerSpecialSkill2D>();
+        }
     }
 
     private void Update()
     {
         ReadInput();
         UpdateTimers();
+
+        if (specialSkill != null && specialSkill.IsUsingSkill)
+        {
+            parryPressed = false;
+            return;
+        }
 
         if (parryPressed && cooldownTimer <= 0f && !parryActive && !IsFailLocked)
         {
@@ -157,3 +171,4 @@ public class PlayerParry2D : MonoBehaviour
         audioSource.PlayOneShot(clip, volume);
     }
 }
+

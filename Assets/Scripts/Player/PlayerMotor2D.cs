@@ -25,6 +25,7 @@ public class PlayerMotor2D : MonoBehaviour
     [Header("Optional References")]
     [SerializeField] private PlayerDamageReceiver2D damageReceiver;
     [SerializeField] private PlayerParry2D parry;
+    [SerializeField] private PlayerSpecialSkill2D specialSkill;
 
     [Header("Feel Tuning")]
     [SerializeField] private bool applyRecommendedPhysicsSettings = true;
@@ -74,6 +75,11 @@ public class PlayerMotor2D : MonoBehaviour
         {
             parry = GetComponent<PlayerParry2D>();
         }
+
+        if (specialSkill == null)
+        {
+            specialSkill = GetComponent<PlayerSpecialSkill2D>();
+        }
     }
 
     private void Update()
@@ -90,7 +96,9 @@ public class PlayerMotor2D : MonoBehaviour
             return;
         }
 
-        if ((damageReceiver != null && damageReceiver.IsHitLocked) || (parry != null && parry.IsFailLocked))
+        if ((damageReceiver != null && damageReceiver.IsHitLocked) ||
+            (parry != null && parry.IsFailLocked) ||
+            (specialSkill != null && specialSkill.IsUsingSkill))
         {
             jumpPressed = false;
             dashPressed = false;
@@ -119,7 +127,9 @@ public class PlayerMotor2D : MonoBehaviour
             return;
         }
 
-        if ((damageReceiver != null && damageReceiver.IsHitLocked) || (parry != null && parry.IsFailLocked))
+        if ((damageReceiver != null && damageReceiver.IsHitLocked) ||
+            (parry != null && parry.IsFailLocked) ||
+            (specialSkill != null && specialSkill.IsUsingSkill))
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             return;

@@ -12,18 +12,19 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
     [SerializeField] private float invincibleDuration = 0.45f;
 
     [Header("Hit Reaction")]
-    [SerializeField] private float hitStopMoveDuration = 0.14f;
+    [SerializeField] private float hitStopMoveDuration = 0.16f;
     [SerializeField] private float minKnockbackForce = 5.5f;
 
     [Header("Parry Feedback")]
-    [SerializeField] private float normalParryHitStop = 0.04f;
-    [SerializeField] private float justParryHitStop = 0.07f;
+    [SerializeField] private float normalParryHitStop = 0.035f;
+    [SerializeField] private float justParryHitStop = 0.06f;
 
     [Header("Collision Ghost During Invincible")]
     [SerializeField] private LayerMask ignoreCollisionLayersWhileInvincible;
 
     [Header("References")]
     [SerializeField] private PlayerParry2D parry;
+    [SerializeField] private PlayerSpecialGauge specialGauge;
 
     [Header("Feedback")]
     [SerializeField] private AudioSource audioSource;
@@ -59,6 +60,11 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
         if (parry == null)
         {
             parry = GetComponent<PlayerParry2D>();
+        }
+
+        if (specialGauge == null)
+        {
+            specialGauge = GetComponent<PlayerSpecialGauge>();
         }
 
         if (audioSource == null)
@@ -120,6 +126,12 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
         {
             LastParryResult = parryResult;
             ApplyParryEffects(sourcePosition, parryResult);
+
+            if (specialGauge != null)
+            {
+                specialGauge.AddOnParry(parryResult);
+            }
+
             return false;
         }
 
@@ -136,6 +148,11 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
         currentHp = Mathf.Max(0, currentHp - damage);
         invincibleTimer = invincibleDuration;
         hitLockTimer = hitStopMoveDuration;
+
+        if (specialGauge != null)
+        {
+            specialGauge.AddOnDamaged();
+        }
 
         Vector2 direction = ((Vector2)transform.position - sourcePosition).normalized;
         if (direction.sqrMagnitude < 0.001f)
@@ -170,13 +187,24 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
     private void ApplyParryEffects(Vector2 sourcePosition, ParryResult result)
     {
-        float radius = 1.8f;
-        Collider2D[] hits = Physics2D.OverlapCircleAll(sourcePosition, radius);
-        for (int i = 0; i < hits.Length; i++)
+        EnemyProjectile2D projectile = FindClosestProjectile(sourcePosition, 1.2f);
+        if (projectile != null && projectile.Owner != null)
         {
-            if (hits[i].TryGetComponent(out Damageable2D damageable))
+            if (projectile.Owner.TryGetComponent(out Damageable2D ownerDamageable))
             {
-                damageable.ApplyParryStun(result);
+                ownerDamageable.ApplyParryStun(result);
+            }
+        }
+        else
+        {
+            float radius = 1.8f;
+            Collider2D[] hits = Physics2D.OverlapCircleAll(sourcePosition, radius);
+            for (int i = 0; i < hits.Length; i++)
+            {
+                if (hits[i].TryGetComponent(out Damageable2D damageable))
+                {
+                    damageable.ApplyParryStun(result);
+                }
             }
         }
 
@@ -186,6 +214,30 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
             Time.timeScale = 0f;
             hitStopTimer = stop;
         }
+    }
+
+    private EnemyProjectile2D FindClosestProjectile(Vector2 center, float radius)
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(center, radius);
+        float bestDist = float.MaxValue;
+        EnemyProjectile2D best = null;
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (!hits[i].TryGetComponent(out EnemyProjectile2D p))
+            {
+                continue;
+            }
+
+            float d = Vector2.Distance(center, p.transform.position);
+            if (d < bestDist)
+            {
+                bestDist = d;
+                best = p;
+            }
+        }
+
+        return best;
     }
 
     private void IgnoreCurrentOverlaps()
@@ -239,3 +291,4 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
         RestoreIgnoredCollisions();
     }
 }
+

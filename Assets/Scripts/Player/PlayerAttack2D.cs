@@ -20,8 +20,16 @@ public class PlayerAttack2D : MonoBehaviour
     [SerializeField] private AudioClip attackSwingClip;
     [SerializeField] private AudioClip hitConfirmClip;
 
+    [Header("Debug Draw")]
+    [SerializeField] private bool showHitboxAlways = true;
+    [SerializeField] private Color idleHitboxColor = new Color(1f, 0.3f, 0.3f, 0.55f);
+    [SerializeField] private Color activeHitboxColor = new Color(1f, 0.1f, 0.1f, 0.95f);
+    [SerializeField] private Color activeFillColor = new Color(1f, 0.1f, 0.1f, 0.22f);
+
     [Header("Optional References")]
     [SerializeField] private PlayerParry2D parry;
+    [SerializeField] private PlayerSpecialGauge specialGauge;
+    [SerializeField] private PlayerSpecialSkill2D specialSkill;
 
     private int comboStep;
     private float comboTimer;
@@ -41,6 +49,16 @@ public class PlayerAttack2D : MonoBehaviour
         if (parry == null)
         {
             parry = GetComponent<PlayerParry2D>();
+        }
+
+        if (specialGauge == null)
+        {
+            specialGauge = GetComponent<PlayerSpecialGauge>();
+        }
+
+        if (specialSkill == null)
+        {
+            specialSkill = GetComponent<PlayerSpecialSkill2D>();
         }
     }
 
@@ -64,7 +82,7 @@ public class PlayerAttack2D : MonoBehaviour
             }
         }
 
-        if (parry != null && parry.IsFailLocked)
+        if ((parry != null && parry.IsFailLocked) || (specialSkill != null && specialSkill.IsUsingSkill))
         {
             return;
         }
@@ -130,6 +148,11 @@ public class PlayerAttack2D : MonoBehaviour
 
                 damageable.TakeHit(damage, knockbackDir);
                 hitSomething = true;
+
+                if (specialGauge != null)
+                {
+                    specialGauge.AddOnAttackHit();
+                }
             }
         }
 
@@ -146,14 +169,39 @@ public class PlayerAttack2D : MonoBehaviour
         audioSource.PlayOneShot(clip, volume);
     }
 
-    private void OnDrawGizmosSelected()
+    private void DrawHitGizmo()
     {
         if (hitPoint == null)
         {
             return;
         }
 
-        Gizmos.color = Color.red;
+        if (isAttacking)
+        {
+            Gizmos.color = activeFillColor;
+            Gizmos.DrawSphere(hitPoint.position, attackRadius);
+            Gizmos.color = activeHitboxColor;
+        }
+        else
+        {
+            Gizmos.color = idleHitboxColor;
+        }
+
         Gizmos.DrawWireSphere(hitPoint.position, attackRadius);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!showHitboxAlways)
+        {
+            return;
+        }
+
+        DrawHitGizmo();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        DrawHitGizmo();
     }
 }
