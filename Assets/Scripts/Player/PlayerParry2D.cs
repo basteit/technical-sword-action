@@ -11,12 +11,15 @@ public enum ParryResult
 public class PlayerParry2D : MonoBehaviour
 {
     [Header("Parry Window")]
-    [SerializeField] private float parryWindowDuration = 0.16f;
-    [SerializeField] private float justParryDuration = 0.05f;
-    [SerializeField] private float parryCooldown = 0.14f;
+    [SerializeField] private float parryWindowDuration = 0.2f;
+    [SerializeField] private float justParryDuration = 0.07f;
+    [SerializeField] private float parryCooldown = 0.22f;
 
     [Header("Parry Fail")]
-    [SerializeField] private float failLockDuration = 0.24f;
+    [SerializeField] private float failLockDuration = 0.3f;
+
+    [Header("Parry Snap")]
+    [SerializeField] private float parrySnapDistance = 1.9f;
 
     [Header("References")]
     [SerializeField] private PlayerSpecialSkill2D specialSkill;
@@ -34,6 +37,10 @@ public class PlayerParry2D : MonoBehaviour
     private float parryElapsed;
     private float cooldownTimer;
     private float failLockTimer;
+    private int attemptCount;
+    private int successCount;
+    private int justSuccessCount;
+    private int missCount;
 
     public bool IsParryActive => parryActive;
     public bool IsFailLocked => failLockTimer > 0f;
@@ -41,6 +48,11 @@ public class PlayerParry2D : MonoBehaviour
     public float ParryCooldownRemaining => Mathf.Max(0f, cooldownTimer);
     public float FailLockRemaining => Mathf.Max(0f, failLockTimer);
     public ParryResult LastParryResult { get; private set; } = ParryResult.None;
+    public int AttemptCount => attemptCount;
+    public int SuccessCount => successCount;
+    public int JustSuccessCount => justSuccessCount;
+    public int MissCount => missCount;
+    public float SuccessRate => attemptCount > 0 ? (float)successCount / attemptCount : 0f;
 
     private void Awake()
     {
@@ -128,11 +140,24 @@ public class PlayerParry2D : MonoBehaviour
         parryElapsed = 0f;
         cooldownTimer = parryCooldown;
         LastParryResult = ParryResult.None;
+        attemptCount++;
     }
 
     public bool TryResolveParry(out ParryResult result)
     {
+        return TryResolveParry(transform.position, out result);
+    }
+
+    public bool TryResolveParry(Vector2 sourcePosition, out ParryResult result)
+    {
         if (!parryActive)
+        {
+            result = ParryResult.None;
+            return false;
+        }
+
+        float dist = Vector2.Distance(transform.position, sourcePosition);
+        if (dist > parrySnapDistance)
         {
             result = ParryResult.None;
             return false;
@@ -146,6 +171,7 @@ public class PlayerParry2D : MonoBehaviour
 
         if (result == ParryResult.Just)
         {
+            justSuccessCount++;
             PlayClip(justParryClip, 1f);
         }
         else
@@ -153,12 +179,15 @@ public class PlayerParry2D : MonoBehaviour
             PlayClip(normalParryClip, 0.95f);
         }
 
+        successCount++;
+
         return true;
     }
 
     private void ApplyFailLock()
     {
         failLockTimer = failLockDuration;
+        missCount++;
     }
 
     private void PlayClip(AudioClip clip, float volume)

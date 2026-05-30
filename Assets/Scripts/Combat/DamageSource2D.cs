@@ -1,13 +1,22 @@
-﻿using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class DamageSource2D : MonoBehaviour
 {
+    private enum HitWindowMode
+    {
+        ManualWindow,
+        AlwaysOn
+    }
+
+    [SerializeField] private HitWindowMode hitWindowMode = HitWindowMode.ManualWindow;
     [SerializeField] private int damage = 1;
     [SerializeField] private float knockbackForce = 4f;
     [SerializeField] private LayerMask targetLayers;
     [SerializeField] private float repeatInterval = 0.15f;
 
-    private readonly System.Collections.Generic.Dictionary<int, float> lastHitTimeByTarget = new();
+    private readonly Dictionary<int, float> lastHitTimeByTarget = new();
+    private bool isHitWindowOpen;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -19,8 +28,28 @@ public class DamageSource2D : MonoBehaviour
         ProcessHit(other);
     }
 
+    public void OpenHitWindow()
+    {
+        isHitWindowOpen = true;
+    }
+
+    public void CloseHitWindow()
+    {
+        isHitWindowOpen = false;
+    }
+
+    public void SetHitWindow(bool open)
+    {
+        isHitWindowOpen = open;
+    }
+
     private void ProcessHit(Collider2D other)
     {
+        if (hitWindowMode == HitWindowMode.ManualWindow && !isHitWindowOpen)
+        {
+            return;
+        }
+
         if ((targetLayers.value & (1 << other.gameObject.layer)) == 0)
         {
             return;

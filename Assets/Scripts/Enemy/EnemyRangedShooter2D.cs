@@ -5,6 +5,13 @@ public class EnemyRangedShooter2D : MonoBehaviour
     [Header("Target")]
     [SerializeField] private Transform target;
     [SerializeField] private float detectRange = 12f;
+    [SerializeField] private float loseTargetRange = 16f;
+
+    [Header("Spacing")]
+    [SerializeField] private float moveSpeed = 2.6f;
+    [SerializeField] private float preferredMinDistance = 4.5f;
+    [SerializeField] private float preferredMaxDistance = 7.2f;
+    [SerializeField] private float nearStopDistance = 0.75f;
 
     [Header("Shoot")]
     [SerializeField] private EnemyProjectile2D projectilePrefab;
@@ -39,7 +46,17 @@ public class EnemyRangedShooter2D : MonoBehaviour
         }
 
         float dist = Vector2.Distance(transform.position, target.position);
-        if (dist > detectRange)
+        if (dist > loseTargetRange)
+        {
+            return;
+        }
+
+        if (dist <= detectRange)
+        {
+            UpdateSpacing(dist);
+        }
+
+        if (dist < preferredMinDistance || dist > preferredMaxDistance)
         {
             return;
         }
@@ -52,6 +69,31 @@ public class EnemyRangedShooter2D : MonoBehaviour
 
         shootTimer = shootInterval;
         ShootAtTarget();
+    }
+
+    private void UpdateSpacing(float dist)
+    {
+        Vector2 toTarget = (Vector2)target.position - (Vector2)transform.position;
+        if (toTarget.sqrMagnitude < 0.0001f)
+        {
+            return;
+        }
+
+        Vector2 dir = toTarget.normalized;
+        if (dist < preferredMinDistance)
+        {
+            if (dist > nearStopDistance)
+            {
+                transform.position += (Vector3)(-dir * moveSpeed * Time.deltaTime);
+            }
+
+            return;
+        }
+
+        if (dist > preferredMaxDistance)
+        {
+            transform.position += (Vector3)(dir * moveSpeed * Time.deltaTime);
+        }
     }
 
     private void ShootAtTarget()

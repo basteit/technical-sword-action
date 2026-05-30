@@ -37,7 +37,7 @@ public class PlayerDebugOverlay : MonoBehaviour
         if (!visible) return;
 
         EnsureGuiStyles();
-        GUI.Box(new Rect(12, 12, 640, 394), "Player Debug", boxStyle);
+        GUI.Box(new Rect(12, 12, 700, 460), "Player Debug", boxStyle);
 
         string state = stateMachine != null ? stateMachine.CurrentState.ToString() : "N/A";
         string grounded = motor != null && motor.IsGrounded ? "Yes" : "No";
@@ -48,8 +48,17 @@ public class PlayerDebugOverlay : MonoBehaviour
         string parryRemain = parry != null ? parry.ParryRemaining.ToString("0.00") : "N/A";
         string parryLast = damageReceiver != null ? damageReceiver.LastParryResult.ToString() : "N/A";
         string failLock = parry != null ? parry.FailLockRemaining.ToString("0.00") : "N/A";
+        string parryAttempts = parry != null ? parry.AttemptCount.ToString() : "N/A";
+        string parrySuccess = parry != null ? parry.SuccessCount.ToString() : "N/A";
+        string parryJust = parry != null ? parry.JustSuccessCount.ToString() : "N/A";
+        string parryMiss = parry != null ? parry.MissCount.ToString() : "N/A";
+        string parryRate = parry != null ? $"{parry.SuccessRate * 100f:0.0}%" : "N/A";
         string gauge = specialGauge != null ? $"{specialGauge.CurrentGauge:0}/{specialGauge.MaxGauge:0} ({specialGauge.GaugeRate * 100f:0}%)" : "N/A";
         string special = specialSkill != null ? (specialSkill.IsUsingSkill ? $"Yes ({specialSkill.LockRemaining:0.00}s)" : "No") : "N/A";
+        string hitsTaken = damageReceiver != null ? damageReceiver.TotalHitsTaken.ToString() : "N/A";
+        string blockedParry = damageReceiver != null ? damageReceiver.BlockedByParry.ToString() : "N/A";
+        string blockedIFrame = damageReceiver != null ? damageReceiver.BlockedByInvincible.ToString() : "N/A";
+        string blockedDash = damageReceiver != null ? damageReceiver.BlockedByDash.ToString() : "N/A";
 
         GUI.Label(new Rect(28, 56, 600, 30), $"State: {state}", labelStyle);
         GUI.Label(new Rect(28, 90, 600, 30), $"Grounded: {grounded} / Dashing: {dashing}", labelStyle);
@@ -60,6 +69,9 @@ public class PlayerDebugOverlay : MonoBehaviour
         GUI.Label(new Rect(28, 260, 600, 30), $"Parry FailLock: {failLock}s", labelStyle);
         GUI.Label(new Rect(28, 294, 600, 30), $"Special Gauge: {gauge}", labelStyle);
         GUI.Label(new Rect(28, 328, 600, 30), $"Special Active: {special}", labelStyle);
-        GUI.Label(new Rect(28, 362, 600, 30), $"FPS: {(1f / Time.unscaledDeltaTime):0}", labelStyle);
+        GUI.Label(new Rect(28, 362, 660, 30), $"Parry Stats: Attempt {parryAttempts} / Success {parrySuccess} / Just {parryJust} / Miss {parryMiss}", labelStyle);
+        GUI.Label(new Rect(28, 396, 660, 30), $"Parry Success Rate: {parryRate} (Target 30-45%)", labelStyle);
+        GUI.Label(new Rect(28, 430, 660, 30), $"Damage Stats: Taken {hitsTaken} / Blocked(Parry {blockedParry}, IFrame {blockedIFrame}, Dash {blockedDash})", labelStyle);
+        GUI.Label(new Rect(490, 56, 180, 30), $"FPS: {(1f / Time.unscaledDeltaTime):0}", labelStyle);
     }
 }

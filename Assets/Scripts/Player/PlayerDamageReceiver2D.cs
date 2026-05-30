@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -44,11 +44,19 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
     private float hitStopTimer;
     private Color defaultColor = Color.white;
     private readonly HashSet<Collider2D> ignoredColliders = new();
+    private int totalHitsTaken;
+    private int blockedByParry;
+    private int blockedByInvincible;
+    private int blockedByDash;
 
     public bool IsInvincible => invincibleTimer > 0f;
     public bool IsHitLocked => hitLockTimer > 0f;
     public int CurrentHp => currentHp;
     public ParryResult LastParryResult { get; private set; } = ParryResult.None;
+    public int TotalHitsTaken => totalHitsTaken;
+    public int BlockedByParry => blockedByParry;
+    public int BlockedByInvincible => blockedByInvincible;
+    public int BlockedByDash => blockedByDash;
 
     private void Awake()
     {
@@ -122,9 +130,10 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
     {
         LastParryResult = ParryResult.None;
 
-        if (parry != null && parry.TryResolveParry(out ParryResult parryResult))
+        if (parry != null && parry.TryResolveParry(sourcePosition, out ParryResult parryResult))
         {
             LastParryResult = parryResult;
+            blockedByParry++;
             ApplyParryEffects(sourcePosition, parryResult);
 
             if (specialGauge != null)
@@ -137,15 +146,18 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
         if (IsInvincible)
         {
+            blockedByInvincible++;
             return false;
         }
 
         if (motor != null && motor.IsDashing)
         {
+            blockedByDash++;
             return false;
         }
 
         currentHp = Mathf.Max(0, currentHp - damage);
+        totalHitsTaken++;
         invincibleTimer = invincibleDuration;
         hitLockTimer = hitStopMoveDuration;
 
@@ -174,6 +186,8 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
             spriteRenderer.color = hitFlashColor;
             flashTimer = hitFlashDuration;
         }
+
+        CombatCameraFeedback2D.PlayHitShake();
 
         IgnoreCurrentOverlaps();
 
@@ -214,6 +228,8 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
             Time.timeScale = 0f;
             hitStopTimer = stop;
         }
+
+        CombatCameraFeedback2D.PlayParryShake(result);
     }
 
     private EnemyProjectile2D FindClosestProjectile(Vector2 center, float radius)
@@ -291,4 +307,5 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
         RestoreIgnoredCollisions();
     }
 }
+
 
