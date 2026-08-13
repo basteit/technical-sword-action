@@ -1282,6 +1282,7 @@ GameObject:
   - component: {fileID: 1408528531}
   - component: {fileID: 1408528526}
   - component: {fileID: 1408528532}
+  - component: {fileID: 1408528533}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -1395,12 +1396,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
+  m_Sprite: {fileID: -1194692603, guid: f75b6e5416ca8694bbc58345e439a004, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 2}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1771,7 +1772,7 @@ Animator:
   m_GameObject: {fileID: 1408528517}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5c7de90eca0c8f54298219705b49bd69, type: 2}
+  m_Controller: {fileID: 9100000, guid: 2aa268a747054264dbcaf2e1231ed435, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1783,6 +1784,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1408528533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408528517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7078591d9c131b643a3f23dbafdf86fa, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationDriver2D
+  animator: {fileID: 1408528532}
+  stateMachine: {fileID: 1408528524}
+  damageReceiver: {fileID: 1408528525}
+  parrySuccessPoseDuration: 0.16
 --- !u!1 &1464564059
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,4099 @@
+fileFormatVersion: 2
+guid: f75b6e5416ca8694bbc58345e439a004
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4639830303036779479
+    second: PlayerPrototype_Motions_0
+  - first:
+      213: 5065037532947068153
+    second: PlayerPrototype_Motions_1
+  - first:
+      213: 1751491920687003288
+    second: PlayerPrototype_Motions_2
+  - first:
+      213: -4753231574093327013
+    second: PlayerPrototype_Motions_3
+  - first:
+      213: -2178948415779680619
+    second: PlayerPrototype_Motions_4
+  - first:
+      213: -1091842563854818308
+    second: PlayerPrototype_Motions_5
+  - first:
+      213: 4508571613057851790
+    second: PlayerPrototype_Motions_6
+  - first:
+      213: 2704929136319213341
+    second: PlayerPrototype_Motions_7
+  - first:
+      213: -5534087860310460222
+    second: PlayerPrototype_Motions_8
+  - first:
+      213: -5726513496881551489
+    second: PlayerPrototype_Motions_9
+  - first:
+      213: -1627562225007257228
+    second: PlayerPrototype_Motions_10
+  - first:
+      213: -3970137043610766984
+    second: PlayerPrototype_Motions_11
+  - first:
+      213: 4985016716033986559
+    second: PlayerPrototype_Motions_12
+  - first:
+      213: -7287853295646078067
+    second: PlayerPrototype_Motions_13
+  - first:
+      213: 1487868410628442241
+    second: PlayerPrototype_Motions_14
+  - first:
+      213: 9079533133066779895
+    second: PlayerPrototype_Motions_15
+  - first:
+      213: -556171942148807772
+    second: PlayerPrototype_Motions_16
+  - first:
+      213: -594132694715158844
+    second: PlayerPrototype_Motions_17
+  - first:
+      213: -1695433377166053231
+    second: PlayerPrototype_Motions_18
+  - first:
+      213: 8157225350468955291
+    second: PlayerPrototype_Motions_19
+  - first:
+      213: -8700933840327986189
+    second: PlayerPrototype_Motions_20
+  - first:
+      213: -2974994937768065964
+    second: PlayerPrototype_Motions_21
+  - first:
+      213: -6657934559659636719
+    second: PlayerPrototype_Motions_22
+  - first:
+      213: 891007739400933692
+    second: PlayerPrototype_Motions_23
+  - first:
+      213: -1032532003581721647
+    second: PlayerPrototype_Motions_24
+  - first:
+      213: 7760011546836869194
+    second: PlayerPrototype_Motions_25
+  - first:
+      213: -7633866010716053076
+    second: PlayerPrototype_Motions_26
+  - first:
+      213: -7259474163800548153
+    second: PlayerPrototype_Motions_27
+  - first:
+      213: -32568823534769122
+    second: PlayerPrototype_Motions_28
+  - first:
+      213: -4533493649758818113
+    second: PlayerPrototype_Motions_29
+  - first:
+      213: 1665410233570436240
+    second: PlayerPrototype_Motions_30
+  - first:
+      213: -5939759377280054247
+    second: PlayerPrototype_Motions_31
+  - first:
+      213: 625608748032226580
+    second: PlayerPrototype_Motions_32
+  - first:
+      213: -8073263562564450500
+    second: PlayerPrototype_Motions_33
+  - first:
+      213: -1157022342026466215
+    second: PlayerPrototype_Motions_34
+  - first:
+      213: -7372214177414055725
+    second: PlayerPrototype_Motions_35
+  - first:
+      213: 4305310189042433169
+    second: PlayerPrototype_Motions_36
+  - first:
+      213: 5007153279643409305
+    second: PlayerPrototype_Motions_37
+  - first:
+      213: -7752561720207858650
+    second: PlayerPrototype_Motions_38
+  - first:
+      213: -1266613234418518012
+    second: PlayerPrototype_Motions_39
+  - first:
+      213: 5858873029438349610
+    second: PlayerPrototype_Motions_40
+  - first:
+      213: 6951483057146882449
+    second: PlayerPrototype_Motions_41
+  - first:
+      213: -6020236558852780119
+    second: PlayerPrototype_Motions_42
+  - first:
+      213: 3226484287998032200
+    second: PlayerPrototype_Motions_43
+  - first:
+      213: -764864664675430879
+    second: PlayerPrototype_Motions_44
+  - first:
+      213: -8853784134648649083
+    second: PlayerPrototype_Motions_45
+  - first:
+      213: 8376271743361915253
+    second: PlayerPrototype_Motions_46
+  - first:
+      213: -2744219888512153455
+    second: PlayerPrototype_Motions_47
+  - first:
+      213: 6892633801859074787
+    second: PlayerPrototype_Motions_48
+  - first:
+      213: -9096524841839883136
+    second: PlayerPrototype_Motions_49
+  - first:
+      213: 1508035467811920076
+    second: PlayerPrototype_Motions_50
+  - first:
+      213: 3633226458634145788
+    second: PlayerPrototype_Motions_51
+  - first:
+      213: 1707048737107264223
+    second: PlayerPrototype_Motions_52
+  - first:
+      213: -7186466507705901729
+    second: PlayerPrototype_Motions_53
+  - first:
+      213: -1903246986523042322
+    second: PlayerPrototype_Motions_54
+  - first:
+      213: 4192719273804128850
+    second: PlayerPrototype_Motions_55
+  - first:
+      213: 2477660528556804119
+    second: PlayerPrototype_Motions_56
+  - first:
+      213: 7647730776532740310
+    second: PlayerPrototype_Motions_57
+  - first:
+      213: 2488614316785072358
+    second: PlayerPrototype_Motions_58
+  - first:
+      213: -3371474026775893040
+    second: PlayerPrototype_Motions_59
+  - first:
+      213: -3659861397186801769
+    second: PlayerPrototype_Motions_60
+  - first:
+      213: 6626920882918661754
+    second: PlayerPrototype_Motions_61
+  - first:
+      213: -6162526128166281175
+    second: PlayerPrototype_Motions_62
+  - first:
+      213: 7819478519870884486
+    second: PlayerPrototype_Motions_63
+  - first:
+      213: 6226584315736964636
+    second: PlayerPrototype_Motions_64
+  - first:
+      213: 5189576356314062819
+    second: PlayerPrototype_Motions_65
+  - first:
+      213: -182609380464669420
+    second: PlayerPrototype_Motions_66
+  - first:
+      213: 390086183953892240
+    second: PlayerPrototype_Motions_67
+  - first:
+      213: -9179648300540375466
+    second: PlayerPrototype_Motions_68
+  - first:
+      213: 852432989667328528
+    second: PlayerPrototype_Motions_69
+  - first:
+      213: 6639453720931547652
+    second: PlayerPrototype_Motions_70
+  - first:
+      213: 708285401622709707
+    second: PlayerPrototype_Motions_71
+  - first:
+      213: -2616432341643978049
+    second: PlayerPrototype_Motions_72
+  - first:
+      213: 2138260559656667031
+    second: PlayerPrototype_Motions_73
+  - first:
+      213: -5999251251612193858
+    second: PlayerPrototype_Motions_74
+  - first:
+      213: -8344587297851329849
+    second: PlayerPrototype_Motions_75
+  - first:
+      213: 3075756055793331832
+    second: PlayerPrototype_Motions_76
+  - first:
+      213: -640287172757948523
+    second: PlayerPrototype_Motions_77
+  - first:
+      213: 7281960898022862123
+    second: PlayerPrototype_Motions_78
+  - first:
+      213: -1624416451216611751
+    second: PlayerPrototype_Motions_79
+  - first:
+      213: -3244703979680813078
+    second: PlayerPrototype_Motions_80
+  - first:
+      213: 4067994152258402245
+    second: PlayerPrototype_Motions_81
+  - first:
+      213: 5251884607812432936
+    second: PlayerPrototype_Motions_82
+  - first:
+      213: -4853967723530850692
+    second: PlayerPrototype_Motions_83
+  - first:
+      213: 349357354692779656
+    second: PlayerPrototype_Motions_84
+  - first:
+      213: -4215899402249480547
+    second: PlayerPrototype_Motions_85
+  - first:
+      213: -8551627584846469426
+    second: PlayerPrototype_Motions_86
+  - first:
+      213: 942337660853735318
+    second: PlayerPrototype_Motions_87
+  - first:
+      213: -3164268964522844723
+    second: PlayerPrototype_Motions_88
+  - first:
+      213: 3526580813472689904
+    second: PlayerPrototype_Motions_89
+  - first:
+      213: -6331025194513950859
+    second: PlayerPrototype_Motions_90
+  - first:
+      213: -987126198985586814
+    second: PlayerPrototype_Motions_91
+  - first:
+      213: -8791301210908793119
+    second: PlayerPrototype_Motions_92
+  - first:
+      213: 5641997054175338517
+    second: PlayerPrototype_Motions_93
+  - first:
+      213: -5307903483578567343
+    second: PlayerPrototype_Motions_94
+  - first:
+      213: 4565581474855621672
+    second: PlayerPrototype_Motions_95
+  - first:
+      213: -5599239739175831117
+    second: PlayerPrototype_Motions_96
+  - first:
+      213: 6191169022392540651
+    second: PlayerPrototype_Motions_97
+  - first:
+      213: -912912329172236571
+    second: PlayerPrototype_Motions_98
+  - first:
+      213: 1364883505986134295
+    second: PlayerPrototype_Motions_99
+  - first:
+      213: 2647306431971675503
+    second: PlayerPrototype_Motions_100
+  - first:
+      213: -7366359047445345607
+    second: PlayerPrototype_Motions_101
+  - first:
+      213: 5453662536651708698
+    second: PlayerPrototype_Motions_102
+  - first:
+      213: 2875672471329112862
+    second: PlayerPrototype_Motions_103
+  - first:
+      213: -9036828293783083373
+    second: PlayerPrototype_Motions_104
+  - first:
+      213: 2369986314103339162
+    second: PlayerPrototype_Motions_105
+  - first:
+      213: 5810888051519654115
+    second: PlayerPrototype_Motions_106
+  - first:
+      213: 4084153925486706991
+    second: PlayerPrototype_Motions_107
+  - first:
+      213: -4366269548258028460
+    second: PlayerPrototype_Motions_108
+  - first:
+      213: -8025173089876085392
+    second: PlayerPrototype_Motions_109
+  - first:
+      213: 7094349023399674307
+    second: PlayerPrototype_Motions_110
+  - first:
+      213: -4727025067193100018
+    second: PlayerPrototype_Motions_111
+  - first:
+      213: 2079984859375436556
+    second: PlayerPrototype_Motions_112
+  - first:
+      213: -6135116150919211520
+    second: PlayerPrototype_Motions_113
+  - first:
+      213: 5746382693671246361
+    second: PlayerPrototype_Motions_114
+  - first:
+      213: 5790700285347192533
+    second: PlayerPrototype_Motions_115
+  - first:
+      213: -2084753424729464244
+    second: PlayerPrototype_Motions_116
+  - first:
+      213: -700286705010361262
+    second: PlayerPrototype_Motions_117
+  - first:
+      213: 689507474126908021
+    second: PlayerPrototype_Motions_118
+  - first:
+      213: -6540505272950821248
+    second: PlayerPrototype_Motions_119
+  - first:
+      213: -2121525738266122761
+    second: PlayerPrototype_Motions_120
+  - first:
+      213: -3410478820709703505
+    second: PlayerPrototype_Motions_121
+  - first:
+      213: 1842130031098993281
+    second: PlayerPrototype_Motions_122
+  - first:
+      213: 4407886722385931716
+    second: PlayerPrototype_Motions_123
+  - first:
+      213: -305562824619451437
+    second: PlayerPrototype_Motions_124
+  - first:
+      213: -8063661408393476713
+    second: PlayerPrototype_Motions_125
+  - first:
+      213: 7196311111844283942
+    second: PlayerPrototype_Motions_126
+  - first:
+      213: 3028339993649710616
+    second: PlayerPrototype_Motions_127
+  - first:
+      213: 6539493088716291975
+    second: PlayerPrototype_Motions_128
+  - first:
+      213: -3271493226693074378
+    second: PlayerPrototype_Motions_129
+  - first:
+      213: 431935157301803236
+    second: PlayerPrototype_Motions_130
+  - first:
+      213: -2173037632872448561
+    second: PlayerPrototype_Motions_131
+  - first:
+      213: -3811450861963542790
+    second: PlayerPrototype_Motions_132
+  - first:
+      213: 4675707639524829172
+    second: PlayerPrototype_Motions_133
+  - first:
+      213: -1464134664326110412
+    second: PlayerPrototype_Motions_134
+  - first:
+      213: 8593033211420564079
+    second: PlayerPrototype_Motions_135
+  - first:
+      213: 6291667074927163116
+    second: PlayerPrototype_Motions_136
+  - first:
+      213: 6441212215660909918
+    second: PlayerPrototype_Motions_137
+  - first:
+      213: -1302578527092449518
+    second: PlayerPrototype_Motions_138
+  - first:
+      213: -6980848583947832130
+    second: PlayerPrototype_Motions_139
+  - first:
+      213: -1987588073565040096
+    second: PlayerPrototype_Motions_140
+  - first:
+      213: 2579583422384813972
+    second: PlayerPrototype_Motions_141
+  - first:
+      213: 5335889166240796732
+    second: PlayerPrototype_Motions_142
+  - first:
+      213: -3064414918244777075
+    second: PlayerPrototype_Motions_143
+  - first:
+      213: 2122238835247773060
+    second: PlayerPrototype_Motions_144
+  - first:
+      213: 9039480375499835163
+    second: PlayerPrototype_Motions_145
+  - first:
+      213: 4144381142483084438
+    second: PlayerPrototype_Motions_146
+  - first:
+      213: -3552084613068114041
+    second: PlayerPrototype_Motions_147
+  - first:
+      213: 219203436096163978
+    second: PlayerPrototype_Motions_148
+  - first:
+      213: 5024482439459766573
+    second: PlayerPrototype_Motions_149
+  - first:
+      213: 7812145640571589532
+    second: PlayerPrototype_Motions_150
+  - first:
+      213: 2152721692850867661
+    second: PlayerPrototype_Motions_151
+  - first:
+      213: -7248794176599938669
+    second: PlayerPrototype_Motions_152
+  - first:
+      213: 4386381124033387385
+    second: PlayerPrototype_Motions_153
+  - first:
+      213: 1188432073647112334
+    second: PlayerPrototype_Motions_154
+  - first:
+      213: 8103474217919912089
+    second: PlayerPrototype_Motions_155
+  - first:
+      213: -6318045599359678764
+    second: PlayerPrototype_Motions_156
+  - first:
+      213: -8791180298944512988
+    second: PlayerPrototype_Motions_157
+  - first:
+      213: -315280487627679376
+    second: PlayerPrototype_Motions_158
+  - first:
+      213: -1082046988490542736
+    second: PlayerPrototype_Motions_159
+  - first:
+      213: -7816169300823871479
+    second: PlayerPrototype_Motions_160
+  - first:
+      213: 2490639755788833033
+    second: PlayerPrototype_Motions_161
+  - first:
+      213: 3006322420880188083
+    second: PlayerPrototype_Motions_162
+  - first:
+      213: 7185850830565800691
+    second: PlayerPrototype_Motions_163
+  - first:
+      213: -1734789865246572498
+    second: PlayerPrototype_Motions_164
+  - first:
+      213: -3771939351781179539
+    second: PlayerPrototype_Motions_165
+  - first:
+      213: 2623734657920303872
+    second: PlayerPrototype_Motions_166
+  - first:
+      213: 892742400625023391
+    second: PlayerPrototype_Motions_167
+  - first:
+      213: 8793456135972453070
+    second: PlayerPrototype_Motions_168
+  - first:
+      213: 1571383739362096550
+    second: PlayerPrototype_Motions_169
+  - first:
+      213: -2388856103929163974
+    second: PlayerPrototype_Motions_170
+  - first:
+      213: -6690114074118075393
+    second: PlayerPrototype_Motions_171
+  - first:
+      213: 375414837535920554
+    second: PlayerPrototype_Motions_172
+  - first:
+      213: 2396447281289384324
+    second: PlayerPrototype_Motions_173
+  - first:
+      213: 5432904180256995268
+    second: PlayerPrototype_Motions_174
+  - first:
+      213: 402604612365741442
+    second: PlayerPrototype_Motions_175
+  - first:
+      213: 9027327593434075235
+    second: PlayerPrototype_Motions_176
+  - first:
+      213: 6852614064729917255
+    second: PlayerPrototype_Motions_177
+  - first:
+      213: -6924098989456536261
+    second: PlayerPrototype_Motions_178
+  - first:
+      213: -3595488435691907496
+    second: PlayerPrototype_Motions_179
+  - first:
+      213: 2002434954106686829
+    second: PlayerPrototype_Motions_180
+  - first:
+      213: -449811220338300121
+    second: PlayerPrototype_Motions_181
+  - first:
+      213: -1794885881214727010
+    second: PlayerPrototype_Motions_182
+  - first:
+      213: -3785850878272970911
+    second: PlayerPrototype_Motions_183
+  - first:
+      213: -219512024710278879
+    second: PlayerPrototype_Motions_184
+  - first:
+      213: 5904383106077974037
+    second: PlayerPrototype_Motions_185
+  - first:
+      213: -5447138889127312037
+    second: PlayerPrototype_Motions_186
+  - first:
+      213: -2743257765112874729
+    second: PlayerPrototype_Motions_187
+  - first:
+      213: -1452564836160084218
+    second: PlayerPrototype_Motions_188
+  - first:
+      213: -5228765404654206406
+    second: PlayerPrototype_Motions_189
+  - first:
+      213: 5554239503562634096
+    second: PlayerPrototype_Motions_190
+  - first:
+      213: 7575201269166334845
+    second: PlayerPrototype_Motions_191
+  - first:
+      213: -8851956287514316304
+    second: PlayerPrototype_Motions_192
+  - first:
+      213: 3061628043031200945
+    second: PlayerPrototype_Motions_193
+  - first:
+      213: 6828375976679707059
+    second: PlayerPrototype_Motions_194
+  - first:
+      213: -5635309993744264180
+    second: PlayerPrototype_Motions_195
+  - first:
+      213: 7765258532962966880
+    second: PlayerPrototype_Motions_196
+  - first:
+      213: 2530305327722927222
+    second: PlayerPrototype_Motions_197
+  - first:
+      213: -8978977968037550237
+    second: PlayerPrototype_Motions_198
+  - first:
+      213: 1471624632143954247
+    second: PlayerPrototype_Motions_199
+  - first:
+      213: 8124163614276998316
+    second: PlayerPrototype_Motions_200
+  - first:
+      213: -5685478070131031200
+    second: PlayerPrototype_Motions_201
+  - first:
+      213: 236082285761012471
+    second: PlayerPrototype_Motions_202
+  - first:
+      213: 2684970575809274582
+    second: PlayerPrototype_Motions_203
+  - first:
+      213: 6953159135150867836
+    second: PlayerPrototype_Motions_204
+  - first:
+      213: -3287587646169529578
+    second: PlayerPrototype_Motions_205
+  - first:
+      213: 7211712320971302279
+    second: PlayerPrototype_Motions_206
+  - first:
+      213: 444611729705969304
+    second: PlayerPrototype_Motions_207
+  - first:
+      213: -8733190969634819899
+    second: PlayerPrototype_Motions_208
+  - first:
+      213: -3137441991654159807
+    second: PlayerPrototype_Motions_209
+  - first:
+      213: 1607664948761027919
+    second: PlayerPrototype_Motions_210
+  - first:
+      213: 653768274066751559
+    second: PlayerPrototype_Motions_211
+  - first:
+      213: -8601663629161460151
+    second: PlayerPrototype_Motions_212
+  - first:
+      213: -7014030662331217981
+    second: PlayerPrototype_Motions_213
+  - first:
+      213: 6433388657016700755
+    second: PlayerPrototype_Motions_214
+  - first:
+      213: -9012545994125442095
+    second: PlayerPrototype_Motions_215
+  - first:
+      213: -2486187698733946338
+    second: PlayerPrototype_Motions_216
+  - first:
+      213: 3169561185830878070
+    second: PlayerPrototype_Motions_217
+  - first:
+      213: -6139833256489123359
+    second: PlayerPrototype_Motions_218
+  - first:
+      213: -8246507642655356606
+    second: PlayerPrototype_Motions_219
+  - first:
+      213: 7495760872423063495
+    second: PlayerPrototype_Motions_220
+  - first:
+      213: 1733713187998494303
+    second: PlayerPrototype_Motions_221
+  - first:
+      213: -7187444612016301261
+    second: PlayerPrototype_Motions_222
+  - first:
+      213: 6134027214405606344
+    second: PlayerPrototype_Motions_223
+  - first:
+      213: -9024752678402452800
+    second: PlayerPrototype_Motions_224
+  - first:
+      213: -8537947678430258698
+    second: PlayerPrototype_Motions_225
+  - first:
+      213: 7330507836150861643
+    second: PlayerPrototype_Motions_226
+  - first:
+      213: -1271692460721851979
+    second: PlayerPrototype_Motions_227
+  - first:
+      213: 283694165335885770
+    second: PlayerPrototype_Motions_228
+  - first:
+      213: -5129731847465637009
+    second: PlayerPrototype_Motions_229
+  - first:
+      213: -272102649907514116
+    second: PlayerPrototype_Motions_230
+  - first:
+      213: 8572051240137058760
+    second: PlayerPrototype_Motions_231
+  - first:
+      213: 6396624873999374667
+    second: PlayerPrototype_Motions_232
+  - first:
+      213: 4052858363481229846
+    second: PlayerPrototype_Motions_233
+  - first:
+      213: 224130790011146465
+    second: PlayerPrototype_Motions_234
+  - first:
+      213: -6648446360918664295
+    second: PlayerPrototype_Motions_235
+  - first:
+      213: 6123738726572854743
+    second: PlayerPrototype_Motions_236
+  - first:
+      213: -693995907093075933
+    second: PlayerPrototype_Motions_237
+  - first:
+      213: 4753754486069331743
+    second: PlayerPrototype_Motions_238
+  - first:
+      213: 8603203460340511317
+    second: PlayerPrototype_Motions_239
+  - first:
+      213: 6393878337869184786
+    second: PlayerPrototype_Motions_240
+  - first:
+      213: 4463842364189034656
+    second: PlayerPrototype_Motions_241
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: PlayerProto_Idle_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1472
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 537a4de43a9008442aaa4ffad227f02f
+      internalID: -1194692603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Idle_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 1472
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c62e874696a04bc4b964b0c19dd740d0
+      internalID: 1007352155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Idle_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 1472
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 003d4b4c5f6695d448e27464e7f25f43
+      internalID: -2034279409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Idle_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 1472
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 93aa0845e294fbd4dbe4846e6687b2e7
+      internalID: -688848852
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Move_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1408
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f58e34f2d606e814e8d00ed82347616f
+      internalID: 66640570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Move_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 1408
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7432c251f709ba74fa3cb9595c1cddc5
+      internalID: 1075713338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Move_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 1408
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d9bbf6a4f63763409a4237423aca4f1
+      internalID: -2124992875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Move_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 1408
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7fe1019e5baefcb418106edffbe9e1b7
+      internalID: -577176892
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Move_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 1408
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4b22c1b308c7cd4e82db9075b7a5755
+      internalID: 1588531785
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Move_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 1408
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d20f3ee3cab10c34fa26d686b6907664
+      internalID: -579851043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Jump_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1344
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60d67350911d5ae428871f8bf461e1c8
+      internalID: -590895718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Jump_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 1344
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 262dec4793cb1c74aab08977557ac346
+      internalID: 2041642684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Jump_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 1344
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c3123e19d5863c149983843bcea2e266
+      internalID: -297917480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Jump_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 1344
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85abb8eb99ff9fd4eb27d5743fda0786
+      internalID: -1846669756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Fall_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1280
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb9ce8712b73aac4f9bfabca4b4f7d39
+      internalID: 1592607313
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Fall_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 1280
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89d60b410495fab448f5867febe284fc
+      internalID: 1239934930
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Fall_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 1280
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 86d2ac2cc8b08594a8c51b02d36e6291
+      internalID: -1007786661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_DropThrough_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1216
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 77d7b482f7197964698f0bafb4e5c563
+      internalID: -538816767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_DropThrough_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 1216
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 397986d5dc1faae449ac6b355cc78061
+      internalID: 1279234283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_DropThrough_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 1216
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3dbac556228a71848923a35a43ec0845
+      internalID: -189423679
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_DropThrough_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 1216
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c2a91df91af6a2e4eb7728d3ff7fbbfa
+      internalID: 2092965988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Dash_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1152
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b62595456b0ff564e80a1f1d08064396
+      internalID: -1760546801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Dash_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 1152
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92ccbe1e65b931743a109180061dbdf8
+      internalID: 1716634516
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Dash_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 1152
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43ec0e0821b2e3d46bc16ce957605170
+      internalID: -438500451
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Dash_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 1152
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a241bc43a6904b4cb39256fc5aa2f20
+      internalID: 1758561795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Dash_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 1152
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b67c881f8f5e52f49bca771807b84e86
+      internalID: 344139930
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_1_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1088
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5725e5b3ae6fc845a096d29b9231bb2
+      internalID: 912128272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_1_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 1088
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f784d6c36a7b5e140b5a635431cb840b
+      internalID: 294079870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_1_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 1088
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85b84f75d1fbf2344a70074689333824
+      internalID: -1286505127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_1_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 1088
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: de1e10e45cf5f9e448834e966c1ab0ea
+      internalID: 1651178942
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_1_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 1088
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f686409b18feb994b83cef22dd09cae9
+      internalID: -1413396576
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_1_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 1088
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cbf6587adab8cb54b8630d82a94e2c1f
+      internalID: -1336358924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_1_06
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 1088
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 342ff49564d7c5c4781a99e8e8a198a4
+      internalID: -1785872468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_1_07
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 1088
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ce9d50fbbb3f7814ab6b7fb51deaaadc
+      internalID: 255052924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_2_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1024
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f3342c1091081c5498fcea4a83a77318
+      internalID: 1438439575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_2_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 1024
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f2c9122705616a847978a1b8d5281190
+      internalID: -679597475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_2_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 1024
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b1336a5a86b247f458ec2e3f0524e696
+      internalID: -1732759898
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_2_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 1024
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c652f8063183afa42a63881b952af508
+      internalID: -1991751596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_2_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 1024
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c5cf607fe4c23d642a91d16565a15cf6
+      internalID: 982406574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_2_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 1024
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b48ed0bfd3f539408042fa464ffbc99
+      internalID: -845554059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_2_06
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 1024
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1973d570a1ed4f24d855aaa419725919
+      internalID: 1843328399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_2_07
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 1024
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 18cdc4c4d1f0d4540b636061bd5e62f9
+      internalID: -1675303877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_3_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 960
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d05e6039165ac3848afd0440dc520ace
+      internalID: -702757427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_3_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 960
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bb12d822ac70be34ab4e063dc4b0329e
+      internalID: 507401667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_3_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 960
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a075087f90f63246a93f752ba3fd868
+      internalID: 1246698356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_3_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 960
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: df037334d1f4a7f46ab5e6af4bc0611d
+      internalID: 314401822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_3_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 960
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e32e725f11a5a164dacb5108673689ec
+      internalID: -1394320680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_3_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 960
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 626eb33a8a9cdd641828143f9ae0dcd6
+      internalID: 44890346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_3_06
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 960
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 35c5f04ae3af0d643bfea930997bfb6e
+      internalID: 467852183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_3_07
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 960
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1bd5b5671c8ac24b8abde650c5f6669
+      internalID: 14304441
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_4_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 896
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 86f4d07593659d342acb440ec62463a6
+      internalID: 2090743295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_4_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 896
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5bc5836605bdb244fbab886a0c203d37
+      internalID: 56152810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_4_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 896
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b1583402b00298a4195cf6287a287ad2
+      internalID: -1992096650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_4_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 896
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9d1b2766a544b3d4c95421055af7d976
+      internalID: 321418790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_4_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 896
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0940c68b5bcbc0b429d6e4f706a683c7
+      internalID: -1313132809
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_4_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 896
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cc06432cfa2fc8f40b36a05b18357639
+      internalID: 1619360570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_4_06
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 896
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc634054b3ff83c439dfe94ef767a36b
+      internalID: 775582068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_4_07
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 896
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4426e6ae35700904a98e79326c2675fc
+      internalID: -1398024661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_4_08
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 896
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 938b76170cb0e524eb490579c8025ebb
+      internalID: -417212961
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_4_09
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 896
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e60040d9160cf784f8cd4f13d91488fd
+      internalID: -371776471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Attack_4_10
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 896
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bd09c730a6dfb4d43857eaaa2dfa8ef7
+      internalID: -178652392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Parry_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 832
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 139754e63c1e72d4fbea96461c6edb50
+      internalID: -1521253756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Parry_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 832
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e624e8858a23ff4f9a2668bf8fb7144
+      internalID: 2105492991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Parry_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 832
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d48aa771512350428bf16339034345f
+      internalID: 627776181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Parry_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 832
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e61b38daadda81439d2d306873f4d7e
+      internalID: 1862055312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Parry_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 832
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a95bcf3def315b842b502b9c2ac17c62
+      internalID: -2105843308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParrySuccess_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 768
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19d23297c93de2a47a1011a3d8564a53
+      internalID: 1918872303
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParrySuccess_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 768
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: de34bdcea75535f47b213f6c8bf25c78
+      internalID: -29912488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParrySuccess_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 768
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b059693777da1fa4e9a229c447afb28b
+      internalID: 381436090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParrySuccess_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 768
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 45e7678a26e334b45a7cc114fd2d8d23
+      internalID: 450139536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParryFail_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 704
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d7b1f2de377595a41b5cf21bf342b736
+      internalID: 214412360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParryFail_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 704
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 45cfc3a6dd96bbe49888af7880096c46
+      internalID: 1682508884
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParryFail_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 704
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a12bea1844580940bbbeb16c12dfbc0
+      internalID: -519860889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParryFail_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 704
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7a438a7a7c3bab4f9a70465e493b448
+      internalID: -814788692
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParryCounter_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 640
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c06423ef970d3c742981864aaaf6cc2f
+      internalID: -835302595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParryCounter_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 640
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1293e301cb08b244abab796dd1d383eb
+      internalID: -1394350938
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParryCounter_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 640
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27e58d8e08f8af24584ca94bcd5eff7d
+      internalID: 2130100423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParryCounter_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 640
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c490481df7ab4a84997ace441801e433
+      internalID: 1760710727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParryCounter_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 640
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a2e118ec276d374d9637f1afdad7d66
+      internalID: 310915221
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParryCounter_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 640
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e1ca160280bb909469f69442c1c2f239
+      internalID: -1505543620
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ParryCounter_06
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 640
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 29022b36ad638e841b0aa008623fcbf1
+      internalID: 1400839147
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Special_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 576
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 50b15f6e6711e2747a46a44d9d0c2337
+      internalID: 516932005
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Special_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 576
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4fc44d2f6a35dbe4aa9ae1582319249a
+      internalID: -154095486
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Special_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 576
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e37d724a601b01468f6c3a412715eaf
+      internalID: -1821280616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Special_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 576
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65932bd61fc47dd4d869f54b0cdb7d45
+      internalID: -1128374826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Special_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 576
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f12f952909a4bfb40991b1467166533e
+      internalID: 2138813404
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Special_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 576
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b88a8992f7e5ec2429011f3adc1eadd2
+      internalID: 1452325367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Special_06
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 576
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5eaa88cf025bf1942989e790caf32c40
+      internalID: -1965475137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Special_07
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 576
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 69a8f4656506adb44b21f49102af0ca3
+      internalID: 1954539980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Special_08
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 576
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a92d874f03f8e00408d3e97fed513c11
+      internalID: -264097172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Hit_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 512
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca14a757f8b45f94085a8ad52ae86b40
+      internalID: 618626697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Hit_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 512
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f04d8bf51164b94883ac08e5f5b5ecd
+      internalID: -773071649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Hit_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 512
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 46139c687c175d546b344afff5b2998f
+      internalID: -1245335470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Heal_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 448
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee945b31b9b1a3942a2685ff7c530e61
+      internalID: -586490936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Heal_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 448
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 395bcbd8cae36944b8a2016735e0d624
+      internalID: -333010729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Heal_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 448
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d58cddf2aebc9b64ca2fdcf394d0f807
+      internalID: -1369743082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Heal_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 448
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 23724029a5a555342a6940cc0515f644
+      internalID: -1728745766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Heal_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 448
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a0dabb8578f84045b56f2d855338ad1
+      internalID: -14300607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Heal_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 448
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa2a988afe0d4f94088e9b5207853f63
+      internalID: 1500556581
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Death_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 384
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9fc52a8db5ecbf4d9e271d764d2db9c
+      internalID: 2096646470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Death_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 384
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ec868b7495eb8549b6580a31151dc5c
+      internalID: 1630512757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Death_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 384
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f9a86bb51f9a0c449ea6858364560c3
+      internalID: 527320713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Death_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 384
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5756517a79b8304b8812fdd803d0b66
+      internalID: 1027506036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Death_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 384
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d8d786fbb9e23214994cdfcd53b69959
+      internalID: 2028821570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Death_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 384
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a49880120fc276408a2130c15eb2fe2
+      internalID: -556673333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Death_06
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 384
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: acb9491c3e799b342b5d3f879ff2f090
+      internalID: 1607183082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Death_07
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 384
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3c822d0519f35c44fbf1aedf9a3d681f
+      internalID: 1473374180
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Respawn_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 320
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 32f5bf0386452554e874db91ae845560
+      internalID: 2090500067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Respawn_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 320
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53ae81ef895df654a8614582b13c8d43
+      internalID: 909497480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Respawn_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 320
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 75ffcd15540fe834a93028fd010db23b
+      internalID: 464245452
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Respawn_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 320
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42370e98acb2c694883087d566a9c927
+      internalID: 688139216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Respawn_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 320
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2434485337aeef64c8379e16482ccaa2
+      internalID: -380004031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Respawn_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 320
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba8c488578306494db17e04b7e3388b8
+      internalID: -782698794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Rest_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cbed8bf1a5bf31748b9338d31da9fee6
+      internalID: -30400257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Rest_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 256
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd862c97ccd1ab748a4b4c6dd5e50717
+      internalID: 59692962
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Rest_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 256
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 824a32a50d5da7a4a9ac684bc64c45c0
+      internalID: -1811572074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Rest_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 256
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c83144a43eddd724387256a57c13a6d7
+      internalID: 1864030967
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Rest_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 256
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a1d60f65a8549f340baaf3e2c228d973
+      internalID: -439114364
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_Rest_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 256
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0d8d41d9b6dc59d4aa90aee928739fc7
+      internalID: -1349510253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ComboBranch_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bfddebd9a3089964fb52a8d2242e82a0
+      internalID: 669665572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ComboBranch_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 192
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cc944cf4e2b1711458e56810a5a35234
+      internalID: 1890544857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ComboBranch_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 192
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f9f6f7c4c2a60384e983fd3dff1d5ce0
+      internalID: 224327350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ComboBranch_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 192
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8b46ae4719f07bf43ae1ef2255a3e258
+      internalID: 1058943819
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ComboBranch_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 192
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3f320d6ab3e80b449da77e93d025f50
+      internalID: 698346306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ComboBranch_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 192
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cef3c40137f0caf4db4add5df09a4d29
+      internalID: 46169705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_ComboBranch_06
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 192
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3be825cf167e14d4980ce672713fe7c0
+      internalID: 949573404
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_AirRecovery_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 128
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 161141e2ffae1b748ab9fa546778a251
+      internalID: 1888862124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_AirRecovery_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 128
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a80c07e41f826c64b86ee42e62117106
+      internalID: -1484507254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_AirRecovery_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 128
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8eec4c817d8548b4797ab5a5e0607e93
+      internalID: 2022354106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_AirRecovery_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 128
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e78e11d8d7dae4d448098694637536cb
+      internalID: 23641897
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_AirDashSlash_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 64
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ecfc0d6d6aa0260408587312af451250
+      internalID: -541692118
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_AirDashSlash_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 64
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: beb1b5ac5da090944a62a82bd609a0a3
+      internalID: -767522125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_AirDashSlash_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 64
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad2ce5805c9db4741a4687aac56d727f
+      internalID: 160636190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_AirDashSlash_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 64
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cedf22b79f97d0d41b4fb70e62a4437e
+      internalID: -1059755626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_AirDashSlash_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 64
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b5e6a472e8032a479737fca2b5d9cb5
+      internalID: -779512499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_AirDashSlash_05
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 64
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 648f8a653c8ba794fa7993a91acd6fb1
+      internalID: 246836143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_LandingShock_00
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd54fce8b8898724183c3d7e18c772db
+      internalID: -1590864988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_LandingShock_01
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec187bf9c038b634587fdea7d60d6a19
+      internalID: 1174255270
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_LandingShock_02
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 88c0b0f0f4bf7d546ae6da6b33f64f40
+      internalID: -749599222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_LandingShock_03
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dbcdd59200e556d45be9b5a0a511f4b7
+      internalID: -923358742
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerProto_LandingShock_04
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 64
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5, y: 0.59375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a20536e146bb8204c8c4b83550cccac6
+      internalID: 122474783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 3febdab21369661499d4f11d2a8c336b
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      PlayerProto_AirDashSlash_00: -541692118
+      PlayerProto_AirDashSlash_01: -767522125
+      PlayerProto_AirDashSlash_02: 160636190
+      PlayerProto_AirDashSlash_03: -1059755626
+      PlayerProto_AirDashSlash_04: -779512499
+      PlayerProto_AirDashSlash_05: 246836143
+      PlayerProto_AirRecovery_00: 1888862124
+      PlayerProto_AirRecovery_01: -1484507254
+      PlayerProto_AirRecovery_02: 2022354106
+      PlayerProto_AirRecovery_03: 23641897
+      PlayerProto_Attack_1_00: 912128272
+      PlayerProto_Attack_1_01: 294079870
+      PlayerProto_Attack_1_02: -1286505127
+      PlayerProto_Attack_1_03: 1651178942
+      PlayerProto_Attack_1_04: -1413396576
+      PlayerProto_Attack_1_05: -1336358924
+      PlayerProto_Attack_1_06: -1785872468
+      PlayerProto_Attack_1_07: 255052924
+      PlayerProto_Attack_2_00: 1438439575
+      PlayerProto_Attack_2_01: -679597475
+      PlayerProto_Attack_2_02: -1732759898
+      PlayerProto_Attack_2_03: -1991751596
+      PlayerProto_Attack_2_04: 982406574
+      PlayerProto_Attack_2_05: -845554059
+      PlayerProto_Attack_2_06: 1843328399
+      PlayerProto_Attack_2_07: -1675303877
+      PlayerProto_Attack_3_00: -702757427
+      PlayerProto_Attack_3_01: 507401667
+      PlayerProto_Attack_3_02: 1246698356
+      PlayerProto_Attack_3_03: 314401822
+      PlayerProto_Attack_3_04: -1394320680
+      PlayerProto_Attack_3_05: 44890346
+      PlayerProto_Attack_3_06: 467852183
+      PlayerProto_Attack_3_07: 14304441
+      PlayerProto_Attack_4_00: 2090743295
+      PlayerProto_Attack_4_01: 56152810
+      PlayerProto_Attack_4_02: -1992096650
+      PlayerProto_Attack_4_03: 321418790
+      PlayerProto_Attack_4_04: -1313132809
+      PlayerProto_Attack_4_05: 1619360570
+      PlayerProto_Attack_4_06: 775582068
+      PlayerProto_Attack_4_07: -1398024661
+      PlayerProto_Attack_4_08: -417212961
+      PlayerProto_Attack_4_09: -371776471
+      PlayerProto_Attack_4_10: -178652392
+      PlayerProto_ComboBranch_00: 669665572
+      PlayerProto_ComboBranch_01: 1890544857
+      PlayerProto_ComboBranch_02: 224327350
+      PlayerProto_ComboBranch_03: 1058943819
+      PlayerProto_ComboBranch_04: 698346306
+      PlayerProto_ComboBranch_05: 46169705
+      PlayerProto_ComboBranch_06: 949573404
+      PlayerProto_Dash_00: -1760546801
+      PlayerProto_Dash_01: 1716634516
+      PlayerProto_Dash_02: -438500451
+      PlayerProto_Dash_03: 1758561795
+      PlayerProto_Dash_04: 344139930
+      PlayerProto_Death_00: 2096646470
+      PlayerProto_Death_01: 1630512757
+      PlayerProto_Death_02: 527320713
+      PlayerProto_Death_03: 1027506036
+      PlayerProto_Death_04: 2028821570
+      PlayerProto_Death_05: -556673333
+      PlayerProto_Death_06: 1607183082
+      PlayerProto_Death_07: 1473374180
+      PlayerProto_DropThrough_00: -538816767
+      PlayerProto_DropThrough_01: 1279234283
+      PlayerProto_DropThrough_02: -189423679
+      PlayerProto_DropThrough_03: 2092965988
+      PlayerProto_Fall_00: 1592607313
+      PlayerProto_Fall_01: 1239934930
+      PlayerProto_Fall_02: -1007786661
+      PlayerProto_Heal_00: -586490936
+      PlayerProto_Heal_01: -333010729
+      PlayerProto_Heal_02: -1369743082
+      PlayerProto_Heal_03: -1728745766
+      PlayerProto_Heal_04: -14300607
+      PlayerProto_Heal_05: 1500556581
+      PlayerProto_Hit_00: 618626697
+      PlayerProto_Hit_01: -773071649
+      PlayerProto_Hit_02: -1245335470
+      PlayerProto_Idle_00: -1194692603
+      PlayerProto_Idle_01: 1007352155
+      PlayerProto_Idle_02: -2034279409
+      PlayerProto_Idle_03: -688848852
+      PlayerProto_Jump_00: -590895718
+      PlayerProto_Jump_01: 2041642684
+      PlayerProto_Jump_02: -297917480
+      PlayerProto_Jump_03: -1846669756
+      PlayerProto_LandingShock_00: -1590864988
+      PlayerProto_LandingShock_01: 1174255270
+      PlayerProto_LandingShock_02: -749599222
+      PlayerProto_LandingShock_03: -923358742
+      PlayerProto_LandingShock_04: 122474783
+      PlayerProto_Move_00: 66640570
+      PlayerProto_Move_01: 1075713338
+      PlayerProto_Move_02: -2124992875
+      PlayerProto_Move_03: -577176892
+      PlayerProto_Move_04: 1588531785
+      PlayerProto_Move_05: -579851043
+      PlayerProto_ParryCounter_00: -835302595
+      PlayerProto_ParryCounter_01: -1394350938
+      PlayerProto_ParryCounter_02: 2130100423
+      PlayerProto_ParryCounter_03: 1760710727
+      PlayerProto_ParryCounter_04: 310915221
+      PlayerProto_ParryCounter_05: -1505543620
+      PlayerProto_ParryCounter_06: 1400839147
+      PlayerProto_ParryFail_00: 214412360
+      PlayerProto_ParryFail_01: 1682508884
+      PlayerProto_ParryFail_02: -519860889
+      PlayerProto_ParryFail_03: -814788692
+      PlayerProto_ParrySuccess_00: 1918872303
+      PlayerProto_ParrySuccess_01: -29912488
+      PlayerProto_ParrySuccess_02: 381436090
+      PlayerProto_ParrySuccess_03: 450139536
+      PlayerProto_Parry_00: -1521253756
+      PlayerProto_Parry_01: 2105492991
+      PlayerProto_Parry_02: 627776181
+      PlayerProto_Parry_03: 1862055312
+      PlayerProto_Parry_04: -2105843308
+      PlayerProto_Respawn_00: 2090500067
+      PlayerProto_Respawn_01: 909497480
+      PlayerProto_Respawn_02: 464245452
+      PlayerProto_Respawn_03: 688139216
+      PlayerProto_Respawn_04: -380004031
+      PlayerProto_Respawn_05: -782698794
+      PlayerProto_Rest_00: -30400257
+      PlayerProto_Rest_01: 59692962
+      PlayerProto_Rest_02: -1811572074
+      PlayerProto_Rest_03: 1864030967
+      PlayerProto_Rest_04: -439114364
+      PlayerProto_Rest_05: -1349510253
+      PlayerProto_Special_00: 516932005
+      PlayerProto_Special_01: -154095486
+      PlayerProto_Special_02: -1821280616
+      PlayerProto_Special_03: -1128374826
+      PlayerProto_Special_04: 2138813404
+      PlayerProto_Special_05: 1452325367
+      PlayerProto_Special_06: -1965475137
+      PlayerProto_Special_07: 1954539980
+      PlayerProto_Special_08: -264097172
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

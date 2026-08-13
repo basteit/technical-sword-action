@@ -15,3 +15,8 @@
 - `fix/*`: bug fix
 
 See `CONTRIBUTING.md` for full workflow.
+
+## Art Workflow
+
+主人公ドット絵のサイズ、足裏基準、Asepriteタグ、Unityへの追加・差し替え手順は
+[`Assets/Art/Player/Prototype/README.md`](Assets/Art/Player/Prototype/README.md) を参照してください。
