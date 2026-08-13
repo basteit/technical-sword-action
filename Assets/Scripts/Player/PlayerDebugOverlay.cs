@@ -46,7 +46,7 @@ public class PlayerDebugOverlay : MonoBehaviour
         string dashing = motor != null && motor.IsDashing ? "Yes" : "No";
         string cd = motor != null ? motor.DashCooldownRemaining.ToString("0.00") : "N/A";
         string attackState = attack != null
-            ? $"{(attack.IsAttacking ? "Active" : "Idle")} / Step {attack.ComboStep}/{attack.MaxComboStep} / Hit {(attack.HitAppliedForCurrentStep ? "Yes" : "No")}"
+            ? $"{(attack.IsAttacking ? "Active" : "Idle")} / Step {attack.ComboStep}/{attack.MaxComboStep} / Hit Event {(attack.HitAppliedForCurrentStep ? "Fired" : "Pending")}"
             : "N/A";
         string attackTiming = attack != null
             ? $"Window {(attack.IsComboWindowOpen ? "Open" : "Closed")} / Queued {(attack.HasQueuedAttack ? "Yes" : "No")} / Buffer {attack.InputBufferRemaining:0.000}s / Fallback {attack.StepTimeoutRemaining:0.000}s"
