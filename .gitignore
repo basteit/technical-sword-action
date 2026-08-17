@@ -75,3 +75,8 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
+
+# Local Codex and ULoop generated outputs
+/_codex_tmp/
+/.codex-tmp/
+/.uloop/outputs/

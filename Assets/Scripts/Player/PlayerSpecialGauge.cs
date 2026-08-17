@@ -26,6 +26,11 @@ public class PlayerSpecialGauge : MonoBehaviour
         AddGauge(gainOnAttackHit);
     }
 
+    public void AddOnAttackHit(float amount)
+    {
+        AddGauge(amount);
+    }
+
     public void AddOnDamaged()
     {
         AddGauge(gainOnDamaged);
