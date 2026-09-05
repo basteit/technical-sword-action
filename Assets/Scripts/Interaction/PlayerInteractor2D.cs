@@ -10,6 +10,7 @@ public sealed class PlayerInteractor2D : MonoBehaviour
 
     private readonly Dictionary<Collider2D, List<MonoBehaviour>> overlapSources = new();
     private readonly List<MonoBehaviour> candidates = new();
+    private readonly List<Collider2D> invalidSources = new();
     private IInteractable2D currentInteractable;
     private PlayerMotor2D motor;
     private PlayerAttack2D attack;
@@ -36,7 +37,6 @@ public sealed class PlayerInteractor2D : MonoBehaviour
         }
 
         UpdatePrompt();
-
     }
 
     public bool TryInteract()
@@ -56,6 +56,7 @@ public sealed class PlayerInteractor2D : MonoBehaviour
 
     public bool TryStartSelectedInteractionFromStateMachine(IInteractable2D selected)
     {
+        RemoveInvalidSources();
         if (!CanStartInteraction() || selected is not MonoBehaviour behaviour ||
             behaviour == null || !behaviour.isActiveAndEnabled ||
             !candidates.Contains(behaviour) || !selected.CanInteract(gameObject))
@@ -131,6 +132,7 @@ public sealed class PlayerInteractor2D : MonoBehaviour
 
     private void SelectCurrentInteractable()
     {
+        RemoveInvalidSources();
         currentInteractable = null;
         // Target selection is independent of ActionState. An unavailable Interact
         // must remain Interact when the shared B press is rejected by the state gate.
@@ -176,6 +178,17 @@ public sealed class PlayerInteractor2D : MonoBehaviour
         }
 
         promptView?.Show(currentInteractable.InteractionPrompt);
+    }
+
+    private void RemoveInvalidSources()
+    {
+        // A collider can disappear between input collection and the next physics callback.
+        invalidSources.Clear();
+        foreach (var pair in overlapSources)
+            if (pair.Key == null || !pair.Key.enabled || !pair.Key.gameObject.activeInHierarchy)
+                invalidSources.Add(pair.Key);
+        foreach (Collider2D source in invalidSources) overlapSources.Remove(source);
+        if (invalidSources.Count > 0) RebuildCandidates();
     }
 
     private void ResolvePlayerActions()
