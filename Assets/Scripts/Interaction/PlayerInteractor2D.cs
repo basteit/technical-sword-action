@@ -77,13 +77,26 @@ public sealed class PlayerInteractor2D : MonoBehaviour
 
     public bool TryStartInteractionFromStateMachine()
     {
-        if (!CanStartInteraction() || currentInteractable == null || !currentInteractable.CanInteract(gameObject))
+        return TryStartSelectedInteractionFromStateMachine(currentInteractable);
+    }
+
+    public bool TryStartSelectedInteractionFromStateMachine(IInteractable2D selected)
+    {
+        if (!CanStartInteraction() || selected is not MonoBehaviour behaviour ||
+            behaviour == null || !behaviour.isActiveAndEnabled ||
+            !candidates.Contains(behaviour) || !selected.CanInteract(gameObject))
         {
             return false;
         }
 
-        currentInteractable.Interact(gameObject);
+        selected.Interact(gameObject);
         return true;
+    }
+
+    public IInteractable2D SelectTargetForSharedInput()
+    {
+        SelectCurrentInteractable();
+        return currentInteractable;
     }
 
     public void CancelInteractionFromStateMachine()
@@ -146,7 +159,9 @@ public sealed class PlayerInteractor2D : MonoBehaviour
     private void SelectCurrentInteractable()
     {
         currentInteractable = null;
-        if (!CanStartInteraction())
+        // Target selection is independent of ActionState. An unavailable Interact
+        // must remain Interact when the shared B press is rejected by the state gate.
+        if (!isActiveAndEnabled)
         {
             return;
         }
@@ -163,7 +178,7 @@ public sealed class PlayerInteractor2D : MonoBehaviour
                 continue;
             }
 
-            if (!candidate.CanInteract(gameObject))
+            if (!behaviour.isActiveAndEnabled || !candidate.CanInteract(gameObject))
             {
                 continue;
             }
@@ -181,7 +196,7 @@ public sealed class PlayerInteractor2D : MonoBehaviour
 
     private void UpdatePrompt()
     {
-        if (currentInteractable == null)
+        if (currentInteractable == null || !CanStartInteraction())
         {
             promptView?.Hide();
             return;

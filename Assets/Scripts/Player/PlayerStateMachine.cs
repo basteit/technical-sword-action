@@ -63,6 +63,8 @@ public class PlayerStateMachine : MonoBehaviour
     private readonly List<Collider2D> collisionReleaseBuffer = new();
 
     private PlayerActionRequest pendingRequests;
+    private PlayerActionRequest pendingSharedRequest;
+    private IInteractable2D pendingSharedTarget;
     private bool interactionObservedGameplayBlock;
     private bool isResetting;
 
@@ -81,6 +83,8 @@ public class PlayerStateMachine : MonoBehaviour
     public int ActiveActionOwnerCount => ActionState == PlayerActionState.Neutral ? 0 : 1;
     public int ActiveCollisionIgnoreCount => ignoredCollisions.Count;
     public PlayerActionRequest PendingRequests => pendingRequests;
+    public PlayerActionRequest LastSharedInputResolution { get; private set; }
+    public int LastSharedInputTargetInstanceId { get; private set; }
 
     // Compatibility view for the existing prototype Animator/debug overlay.
     public PlayerState CurrentState => EvaluateLegacyState();
@@ -138,6 +142,16 @@ public class PlayerStateMachine : MonoBehaviour
         UpdateLocomotionState();
     }
 
+    private void OnEnable()
+    {
+        UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnActiveSceneChanged;
+    }
+
+    private void OnActiveSceneChanged(UnityEngine.SceneManagement.Scene previous, UnityEngine.SceneManagement.Scene next)
+    {
+        ResetToSafeState("ActiveSceneChanged", LifeState != PlayerLifeState.Dead);
+    }
+
     private void Update()
     {
         UpdateLocomotionState();
@@ -167,12 +181,26 @@ public class PlayerStateMachine : MonoBehaviour
         return RequestAction(PlayerActionRequest.Pause);
     }
 
+    public bool RequestSharedDashInteract()
+    {
+        if (!isActiveAndEnabled) return false;
+        if (pendingSharedRequest != PlayerActionRequest.None) return true;
+
+        pendingSharedTarget = interactor != null ? interactor.SelectTargetForSharedInput() : null;
+        pendingSharedRequest = PlayerActionResolver.ResolveSharedDashInteract(pendingSharedTarget != null);
+        LastSharedInputResolution = pendingSharedRequest;
+        LastSharedInputTargetInstanceId = pendingSharedTarget is MonoBehaviour target ? target.GetInstanceID() : 0;
+        return RequestAction(pendingSharedRequest);
+    }
+
     public void SetCombatSuspended(bool suspended)
     {
         CombatSuspended = suspended;
         if (suspended)
         {
             pendingRequests &= PlayerActionRequest.Pause;
+            pendingSharedRequest = PlayerActionRequest.None;
+            pendingSharedTarget = null;
         }
     }
 
@@ -208,7 +236,7 @@ public class PlayerStateMachine : MonoBehaviour
             return;
         }
 
-        TransitionTo(nextAction, reason, false);
+        TransitionTo(nextAction, reason, nextAction == PlayerActionState.ParryCounter);
     }
 
     public bool ForceHit(string reason)
@@ -228,6 +256,8 @@ public class PlayerStateMachine : MonoBehaviour
         }
 
         pendingRequests = PlayerActionRequest.None;
+        pendingSharedRequest = PlayerActionRequest.None;
+        pendingSharedTarget = null;
         return true;
     }
 
@@ -350,6 +380,8 @@ public class PlayerStateMachine : MonoBehaviour
 
         ReleaseAllCollisionIgnores();
         pendingRequests = PlayerActionRequest.None;
+        pendingSharedRequest = PlayerActionRequest.None;
+        pendingSharedTarget = null;
         CombatSuspended = false;
         interactionObservedGameplayBlock = false;
         PreviousActionState = interruptedAction;
@@ -368,7 +400,11 @@ public class PlayerStateMachine : MonoBehaviour
     private void ResolvePendingRequests()
     {
         PlayerActionRequest requests = pendingRequests;
+        bool useSharedTarget = pendingSharedRequest == PlayerActionRequest.Interact;
+        IInteractable2D sharedTarget = pendingSharedTarget;
         pendingRequests = PlayerActionRequest.None;
+        pendingSharedRequest = PlayerActionRequest.None;
+        pendingSharedTarget = null;
 
         if (requests == PlayerActionRequest.None)
         {
@@ -420,7 +456,7 @@ public class PlayerStateMachine : MonoBehaviour
             return;
         }
 
-        if (!TryExecute(decision))
+        if (!TryExecute(decision, useSharedTarget, sharedTarget))
         {
             LastAcceptedRequest = PlayerActionRequest.None;
             LastAcceptedPriority = -1;
@@ -467,7 +503,7 @@ public class PlayerStateMachine : MonoBehaviour
         return legal;
     }
 
-    private bool TryExecute(PlayerActionDecision decision)
+    private bool TryExecute(PlayerActionDecision decision, bool useSharedTarget, IInteractable2D sharedTarget)
     {
         PlayerActionRequest request = decision.SelectedRequest;
         PlayerActionState nextAction = decision.NextAction;
@@ -507,7 +543,11 @@ public class PlayerStateMachine : MonoBehaviour
                 return true;
 
             case PlayerActionRequest.Interact:
-                if (interactor == null || !interactor.TryStartInteractionFromStateMachine()) return false;
+                if (interactor == null) return false;
+                bool interactionStarted = useSharedTarget
+                    ? interactor.TryStartSelectedInteractionFromStateMachine(sharedTarget)
+                    : interactor.TryStartInteractionFromStateMachine();
+                if (!interactionStarted) return false;
                 TransitionTo(nextAction, "AcceptedInteract", true);
                 interactionObservedGameplayBlock = DialogueController.GameplayInputBlocked;
                 return true;
@@ -561,6 +601,7 @@ public class PlayerStateMachine : MonoBehaviour
             CancelActionExecutor(previous, false);
         }
 
+        ReleaseCollisionIgnores(previous);
         PreviousActionState = previous;
         ActionState = nextAction;
         LastTransitionReason = reason;
@@ -730,6 +771,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void OnDisable()
     {
+        UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= OnActiveSceneChanged;
         ResetToSafeState("ControllerDisabled", LifeState != PlayerLifeState.Dead);
     }
 

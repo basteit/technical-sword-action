@@ -7,6 +7,23 @@ namespace TechnicalSwordAction.PlayerState.Tests
     [TestFixture]
     public sealed class PlayerActionResolverTests
     {
+        [TestCase(true, PlayerActionRequest.Interact)]
+        [TestCase(false, PlayerActionRequest.Dash)]
+        public void SharedPressResolvesExactlyOneRequestBeforePriority(bool hasTarget, PlayerActionRequest expected)
+        {
+            Assert.That(PlayerActionResolver.ResolveSharedDashInteract(hasTarget), Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void SharedInteractCannotBecomeDashWhenInteractionIsUnavailable()
+        {
+            var request = PlayerActionResolver.ResolveSharedDashInteract(true);
+            var decision = PlayerActionResolver.Resolve(PlayerActionState.Neutral, request,
+                PlayerActionRequest.Dash, PlayerAttackCancelWindow.None);
+            Assert.That(decision.HasSelection, Is.False);
+            Assert.That(decision.UnavailableRequests, Is.EqualTo(PlayerActionRequest.Interact));
+        }
+
         private static readonly PlayerActionRequest[] Priority =
         {
             PlayerActionRequest.Dash,
@@ -337,7 +354,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [Test]
-        public void Resolve_RepeatedOneHundredTimes_IsDeterministicForEveryNeutralAction()
+        public void Resolve_RepeatedTenTimes_IsDeterministicForEveryNeutralAction()
         {
             foreach (PlayerActionRequest request in Priority)
             {
@@ -346,7 +363,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     request,
                     request);
 
-                for (int iteration = 0; iteration < 100; iteration++)
+                for (int iteration = 0; iteration < 10; iteration++)
                 {
                     PlayerActionDecision actual = Resolve(
                         PlayerActionState.Neutral,

@@ -71,7 +71,7 @@ public class PlayerDebugOverlay : MonoBehaviour
         string blockedIFrame = damageReceiver != null ? damageReceiver.BlockedByInvincible.ToString() : "N/A";
         string blockedDash = damageReceiver != null ? damageReceiver.BlockedByDash.ToString() : "N/A";
 
-        GUI.Label(new Rect(28, 56, 600, 30), $"State: {state}", labelStyle);
+        GUI.Label(new Rect(28, 56, 680, 30), $"State: {state} / Shared B: {stateMachine?.LastSharedInputResolution}", labelStyle);
         GUI.Label(new Rect(28, 90, 600, 30), $"Grounded: {grounded} / Dashing: {dashing}", labelStyle);
         GUI.Label(new Rect(28, 124, 660, 30), $"Attack: {attackState}", labelStyle);
         GUI.Label(new Rect(28, 158, 860, 30), $"Attack Timing: {attackTiming}", labelStyle);

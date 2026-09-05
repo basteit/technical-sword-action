@@ -6,6 +6,12 @@ namespace TechnicalSwordAction.PlayerState
     /// </summary>
     public static class PlayerActionResolver
     {
+        // Resolve the shared press before independent requests enter priority arbitration.
+        public static PlayerActionRequest ResolveSharedDashInteract(bool hasValidInteractionTarget)
+        {
+            return hasValidInteractionTarget ? PlayerActionRequest.Interact : PlayerActionRequest.Dash;
+        }
+
         private static readonly PlayerActionRequest[] Priority =
         {
             PlayerActionRequest.Dash,
