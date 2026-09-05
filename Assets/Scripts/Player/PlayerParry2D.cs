@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using TechnicalSwordAction.PlayerState;
 
 public enum ParryResult
 {
@@ -16,13 +17,15 @@ public class PlayerParry2D : MonoBehaviour
     [SerializeField] private float parryCooldown = 0.22f;
 
     [Header("Parry Fail")]
-    [SerializeField] private float failLockDuration = 0.3f;
+    [SerializeField, Min(0f)] private float failLockDuration = 0.3f;
+    [SerializeField, Min(0f)] private float successLockDuration = 0.16f;
 
     [Header("Parry Snap")]
     [SerializeField] private float parrySnapDistance = 1.9f;
 
     [Header("References")]
     [SerializeField] private PlayerSpecialSkill2D specialSkill;
+    [SerializeField] private PlayerStateMachine stateMachine;
 
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
@@ -30,13 +33,13 @@ public class PlayerParry2D : MonoBehaviour
     [SerializeField] private AudioClip justParryClip;
     [SerializeField] private AudioClip parryMissClip;
 
-    private bool parryPressed;
     private bool parryActive;
     private bool parryResolved;
     private float parryTimer;
     private float parryElapsed;
     private float cooldownTimer;
     private float failLockTimer;
+    private float successLockTimer;
     private int attemptCount;
     private int successCount;
     private int justSuccessCount;
@@ -44,9 +47,16 @@ public class PlayerParry2D : MonoBehaviour
 
     public bool IsParryActive => parryActive;
     public bool IsFailLocked => failLockTimer > 0f;
+    public bool IsSuccessLocked => successLockTimer > 0f;
+    public bool CanStartParry => isActiveAndEnabled &&
+                                 cooldownTimer <= 0f &&
+                                 !parryActive &&
+                                 !IsFailLocked &&
+                                 !IsSuccessLocked;
     public float ParryRemaining => Mathf.Max(0f, parryTimer);
     public float ParryCooldownRemaining => Mathf.Max(0f, cooldownTimer);
     public float FailLockRemaining => Mathf.Max(0f, failLockTimer);
+    public float SuccessLockRemaining => Mathf.Max(0f, successLockTimer);
     public ParryResult LastParryResult { get; private set; } = ParryResult.None;
     public int AttemptCount => attemptCount;
     public int SuccessCount => successCount;
@@ -65,25 +75,17 @@ public class PlayerParry2D : MonoBehaviour
         {
             specialSkill = GetComponent<PlayerSpecialSkill2D>();
         }
+
+        if (stateMachine == null)
+        {
+            stateMachine = GetComponent<PlayerStateMachine>();
+        }
     }
 
     private void Update()
     {
         ReadInput();
         UpdateTimers();
-
-        if (specialSkill != null && specialSkill.IsUsingSkill)
-        {
-            parryPressed = false;
-            return;
-        }
-
-        if (parryPressed && cooldownTimer <= 0f && !parryActive && !IsFailLocked)
-        {
-            StartParry();
-        }
-
-        parryPressed = false;
     }
 
     private void ReadInput()
@@ -95,7 +97,7 @@ public class PlayerParry2D : MonoBehaviour
 
         if (Keyboard.current.kKey.wasPressedThisFrame)
         {
-            parryPressed = true;
+            stateMachine?.RequestAction(PlayerActionRequest.Parry);
         }
     }
 
@@ -103,12 +105,25 @@ public class PlayerParry2D : MonoBehaviour
     {
         if (cooldownTimer > 0f)
         {
-            cooldownTimer -= Time.deltaTime;
+            cooldownTimer = Mathf.Max(0f, cooldownTimer - Time.deltaTime);
         }
 
         if (failLockTimer > 0f)
         {
-            failLockTimer -= Time.deltaTime;
+            failLockTimer = Mathf.Max(0f, failLockTimer - Time.deltaTime);
+            if (failLockTimer <= 0f)
+            {
+                stateMachine?.CompleteAction(PlayerActionState.ParryFail, "ParryFailComplete");
+            }
+        }
+
+        if (successLockTimer > 0f)
+        {
+            successLockTimer = Mathf.Max(0f, successLockTimer - Time.deltaTime);
+            if (successLockTimer <= 0f)
+            {
+                stateMachine?.CompleteAction(PlayerActionState.ParrySuccess, "ParrySuccessComplete");
+            }
         }
 
         if (!parryActive)
@@ -128,12 +143,25 @@ public class PlayerParry2D : MonoBehaviour
             {
                 ApplyFailLock();
                 PlayClip(parryMissClip, 0.8f);
+                stateMachine?.ChangeActionPhase(
+                    PlayerActionState.Parry,
+                    PlayerActionState.ParryFail,
+                    "ParryMiss");
+                if (failLockTimer <= 0f)
+                {
+                    stateMachine?.CompleteAction(PlayerActionState.ParryFail, "ParryFailComplete");
+                }
             }
         }
     }
 
-    private void StartParry()
+    public bool TryStartParryFromStateMachine()
     {
+        if (!CanStartParry)
+        {
+            return false;
+        }
+
         parryActive = true;
         parryResolved = false;
         parryTimer = parryWindowDuration;
@@ -141,6 +169,7 @@ public class PlayerParry2D : MonoBehaviour
         cooldownTimer = parryCooldown;
         LastParryResult = ParryResult.None;
         attemptCount++;
+        return true;
     }
 
     public bool TryResolveParry(out ParryResult result)
@@ -168,6 +197,7 @@ public class PlayerParry2D : MonoBehaviour
         parryActive = false;
         parryResolved = true;
         parryTimer = 0f;
+        successLockTimer = successLockDuration;
 
         if (result == ParryResult.Just)
         {
@@ -180,13 +210,38 @@ public class PlayerParry2D : MonoBehaviour
         }
 
         successCount++;
+        stateMachine?.ChangeActionPhase(
+            PlayerActionState.Parry,
+            PlayerActionState.ParrySuccess,
+            "ParrySuccess");
+
+        if (successLockTimer <= 0f)
+        {
+            stateMachine?.CompleteAction(PlayerActionState.ParrySuccess, "ParrySuccessComplete");
+        }
 
         return true;
     }
 
+    public void CancelParryFromStateMachine(bool clearCooldown = false)
+    {
+        parryActive = false;
+        parryResolved = false;
+        parryTimer = 0f;
+        parryElapsed = 0f;
+        failLockTimer = 0f;
+        successLockTimer = 0f;
+        LastParryResult = ParryResult.None;
+
+        if (clearCooldown)
+        {
+            cooldownTimer = 0f;
+        }
+    }
+
     private void ApplyFailLock()
     {
-        failLockTimer = failLockDuration;
+        failLockTimer = Mathf.Max(0f, failLockDuration);
         missCount++;
     }
 
@@ -198,6 +253,16 @@ public class PlayerParry2D : MonoBehaviour
         }
 
         audioSource.PlayOneShot(clip, volume);
+    }
+
+    private void OnDisable()
+    {
+        bool hadAction = parryActive || IsFailLocked || IsSuccessLocked;
+        CancelParryFromStateMachine(hadAction);
+        if (hadAction)
+        {
+            stateMachine?.CompleteParryAction("ParryDisabled");
+        }
     }
 }
 

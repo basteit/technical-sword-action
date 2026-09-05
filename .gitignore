@@ -34,6 +34,7 @@ ExportedObj/
 *.csproj
 *.unityproj
 *.sln
+*.slnx
 *.suo
 *.tmp
 *.user
@@ -80,3 +81,7 @@ crashlytics-build.properties
 /_codex_tmp/
 /.codex-tmp/
 /.uloop/outputs/
+
+# Local scratch work, generated previews, and document exports
+/tmp/
+/output/

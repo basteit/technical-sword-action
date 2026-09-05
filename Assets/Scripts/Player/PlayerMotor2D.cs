@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TechnicalSwordAction.PlayerState;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
@@ -26,6 +27,7 @@ public class PlayerMotor2D : MonoBehaviour
     [SerializeField] private PlayerDamageReceiver2D damageReceiver;
     [SerializeField] private PlayerParry2D parry;
     [SerializeField] private PlayerSpecialSkill2D specialSkill;
+    [SerializeField] private PlayerStateMachine stateMachine;
 
     [Header("Feel Tuning")]
     [SerializeField] private bool applyRecommendedPhysicsSettings = true;
@@ -48,8 +50,11 @@ public class PlayerMotor2D : MonoBehaviour
     public float MoveInput => moveInput;
     public bool IsGrounded => isGrounded;
     public bool IsDashing => isDashing;
-    public bool CanDash => dashCooldownTimer <= 0f;
+    public bool CanDash => CanStartDash;
+    public bool CanStartDash => isActiveAndEnabled && !isDashing && dashCooldownTimer <= 0f;
+    public bool CanStartJump => isActiveAndEnabled && isGrounded && !isDashing;
     public Vector2 Velocity => rb != null ? rb.linearVelocity : Vector2.zero;
+    public float DashRemaining => Mathf.Max(0f, dashTimer);
     public float DashCooldownRemaining => Mathf.Max(0f, dashCooldownTimer);
     public int FacingSign => facingSign;
 
@@ -80,6 +85,11 @@ public class PlayerMotor2D : MonoBehaviour
         {
             specialSkill = GetComponent<PlayerSpecialSkill2D>();
         }
+
+        if (stateMachine == null)
+        {
+            stateMachine = GetComponent<PlayerStateMachine>();
+        }
     }
 
     private void Update()
@@ -89,30 +99,14 @@ public class PlayerMotor2D : MonoBehaviour
         UpdateDashTimers();
         UpdateFacing();
 
-        if (isDashing)
+        if (jumpPressed)
         {
-            jumpPressed = false;
-            dashPressed = false;
-            return;
+            stateMachine?.RequestAction(PlayerActionRequest.Jump);
         }
 
-        if ((damageReceiver != null && damageReceiver.IsHitLocked) ||
-            (parry != null && parry.IsFailLocked) ||
-            (specialSkill != null && specialSkill.IsUsingSkill))
+        if (dashPressed)
         {
-            jumpPressed = false;
-            dashPressed = false;
-            return;
-        }
-
-        if (jumpPressed && isGrounded)
-        {
-            Jump();
-        }
-
-        if (dashPressed && CanDash)
-        {
-            StartDash();
+            stateMachine?.RequestAction(PlayerActionRequest.Dash);
         }
 
         jumpPressed = false;
@@ -127,9 +121,19 @@ public class PlayerMotor2D : MonoBehaviour
             return;
         }
 
-        if ((damageReceiver != null && damageReceiver.IsHitLocked) ||
-            (parry != null && parry.IsFailLocked) ||
-            (specialSkill != null && specialSkill.IsUsingSkill))
+        if (stateMachine != null && stateMachine.ActionState == PlayerActionState.Hit)
+        {
+            // Hit reaction owns the whole velocity until its lock ends.
+            return;
+        }
+
+        bool movementLocked = stateMachine != null
+            ? stateMachine.BlocksStandardMovement
+            : (damageReceiver != null && damageReceiver.IsHitLocked) ||
+              (parry != null && parry.IsFailLocked) ||
+              (specialSkill != null && specialSkill.IsUsingSkill);
+
+        if (movementLocked)
         {
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             return;
@@ -209,14 +213,25 @@ public class PlayerMotor2D : MonoBehaviour
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
     }
 
-    private void Jump()
+    public bool TryStartJumpFromStateMachine()
     {
+        if (!CanStartJump)
+        {
+            return false;
+        }
+
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        return true;
     }
 
-    private void StartDash()
+    public bool TryStartDashFromStateMachine()
     {
+        if (!CanStartDash)
+        {
+            return false;
+        }
+
         int dashSign = facingSign;
 
         if (Mathf.Abs(moveInput) > 0.01f)
@@ -233,14 +248,39 @@ public class PlayerMotor2D : MonoBehaviour
         rb.gravityScale = 0f;
         rb.linearVelocity = dashDirection * dashSpeed;
         IgnoreDashOverlaps();
+        return true;
     }
 
-    private void EndDash()
+    private void EndDash(bool notifyStateMachine)
     {
         isDashing = false;
+        dashTimer = 0f;
         rb.gravityScale = originalGravityScale;
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+        rb.linearVelocity = Vector2.zero;
         RestoreDashIgnoredCollisions();
+
+        if (notifyStateMachine)
+        {
+            stateMachine?.CompleteAction(PlayerActionState.Dash, "DashComplete");
+        }
+    }
+
+    public void CancelDashFromStateMachine(bool clearPersistentState = false)
+    {
+        dashTimer = 0f;
+        if (clearPersistentState)
+        {
+            dashCooldownTimer = 0f;
+        }
+
+        if (!isDashing)
+        {
+            rb.gravityScale = originalGravityScale;
+            RestoreDashIgnoredCollisions();
+            return;
+        }
+
+        EndDash(false);
     }
 
     private void UpdateDashTimers()
@@ -259,7 +299,7 @@ public class PlayerMotor2D : MonoBehaviour
 
         if (dashTimer <= 0f)
         {
-            EndDash();
+            EndDash(true);
         }
     }
 
@@ -284,13 +324,27 @@ public class PlayerMotor2D : MonoBehaviour
                 continue;
             }
 
-            Physics2D.IgnoreCollision(ownCollider, other, true);
-            ignoredDashColliders.Add(other);
+            if (stateMachine != null)
+            {
+                stateMachine.AcquireCollisionIgnore(PlayerActionState.Dash, ownCollider, other);
+            }
+            else
+            {
+                Physics2D.IgnoreCollision(ownCollider, other, true);
+                ignoredDashColliders.Add(other);
+            }
         }
     }
 
     private void RestoreDashIgnoredCollisions()
     {
+        if (stateMachine != null)
+        {
+            stateMachine.ReleaseCollisionIgnores(PlayerActionState.Dash);
+            ignoredDashColliders.Clear();
+            return;
+        }
+
         if (ownCollider == null)
         {
             ignoredDashColliders.Clear();
@@ -310,7 +364,14 @@ public class PlayerMotor2D : MonoBehaviour
 
     private void OnDisable()
     {
-        RestoreDashIgnoredCollisions();
+        bool wasDashing = isDashing;
+        CancelDashFromStateMachine(wasDashing);
+        jumpPressed = false;
+        dashPressed = false;
+        if (wasDashing)
+        {
+            stateMachine?.CompleteAction(PlayerActionState.Dash, "DashDisabled");
+        }
     }
 
     private void OnDrawGizmosSelected()

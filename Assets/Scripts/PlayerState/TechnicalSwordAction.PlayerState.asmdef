@@ -1,0 +1,14 @@
+{
+  "name": "TechnicalSwordAction.PlayerState",
+  "rootNamespace": "TechnicalSwordAction.PlayerState",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": true
+}

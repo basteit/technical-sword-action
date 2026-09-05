@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TechnicalSwordAction.PlayerState;
 
 public class PlayerAttack2D : MonoBehaviour
 {
@@ -56,6 +57,7 @@ public class PlayerAttack2D : MonoBehaviour
     [SerializeField] private PlayerParry2D parry;
     [SerializeField] private PlayerSpecialGauge specialGauge;
     [SerializeField] private PlayerSpecialSkill2D specialSkill;
+    [SerializeField] private PlayerStateMachine stateMachine;
 
     private readonly HashSet<Damageable2D> damagedTargets = new();
 
@@ -68,6 +70,7 @@ public class PlayerAttack2D : MonoBehaviour
     private float stepTimeoutRemaining;
     private int attackTriggerHash;
     private int comboStepHash;
+    private PlayerAttackCancelWindow openCancelWindows;
 
     public bool IsAttacking => isAttacking;
     public int ComboStep => comboStep;
@@ -77,6 +80,8 @@ public class PlayerAttack2D : MonoBehaviour
     public bool HitAppliedForCurrentStep => hitAppliedForCurrentStep;
     public float InputBufferRemaining => Mathf.Max(0f, bufferedAttackRemaining);
     public float StepTimeoutRemaining => Mathf.Max(0f, stepTimeoutRemaining);
+    public PlayerAttackCancelWindow OpenCancelWindows => openCancelWindows;
+    public bool CanStartAttackFromStateMachine => isActiveAndEnabled && !isAttacking;
     public int ComboAttemptCount { get; private set; }
     public int FullComboCount { get; private set; }
     public float FullComboRate => ComboAttemptCount <= 0 ? 0f : FullComboCount / (float)ComboAttemptCount;
@@ -105,18 +110,13 @@ public class PlayerAttack2D : MonoBehaviour
 
         if (isAttacking)
         {
-            if (ShouldInterruptAttack())
-            {
-                CancelAttack("Interrupted");
-                return;
-            }
-
             stepTimeoutRemaining -= Time.deltaTime;
             if (stepTimeoutRemaining <= 0f)
             {
                 TimeoutFallbackCount++;
                 LastEndReason = "TimeoutFallback";
                 ResetAttackState(true);
+                stateMachine?.CompleteAction(PlayerActionState.Attack, "AttackTimeoutFallback");
             }
         }
 
@@ -135,13 +135,7 @@ public class PlayerAttack2D : MonoBehaviour
 
         if (!isAttacking)
         {
-            if (!CanStartAttack())
-            {
-                return false;
-            }
-
-            StartAttackStep(1);
-            return true;
+            return stateMachine != null && stateMachine.RequestAction(PlayerActionRequest.Attack);
         }
 
         if (comboStep >= ComboStepCount)
@@ -149,13 +143,19 @@ public class PlayerAttack2D : MonoBehaviour
             return false;
         }
 
-        if (ShouldInterruptAttack())
+        bufferedAttackRemaining = Mathf.Max(inputBufferDuration, SixFramesAtSixtyFps);
+        TryConsumeBufferedInput();
+        return true;
+    }
+
+    public bool TryStartAttackFromStateMachine()
+    {
+        if (!CanStartAttackFromStateMachine)
         {
             return false;
         }
 
-        bufferedAttackRemaining = Mathf.Max(inputBufferDuration, SixFramesAtSixtyFps);
-        TryConsumeBufferedInput();
+        StartAttackStep(1);
         return true;
     }
 
@@ -183,6 +183,7 @@ public class PlayerAttack2D : MonoBehaviour
         queuedNextAttack = false;
         hitAppliedForCurrentStep = false;
         bufferedAttackRemaining = 0f;
+        openCancelWindows = PlayerAttackCancelWindow.None;
 
         AttackStepData data = GetStepData(comboStep);
         stepTimeoutRemaining = data.fallbackDuration + fallbackGraceDuration;
@@ -265,6 +266,34 @@ public class PlayerAttack2D : MonoBehaviour
         comboWindowOpen = false;
     }
 
+    // #48 owns the configured frame ranges. These methods are the runtime seam
+    // that its timeline/data driver will call when each inclusive window changes.
+    public void OnDefenseCancelWindowOpen()
+    {
+        if (isAttacking)
+        {
+            openCancelWindows |= PlayerAttackCancelWindow.Defense;
+        }
+    }
+
+    public void OnDefenseCancelWindowClose()
+    {
+        openCancelWindows &= ~PlayerAttackCancelWindow.Defense;
+    }
+
+    public void OnLateCancelWindowOpen()
+    {
+        if (isAttacking)
+        {
+            openCancelWindows |= PlayerAttackCancelWindow.Late;
+        }
+    }
+
+    public void OnLateCancelWindowClose()
+    {
+        openCancelWindows &= ~PlayerAttackCancelWindow.Late;
+    }
+
     public void OnAttackEnd(int step)
     {
         if (!CanProcessAnimationEvent(step))
@@ -298,6 +327,7 @@ public class PlayerAttack2D : MonoBehaviour
 
         LastEndReason = reason;
         ResetAttackState(true);
+        stateMachine?.CompleteAction(PlayerActionState.Attack, $"Attack{reason}");
     }
 
     private void UpdateBufferedInput()
@@ -322,22 +352,6 @@ public class PlayerAttack2D : MonoBehaviour
         bufferedAttackRemaining = 0f;
     }
 
-    private bool CanStartAttack()
-    {
-        return (motor == null || !motor.IsDashing) &&
-               (damageReceiver == null || !damageReceiver.IsHitLocked) &&
-               (parry == null || (!parry.IsParryActive && !parry.IsFailLocked)) &&
-               (specialSkill == null || !specialSkill.IsUsingSkill);
-    }
-
-    private bool ShouldInterruptAttack()
-    {
-        return (motor != null && motor.IsDashing) ||
-               (damageReceiver != null && damageReceiver.IsHitLocked) ||
-               (parry != null && (parry.IsParryActive || parry.IsFailLocked)) ||
-               (specialSkill != null && specialSkill.IsUsingSkill);
-    }
-
     private bool IsCurrentStep(int step)
     {
         return isAttacking && step == comboStep && step >= 1 && step <= ComboStepCount;
@@ -350,13 +364,7 @@ public class PlayerAttack2D : MonoBehaviour
             return false;
         }
 
-        if (!ShouldInterruptAttack())
-        {
-            return true;
-        }
-
-        CancelAttack("Interrupted");
-        return false;
+        return true;
     }
 
     private void ResetAttackState(bool updateAnimator)
@@ -368,6 +376,7 @@ public class PlayerAttack2D : MonoBehaviour
         hitAppliedForCurrentStep = false;
         bufferedAttackRemaining = 0f;
         stepTimeoutRemaining = 0f;
+        openCancelWindows = PlayerAttackCancelWindow.None;
         damagedTargets.Clear();
 
         if (updateAnimator && animator != null && attackTriggerHash != 0 && comboStepHash != 0)
@@ -396,6 +405,7 @@ public class PlayerAttack2D : MonoBehaviour
         if (parry == null) parry = GetComponent<PlayerParry2D>();
         if (specialGauge == null) specialGauge = GetComponent<PlayerSpecialGauge>();
         if (specialSkill == null) specialSkill = GetComponent<PlayerSpecialSkill2D>();
+        if (stateMachine == null) stateMachine = GetComponent<PlayerStateMachine>();
         if (animator == null) animator = GetComponentInChildren<Animator>();
     }
 
@@ -472,12 +482,17 @@ public class PlayerAttack2D : MonoBehaviour
 
     private void OnDisable()
     {
-        if (isAttacking || comboStep != 0)
+        bool hadAttack = isAttacking || comboStep != 0;
+        if (hadAttack)
         {
             LastEndReason = "Disabled";
         }
 
         ResetAttackState(true);
+        if (hadAttack)
+        {
+            stateMachine?.CompleteAction(PlayerActionState.Attack, "AttackDisabled");
+        }
     }
 
     private void OnDrawGizmos()

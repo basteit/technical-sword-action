@@ -16,6 +16,11 @@ public class PlayerSpecialGauge : MonoBehaviour
     public float MaxGauge => maxGauge;
     public float GaugeRate => maxGauge <= 0f ? 0f : CurrentGauge / maxGauge;
 
+    public bool CanConsume(float amount)
+    {
+        return amount <= 0f || CurrentGauge >= amount;
+    }
+
     private void Awake()
     {
         CurrentGauge = Mathf.Clamp(startGauge, 0f, maxGauge);
@@ -50,14 +55,14 @@ public class PlayerSpecialGauge : MonoBehaviour
 
     public bool Consume(float amount)
     {
+        if (!CanConsume(amount))
+        {
+            return false;
+        }
+
         if (amount <= 0f)
         {
             return true;
-        }
-
-        if (CurrentGauge < amount)
-        {
-            return false;
         }
 
         CurrentGauge -= amount;

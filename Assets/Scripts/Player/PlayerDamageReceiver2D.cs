@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using TechnicalSwordAction.PlayerState;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
@@ -9,10 +10,10 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
     [SerializeField] private int maxHp = 5;
 
     [Header("Invincibility")]
-    [SerializeField] private float invincibleDuration = 0.45f;
+    [SerializeField, Min(0f)] private float invincibleDuration = 0.45f;
 
     [Header("Hit Reaction")]
-    [SerializeField] private float hitStopMoveDuration = 0.16f;
+    [SerializeField, Min(0f)] private float hitStopMoveDuration = 0.16f;
     [SerializeField] private float minKnockbackForce = 5.5f;
 
     [Header("Parry Feedback")]
@@ -25,6 +26,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
     [Header("References")]
     [SerializeField] private PlayerParry2D parry;
     [SerializeField] private PlayerSpecialGauge specialGauge;
+    [SerializeField] private PlayerStateMachine stateMachine;
 
     [Header("Feedback")]
     [SerializeField] private AudioSource audioSource;
@@ -51,6 +53,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
     public bool IsInvincible => invincibleTimer > 0f;
     public bool IsHitLocked => hitLockTimer > 0f;
+    public float HitLockRemaining => Mathf.Max(0f, hitLockTimer);
     public int CurrentHp => currentHp;
     public ParryResult LastParryResult { get; private set; } = ParryResult.None;
     public int TotalHitsTaken => totalHitsTaken;
@@ -73,6 +76,11 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
         if (specialGauge == null)
         {
             specialGauge = GetComponent<PlayerSpecialGauge>();
+        }
+
+        if (stateMachine == null)
+        {
+            stateMachine = GetComponent<PlayerStateMachine>();
         }
 
         if (audioSource == null)
@@ -113,7 +121,11 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
         if (hitLockTimer > 0f)
         {
-            hitLockTimer -= Time.deltaTime;
+            hitLockTimer = Mathf.Max(0f, hitLockTimer - Time.deltaTime);
+            if (hitLockTimer <= 0f)
+            {
+                stateMachine?.CompleteAction(PlayerActionState.Hit, "HitLockComplete");
+            }
         }
 
         if (flashTimer > 0f)
@@ -158,8 +170,21 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
         currentHp = Mathf.Max(0, currentHp - damage);
         totalHitsTaken++;
-        invincibleTimer = invincibleDuration;
-        hitLockTimer = hitStopMoveDuration;
+        invincibleTimer = Mathf.Max(0f, invincibleDuration);
+        hitLockTimer = Mathf.Max(0f, hitStopMoveDuration);
+
+        if (currentHp <= 0)
+        {
+            stateMachine?.SetDead("FatalHit");
+        }
+        else
+        {
+            stateMachine?.ForceHit("DamageReceived");
+            if (hitLockTimer <= 0f)
+            {
+                stateMachine?.CompleteAction(PlayerActionState.Hit, "HitLockComplete");
+            }
+        }
 
         if (specialGauge != null)
         {
@@ -189,7 +214,10 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
         CombatCameraFeedback2D.PlayHitShake();
 
-        IgnoreCurrentOverlaps();
+        if (invincibleTimer > 0f)
+        {
+            IgnoreCurrentOverlaps();
+        }
 
         if (currentHp <= 0)
         {
@@ -277,13 +305,27 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
                 continue;
             }
 
-            Physics2D.IgnoreCollision(ownCollider, other, true);
-            ignoredColliders.Add(other);
+            if (stateMachine != null)
+            {
+                stateMachine.AcquireCollisionIgnore(PlayerActionState.Hit, ownCollider, other);
+            }
+            else
+            {
+                Physics2D.IgnoreCollision(ownCollider, other, true);
+                ignoredColliders.Add(other);
+            }
         }
     }
 
     private void RestoreIgnoredCollisions()
     {
+        if (stateMachine != null)
+        {
+            stateMachine.ReleaseCollisionIgnores(PlayerActionState.Hit);
+            ignoredColliders.Clear();
+            return;
+        }
+
         if (ownCollider == null)
         {
             ignoredColliders.Clear();
@@ -301,10 +343,35 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
         ignoredColliders.Clear();
     }
 
+    public void CancelHitFromStateMachine(bool clearInvincibility = true)
+    {
+        bool ownedHitStop = hitStopTimer > 0f;
+        hitLockTimer = 0f;
+        hitStopTimer = 0f;
+        flashTimer = 0f;
+
+        if (ownedHitStop && Mathf.Approximately(Time.timeScale, 0f))
+        {
+            Time.timeScale = 1f;
+        }
+
+        if (clearInvincibility)
+        {
+            invincibleTimer = 0f;
+            RestoreIgnoredCollisions();
+        }
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = defaultColor;
+        }
+    }
+
     private void OnDisable()
     {
         Time.timeScale = 1f;
-        RestoreIgnoredCollisions();
+        CancelHitFromStateMachine();
+        stateMachine?.CompleteAction(PlayerActionState.Hit, "DamageReceiverDisabled");
     }
 }
 

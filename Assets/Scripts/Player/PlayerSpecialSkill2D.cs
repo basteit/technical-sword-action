@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using TechnicalSwordAction.PlayerState;
 
 public class PlayerSpecialSkill2D : MonoBehaviour
 {
     [Header("Gauge")]
     [SerializeField] private PlayerSpecialGauge specialGauge;
     [SerializeField] private float requiredGauge = 60f;
+
+    [Header("State")]
+    [SerializeField] private PlayerStateMachine stateMachine;
 
     [Header("Skill")]
     [SerializeField] private Transform skillPoint;
@@ -31,15 +35,25 @@ public class PlayerSpecialSkill2D : MonoBehaviour
     private bool isUsingSkill;
     private float lockTimer;
     private bool damageApplied;
+    private float reservedGauge;
 
     public bool IsUsingSkill => isUsingSkill;
     public float LockRemaining => Mathf.Max(0f, lockTimer);
+    public bool CanStartSkill => isActiveAndEnabled &&
+                                 !isUsingSkill &&
+                                 specialGauge != null &&
+                                 specialGauge.CanConsume(Mathf.Max(0f, requiredGauge));
 
     private void Awake()
     {
         if (specialGauge == null)
         {
             specialGauge = GetComponent<PlayerSpecialGauge>();
+        }
+
+        if (stateMachine == null)
+        {
+            stateMachine = GetComponent<PlayerStateMachine>();
         }
 
         if (audioSource == null)
@@ -58,27 +72,25 @@ public class PlayerSpecialSkill2D : MonoBehaviour
 
         if (Keyboard.current != null && Keyboard.current.lKey.wasPressedThisFrame)
         {
-            TryCastSkill();
+            stateMachine?.RequestAction(PlayerActionRequest.Special);
         }
     }
 
-    private void TryCastSkill()
+    public bool TryStartSkillFromStateMachine()
     {
-        if (specialGauge == null)
+        float gaugeCost = Mathf.Max(0f, requiredGauge);
+        if (!CanStartSkill)
         {
-            return;
-        }
-
-        if (!specialGauge.Consume(requiredGauge))
-        {
-            return;
+            return false;
         }
 
         isUsingSkill = true;
         lockTimer = startupLock + recoveryLock;
         damageApplied = false;
+        reservedGauge = gaugeCost;
 
         PlayClip(castClip, 1f);
+        return true;
     }
 
     private void UpdateSkillLock()
@@ -87,6 +99,14 @@ public class PlayerSpecialSkill2D : MonoBehaviour
 
         if (!damageApplied && lockTimer <= recoveryLock)
         {
+            if (!specialGauge.Consume(reservedGauge))
+            {
+                CancelSkillFromStateMachine();
+                stateMachine?.CompleteAction(PlayerActionState.Special, "SpecialGaugeUnavailable");
+                return;
+            }
+
+            reservedGauge = 0f;
             ApplySkillDamage();
             damageApplied = true;
         }
@@ -95,7 +115,16 @@ public class PlayerSpecialSkill2D : MonoBehaviour
         {
             isUsingSkill = false;
             lockTimer = 0f;
+            stateMachine?.CompleteAction(PlayerActionState.Special, "SpecialComplete");
         }
+    }
+
+    public void CancelSkillFromStateMachine()
+    {
+        isUsingSkill = false;
+        lockTimer = 0f;
+        damageApplied = false;
+        reservedGauge = 0f;
     }
 
     private void ApplySkillDamage()
@@ -173,5 +202,15 @@ public class PlayerSpecialSkill2D : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         DrawSkillGizmo();
+    }
+
+    private void OnDisable()
+    {
+        bool wasUsingSkill = isUsingSkill;
+        CancelSkillFromStateMachine();
+        if (wasUsingSkill)
+        {
+            stateMachine?.CompleteAction(PlayerActionState.Special, "SpecialDisabled");
+        }
     }
 }
