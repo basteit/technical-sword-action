@@ -70,6 +70,7 @@ uloop get-logs --log-type Warning
 - 最終PlayMode後のConsole: Error 0 / Warning 0。
 - SampleScene実動スモーク: 通常再生で60Hz/Script物理、Idle表示を確認。Pause中に300ms待ってtickは1408のまま、Attack要求はfalse、揺れタイマーは0まで進行した。解除後はtick1422、timeScale=1、停止owner=0へ復帰。終了後はEditMode、保存済SampleScene、timeScale=1、fixedDeltaTime=1/60へ戻した。
 - 表示証跡（ローカル生成物、コミット対象外）: `tmp/issue47/Game_20260905_204314_869.png`、`tmp/issue47/Game_20260905_204354_430.png`。
+- ユーザー手動確認: 提示したSampleSceneの操作確認項目に対して「問題ないです」との報告を受領。所要時間・試行回数・パリィ成功率などの実測値は未申告のため補完しない。
 
 ## 既存編集の保護と残る受入
 
@@ -81,7 +82,7 @@ SampleSceneの未保存内容はユーザーの明示許可を受けて保存し
 
 - PR #63の統合版に合わせた再適用・再検証と、#40自身の残DoD。
 - #41の標準Binding・実入力記録再生を通した検証。本テストは中央APIへtick単位に同じ要求を渡すため、まだ未実装のRouterや実機Binding全体の証跡ではない。
-- 未コミット攻撃時間調整と素材を含むSampleSceneでの全4段・全Actionの長時間手動プレイ評価。既存4段目のfallbackとClip時刻の調整を時計実装へ混ぜない。
+- SampleSceneの提示項目についてユーザー確認は問題なし。長時間試験の所要時間・回数・定量指標は未記録。既存4段目のfallbackとClip時刻の調整を時計実装へ混ぜない。
 - 敵全アーキタイプ、同tickの相打ち・全判定収集、全入力・全Actionの組合せを含む本番回帰。今回の成功は時計の代表統合試験であり、後続Issueの受入を置き換えない。
 
 Issue close、自動マージ、mainへの統合は実施しない。
