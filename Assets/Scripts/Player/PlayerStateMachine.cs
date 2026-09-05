@@ -152,14 +152,8 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
 
     private void OnEnable()
     {
-        UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnActiveSceneChanged;
         CombatTimeController.Register(this);
         CombatTimeController.PauseChanged += OnPauseChanged;
-    }
-
-    private void OnActiveSceneChanged(UnityEngine.SceneManagement.Scene previous, UnityEngine.SceneManagement.Scene next)
-    {
-        ResetToSafeState("ActiveSceneChanged", LifeState != PlayerLifeState.Dead);
     }
 
     private void OnPauseChanged(bool paused)
@@ -867,7 +861,6 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
 
     private void OnDisable()
     {
-        UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= OnActiveSceneChanged;
         CombatTimeController.PauseChanged -= OnPauseChanged;
         CombatTimeController.Unregister(this);
         ResetToSafeState("ControllerDisabled", LifeState != PlayerLifeState.Dead);

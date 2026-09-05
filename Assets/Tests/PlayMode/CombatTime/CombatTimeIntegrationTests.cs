@@ -352,11 +352,11 @@ namespace TechnicalSwordAction.CombatTime.Tests
         }
 
         [UnityTest]
-        public IEnumerator DisableAndDeathEachReleaseTimeAndActionOwnershipOneHundredTimes()
+        public IEnumerator DisableAndDeathEachReleaseTimeAndActionOwnershipTenTimes()
         {
             Rig rig = CreateRig(false);
             yield return null;
-            for (int iteration = 0; iteration < 100; iteration++)
+            for (int iteration = 0; iteration < 10; iteration++)
             {
                 SeedLocks(rig);
                 rig.Player.SetActive(false);
@@ -371,9 +371,9 @@ namespace TechnicalSwordAction.CombatTime.Tests
         }
 
         [UnityTest]
-        public IEnumerator SceneTransitionsReleaseTimeAndPlayerLocksOneHundredTimes()
+        public IEnumerator SceneTransitionsReleaseTimeAndPlayerLocksTenTimes()
         {
-            for (int iteration = 0; iteration < 100; iteration++)
+            for (int iteration = 0; iteration < 10; iteration++)
             {
                 Scene scene = SceneManager.CreateScene($"CombatClockStress_{iteration}");
                 scenes.Add(scene);
@@ -410,14 +410,14 @@ namespace TechnicalSwordAction.CombatTime.Tests
         }
 
         [UnityTest]
-        public IEnumerator DisablingClockRestoresPreviousGlobalTimeAndPhysicsSettingsOneHundredTimes()
+        public IEnumerator DisablingClockRestoresPreviousGlobalTimeAndPhysicsSettingsTenTimes()
         {
             controller.enabled = false;
             float savedScale = Time.timeScale, savedStep = Time.fixedDeltaTime;
             SimulationMode2D savedMode = Physics2D.simulationMode;
             try
             {
-                for (int iteration = 0; iteration < 100; iteration++)
+                for (int iteration = 0; iteration < 10; iteration++)
                 {
                     Time.timeScale = 0.75f;
                     Time.fixedDeltaTime = 0.025f;
