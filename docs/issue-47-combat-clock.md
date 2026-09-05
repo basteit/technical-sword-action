@@ -6,10 +6,10 @@
 - Issue: https://github.com/basteit/technical-sword-action/issues/47
 - 引き継ぎ: https://github.com/basteit/technical-sword-action/issues/47#issuecomment-5551394234
 - 着手時main: `6efbeddaabad33a0d48c4e31cae7d5e7a170ff7d`。
-- 先行PR #63はOPEN / Draft / 未マージ。参照版は `5d32ce14c573e3a8962dd1bf329a3c4b12f3d55c`、状態機械実装は `5b2041f`。
-- `issue/47-combat-clock`はそのPR版から同じcheckout内で分岐した。新規worktree・別checkoutは作成していない。純C#時計は独立し、実Componentへの接続はPR #63に依存する暫定統合である。#63の統合版に合わせて再検証するまでmainへの統合完了と扱わない。
+- 先行PR #63は2026-09-05にマージ済み。現在の基点は統合後mainの `e9f059ce88a954cfa561ed616f0b851fc3eae815`。
+- `issue/47-combat-clock`の3コミットを統合後mainへ載せ直し、同じcheckoutで再検証した。新規worktree・別checkoutは作成していない。純C#時計は独立し、実Componentへの接続は#40の中央状態契約に統合している。
 - 規則はCONTRIBUTING.md、内容は現行要件3.4・3.6・12.1、design-summary-guide、9月末ロードマップ、development-plan、completion-roadmap-2026-09-05、Issue本文・引き継ぎを参照した。ローカルの未コミット要件文書を最新仕様として読んだが、この変更には含めない。
-- #40に残る共有B中央API契約、未実装Action用adapterを含む全DoD証拠、PR受入は#40の責務として維持する。Heal・標準入力Router・Cancel設定・撃破スロー効果は追加していない。
+- #40の共有B中央APIとアダプタを含む状態契約を維持する。Heal・標準入力Router・Cancel設定・撃破スロー効果は追加していない。
 
 ## 時間の所有権
 
@@ -56,16 +56,27 @@ Pause中は既存予約の残量を保持し、新規Gameplay予約を作らな�
 ```powershell
 uloop compile --wait-for-domain-reload true
 uloop run-tests --test-mode EditMode
-uloop run-tests --test-mode PlayMode --filter-type assembly --filter-value TechnicalSwordAction.CombatTime.PlayModeTests
+uloop run-tests --test-mode PlayMode
 uloop get-logs --log-type Error
 uloop get-logs --log-type Warning
 ```
 
+### #40統合後の最終結果（2026-09-05 13:32 UTC）
+
 - コンパイル: Error 0 / Warning 0。
+- EditMode: **172 / 172成功**。
+- PlayMode全体: **20 / 20成功**（時計10件、状態契約10件）。
+- 実行後Console: Error 0 / Warning 0。
+- ユーザー指定によりDisable・死亡・Scene遷移・時計設定復元など同条件の反復を各10回へ短縮。127通りの入力組合せと180tickの時間列比較は維持した。
+- #40で追加されたB共有要求にもPauseの入力拒否、停止中の選択対象保持、予約期限切れ後の再入力を適用し、回帰テストを追加した。Scene変更時の一括リセットはTime Controllerへ集約し、二重通知を避けた。
+- 下記の初期検証記録は統合前の履歴。現在の合否は上記の結果を参照する。
+
+### 初期検証の履歴
+
 - EditMode: 169 / 169成功。既存State resolverと純時計テストを含む。
 - PlayMode初期7件: 7 / 7成功（2026-09-05 11:36:59 UTC）。停止中予約、物理・実Animator・ダメージ・ゲージ、Disable/死亡/Scene遷移各100回、時計Disableの設定復元100回、3秒/30秒の整数F境界を確認。
 - fps分割テストは30/60/120の各frame秒を同じdriverへ渡し、180tickの状態・生死・HP・Hit・ゲージ・位置・無敵・ロック・Break・Animator状態と時刻の列を比較する。実Animation Eventで敵に2Hit、プレイヤー被弾2回、HP3、敵HP48、ゲージ24、timeout fallback 0を必須とし、ゼロHitの空回しでは合格しない。
-- 最新PlayMode: 10 / 10成功（2026-09-05 11:41:44 UTC）。実描画ループでvSyncを0、targetFrameRateを30/60/120に設定し、180tick終了までの181個のsnapshotを比較するテストを追加。攻撃中コンボ予約のPause保持・解除破棄、ヒットストップ中の保持と解除後の単一queueも成功。
+- 統合前PlayMode: 10 / 10成功（2026-09-05 11:41:44 UTC）。実描画ループでvSyncを0、targetFrameRateを30/60/120に設定し、180tick終了までの181個のsnapshotを比較するテストを追加。攻撃中コンボ予約のPause保持・解除破棄、ヒットストップ中の保持と解除後の単一queueも成功。
 - この実描画テストは設定上限を変更したUnity Editor PlayModeであり、実機Bindingの録画や最低環境の性能計測ではない。時間・数値の厳密比較はframe分割テストで保証する。
 - 最終PlayMode後のConsole: Error 0 / Warning 0。
 - SampleScene実動スモーク: 通常再生で60Hz/Script物理、Idle表示を確認。Pause中に300ms待ってtickは1408のまま、Attack要求はfalse、揺れタイマーは0まで進行した。解除後はtick1422、timeScale=1、停止owner=0へ復帰。終了後はEditMode、保存済SampleScene、timeScale=1、fixedDeltaTime=1/60へ戻した。
@@ -78,9 +89,10 @@ uloop get-logs --log-type Warning
 
 SampleSceneの未保存内容はユーザーの明示許可を受けて保存した。Sceneは今回のコミットに含めない。テスト用Sceneはテスト内で生成・解放し、ユーザーのSceneを破棄しない。
 
-残る受入:
+統合後の確認では、ユーザーの素材・Scene・文書等のハッシュ一致を確認した。攻撃時間の4か所の調整も保持し、今回のPR差分には含めない。テストは未コミットのユーザー変更を保持した作業ディレクトリで実施しており、クリーンcheckoutそのものの実行結果ではない。
 
-- PR #63の統合版に合わせた再適用・再検証と、#40自身の残DoD。
+後続Issueでの受入:
+
 - #41の標準Binding・実入力記録再生を通した検証。本テストは中央APIへtick単位に同じ要求を渡すため、まだ未実装のRouterや実機Binding全体の証跡ではない。
 - SampleSceneの提示項目についてユーザー確認は問題なし。長時間試験の所要時間・回数・定量指標は未記録。既存4段目のfallbackとClip時刻の調整を時計実装へ混ぜない。
 - 敵全アーキタイプ、同tickの相打ち・全判定収集、全入力・全Actionの組合せを含む本番回帰。今回の成功は時計の代表統合試験であり、後続Issueの受入を置き換えない。
