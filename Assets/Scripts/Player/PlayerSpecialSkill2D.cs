@@ -2,7 +2,7 @@
 using UnityEngine.InputSystem;
 using TechnicalSwordAction.PlayerState;
 
-public class PlayerSpecialSkill2D : MonoBehaviour
+public class PlayerSpecialSkill2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener, ICombatHitListener
 {
     [Header("Gauge")]
     [SerializeField] private PlayerSpecialGauge specialGauge;
@@ -62,18 +62,25 @@ public class PlayerSpecialSkill2D : MonoBehaviour
         }
     }
 
+    // Hostile hits resolve first so a hit on the startup frame cancels expenditure.
+    public int CombatTickOrder => 400;
+
+    private void OnEnable()
+    {
+        CombatTimeController.Register(this);
+    }
+
     private void Update()
     {
-        if (isUsingSkill)
-        {
-            UpdateSkillLock();
-            return;
-        }
-
-        if (Keyboard.current != null && Keyboard.current.lKey.wasPressedThisFrame)
+        if (CombatTimeController.AcceptsGameplayInput &&
+            Keyboard.current != null && Keyboard.current.lKey.wasPressedThisFrame)
         {
             stateMachine?.RequestAction(PlayerActionRequest.Special);
         }
+    }
+
+    public void CombatTick()
+    {
     }
 
     public bool TryStartSkillFromStateMachine()
@@ -93,11 +100,10 @@ public class PlayerSpecialSkill2D : MonoBehaviour
         return true;
     }
 
-    private void UpdateSkillLock()
+    public void ResolveCombatHits()
     {
-        lockTimer -= Time.deltaTime;
-
-        if (!damageApplied && lockTimer <= recoveryLock)
+        if (isUsingSkill && !damageApplied &&
+            lockTimer - CombatTimeController.StepSeconds <= recoveryLock + 0.000001f)
         {
             if (!specialGauge.Consume(reservedGauge))
             {
@@ -110,6 +116,16 @@ public class PlayerSpecialSkill2D : MonoBehaviour
             ApplySkillDamage();
             damageApplied = true;
         }
+    }
+
+    public void CombatTickTimers()
+    {
+        if (!isUsingSkill)
+        {
+            return;
+        }
+
+        lockTimer = CombatTimeController.AdvanceTimer(lockTimer);
 
         if (lockTimer <= 0f)
         {
@@ -206,6 +222,7 @@ public class PlayerSpecialSkill2D : MonoBehaviour
 
     private void OnDisable()
     {
+        CombatTimeController.Unregister(this);
         bool wasUsingSkill = isUsingSkill;
         CancelSkillFromStateMachine();
         if (wasUsingSkill)

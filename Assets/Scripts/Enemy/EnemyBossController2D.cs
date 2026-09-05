@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Damageable2D))]
-public class EnemyBossController2D : MonoBehaviour
+public class EnemyBossController2D : MonoBehaviour, ICombatTickListener, ICombatHitListener, ICombatTimerListener
 {
     private enum BossAction
     {
@@ -56,6 +56,32 @@ public class EnemyBossController2D : MonoBehaviour
     private bool phase2;
     private bool isCharging;
     private Vector2 chargeDir;
+    private bool advanceActionTimer;
+    private bool advanceChargeTimer;
+    private bool pendingMeleeHit;
+    private bool pendingChargeHit;
+
+    public int CombatTickOrder => 200;
+
+    private void OnEnable()
+    {
+        actionTimer = actionInterval;
+        CombatTimeController.Register(this);
+    }
+
+    private void OnDisable()
+    {
+        CombatTimeController.Unregister(this);
+        CombatTimeController.ReleaseOwner(this);
+        actionTimer = 0f;
+        chargeTimer = 0f;
+        isCharging = false;
+        nextAction = BossAction.MeleeArc;
+        advanceActionTimer = false;
+        advanceChargeTimer = false;
+        pendingMeleeHit = false;
+        pendingChargeHit = false;
+    }
 
     private void Awake()
     {
@@ -69,8 +95,12 @@ public class EnemyBossController2D : MonoBehaviour
         TryFindPlayerTarget();
     }
 
-    private void Update()
+    public void CombatTick()
     {
+        advanceActionTimer = false;
+        advanceChargeTimer = false;
+        pendingMeleeHit = false;
+        pendingChargeHit = false;
         if (target == null)
         {
             TryFindPlayerTarget();
@@ -89,6 +119,7 @@ public class EnemyBossController2D : MonoBehaviour
 
         if (isCharging)
         {
+            advanceChargeTimer = true;
             UpdateCharge();
             return;
         }
@@ -101,8 +132,8 @@ public class EnemyBossController2D : MonoBehaviour
 
         UpdateSpacing(dist);
 
-        actionTimer -= Time.deltaTime;
-        if (actionTimer > 0f)
+        advanceActionTimer = true;
+        if (CombatTimeController.AdvanceTimer(actionTimer) > 0f)
         {
             return;
         }
@@ -116,6 +147,39 @@ public class EnemyBossController2D : MonoBehaviour
         }
 
         actionTimer = interval;
+        advanceActionTimer = false;
+    }
+
+    public void ResolveCombatHits()
+    {
+        if (pendingMeleeHit)
+        {
+            pendingMeleeHit = false;
+            DoMeleeArc();
+        }
+
+        if (pendingChargeHit)
+        {
+            pendingChargeHit = false;
+            ResolveChargeHits();
+        }
+    }
+
+    public void CombatTickTimers()
+    {
+        if (advanceActionTimer)
+        {
+            actionTimer = CombatTimeController.AdvanceTimer(actionTimer);
+        }
+
+        if (advanceChargeTimer)
+        {
+            chargeTimer = CombatTimeController.AdvanceTimer(chargeTimer);
+            if (chargeTimer <= 0f)
+            {
+                isCharging = false;
+            }
+        }
     }
 
     private void UpdateSpacing(float dist)
@@ -129,11 +193,11 @@ public class EnemyBossController2D : MonoBehaviour
         Vector2 dir = toTarget.normalized;
         if (dist < preferredMinDistance)
         {
-            transform.position += (Vector3)(-dir * moveSpeed * Time.deltaTime);
+            transform.position += (Vector3)(-dir * moveSpeed * CombatTimeController.StepSeconds);
         }
         else if (dist > preferredMaxDistance)
         {
-            transform.position += (Vector3)(dir * moveSpeed * Time.deltaTime);
+            transform.position += (Vector3)(dir * moveSpeed * CombatTimeController.StepSeconds);
         }
     }
 
@@ -142,7 +206,7 @@ public class EnemyBossController2D : MonoBehaviour
         switch (action)
         {
             case BossAction.MeleeArc:
-                DoMeleeArc();
+                pendingMeleeHit = true;
                 break;
             case BossAction.TripleShot:
                 DoTripleShot();
@@ -208,9 +272,12 @@ public class EnemyBossController2D : MonoBehaviour
 
     private void UpdateCharge()
     {
-        chargeTimer -= Time.deltaTime;
-        transform.position += (Vector3)(chargeDir * chargeSpeed * Time.deltaTime);
+        transform.position += (Vector3)(chargeDir * chargeSpeed * CombatTimeController.StepSeconds);
+        pendingChargeHit = true;
+    }
 
+    private void ResolveChargeHits()
+    {
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, chargeHitRadius, meleeTargetLayers);
         for (int i = 0; i < hits.Length; i++)
         {
@@ -220,11 +287,6 @@ public class EnemyBossController2D : MonoBehaviour
             }
 
             receiver.TryReceiveHit(ScaleDamage(chargeDamage), transform.position, chargeKnockback);
-        }
-
-        if (chargeTimer <= 0f)
-        {
-            isCharging = false;
         }
     }
 

@@ -21,6 +21,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private Rigidbody2D body;
         private Scene originalScene;
         private float savedScale, savedFixedStep;
+        private Type timeType;
+        private Behaviour timeController;
+        private bool savedManualAdvance;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -28,6 +31,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             originalScene = SceneManager.GetActiveScene();
             savedScale = Time.timeScale;
             savedFixedStep = Time.fixedDeltaTime;
+            timeType = Type.GetType("CombatTimeController, Assembly-CSharp", true);
+            timeController = (Behaviour)Object.FindFirstObjectByType(timeType);
+            savedManualAdvance = Get<bool>(timeController, "ManualAdvanceOnly");
+            timeType.GetProperty("ManualAdvanceOnly").SetValue(timeController, true);
             player = NewObject("StateContractPlayer");
             player.SetActive(false);
             body = player.AddComponent<Rigidbody2D>();
@@ -62,6 +69,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             if (originalScene.IsValid() && originalScene.isLoaded) SceneManager.SetActiveScene(originalScene);
             foreach (var scene in scenes) if (scene.IsValid() && scene.isLoaded) yield return SceneManager.UnloadSceneAsync(scene);
             scenes.Clear();
+            timeType.GetProperty("ManualAdvanceOnly").SetValue(timeController, savedManualAdvance);
             Time.timeScale = savedScale;
             Time.fixedDeltaTime = savedFixedStep;
         }
@@ -133,6 +141,44 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
         }
 
+        [UnityTest]
+        public IEnumerator SharedBRespectsPauseHitstopAndExpiresItsSelectedContext()
+        {
+            Reset(); IncludeTarget();
+            TimeCall("SetPaused", true);
+            Assert.That((bool)Call(state, "RequestSharedDashInteract"), Is.False);
+            Assert.That(Get<PlayerActionRequest>(state, "PendingRequests"), Is.EqualTo(PlayerActionRequest.None));
+            TimeCall("SetPaused", false);
+            yield return null;
+
+            TimeCall("RequestHitstop", this, 4f / 60f);
+            Assert.That((bool)Call(state, "RequestSharedDashInteract"), Is.True);
+            ExcludeTarget();
+            Assert.That((bool)Call(state, "RequestSharedDashInteract"), Is.True);
+            Assert.That(Get<PlayerActionRequest>(state, "LastSharedInputResolution"), Is.EqualTo(PlayerActionRequest.Interact));
+            Call(timeController, "AdvanceFrame", 3d / 60d);
+            Assert.That((int)Call(state, "GetInputBufferFramesRemaining", PlayerActionRequest.Interact), Is.EqualTo(1));
+            Assert.That(Get<int>(interactable, "Count"), Is.Zero);
+            TimeCall("ReleaseOwner", this);
+            Resolve(); Call(state, "CombatTickTimers");
+            Assert.That(Get<bool>(motor, "IsDashing"), Is.False);
+            Assert.That(Get<PlayerActionRequest>(state, "PendingRequests"), Is.EqualTo(PlayerActionRequest.None));
+
+            // Expired Interact must not keep the next distinct press latched.
+            Assert.That((bool)Call(state, "RequestSharedDashInteract"), Is.True);
+            Resolve();
+            Assert.That(Action, Is.EqualTo(PlayerActionState.Dash));
+            Assert.That(Get<PlayerActionRequest>(state, "LastSharedInputResolution"), Is.EqualTo(PlayerActionRequest.Dash));
+
+            Reset(); IncludeTarget();
+            TimeCall("RequestHitstop", this, 4f / 60f);
+            Call(state, "RequestSharedDashInteract");
+            Call(timeController, "AdvanceFrame", 3d / 60d);
+            TimeCall("ReleaseOwner", this);
+            Resolve(); Resolve();
+            Assert.That(Get<int>(interactable, "Count"), Is.EqualTo(1));
+        }
+
         [Test]
         public void DefenseAndLateCancelGatesAndResourceFallbackMatchCentralContract()
         {
@@ -193,7 +239,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<float>(parry, "SuccessLockRemaining"), Is.Zero);
                 Call(state, "ResetToSafeState", "CounterReset", true); AssertClean($"counter {i}");
                 Reset(); Start(PlayerActionRequest.Parry);
-                Field(parry, "parryTimer", 0f); Call(parry, "Update");
+                Field(parry, "parryTimer", 0f); Call(parry, "CombatTickTimers");
                 Assert.That(Action, Is.EqualTo(PlayerActionState.ParryFail));
                 Call(state, "ResetToSafeState", "FailReset", true); AssertClean($"fail {i}");
             }
@@ -235,7 +281,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<PlayerActionRequest>(state, "LastAcceptedRequest"), Is.EqualTo(request));
                 if (request == PlayerActionRequest.Heal) Call(heal, "Finish");
                 double deadline = Time.realtimeSinceStartupAsDouble + 3d;
-                while (Action != PlayerActionState.Neutral && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+                while (Action != PlayerActionState.Neutral && Time.realtimeSinceStartupAsDouble < deadline)
+                {
+                    Call(timeController, "AdvanceFrame", 1d / 60d);
+                    yield return null;
+                }
                 Assert.That(Action, Is.EqualTo(PlayerActionState.Neutral), $"natural completion {request}");
             }
         }
@@ -296,7 +346,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         private void ExcludeTarget() => Call(interactor, "OnTriggerExit2D", target.GetComponent<Collider2D>());
         private void Start(PlayerActionRequest request) { Call(state, "RequestAction", request); Resolve(); }
-        private void Resolve() => Call(state, "LateUpdate");
+        private void Resolve() => Call(state, "CombatTick");
+        private void TimeCall(string name, params object[] args) => timeType.GetMethod(name, BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
         private GameObject NewObject(string name) { var item = new GameObject(name); objects.Add(item); return item; }
         private static Component Add(GameObject item, string name) => item.AddComponent(Type.GetType(name + ", Assembly-CSharp", true));
         private static T Get<T>(object item, string name) => (T)item.GetType().GetProperty(name, Flags).GetValue(item);

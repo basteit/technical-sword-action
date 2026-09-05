@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Damageable2D))]
-public class EnemyMeleeChaser2D : MonoBehaviour
+public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHitListener, ICombatTimerListener
 {
     private enum State
     {
@@ -37,6 +37,26 @@ public class EnemyMeleeChaser2D : MonoBehaviour
     private float stateTimer;
     private bool attackApplied;
     private Vector2 facing = Vector2.right;
+    private bool advanceStateTimer;
+    private bool pendingMeleeHit;
+
+    public int CombatTickOrder => 200;
+
+    private void OnEnable()
+    {
+        CombatTimeController.Register(this);
+    }
+
+    private void OnDisable()
+    {
+        CombatTimeController.Unregister(this);
+        CombatTimeController.ReleaseOwner(this);
+        currentState = State.Idle;
+        stateTimer = 0f;
+        attackApplied = false;
+        advanceStateTimer = false;
+        pendingMeleeHit = false;
+    }
 
     private void Awake()
     {
@@ -52,8 +72,10 @@ public class EnemyMeleeChaser2D : MonoBehaviour
         TryFindPlayerTarget();
     }
 
-    private void Update()
+    public void CombatTick()
     {
+        advanceStateTimer = false;
+        pendingMeleeHit = false;
         if (target == null)
         {
             TryFindPlayerTarget();
@@ -91,12 +113,31 @@ public class EnemyMeleeChaser2D : MonoBehaviour
                 UpdateApproach(distance, toTarget);
                 break;
             case State.AttackWindup:
+                advanceStateTimer = true;
                 UpdateAttackWindup(distance);
                 break;
             case State.Recovery:
             case State.Cooldown:
+                advanceStateTimer = true;
                 UpdateTimedState();
                 break;
+        }
+    }
+
+    public void ResolveCombatHits()
+    {
+        if (pendingMeleeHit)
+        {
+            pendingMeleeHit = false;
+            TryApplyMeleeHit();
+        }
+    }
+
+    public void CombatTickTimers()
+    {
+        if (advanceStateTimer)
+        {
+            stateTimer = CombatTimeController.AdvanceTimer(stateTimer);
         }
     }
 
@@ -112,38 +153,37 @@ public class EnemyMeleeChaser2D : MonoBehaviour
 
         if (distance < preferredMinDistance)
         {
-            Vector2 retreat = -toTarget.normalized * (moveSpeed * Time.deltaTime);
+            Vector2 retreat = -toTarget.normalized * (moveSpeed * CombatTimeController.StepSeconds);
             transform.position += (Vector3)retreat;
             return;
         }
 
         if (distance > preferredMaxDistance)
         {
-            Vector2 advance = toTarget.normalized * (moveSpeed * Time.deltaTime);
+            Vector2 advance = toTarget.normalized * (moveSpeed * CombatTimeController.StepSeconds);
             transform.position += (Vector3)advance;
         }
     }
 
     private void UpdateAttackWindup(float distance)
     {
-        stateTimer -= Time.deltaTime;
-        if (!attackApplied && stateTimer <= 0f)
+        if (!attackApplied && CombatTimeController.AdvanceTimer(stateTimer) <= 0f)
         {
             attackApplied = true;
             if (distance <= attackRange * 1.1f)
             {
-                TryApplyMeleeHit();
+                pendingMeleeHit = true;
             }
 
             currentState = State.Recovery;
             stateTimer = recoveryDuration;
+            advanceStateTimer = false;
         }
     }
 
     private void UpdateTimedState()
     {
-        stateTimer -= Time.deltaTime;
-        if (stateTimer > 0f)
+        if (CombatTimeController.AdvanceTimer(stateTimer) > 0f)
         {
             return;
         }
@@ -152,10 +192,12 @@ public class EnemyMeleeChaser2D : MonoBehaviour
         {
             currentState = State.Cooldown;
             stateTimer = cooldownDuration;
+            advanceStateTimer = false;
             return;
         }
 
         currentState = State.Approach;
+        advanceStateTimer = false;
     }
 
     private void TryApplyMeleeHit()

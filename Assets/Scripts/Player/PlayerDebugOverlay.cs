@@ -87,5 +87,9 @@ public class PlayerDebugOverlay : MonoBehaviour
         GUI.Label(new Rect(28, 498, 860, 30), $"Parry Success Rate: {parryRate} (diagnostic)", labelStyle);
         GUI.Label(new Rect(28, 532, 860, 30), $"Damage Stats: Taken {hitsTaken} / Blocked(Parry {blockedParry}, IFrame {blockedIFrame}, Dash {blockedDash})", labelStyle);
         GUI.Label(new Rect(730, 56, 180, 30), $"FPS: {(1f / Time.unscaledDeltaTime):0}", labelStyle);
+        GUI.Label(new Rect(630, 90, 290, 30), $"Tick: {CombatTimeController.TickCount}", labelStyle);
+        GUI.Label(new Rect(630, 260, 290, 30),
+            CombatTimeController.IsPaused ? "PAUSED (Esc / Menu)" :
+            $"Hitstop: {CombatTimeController.HitstopRemainingTicks}F", labelStyle);
     }
 }

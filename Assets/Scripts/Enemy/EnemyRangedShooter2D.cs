@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class EnemyRangedShooter2D : MonoBehaviour
+public class EnemyRangedShooter2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     [Header("Target")]
     [SerializeField] private Transform target;
@@ -24,6 +24,23 @@ public class EnemyRangedShooter2D : MonoBehaviour
     [SerializeField] private LayerMask reflectedHitLayers;
 
     private float shootTimer;
+    private bool advanceShootTimer;
+
+    public int CombatTickOrder => 200;
+
+    private void OnEnable()
+    {
+        shootTimer = shootInterval;
+        CombatTimeController.Register(this);
+    }
+
+    private void OnDisable()
+    {
+        CombatTimeController.Unregister(this);
+        CombatTimeController.ReleaseOwner(this);
+        shootTimer = 0f;
+        advanceShootTimer = false;
+    }
 
     private void Start()
     {
@@ -38,8 +55,9 @@ public class EnemyRangedShooter2D : MonoBehaviour
         }
     }
 
-    private void Update()
+    public void CombatTick()
     {
+        advanceShootTimer = false;
         if (target == null || projectilePrefab == null || muzzle == null)
         {
             return;
@@ -61,14 +79,23 @@ public class EnemyRangedShooter2D : MonoBehaviour
             return;
         }
 
-        shootTimer -= Time.deltaTime;
-        if (shootTimer > 0f)
+        advanceShootTimer = true;
+        if (CombatTimeController.AdvanceTimer(shootTimer) > 0f)
         {
             return;
         }
 
         shootTimer = shootInterval;
+        advanceShootTimer = false;
         ShootAtTarget();
+    }
+
+    public void CombatTickTimers()
+    {
+        if (advanceShootTimer)
+        {
+            shootTimer = CombatTimeController.AdvanceTimer(shootTimer);
+        }
     }
 
     private void UpdateSpacing(float dist)
@@ -84,7 +111,7 @@ public class EnemyRangedShooter2D : MonoBehaviour
         {
             if (dist > nearStopDistance)
             {
-                transform.position += (Vector3)(-dir * moveSpeed * Time.deltaTime);
+                transform.position += (Vector3)(-dir * moveSpeed * CombatTimeController.StepSeconds);
             }
 
             return;
@@ -92,7 +119,7 @@ public class EnemyRangedShooter2D : MonoBehaviour
 
         if (dist > preferredMaxDistance)
         {
-            transform.position += (Vector3)(dir * moveSpeed * Time.deltaTime);
+            transform.position += (Vector3)(dir * moveSpeed * CombatTimeController.StepSeconds);
         }
     }
 

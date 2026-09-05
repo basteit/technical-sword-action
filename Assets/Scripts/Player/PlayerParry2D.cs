@@ -9,7 +9,7 @@ public enum ParryResult
     Just
 }
 
-public class PlayerParry2D : MonoBehaviour
+public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     [Header("Parry Window")]
     [SerializeField] private float parryWindowDuration = 0.2f;
@@ -82,9 +82,27 @@ public class PlayerParry2D : MonoBehaviour
         }
     }
 
+    public int CombatTickOrder => -100;
+
+    private void OnEnable()
+    {
+        CombatTimeController.Register(this);
+    }
+
     private void Update()
     {
-        ReadInput();
+        if (CombatTimeController.AcceptsGameplayInput)
+        {
+            ReadInput();
+        }
+    }
+
+    public void CombatTick()
+    {
+    }
+
+    public void CombatTickTimers()
+    {
         UpdateTimers();
     }
 
@@ -105,12 +123,12 @@ public class PlayerParry2D : MonoBehaviour
     {
         if (cooldownTimer > 0f)
         {
-            cooldownTimer = Mathf.Max(0f, cooldownTimer - Time.deltaTime);
+            cooldownTimer = CombatTimeController.AdvanceTimer(cooldownTimer);
         }
 
         if (failLockTimer > 0f)
         {
-            failLockTimer = Mathf.Max(0f, failLockTimer - Time.deltaTime);
+            failLockTimer = CombatTimeController.AdvanceTimer(failLockTimer);
             if (failLockTimer <= 0f)
             {
                 stateMachine?.CompleteAction(PlayerActionState.ParryFail, "ParryFailComplete");
@@ -119,7 +137,7 @@ public class PlayerParry2D : MonoBehaviour
 
         if (successLockTimer > 0f)
         {
-            successLockTimer = Mathf.Max(0f, successLockTimer - Time.deltaTime);
+            successLockTimer = CombatTimeController.AdvanceTimer(successLockTimer);
             if (successLockTimer <= 0f)
             {
                 stateMachine?.CompleteAction(PlayerActionState.ParrySuccess, "ParrySuccessComplete");
@@ -131,8 +149,8 @@ public class PlayerParry2D : MonoBehaviour
             return;
         }
 
-        parryTimer -= Time.deltaTime;
-        parryElapsed += Time.deltaTime;
+        parryTimer = CombatTimeController.AdvanceTimer(parryTimer);
+        parryElapsed += CombatTimeController.StepSeconds;
 
         if (parryTimer <= 0f)
         {
@@ -257,8 +275,9 @@ public class PlayerParry2D : MonoBehaviour
 
     private void OnDisable()
     {
+        CombatTimeController.Unregister(this);
         bool hadAction = parryActive || IsFailLocked || IsSuccessLocked;
-        CancelParryFromStateMachine(hadAction);
+        CancelParryFromStateMachine(true);
         if (hadAction)
         {
             stateMachine?.CompleteParryAction("ParryDisabled");

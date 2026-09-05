@@ -1,0 +1,9 @@
+{
+  "name": "TechnicalSwordAction.CombatTime.PlayModeTests",
+  "rootNamespace": "TechnicalSwordAction.CombatTime.Tests",
+  "references": ["UnityEngine.TestRunner", "UnityEditor.TestRunner", "TechnicalSwordAction.CombatTime", "TechnicalSwordAction.PlayerState"],
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+}

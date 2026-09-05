@@ -55,7 +55,8 @@ public class PlayerSpecialGauge : MonoBehaviour
 
     public bool Consume(float amount)
     {
-        if (!CanConsume(amount))
+        if ((CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick) ||
+            !CanConsume(amount))
         {
             return false;
         }
@@ -71,7 +72,8 @@ public class PlayerSpecialGauge : MonoBehaviour
 
     private void AddGauge(float amount)
     {
-        if (amount <= 0f)
+        if (amount <= 0f ||
+            (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick))
         {
             return;
         }

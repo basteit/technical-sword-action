@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
-public class Damageable2D : MonoBehaviour
+public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     private enum EnemyToughnessPreset
     {
@@ -50,6 +50,27 @@ public class Damageable2D : MonoBehaviour
     public int CurrentHp => currentHp;
     public int MaxHp => maxHp;
     public float HpNormalized => maxHp > 0 ? (float)currentHp / maxHp : 0f;
+    public int CombatTickOrder => 190;
+
+    private void OnEnable()
+    {
+        CombatTimeController.Register(this);
+    }
+
+    private void OnDisable()
+    {
+        CombatTimeController.Unregister(this);
+        CombatTimeController.ReleaseOwner(this);
+        flashTimer = 0f;
+        stunTimer = 0f;
+        breakResistTimer = 0f;
+        currentBreak = 0f;
+        knockbackVelocity = Vector2.zero;
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = defaultColor;
+        }
+    }
 
     private void Awake()
     {
@@ -76,26 +97,34 @@ public class Damageable2D : MonoBehaviour
         }
     }
 
-    private void Update()
+    public void CombatTick()
+    {
+        if (knockbackVelocity.sqrMagnitude > 0.0001f)
+        {
+            transform.position += (Vector3)(knockbackVelocity * CombatTimeController.StepSeconds);
+        }
+    }
+
+    public void CombatTickTimers()
     {
         if (breakResistTimer > 0f)
         {
-            breakResistTimer -= Time.deltaTime;
+            breakResistTimer = CombatTimeController.AdvanceTimer(breakResistTimer);
         }
 
         if (stunTimer <= 0f && currentBreak > 0f)
         {
-            currentBreak = Mathf.Max(0f, currentBreak - breakDecayPerSecond * Time.deltaTime);
+            currentBreak = Mathf.Max(0f, currentBreak - breakDecayPerSecond * CombatTimeController.StepSeconds);
         }
 
         if (stunTimer > 0f)
         {
-            stunTimer -= Time.deltaTime;
+            stunTimer = CombatTimeController.AdvanceTimer(stunTimer);
         }
 
         if (flashTimer > 0f)
         {
-            flashTimer -= Time.deltaTime;
+            flashTimer = CombatTimeController.AdvanceTimer(flashTimer);
             if (flashTimer <= 0f && spriteRenderer != null)
             {
                 spriteRenderer.color = defaultColor;
@@ -104,8 +133,7 @@ public class Damageable2D : MonoBehaviour
 
         if (knockbackVelocity.sqrMagnitude > 0.0001f)
         {
-            transform.position += (Vector3)(knockbackVelocity * Time.deltaTime);
-            knockbackVelocity = Vector2.Lerp(knockbackVelocity, Vector2.zero, knockbackDamping * Time.deltaTime);
+            knockbackVelocity = Vector2.Lerp(knockbackVelocity, Vector2.zero, knockbackDamping * CombatTimeController.StepSeconds);
         }
     }
 
@@ -121,6 +149,12 @@ public class Damageable2D : MonoBehaviour
 
     public void TakeHit(int damage, Vector2 direction)
     {
+        if (!isActiveAndEnabled || currentHp <= 0 ||
+            (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick))
+        {
+            return;
+        }
+
         currentHp = Mathf.Max(0, currentHp - damage);
         AddBreak(damage * hitBreakMultiplier);
 
@@ -148,6 +182,12 @@ public class Damageable2D : MonoBehaviour
 
     public void ApplyParryStun(ParryResult result)
     {
+        if (!isActiveAndEnabled || currentHp <= 0 ||
+            (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick))
+        {
+            return;
+        }
+
         if (result == ParryResult.Just)
         {
             stunTimer = justParryStunDuration;

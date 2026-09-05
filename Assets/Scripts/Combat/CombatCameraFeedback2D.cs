@@ -44,14 +44,34 @@ public class CombatCameraFeedback2D : MonoBehaviour
 
         if (shakeTimer > 0f)
         {
-            shakeTimer -= Time.deltaTime;
+            shakeTimer -= Time.unscaledDeltaTime;
             Vector2 random = Random.insideUnitCircle * shakeMagnitude;
             cameraRoot.localPosition = originalLocalPos + new Vector3(random.x, random.y, 0f);
-            shakeMagnitude = Mathf.Lerp(shakeMagnitude, 0f, damping * Time.deltaTime);
+            shakeMagnitude = Mathf.Lerp(shakeMagnitude, 0f, damping * Time.unscaledDeltaTime);
             return;
         }
 
-        cameraRoot.localPosition = Vector3.Lerp(cameraRoot.localPosition, originalLocalPos, damping * Time.deltaTime);
+        cameraRoot.localPosition = Vector3.Lerp(cameraRoot.localPosition, originalLocalPos, damping * Time.unscaledDeltaTime);
+    }
+
+    private void OnEnable()
+    {
+        Instance = this;
+    }
+
+    private void OnDisable()
+    {
+        shakeTimer = 0f;
+        shakeMagnitude = 0f;
+        if (cameraRoot != null)
+        {
+            cameraRoot.localPosition = originalLocalPos;
+        }
+
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     public static void PlayHitShake()

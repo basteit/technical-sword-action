@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 
+using System.Collections.Generic;
+
 [RequireComponent(typeof(Collider2D))]
-public class EnemyProjectile2D : MonoBehaviour
+public class EnemyProjectile2D : MonoBehaviour, ICombatTickListener, ICombatHitListener, ICombatTimerListener
 {
     [SerializeField] private float lifeTime = 3f;
     [SerializeField] private float reflectedSpeedMultiplier = 1.15f;
@@ -17,9 +19,29 @@ public class EnemyProjectile2D : MonoBehaviour
     private float lifeTimer;
     private bool initialized;
     private bool reflected;
+    private readonly List<Collider2D> pendingContacts = new List<Collider2D>();
+    private Collider2D reflectedPlayerCollider;
+    private bool ownedReflectionCollisionIgnore;
 
     public Transform Owner => owner;
     public bool IsReflected => reflected;
+    public int CombatTickOrder => 210;
+
+    private void OnEnable()
+    {
+        CombatTimeController.Register(this);
+    }
+
+    private void OnDisable()
+    {
+        CombatTimeController.Unregister(this);
+        CombatTimeController.ReleaseOwner(this);
+        initialized = false;
+        lifeTimer = 0f;
+        pendingContacts.Clear();
+        ClearReflectionCollision();
+        reflected = false;
+    }
 
     public void Initialize(
         Vector2 dir,
@@ -30,6 +52,8 @@ public class EnemyProjectile2D : MonoBehaviour
         LayerMask reflectedTargets,
         Transform projectileOwner)
     {
+        ClearReflectionCollision();
+        reflected = false;
         direction = dir.normalized;
         speed = moveSpeed;
         damage = hitDamage;
@@ -41,28 +65,56 @@ public class EnemyProjectile2D : MonoBehaviour
         initialized = true;
     }
 
-    private void Update()
+    public void CombatTick()
     {
         if (!initialized)
         {
             return;
         }
 
-        transform.position += (Vector3)(direction * speed * Time.deltaTime);
+        transform.position += (Vector3)(direction * speed * CombatTimeController.StepSeconds);
+    }
 
-        lifeTimer -= Time.deltaTime;
+    public void CombatTickTimers()
+    {
+        if (!initialized)
+        {
+            return;
+        }
+
+        lifeTimer = CombatTimeController.AdvanceTimer(lifeTimer);
         if (lifeTimer <= 0f)
         {
-            Destroy(gameObject);
+            Retire();
         }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!initialized)
+        if (!initialized || (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick))
         {
             return;
         }
+
+        pendingContacts.Add(other);
+    }
+
+    public void ResolveCombatHits()
+    {
+        for (int i = 0; i < pendingContacts.Count && initialized; i++)
+        {
+            Collider2D other = pendingContacts[i];
+            if (other != null && other.isActiveAndEnabled)
+            {
+                ResolveContact(other);
+            }
+        }
+
+        pendingContacts.Clear();
+    }
+
+    private void ResolveContact(Collider2D other)
+    {
 
         if ((targetLayers.value & (1 << other.gameObject.layer)) == 0)
         {
@@ -78,7 +130,7 @@ public class EnemyProjectile2D : MonoBehaviour
                 return;
             }
 
-            Destroy(gameObject);
+            Retire();
             return;
         }
 
@@ -86,10 +138,18 @@ public class EnemyProjectile2D : MonoBehaviour
         {
             Vector2 hitDir = direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.right;
             damageable.TakeHit(damage, hitDir);
-            Destroy(gameObject);
+            Retire();
             return;
         }
 
+        Retire();
+    }
+
+    private void Retire()
+    {
+        // Destroy is deferred until the rendered frame ends. Retire immediately so
+        // another combat tick in the same frame cannot move or hit with this projectile.
+        gameObject.SetActive(false);
         Destroy(gameObject);
     }
 
@@ -113,7 +173,27 @@ public class EnemyProjectile2D : MonoBehaviour
         Collider2D ownCol = GetComponent<Collider2D>();
         if (playerCol != null && ownCol != null)
         {
-            Physics2D.IgnoreCollision(ownCol, playerCol, true);
+            reflectedPlayerCollider = playerCol;
+            ownedReflectionCollisionIgnore = !Physics2D.GetIgnoreCollision(ownCol, playerCol);
+            if (ownedReflectionCollisionIgnore)
+            {
+                Physics2D.IgnoreCollision(ownCol, playerCol, true);
+            }
         }
+    }
+
+    private void ClearReflectionCollision()
+    {
+        if (ownedReflectionCollisionIgnore && reflectedPlayerCollider != null)
+        {
+            Collider2D ownCol = GetComponent<Collider2D>();
+            if (ownCol != null)
+            {
+                Physics2D.IgnoreCollision(ownCol, reflectedPlayerCollider, false);
+            }
+        }
+
+        reflectedPlayerCollider = null;
+        ownedReflectionCollisionIgnore = false;
     }
 }
