@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using TechnicalSwordAction.PlayerState;
 
 public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
@@ -110,14 +109,6 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     {
         CombatTimeController.Register(this);
         CombatTimeController.RegisterAnimator(animator, this);
-    }
-
-    private void Update()
-    {
-        if (Keyboard.current != null && Keyboard.current.jKey.wasPressedThisFrame)
-        {
-            RequestAttack();
-        }
     }
 
     public void CombatTick() => TryConsumeBufferedInput();
