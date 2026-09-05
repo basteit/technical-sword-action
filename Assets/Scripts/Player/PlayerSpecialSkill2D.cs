@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem;
 using TechnicalSwordAction.PlayerState;
 
 public class PlayerSpecialSkill2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener, ICombatHitListener
@@ -68,15 +67,6 @@ public class PlayerSpecialSkill2D : MonoBehaviour, ICombatTickListener, ICombatT
     private void OnEnable()
     {
         CombatTimeController.Register(this);
-    }
-
-    private void Update()
-    {
-        if (CombatTimeController.AcceptsGameplayInput &&
-            Keyboard.current != null && Keyboard.current.lKey.wasPressedThisFrame)
-        {
-            stateMachine?.RequestAction(PlayerActionRequest.Special);
-        }
     }
 
     public void CombatTick()

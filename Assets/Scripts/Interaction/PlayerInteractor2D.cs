@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using TechnicalSwordAction.PlayerState;
 
 [DisallowMultipleComponent]
@@ -11,9 +10,7 @@ public sealed class PlayerInteractor2D : MonoBehaviour
 
     private readonly Dictionary<Collider2D, List<MonoBehaviour>> overlapSources = new();
     private readonly List<MonoBehaviour> candidates = new();
-    private InputAction interactAction;
     private IInteractable2D currentInteractable;
-    private bool waitForRelease = true;
     private PlayerMotor2D motor;
     private PlayerAttack2D attack;
     private PlayerParry2D parry;
@@ -26,14 +23,6 @@ public sealed class PlayerInteractor2D : MonoBehaviour
     private void Awake()
     {
         ResolvePlayerActions();
-        CreateInputAction();
-    }
-
-    private void OnEnable()
-    {
-        CreateInputAction();
-        interactAction.Enable();
-        waitForRelease = true;
     }
 
     private void Update()
@@ -42,27 +31,12 @@ public sealed class PlayerInteractor2D : MonoBehaviour
 
         if (DialogueController.GameplayInputBlocked)
         {
-            waitForRelease = true;
             promptView?.Hide();
             return;
         }
 
         UpdatePrompt();
 
-        if (waitForRelease)
-        {
-            if (!interactAction.IsPressed())
-            {
-                waitForRelease = false;
-            }
-
-            return;
-        }
-
-        if (interactAction.WasPressedThisFrame())
-        {
-            TryInteract();
-        }
     }
 
     public bool TryInteract()
@@ -103,7 +77,6 @@ public sealed class PlayerInteractor2D : MonoBehaviour
     {
         DialogueController.InterruptActive();
 
-        waitForRelease = true;
         promptView?.Hide();
         currentInteractable = null;
     }
@@ -205,18 +178,6 @@ public sealed class PlayerInteractor2D : MonoBehaviour
         promptView?.Show(currentInteractable.InteractionPrompt);
     }
 
-    private void CreateInputAction()
-    {
-        if (interactAction != null)
-        {
-            return;
-        }
-
-        interactAction = new InputAction("Interact", InputActionType.Button);
-        interactAction.AddBinding("<Keyboard>/e");
-        interactAction.AddBinding("<Gamepad>/buttonEast");
-    }
-
     private void ResolvePlayerActions()
     {
         if (motor == null) motor = GetComponent<PlayerMotor2D>();
@@ -249,13 +210,8 @@ public sealed class PlayerInteractor2D : MonoBehaviour
 
     private void OnDisable()
     {
-        interactAction?.Disable();
         promptView?.Hide();
         currentInteractable = null;
     }
 
-    private void OnDestroy()
-    {
-        interactAction?.Dispose();
-    }
 }
