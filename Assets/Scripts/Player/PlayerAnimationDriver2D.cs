@@ -2,7 +2,7 @@ using UnityEngine;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Animator))]
-public class PlayerAnimationDriver2D : MonoBehaviour
+public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
 {
     [Header("References")]
     [SerializeField] private Animator animator;
@@ -35,12 +35,16 @@ public class PlayerAnimationDriver2D : MonoBehaviour
     private void OnEnable()
     {
         ResolveReferences();
+        CombatTimeController.Register(this);
+        CombatTimeController.RegisterAnimator(animator, this);
         observedParryCount = damageReceiver != null ? damageReceiver.BlockedByParry : 0;
         parrySuccessTimer = 0f;
         lastDrivenState = (PlayerState)(-1);
     }
 
-    private void Update()
+    public int CombatTickOrder => 300;
+
+    public void CombatTick()
     {
         if (animator == null || stateMachine == null)
         {
@@ -63,7 +67,7 @@ public class PlayerAnimationDriver2D : MonoBehaviour
 
         if (parrySuccessTimer > 0f && (state == PlayerState.Idle || state == PlayerState.Move))
         {
-            parrySuccessTimer = Mathf.Max(0f, parrySuccessTimer - Time.deltaTime);
+            parrySuccessTimer = Mathf.Max(0f, parrySuccessTimer - CombatTimeController.StepSeconds);
             return;
         }
 
@@ -134,5 +138,11 @@ public class PlayerAnimationDriver2D : MonoBehaviour
     private void Reset()
     {
         ResolveReferences();
+    }
+
+    private void OnDisable()
+    {
+        CombatTimeController.Unregister(this);
+        CombatTimeController.UnregisterAnimator(animator, this);
     }
 }

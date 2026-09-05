@@ -4,7 +4,7 @@ using TechnicalSwordAction.PlayerState;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
-public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
+public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatTickListener, ICombatTimerListener
 {
     [Header("Health")]
     [SerializeField] private int maxHp = 5;
@@ -43,7 +43,6 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
     private float invincibleTimer;
     private float hitLockTimer;
     private float flashTimer;
-    private float hitStopTimer;
     private Color defaultColor = Color.white;
     private readonly HashSet<Collider2D> ignoredColliders = new();
     private int totalHitsTaken;
@@ -60,6 +59,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
     public int BlockedByParry => blockedByParry;
     public int BlockedByInvincible => blockedByInvincible;
     public int BlockedByDash => blockedByDash;
+    public int CombatTickOrder => -100;
 
     private void Awake()
     {
@@ -99,20 +99,20 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
         }
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        if (hitStopTimer > 0f)
-        {
-            hitStopTimer -= Time.unscaledDeltaTime;
-            if (hitStopTimer <= 0f)
-            {
-                Time.timeScale = 1f;
-            }
-        }
+        CombatTimeController.Register(this);
+    }
 
+    public void CombatTick()
+    {
+    }
+
+    public void CombatTickTimers()
+    {
         if (invincibleTimer > 0f)
         {
-            invincibleTimer -= Time.deltaTime;
+            invincibleTimer = CombatTimeController.AdvanceTimer(invincibleTimer);
             if (invincibleTimer <= 0f)
             {
                 RestoreIgnoredCollisions();
@@ -121,7 +121,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
         if (hitLockTimer > 0f)
         {
-            hitLockTimer = Mathf.Max(0f, hitLockTimer - Time.deltaTime);
+            hitLockTimer = CombatTimeController.AdvanceTimer(hitLockTimer);
             if (hitLockTimer <= 0f)
             {
                 stateMachine?.CompleteAction(PlayerActionState.Hit, "HitLockComplete");
@@ -130,7 +130,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
         if (flashTimer > 0f)
         {
-            flashTimer -= Time.deltaTime;
+            flashTimer = CombatTimeController.AdvanceTimer(flashTimer);
             if (flashTimer <= 0f && spriteRenderer != null)
             {
                 spriteRenderer.color = defaultColor;
@@ -141,6 +141,11 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
     public bool TryReceiveHit(int damage, Vector2 sourcePosition, float knockbackForce)
     {
         LastParryResult = ParryResult.None;
+        if (!isActiveAndEnabled || currentHp <= 0 ||
+            (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick))
+        {
+            return false;
+        }
 
         if (parry != null && parry.TryResolveParry(sourcePosition, out ParryResult parryResult))
         {
@@ -253,8 +258,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
         float stop = result == ParryResult.Just ? justParryHitStop : normalParryHitStop;
         if (stop > 0f)
         {
-            Time.timeScale = 0f;
-            hitStopTimer = stop;
+            CombatTimeController.RequestHitstop(this, stop);
         }
 
         CombatCameraFeedback2D.PlayParryShake(result);
@@ -345,15 +349,9 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
     public void CancelHitFromStateMachine(bool clearInvincibility = true)
     {
-        bool ownedHitStop = hitStopTimer > 0f;
         hitLockTimer = 0f;
-        hitStopTimer = 0f;
         flashTimer = 0f;
-
-        if (ownedHitStop && Mathf.Approximately(Time.timeScale, 0f))
-        {
-            Time.timeScale = 1f;
-        }
+        CombatTimeController.ReleaseOwner(this);
 
         if (clearInvincibility)
         {
@@ -369,7 +367,8 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D
 
     private void OnDisable()
     {
-        Time.timeScale = 1f;
+        CombatTimeController.Unregister(this);
+        CombatTimeController.ResetSession();
         CancelHitFromStateMachine();
         stateMachine?.CompleteAction(PlayerActionState.Hit, "DamageReceiverDisabled");
     }

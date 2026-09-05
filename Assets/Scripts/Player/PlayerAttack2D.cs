@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TechnicalSwordAction.PlayerState;
 
-public class PlayerAttack2D : MonoBehaviour
+public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     private const int ComboStepCount = 4;
     private const float SixFramesAtSixtyFps = 6f / 60f;
@@ -104,13 +104,31 @@ public class PlayerAttack2D : MonoBehaviour
         EnsureStepData();
     }
 
+    public int CombatTickOrder => 150;
+
+    private void OnEnable()
+    {
+        CombatTimeController.Register(this);
+        CombatTimeController.RegisterAnimator(animator, this);
+    }
+
     private void Update()
+    {
+        if (Keyboard.current != null && Keyboard.current.jKey.wasPressedThisFrame)
+        {
+            RequestAttack();
+        }
+    }
+
+    public void CombatTick() => TryConsumeBufferedInput();
+
+    public void CombatTickTimers()
     {
         UpdateBufferedInput();
 
         if (isAttacking)
         {
-            stepTimeoutRemaining -= Time.deltaTime;
+            stepTimeoutRemaining = CombatTimeController.AdvanceTimer(stepTimeoutRemaining);
             if (stepTimeoutRemaining <= 0f)
             {
                 TimeoutFallbackCount++;
@@ -119,16 +137,12 @@ public class PlayerAttack2D : MonoBehaviour
                 stateMachine?.CompleteAction(PlayerActionState.Attack, "AttackTimeoutFallback");
             }
         }
-
-        if (Keyboard.current != null && Keyboard.current.jKey.wasPressedThisFrame)
-        {
-            RequestAttack();
-        }
     }
 
     public bool RequestAttack()
     {
-        if (!isActiveAndEnabled)
+        if (!isActiveAndEnabled || !CombatTimeController.AcceptsGameplayInput ||
+            (stateMachine != null && !stateMachine.CanCollectGameplayInput))
         {
             return false;
         }
@@ -144,8 +158,13 @@ public class PlayerAttack2D : MonoBehaviour
         }
 
         bufferedAttackRemaining = Mathf.Max(inputBufferDuration, SixFramesAtSixtyFps);
-        TryConsumeBufferedInput();
         return true;
+    }
+
+    public void ClearBufferedInput()
+    {
+        bufferedAttackRemaining = 0f;
+        queuedNextAttack = false;
     }
 
     public bool TryStartAttackFromStateMachine()
@@ -337,8 +356,7 @@ public class PlayerAttack2D : MonoBehaviour
             return;
         }
 
-        bufferedAttackRemaining = Mathf.Max(0f, bufferedAttackRemaining - Time.deltaTime);
-        TryConsumeBufferedInput();
+        bufferedAttackRemaining = CombatTimeController.AdvanceTimer(bufferedAttackRemaining);
     }
 
     private void TryConsumeBufferedInput()
@@ -359,7 +377,7 @@ public class PlayerAttack2D : MonoBehaviour
 
     private bool CanProcessAnimationEvent(int step)
     {
-        if (!IsCurrentStep(step))
+        if (!IsCurrentStep(step) || (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick))
         {
             return false;
         }
@@ -482,6 +500,8 @@ public class PlayerAttack2D : MonoBehaviour
 
     private void OnDisable()
     {
+        CombatTimeController.Unregister(this);
+        CombatTimeController.UnregisterAnimator(animator, this);
         bool hadAttack = isAttacking || comboStep != 0;
         if (hadAttack)
         {

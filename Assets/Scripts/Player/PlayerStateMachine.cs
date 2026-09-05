@@ -41,7 +41,7 @@ public interface IPlayerActionStateHandler
 
 [DisallowMultipleComponent]
 [DefaultExecutionOrder(1000)]
-public class PlayerStateMachine : MonoBehaviour
+public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     private sealed class CollisionIgnoreRecord
     {
@@ -65,6 +65,8 @@ public class PlayerStateMachine : MonoBehaviour
     private PlayerActionRequest pendingRequests;
     private PlayerActionRequest pendingSharedRequest;
     private IInteractable2D pendingSharedTarget;
+    private readonly int[] bufferedRequestFrames = new int[7];
+    private int suppressGameplayInputFrame = -1;
     private bool interactionObservedGameplayBlock;
     private bool isResetting;
 
@@ -85,6 +87,12 @@ public class PlayerStateMachine : MonoBehaviour
     public PlayerActionRequest PendingRequests => pendingRequests;
     public PlayerActionRequest LastSharedInputResolution { get; private set; }
     public int LastSharedInputTargetInstanceId { get; private set; }
+    public int CombatTickOrder => 100;
+    public bool CanCollectGameplayInput => isActiveAndEnabled &&
+        CombatTimeController.AcceptsGameplayInput &&
+        suppressGameplayInputFrame != Time.frameCount &&
+        !CombatSuspended && LifeState != PlayerLifeState.Dead &&
+        !DialogueController.GameplayInputBlocked;
 
     // Compatibility view for the existing prototype Animator/debug overlay.
     public PlayerState CurrentState => EvaluateLegacyState();
@@ -145,6 +153,8 @@ public class PlayerStateMachine : MonoBehaviour
     private void OnEnable()
     {
         UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnActiveSceneChanged;
+        CombatTimeController.Register(this);
+        CombatTimeController.PauseChanged += OnPauseChanged;
     }
 
     private void OnActiveSceneChanged(UnityEngine.SceneManagement.Scene previous, UnityEngine.SceneManagement.Scene next)
@@ -152,16 +162,56 @@ public class PlayerStateMachine : MonoBehaviour
         ResetToSafeState("ActiveSceneChanged", LifeState != PlayerLifeState.Dead);
     }
 
-    private void Update()
+    private void OnPauseChanged(bool paused)
+    {
+        if (paused)
+        {
+            // Existing reservations retain their remaining combat frames while paused.
+            motor?.ClearSampledInput();
+            suppressGameplayInputFrame = Time.frameCount;
+            return;
+        }
+
+        // Resume discards gameplay input so closing the menu cannot trigger an action.
+        ClearBufferedGameplayInput();
+    }
+
+    public void CombatTick()
     {
         UpdateLocomotionState();
         UpdateInteractionState();
+        ResolvePendingRequests();
+        motor?.ApplyCombatVelocity();
     }
 
-    private void LateUpdate()
+    public void CombatTickTimers()
     {
-        UpdateLocomotionState();
-        ResolvePendingRequests();
+        for (int index = 0; index < bufferedRequestFrames.Length; index++)
+        {
+            if (bufferedRequestFrames[index] > 0 && --bufferedRequestFrames[index] == 0)
+            {
+                pendingRequests &= ~(PlayerActionRequest)(1 << index);
+                if (pendingSharedRequest == (PlayerActionRequest)(1 << index))
+                {
+                    pendingSharedRequest = PlayerActionRequest.None;
+                    pendingSharedTarget = null;
+                }
+            }
+        }
+    }
+
+    public int GetInputBufferFramesRemaining(PlayerActionRequest request)
+    {
+        int remaining = 0;
+        for (int index = 0; index < bufferedRequestFrames.Length; index++)
+        {
+            if ((request & (PlayerActionRequest)(1 << index)) != 0)
+            {
+                remaining = Mathf.Max(remaining, bufferedRequestFrames[index]);
+            }
+        }
+
+        return remaining;
     }
 
     public bool RequestAction(PlayerActionRequest requests)
@@ -172,7 +222,37 @@ public class PlayerStateMachine : MonoBehaviour
             return false;
         }
 
+        if ((normalized & PlayerActionRequest.Pause) != 0)
+        {
+            LastRequestedActions = normalized | pendingRequests;
+            LastAcceptedRequest = PlayerActionRequest.Pause;
+            LastAcceptedPriority = -1;
+            LastRejectionReason = (LastRequestedActions & PlayerActionRequest.Gameplay) != 0
+                ? PlayerActionRejectionReason.PausePriority
+                : PlayerActionRejectionReason.None;
+            CombatTimeController.SetPaused(!CombatTimeController.IsPaused);
+            PauseRequestCount++;
+            PauseRequested?.Invoke();
+            return true;
+        }
+
+        if (!CanCollectGameplayInput)
+        {
+            return false;
+        }
+
         pendingRequests |= normalized;
+        for (int index = 0; index < bufferedRequestFrames.Length; index++)
+        {
+            PlayerActionRequest request = (PlayerActionRequest)(1 << index);
+            if ((normalized & request) != 0)
+            {
+                bufferedRequestFrames[index] = request == PlayerActionRequest.Attack ||
+                    request == PlayerActionRequest.Jump ? 6 :
+                    request == PlayerActionRequest.Interact ? 1 : 4;
+            }
+        }
+
         return true;
     }
 
@@ -183,7 +263,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     public bool RequestSharedDashInteract()
     {
-        if (!isActiveAndEnabled) return false;
+        if (!CanCollectGameplayInput) return false;
         if (pendingSharedRequest != PlayerActionRequest.None) return true;
 
         pendingSharedTarget = interactor != null ? interactor.SelectTargetForSharedInput() : null;
@@ -198,10 +278,24 @@ public class PlayerStateMachine : MonoBehaviour
         CombatSuspended = suspended;
         if (suspended)
         {
-            pendingRequests &= PlayerActionRequest.Pause;
-            pendingSharedRequest = PlayerActionRequest.None;
-            pendingSharedTarget = null;
+            ClearBufferedGameplayInput();
         }
+    }
+
+    public void ClearBufferedGameplayInput()
+    {
+        ClearActionRequests();
+        attack?.ClearBufferedInput();
+        motor?.ClearSampledInput();
+        suppressGameplayInputFrame = Time.frameCount;
+    }
+
+    private void ClearActionRequests()
+    {
+        pendingRequests = PlayerActionRequest.None;
+        pendingSharedRequest = PlayerActionRequest.None;
+        pendingSharedTarget = null;
+        Array.Clear(bufferedRequestFrames, 0, bufferedRequestFrames.Length);
     }
 
     public void CompleteAction(PlayerActionState expectedAction, string reason)
@@ -255,9 +349,7 @@ public class PlayerStateMachine : MonoBehaviour
             TransitionTo(PlayerActionState.Hit, reason, true);
         }
 
-        pendingRequests = PlayerActionRequest.None;
-        pendingSharedRequest = PlayerActionRequest.None;
-        pendingSharedTarget = null;
+        ClearActionRequests();
         return true;
     }
 
@@ -357,6 +449,7 @@ public class PlayerStateMachine : MonoBehaviour
         }
 
         isResetting = true;
+        CombatTimeController.ResetSession();
         PlayerActionState interruptedAction = ActionState;
 
         attack?.CancelAttack(reason);
@@ -379,9 +472,9 @@ public class PlayerStateMachine : MonoBehaviour
         }
 
         ReleaseAllCollisionIgnores();
-        pendingRequests = PlayerActionRequest.None;
-        pendingSharedRequest = PlayerActionRequest.None;
-        pendingSharedTarget = null;
+        ClearActionRequests();
+        motor?.ClearSampledInput();
+        suppressGameplayInputFrame = -1;
         CombatSuspended = false;
         interactionObservedGameplayBlock = false;
         PreviousActionState = interruptedAction;
@@ -402,9 +495,6 @@ public class PlayerStateMachine : MonoBehaviour
         PlayerActionRequest requests = pendingRequests;
         bool useSharedTarget = pendingSharedRequest == PlayerActionRequest.Interact;
         IInteractable2D sharedTarget = pendingSharedTarget;
-        pendingRequests = PlayerActionRequest.None;
-        pendingSharedRequest = PlayerActionRequest.None;
-        pendingSharedTarget = null;
 
         if (requests == PlayerActionRequest.None)
         {
@@ -417,18 +507,21 @@ public class PlayerStateMachine : MonoBehaviour
 
         if (LifeState == PlayerLifeState.Dead)
         {
+            ClearActionRequests();
             ResolveBlockedRequests(requests, PlayerActionRejectionReason.Dead);
             return;
         }
 
         if (CombatSuspended)
         {
+            ClearActionRequests();
             ResolveBlockedRequests(requests, PlayerActionRejectionReason.CombatSuspended);
             return;
         }
 
         if (DialogueController.GameplayInputBlocked && ActionState != PlayerActionState.Interact)
         {
+            ClearActionRequests();
             ResolveBlockedRequests(requests, PlayerActionRejectionReason.GameplayBlocked);
             return;
         }
@@ -456,6 +549,9 @@ public class PlayerStateMachine : MonoBehaviour
             return;
         }
 
+        // A resolved input group cannot leak a lower-priority action into a later tick.
+        ClearActionRequests();
+        attack?.ClearBufferedInput();
         if (!TryExecute(decision, useSharedTarget, sharedTarget))
         {
             LastAcceptedRequest = PlayerActionRequest.None;
@@ -772,6 +868,8 @@ public class PlayerStateMachine : MonoBehaviour
     private void OnDisable()
     {
         UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+        CombatTimeController.PauseChanged -= OnPauseChanged;
+        CombatTimeController.Unregister(this);
         ResetToSafeState("ControllerDisabled", LifeState != PlayerLifeState.Dead);
     }
 

@@ -15,7 +15,7 @@ public class DamageSource2D : MonoBehaviour
     [SerializeField] private LayerMask targetLayers;
     [SerializeField] private float repeatInterval = 0.15f;
 
-    private readonly Dictionary<int, float> lastHitTimeByTarget = new();
+    private readonly Dictionary<int, long> lastHitTickByTarget = new();
     private bool isHitWindowOpen;
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -45,6 +45,7 @@ public class DamageSource2D : MonoBehaviour
 
     private void ProcessHit(Collider2D other)
     {
+        if (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick) return;
         if (hitWindowMode == HitWindowMode.ManualWindow && !isHitWindowOpen)
         {
             return;
@@ -56,9 +57,9 @@ public class DamageSource2D : MonoBehaviour
         }
 
         int id = other.GetInstanceID();
-        if (lastHitTimeByTarget.TryGetValue(id, out float lastTime))
+        if (lastHitTickByTarget.TryGetValue(id, out long lastTick))
         {
-            if (Time.time - lastTime < repeatInterval)
+            if (CombatTimeController.TickCount - lastTick < Mathf.CeilToInt(repeatInterval / CombatTimeController.StepSeconds - 0.00001f))
             {
                 return;
             }
@@ -69,8 +70,14 @@ public class DamageSource2D : MonoBehaviour
             bool applied = receiver.TryReceiveHit(damage, transform.position, knockbackForce);
             if (applied)
             {
-                lastHitTimeByTarget[id] = Time.time;
+                lastHitTickByTarget[id] = CombatTimeController.TickCount;
             }
         }
+    }
+
+    private void OnDisable()
+    {
+        lastHitTickByTarget.Clear();
+        isHitWindowOpen = false;
     }
 }

@@ -5,7 +5,7 @@ using TechnicalSwordAction.PlayerState;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
-public class PlayerMotor2D : MonoBehaviour
+public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     [Header("Move")]
     [SerializeField] private float moveSpeed = 6.5f;
@@ -57,6 +57,7 @@ public class PlayerMotor2D : MonoBehaviour
     public float DashRemaining => Mathf.Max(0f, dashTimer);
     public float DashCooldownRemaining => Mathf.Max(0f, dashCooldownTimer);
     public int FacingSign => facingSign;
+    public int CombatTickOrder => 0;
 
     private void Awake()
     {
@@ -92,12 +93,20 @@ public class PlayerMotor2D : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        CombatTimeController.Register(this);
+    }
+
     private void Update()
     {
+        if (!CombatTimeController.AcceptsGameplayInput)
+        {
+            ClearSampledInput();
+            return;
+        }
+
         ReadInput();
-        UpdateGrounded();
-        UpdateDashTimers();
-        UpdateFacing();
 
         if (jumpPressed)
         {
@@ -113,7 +122,23 @@ public class PlayerMotor2D : MonoBehaviour
         dashPressed = false;
     }
 
-    private void FixedUpdate()
+    public void CombatTick()
+    {
+        UpdateGrounded();
+        UpdateFacing();
+        if (stateMachine == null)
+        {
+            ApplyCombatVelocity();
+        }
+    }
+
+    public void CombatTickTimers()
+    {
+        UpdateDashTimers();
+    }
+
+    // The state machine calls this after arbitration, before the clock simulates physics.
+    public void ApplyCombatVelocity()
     {
         if (isDashing)
         {
@@ -170,6 +195,13 @@ public class PlayerMotor2D : MonoBehaviour
         }
 
         moveInput = Mathf.Clamp(moveInput, -1f, 1f);
+    }
+
+    public void ClearSampledInput()
+    {
+        moveInput = 0f;
+        jumpPressed = false;
+        dashPressed = false;
     }
 
     private void UpdateFacing()
@@ -287,7 +319,7 @@ public class PlayerMotor2D : MonoBehaviour
     {
         if (dashCooldownTimer > 0f)
         {
-            dashCooldownTimer -= Time.deltaTime;
+            dashCooldownTimer = CombatTimeController.AdvanceTimer(dashCooldownTimer);
         }
 
         if (!isDashing)
@@ -295,7 +327,7 @@ public class PlayerMotor2D : MonoBehaviour
             return;
         }
 
-        dashTimer -= Time.deltaTime;
+        dashTimer = CombatTimeController.AdvanceTimer(dashTimer);
 
         if (dashTimer <= 0f)
         {
@@ -364,10 +396,10 @@ public class PlayerMotor2D : MonoBehaviour
 
     private void OnDisable()
     {
+        CombatTimeController.Unregister(this);
         bool wasDashing = isDashing;
-        CancelDashFromStateMachine(wasDashing);
-        jumpPressed = false;
-        dashPressed = false;
+        CancelDashFromStateMachine(true);
+        ClearSampledInput();
         if (wasDashing)
         {
             stateMachine?.CompleteAction(PlayerActionState.Dash, "DashDisabled");
