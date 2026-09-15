@@ -233,6 +233,17 @@
                 },
                 {
                     "name": "",
+                    "id": "8fdf6e61-7c62-4b0f-a99c-9ea0b8d80764",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "eba68046-86f6-460b-bbb3-876210dc9cd3",
                     "path": "<Keyboard>/k",
                     "interactions": "",
@@ -315,6 +326,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0d8b54d3-b3cb-40b8-96c8-19d808f7d8a7",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
                     "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
