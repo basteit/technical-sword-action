@@ -1,6 +1,6 @@
 {
   "name": "TechnicalSwordAction.PlayerState.PlayModeTests",
-  "references": ["TechnicalSwordAction.PlayerState", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+  "references": ["TechnicalSwordAction.PlayerState", "UnityEngine.TestRunner", "Unity.InputSystem", "UnityEditor.TestRunner"],
   "includePlatforms": [],
   "overrideReferences": true,
   "precompiledReferences": ["nunit.framework.dll"],

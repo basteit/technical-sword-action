@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using TechnicalSwordAction.CombatTime;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public interface ICombatTickListener
@@ -38,7 +37,6 @@ public sealed class CombatTimeController : MonoBehaviour
     private readonly Dictionary<Animator, AnimatorRegistration> animators = new();
     private readonly List<Animator> animatorSnapshot = new();
     private readonly CombatClock clock = new();
-    private InputAction pauseAction;
     private SimulationMode2D previousSimulationMode;
     private float previousTimeScale;
     private float previousFixedDeltaTime;
@@ -110,10 +108,6 @@ public sealed class CombatTimeController : MonoBehaviour
         foreach (var pair in animators)
             if (pair.Key != null) pair.Key.enabled = false;
         ApplyTimeScale();
-        pauseAction = new InputAction("Pause", InputActionType.Button);
-        pauseAction.AddBinding("<Keyboard>/escape");
-        pauseAction.AddBinding("<Gamepad>/start");
-        pauseAction.Enable();
         SceneManager.sceneLoaded += OnSceneLoaded;
         SceneManager.activeSceneChanged += OnActiveSceneChanged;
     }
@@ -186,15 +180,6 @@ public sealed class CombatTimeController : MonoBehaviour
     }
 
     public static void RequestDefeatSlow(object source) => DefeatSlowRequested?.Invoke(source);
-
-    private void Update()
-    {
-        if (DialogueController.GameplayInputBlocked) return;
-        if (pauseAction == null || !pauseAction.WasPressedThisFrame()) return;
-        var player = FindFirstObjectByType<PlayerStateMachine>();
-        if (player != null) player.RequestPause();
-        else SetPaused(!IsPaused);
-    }
 
     private void LateUpdate()
     {
@@ -280,8 +265,6 @@ public sealed class CombatTimeController : MonoBehaviour
         ResetActors("TimeControllerDisabled");
         SceneManager.sceneLoaded -= OnSceneLoaded;
         SceneManager.activeSceneChanged -= OnActiveSceneChanged;
-        pauseAction?.Dispose();
-        pauseAction = null;
         foreach (var pair in animators)
             if (pair.Key != null) pair.Key.enabled = pair.Value.WasEnabled;
         Physics2D.simulationMode = previousSimulationMode;

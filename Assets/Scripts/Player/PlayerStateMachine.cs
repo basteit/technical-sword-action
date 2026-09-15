@@ -153,6 +153,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
     private void OnEnable()
     {
         CombatTimeController.Register(this);
+        if (GetComponent<PlayerInputRouter>() == null) gameObject.AddComponent<PlayerInputRouter>();
         CombatTimeController.PauseChanged += OnPauseChanged;
     }
 
@@ -279,6 +280,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
     public void ClearBufferedGameplayInput()
     {
         ClearActionRequests();
+        GetComponent<PlayerInputRouter>()?.ClearGameplayInput();
         attack?.ClearBufferedInput();
         motor?.ClearSampledInput();
         suppressGameplayInputFrame = Time.frameCount;
@@ -467,6 +469,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
 
         ReleaseAllCollisionIgnores();
         ClearActionRequests();
+        GetComponent<PlayerInputRouter>()?.ClearGameplayInput();
         motor?.ClearSampledInput();
         suppressGameplayInputFrame = -1;
         CombatSuspended = false;

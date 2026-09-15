@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem;
 using TechnicalSwordAction.PlayerState;
 
 public enum ParryResult
@@ -89,14 +88,6 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         CombatTimeController.Register(this);
     }
 
-    private void Update()
-    {
-        if (CombatTimeController.AcceptsGameplayInput)
-        {
-            ReadInput();
-        }
-    }
-
     public void CombatTick()
     {
     }
@@ -104,19 +95,6 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     public void CombatTickTimers()
     {
         UpdateTimers();
-    }
-
-    private void ReadInput()
-    {
-        if (Keyboard.current == null)
-        {
-            return;
-        }
-
-        if (Keyboard.current.kKey.wasPressedThisFrame)
-        {
-            stateMachine?.RequestAction(PlayerActionRequest.Parry);
-        }
     }
 
     private void UpdateTimers()

@@ -39,7 +39,7 @@ public class PlayerDebugOverlay : MonoBehaviour
         if (!visible) return;
 
         EnsureGuiStyles();
-        GUI.Box(new Rect(12, 12, 920, 574), "Player Debug", boxStyle);
+        GUI.Box(new Rect(12, 12, 920, 608), "Player Debug", boxStyle);
 
         string state = stateMachine != null ? stateMachine.CurrentState.ToString() : "N/A";
         string grounded = motor != null && motor.IsGrounded ? "Yes" : "No";
@@ -86,6 +86,8 @@ public class PlayerDebugOverlay : MonoBehaviour
         GUI.Label(new Rect(28, 464, 860, 30), $"Parry Stats: Attempt {parryAttempts} / Success {parrySuccess} / Just {parryJust} / Miss {parryMiss}", labelStyle);
         GUI.Label(new Rect(28, 498, 860, 30), $"Parry Success Rate: {parryRate} (diagnostic)", labelStyle);
         GUI.Label(new Rect(28, 532, 860, 30), $"Damage Stats: Taken {hitsTaken} / Blocked(Parry {blockedParry}, IFrame {blockedIFrame}, Dash {blockedDash})", labelStyle);
+        var input = GetComponent<PlayerInputRouter>();
+        GUI.Label(new Rect(28, 566, 860, 30), $"Input: {input?.LastUsedDevice?.displayName ?? "None"} / Move {input?.MoveValue} / B presses {input?.SharedPressCount}", labelStyle);
         GUI.Label(new Rect(730, 56, 180, 30), $"FPS: {(1f / Time.unscaledDeltaTime):0}", labelStyle);
         GUI.Label(new Rect(630, 90, 290, 30), $"Tick: {CombatTimeController.TickCount}", labelStyle);
         GUI.Label(new Rect(630, 260, 290, 30),

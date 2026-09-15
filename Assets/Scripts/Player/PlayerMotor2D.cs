@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using TechnicalSwordAction.PlayerState;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -35,8 +34,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     private Rigidbody2D rb;
     private Collider2D ownCollider;
     private float moveInput;
-    private bool jumpPressed;
-    private bool dashPressed;
+    private bool jumpDownInput;
 
     private bool isGrounded;
     private bool isDashing;
@@ -48,6 +46,15 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     private readonly HashSet<Collider2D> ignoredDashColliders = new();
 
     public float MoveInput => moveInput;
+    public bool DownInput { get; private set; }
+    // The floor traversal executor in #49 consumes this sample with the Jump request.
+    public bool JumpDownInput => jumpDownInput;
+    public void SetMoveInput(Vector2 value)
+    {
+        moveInput = Mathf.Abs(value.x) >= 0.5f ? Mathf.Sign(value.x) : 0f;
+        DownInput = value.y <= -0.5f;
+    }
+    public void SetJumpDownInput(bool down) => jumpDownInput = down;
     public bool IsGrounded => isGrounded;
     public bool IsDashing => isDashing;
     public bool CanDash => CanStartDash;
@@ -98,30 +105,6 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         CombatTimeController.Register(this);
     }
 
-    private void Update()
-    {
-        if (!CombatTimeController.AcceptsGameplayInput)
-        {
-            ClearSampledInput();
-            return;
-        }
-
-        ReadInput();
-
-        if (jumpPressed)
-        {
-            stateMachine?.RequestAction(PlayerActionRequest.Jump);
-        }
-
-        if (dashPressed)
-        {
-            stateMachine?.RequestAction(PlayerActionRequest.Dash);
-        }
-
-        jumpPressed = false;
-        dashPressed = false;
-    }
-
     public void CombatTick()
     {
         UpdateGrounded();
@@ -167,41 +150,11 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
     }
 
-    private void ReadInput()
-    {
-        moveInput = 0f;
-
-        if (Keyboard.current != null)
-        {
-            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed)
-            {
-                moveInput -= 1f;
-            }
-
-            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
-            {
-                moveInput += 1f;
-            }
-
-            if (Keyboard.current.spaceKey.wasPressedThisFrame)
-            {
-                jumpPressed = true;
-            }
-
-            if (Keyboard.current.leftShiftKey.wasPressedThisFrame || Keyboard.current.rightShiftKey.wasPressedThisFrame)
-            {
-                dashPressed = true;
-            }
-        }
-
-        moveInput = Mathf.Clamp(moveInput, -1f, 1f);
-    }
-
     public void ClearSampledInput()
     {
         moveInput = 0f;
-        jumpPressed = false;
-        dashPressed = false;
+        DownInput = false;
+        jumpDownInput = false;
     }
 
     private void UpdateFacing()
