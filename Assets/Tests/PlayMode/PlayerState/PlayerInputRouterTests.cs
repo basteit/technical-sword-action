@@ -94,11 +94,14 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             var padBindings = new (GamepadButton button, PlayerActionRequest request)[] {
                 (GamepadButton.South, PlayerActionRequest.Jump), (GamepadButton.West, PlayerActionRequest.Attack),
+                (GamepadButton.LeftTrigger, PlayerActionRequest.Dash),
                 (GamepadButton.LeftShoulder, PlayerActionRequest.Parry), (GamepadButton.RightShoulder, PlayerActionRequest.Special),
-                (GamepadButton.North, PlayerActionRequest.Heal) };
+                (GamepadButton.North, PlayerActionRequest.Heal), (GamepadButton.East, PlayerActionRequest.Interact) };
             foreach (var binding in padBindings)
             {
-                Release(); Reset(); Pad(binding.button); Resolve();
+                Release(); Reset();
+                if (binding.request == PlayerActionRequest.Interact) Include();
+                Pad(binding.button); Resolve();
                 Assert.That(Accepted, Is.EqualTo(binding.request), binding.button.ToString());
                 Assert.That(Get<string>(router, "LastUsedControlScheme"), Is.EqualTo("Gamepad"));
             }
@@ -112,7 +115,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [Test]
-        public void BWithAndWithoutTargetTenPressesEachNeverDoubleFires()
+        public void BRemainsInteractOnlyAndNeverTriggersDash()
         {
             int startCount = Get<int>(counter, "Count");
             int sharedBefore = Get<int>(router, "SharedPressCount");
@@ -123,11 +126,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<int>(counter, "Count"), Is.EqualTo(startCount + i + 1));
                 Assert.That(Get<bool>(motor, "IsDashing"), Is.False);
                 Release(); Reset(); Exclude(); Pad(GamepadButton.East); Resolve();
-                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Dash));
+                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.None));
                 Assert.That(Get<int>(counter, "Count"), Is.EqualTo(startCount + i + 1));
+                Assert.That(Get<bool>(motor, "IsDashing"), Is.False);
                 Release();
             }
-            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(sharedBefore + 20));
+            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(sharedBefore));
         }
 
         [Test]
@@ -143,7 +147,6 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 if (scenario == 3) Exclude();
                 if (scenario == 4) target.GetComponent<Collider2D>().enabled = false;
                 for (int tick = 0; tick < 15; tick++) { Resolve(); Call(state, "CombatTickTimers"); }
-                Assert.That(Get<PlayerActionRequest>(router, "LastSharedResolution"), Is.EqualTo(PlayerActionRequest.Interact));
                 Assert.That(Get<bool>(motor, "IsDashing"), Is.False);
                 Assert.That(Get<int>(counter, "Count"), Is.Zero);
                 Call(state, "CompleteAction", PlayerActionState.Attack, "TestUnlock");
@@ -164,15 +167,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Dash));
             Assert.That(Get<int>(counter, "Count"), Is.Zero);
             Release(); Reset(); Include(); Pad(GamepadButton.East); Resolve();
+            Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Interact));
             Call(state, "CompleteAction", PlayerActionState.Interact, "TestComplete");
             Keys(Key.LeftShift); Resolve();
             Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Dash));
             Release(); Reset(); Include();
-            // Even with E and Shift held, the independent physical B edge is observed once.
+            // B remains the independent Interact edge while keyboard inputs stay separate.
             Keys(Key.E, Key.LeftShift); Resolve();
             int before = Get<int>(router, "SharedPressCount");
             Pad(GamepadButton.East);
-            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(before + 1));
+            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(before));
+            Assert.That(Get<int>(counter, "Count"), Is.EqualTo(1));
         }
 
         [Test]
@@ -200,7 +205,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Include();
             InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.East));
             InputSystem.QueueStateEvent(pad, new GamepadState()); Pump();
-            Assert.That((bool)Call(router, "IsHeld", "SharedDashInteract"), Is.False);
+            Assert.That((bool)Call(router, "IsHeld", "Interact"), Is.False);
             Assert.That(Get<PlayerActionRequest>(state, "PendingRequests"), Is.EqualTo(PlayerActionRequest.Interact));
             Resolve(); Resolve();
             Assert.That(Get<int>(counter, "Count"), Is.EqualTo(1));
@@ -316,13 +321,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Reset();
                 target.transform.position = new Vector3(0.99f, 0);
                 Call(clock, "AdvanceFrame", 1d / 60d);
+                Call(interactor, "OnTriggerEnter2D", target.GetComponent<Collider2D>());
+                Call(interactor, "SelectCurrentInteractable");
                 Pad(GamepadButton.East); Resolve();
                 Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Interact), "Inside boundary");
                 Release(); Reset();
                 target.transform.position = new Vector3(1.05f, 0); // beyond Physics2D contact skin
                 Call(clock, "AdvanceFrame", 1d / 60d);
+                Call(interactor, "OnTriggerExit2D", target.GetComponent<Collider2D>());
+                Call(interactor, "SelectCurrentInteractable");
                 Pad(GamepadButton.East); Resolve();
-                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Dash), "Outside boundary");
+                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.None), "Outside boundary");
                 Release();
             }
             GameObject other = new GameObject("CloserCounter");
@@ -360,8 +369,26 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private void Pad(params GamepadButton[] buttons)
         {
             var value = new GamepadState();
-            foreach (var button in buttons) value = value.WithButton(button);
-            InputSystem.QueueStateEvent(pad, value); Pump();
+            foreach (var button in buttons)
+            {
+                if (button != GamepadButton.LeftTrigger && button != GamepadButton.RightTrigger)
+                {
+                    value = value.WithButton(button);
+                }
+            }
+            InputSystem.QueueStateEvent(pad, value);
+            foreach (var button in buttons)
+            {
+                if (button == GamepadButton.LeftTrigger)
+                {
+                    InputSystem.QueueDeltaStateEvent(pad.leftTrigger, 1f);
+                }
+                else if (button == GamepadButton.RightTrigger)
+                {
+                    InputSystem.QueueDeltaStateEvent(pad.rightTrigger, 1f);
+                }
+            }
+            Pump();
         }
         private void Release()
         {

@@ -52,9 +52,7 @@ public sealed class PlayerInputRouter : MonoBehaviour
         move.performed += ObserveDevice;
         foreach (string name in new[] { "Jump", "Attack", "Dash", "Parry", "Special", "Heal", "Interact", "Pause" })
             Subscribe(actions.FindAction("Gameplay/" + name, true));
-        Subscribe(actions.FindAction("Context/SharedDashInteract", true));
         actions.FindActionMap("Gameplay", true).Enable();
-        actions.FindActionMap("Context", true).Enable();
         CombatTimeController.PauseChanged += OnPauseChanged;
         InputSystem.onAfterUpdate += AfterInputUpdate;
     }
@@ -110,14 +108,6 @@ public sealed class PlayerInputRouter : MonoBehaviour
 
         MoveValue = move.ReadValue<Vector2>();
         motor?.SetMoveInput(MoveValue);
-        if (TakePress("SharedDashInteract"))
-        {
-            if (state.RequestSharedDashInteract())
-            {
-                SharedPressCount++;
-                NotifyRequest(state.LastSharedInputResolution);
-            }
-        }
         Route("Dash", PlayerActionRequest.Dash);
         Route("Parry", PlayerActionRequest.Parry);
         Route("Special", PlayerActionRequest.Special);
@@ -134,7 +124,22 @@ public sealed class PlayerInputRouter : MonoBehaviour
 
     private void Route(string name, PlayerActionRequest request)
     {
-        if (TakePress(name) && state.RequestAction(request)) NotifyRequest(request);
+        if (!TakePress(name))
+        {
+            return;
+        }
+
+        if (name == "Interact")
+        {
+            if (state.RequestInteraction())
+            {
+                NotifyRequest(request);
+            }
+
+            return;
+        }
+
+        if (state.RequestAction(request)) NotifyRequest(request);
     }
 
     private void NotifyRequest(PlayerActionRequest request)

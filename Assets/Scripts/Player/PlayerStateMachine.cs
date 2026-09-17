@@ -268,6 +268,25 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         return RequestAction(pendingSharedRequest);
     }
 
+    public bool RequestInteraction()
+    {
+        if (!CanCollectGameplayInput || interactor == null)
+        {
+            return false;
+        }
+
+        pendingSharedRequest = PlayerActionRequest.Interact;
+        pendingSharedTarget = interactor.SelectTargetForSharedInput();
+        bool accepted = RequestAction(PlayerActionRequest.Interact);
+        if (!accepted)
+        {
+            pendingSharedRequest = PlayerActionRequest.None;
+            pendingSharedTarget = null;
+        }
+
+        return accepted;
+    }
+
     public void SetCombatSuspended(bool suspended)
     {
         CombatSuspended = suspended;
