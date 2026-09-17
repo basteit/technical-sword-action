@@ -18,6 +18,10 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         public float groundMotionDistance;
         [Min(0f), Tooltip("How long ground motion is applied, in seconds.")]
         public float groundMotionDuration;
+        [Tooltip("Use the displacement curve instead of constant distance/duration.")]
+        public bool useGroundMotionCurve;
+        [Tooltip("X: seconds since this step starts. Y: cumulative displacement in world units, relative to facing. Flat sections stop; falling sections move backward.")]
+        public AnimationCurve groundMotionCurve;
     }
 
     [Header("Combo")]
@@ -76,6 +80,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     private float bufferedAttackRemaining;
     private float stepTimeoutRemaining;
     private float groundMotionRemaining;
+    private float groundMotionElapsed;
     private int attackFacingSign = 1;
     private int attackTriggerHash;
     private int comboStepHash;
@@ -103,8 +108,15 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
             }
 
             AttackStepData data = GetStepData(Mathf.Max(1, comboStep));
+            float tick = CombatTimeController.StepSeconds;
+            if (data.useGroundMotionCurve && data.groundMotionCurve != null && data.groundMotionCurve.length >= 2)
+            {
+                float end = data.groundMotionCurve[data.groundMotionCurve.length - 1].time;
+                float next = Mathf.Min(end, groundMotionElapsed + tick);
+                return (data.groundMotionCurve.Evaluate(next) - data.groundMotionCurve.Evaluate(groundMotionElapsed)) / tick * attackFacingSign;
+            }
             float duration = Mathf.Max(CombatTimeController.StepSeconds, data.groundMotionDuration);
-            return data.groundMotionDistance / duration * attackFacingSign;
+            return data.groundMotionDistance / duration * Mathf.Min(tick, groundMotionRemaining) / tick * attackFacingSign;
         }
     }
     public PlayerAttackCancelWindow OpenCancelWindows => openCancelWindows;
@@ -151,6 +163,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         {
             stepTimeoutRemaining = CombatTimeController.AdvanceTimer(stepTimeoutRemaining);
             groundMotionRemaining = CombatTimeController.AdvanceTimer(groundMotionRemaining);
+            groundMotionElapsed += CombatTimeController.StepSeconds;
             if (stepTimeoutRemaining <= 0f)
             {
                 TimeoutFallbackCount++;
@@ -229,6 +242,11 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         AttackStepData data = GetStepData(comboStep);
         stepTimeoutRemaining = data.fallbackDuration + fallbackGraceDuration;
         groundMotionRemaining = Mathf.Max(0f, data.groundMotionDuration);
+        groundMotionElapsed = 0f;
+        if (data.useGroundMotionCurve && data.groundMotionCurve != null && data.groundMotionCurve.length >= 2)
+        {
+            groundMotionRemaining = Mathf.Max(0f, data.groundMotionCurve[data.groundMotionCurve.length - 1].time);
+        }
         attackFacingSign = motor != null && motor.FacingSign < 0 ? -1 : 1;
         damagedTargets.Clear();
 
@@ -419,6 +437,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         bufferedAttackRemaining = 0f;
         stepTimeoutRemaining = 0f;
         groundMotionRemaining = 0f;
+        groundMotionElapsed = 0f;
         openCancelWindows = PlayerAttackCancelWindow.None;
         damagedTargets.Clear();
 
@@ -473,6 +492,10 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
                 source.groundMotionDistance = defaults.groundMotionDistance;
             }
             if (source.groundMotionDuration <= 0f) source.groundMotionDuration = defaults.groundMotionDuration;
+            if (source.groundMotionCurve == null || source.groundMotionCurve.length < 2)
+            {
+                source.groundMotionCurve = AnimationCurve.Linear(0f, 0f, source.groundMotionDuration, source.groundMotionDistance);
+            }
 
             normalized[i] = source;
         }

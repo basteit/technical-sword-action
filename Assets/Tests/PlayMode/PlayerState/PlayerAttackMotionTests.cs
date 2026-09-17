@@ -127,6 +127,33 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 "A negative per-step distance should move back from the facing direction.");
         }
 
+        [Test]
+        public void CurveSupportsDelayedAdvancePauseAndRetreat()
+        {
+            Array steps = (Array)GetField(attack, "attackSteps").GetValue(attack);
+            object firstStep = steps.GetValue(0);
+            Field(firstStep, "useGroundMotionCurve", true);
+            Field(firstStep, "groundMotionCurve", new AnimationCurve(
+                new Keyframe(0f, 0f, 0f, 0f),
+                new Keyframe(0.1f, 0f, 0f, 2f),
+                new Keyframe(0.2f, 0.2f, 2f, 0f),
+                new Keyframe(0.3f, 0.2f, 0f, -1f),
+                new Keyframe(0.4f, 0.1f, -1f, 0f)));
+            steps.SetValue(firstStep, 0);
+            SetField(attack, "attackSteps", steps);
+            SetField(motor, "isGrounded", true);
+            StartAttack();
+            Assert.That(body.linearVelocity.x, Is.EqualTo(0f).Within(0.0001f));
+            SetField(attack, "groundMotionElapsed", 0.12f);
+            Assert.That(Get<float>(attack, "GroundMotionVelocity"), Is.GreaterThan(0f));
+            SetField(attack, "groundMotionElapsed", 0.22f);
+            Assert.That(Get<float>(attack, "GroundMotionVelocity"), Is.EqualTo(0f).Within(0.0001f));
+            SetField(attack, "groundMotionElapsed", 0.32f);
+            Assert.That(Get<float>(attack, "GroundMotionVelocity"), Is.LessThan(0f));
+            Call(attack, "CancelAttack", "TestCancel");
+            Assert.That(Get<float>(attack, "GroundMotionVelocity"), Is.EqualTo(0f));
+        }
+
         private void StartAttack()
         {
             Assert.That((bool)Call(state, "RequestAction", PlayerActionRequest.Attack), Is.True);
