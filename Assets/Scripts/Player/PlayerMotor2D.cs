@@ -26,6 +26,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     [SerializeField] private PlayerDamageReceiver2D damageReceiver;
     [SerializeField] private PlayerParry2D parry;
     [SerializeField] private PlayerSpecialSkill2D specialSkill;
+    [SerializeField] private PlayerAttack2D attack;
     [SerializeField] private PlayerStateMachine stateMachine;
 
     [Header("Feel Tuning")]
@@ -94,6 +95,11 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
             specialSkill = GetComponent<PlayerSpecialSkill2D>();
         }
 
+        if (attack == null)
+        {
+            attack = GetComponent<PlayerAttack2D>();
+        }
+
         if (stateMachine == null)
         {
             stateMachine = GetComponent<PlayerStateMachine>();
@@ -135,6 +141,23 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
             return;
         }
 
+        if (stateMachine != null && stateMachine.ActionState == PlayerActionState.Attack && attack != null)
+        {
+            if (isGrounded)
+            {
+                // Ground attacks ignore live movement input. The current attack step
+                // owns its signed forward/backward motion for the configured window.
+                rb.linearVelocity = new Vector2(attack.GroundMotionVelocity, rb.linearVelocity.y);
+            }
+            else
+            {
+                // Air attacks retain steering, but at a deliberately reduced speed.
+                rb.linearVelocity = new Vector2(moveInput * moveSpeed * attack.AirMoveSpeedMultiplier, rb.linearVelocity.y);
+            }
+
+            return;
+        }
+
         bool movementLocked = stateMachine != null
             ? stateMachine.BlocksStandardMovement
             : (damageReceiver != null && damageReceiver.IsHitLocked) ||
@@ -159,7 +182,8 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
     private void UpdateFacing()
     {
-        if (!flipSpriteByMoveInput || isDashing)
+        if (!flipSpriteByMoveInput || isDashing ||
+            (stateMachine != null && stateMachine.ActionState == PlayerActionState.Attack))
         {
             return;
         }

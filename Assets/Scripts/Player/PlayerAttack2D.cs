@@ -14,6 +14,14 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         public float radius;
         public float gaugeGain;
         public float fallbackDuration;
+        [Tooltip("Signed displacement in world units during this ground attack step. Positive moves toward facing direction; negative moves backward.")]
+        public float groundMotionDistance;
+        [Min(0f), Tooltip("How long ground motion is applied, in seconds.")]
+        public float groundMotionDuration;
+        [Tooltip("Use the displacement curve instead of constant distance/duration.")]
+        public bool useGroundMotionCurve;
+        [Tooltip("X: seconds since this step starts. Y: cumulative displacement in world units, relative to facing. Flat sections stop; falling sections move backward.")]
+        public AnimationCurve groundMotionCurve;
     }
 
     [Header("Combo")]
@@ -33,11 +41,15 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     [Header("Per Step (1-4)")]
     [SerializeField] private AttackStepData[] attackSteps =
     {
-        new AttackStepData { damage = 1, radius = 0.65f, gaugeGain = 2f, fallbackDuration = 0.62f },
-        new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.52f },
-        new AttackStepData { damage = 2, radius = 0.75f, gaugeGain = 2f, fallbackDuration = 0.62f },
-        new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 1.02f }
+        new AttackStepData { damage = 1, radius = 0.65f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.10f, groundMotionDuration = 0.14f },
+        new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.52f, groundMotionDistance = 0.14f, groundMotionDuration = 0.16f },
+        new AttackStepData { damage = 2, radius = 0.75f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.18f, groundMotionDuration = 0.18f },
+        new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 1.02f, groundMotionDistance = 0.22f, groundMotionDuration = 0.20f }
     };
+
+    [Header("Air Attack Movement")]
+    [SerializeField, Range(0f, 1f), Tooltip("Multiplier applied to normal move speed while attacking in the air.")]
+    private float airMoveSpeedMultiplier = 0.35f;
 
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
@@ -67,6 +79,9 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     private bool hitAppliedForCurrentStep;
     private float bufferedAttackRemaining;
     private float stepTimeoutRemaining;
+    private float groundMotionRemaining;
+    private float groundMotionElapsed;
+    private int attackFacingSign = 1;
     private int attackTriggerHash;
     private int comboStepHash;
     private PlayerAttackCancelWindow openCancelWindows;
@@ -79,6 +94,31 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     public bool HitAppliedForCurrentStep => hitAppliedForCurrentStep;
     public float InputBufferRemaining => Mathf.Max(0f, bufferedAttackRemaining);
     public float StepTimeoutRemaining => Mathf.Max(0f, stepTimeoutRemaining);
+    public float GroundMotionRemaining => Mathf.Max(0f, groundMotionRemaining);
+    public float GroundMotionDistance => GetStepData(Mathf.Max(1, comboStep)).groundMotionDistance;
+    public float GroundMotionDuration => GetStepData(Mathf.Max(1, comboStep)).groundMotionDuration;
+    public float AirMoveSpeedMultiplier => airMoveSpeedMultiplier;
+    public float GroundMotionVelocity
+    {
+        get
+        {
+            if (!isAttacking || groundMotionRemaining <= 0f)
+            {
+                return 0f;
+            }
+
+            AttackStepData data = GetStepData(Mathf.Max(1, comboStep));
+            float tick = CombatTimeController.StepSeconds;
+            if (data.useGroundMotionCurve && data.groundMotionCurve != null && data.groundMotionCurve.length >= 2)
+            {
+                float end = data.groundMotionCurve[data.groundMotionCurve.length - 1].time;
+                float next = Mathf.Min(end, groundMotionElapsed + tick);
+                return (data.groundMotionCurve.Evaluate(next) - data.groundMotionCurve.Evaluate(groundMotionElapsed)) / tick * attackFacingSign;
+            }
+            float duration = Mathf.Max(CombatTimeController.StepSeconds, data.groundMotionDuration);
+            return data.groundMotionDistance / duration * Mathf.Min(tick, groundMotionRemaining) / tick * attackFacingSign;
+        }
+    }
     public PlayerAttackCancelWindow OpenCancelWindows => openCancelWindows;
     public bool CanStartAttackFromStateMachine => isActiveAndEnabled && !isAttacking;
     public int ComboAttemptCount { get; private set; }
@@ -91,6 +131,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     {
         EnsureReferences();
         EnsureStepData();
+        airMoveSpeedMultiplier = Mathf.Clamp01(airMoveSpeedMultiplier);
         attackTriggerHash = Animator.StringToHash(attackTriggerName);
         comboStepHash = Animator.StringToHash(comboStepParamName);
         ResetAttackState(true);
@@ -100,6 +141,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     {
         inputBufferDuration = Mathf.Max(0f, inputBufferDuration);
         fallbackGraceDuration = Mathf.Max(0f, fallbackGraceDuration);
+        airMoveSpeedMultiplier = Mathf.Clamp01(airMoveSpeedMultiplier);
         EnsureStepData();
     }
 
@@ -120,6 +162,8 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         if (isAttacking)
         {
             stepTimeoutRemaining = CombatTimeController.AdvanceTimer(stepTimeoutRemaining);
+            groundMotionRemaining = CombatTimeController.AdvanceTimer(groundMotionRemaining);
+            groundMotionElapsed += CombatTimeController.StepSeconds;
             if (stepTimeoutRemaining <= 0f)
             {
                 TimeoutFallbackCount++;
@@ -197,6 +241,13 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
         AttackStepData data = GetStepData(comboStep);
         stepTimeoutRemaining = data.fallbackDuration + fallbackGraceDuration;
+        groundMotionRemaining = Mathf.Max(0f, data.groundMotionDuration);
+        groundMotionElapsed = 0f;
+        if (data.useGroundMotionCurve && data.groundMotionCurve != null && data.groundMotionCurve.length >= 2)
+        {
+            groundMotionRemaining = Mathf.Max(0f, data.groundMotionCurve[data.groundMotionCurve.length - 1].time);
+        }
+        attackFacingSign = motor != null && motor.FacingSign < 0 ? -1 : 1;
         damagedTargets.Clear();
 
         if (animator != null)
@@ -385,6 +436,8 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         hitAppliedForCurrentStep = false;
         bufferedAttackRemaining = 0f;
         stepTimeoutRemaining = 0f;
+        groundMotionRemaining = 0f;
+        groundMotionElapsed = 0f;
         openCancelWindows = PlayerAttackCancelWindow.None;
         damagedTargets.Clear();
 
@@ -431,6 +484,18 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
             if (source.radius <= 0f) source.radius = defaults.radius;
             if (source.gaugeGain <= 0f) source.gaugeGain = defaults.gaugeGain;
             if (source.fallbackDuration <= 0f) source.fallbackDuration = defaults.fallbackDuration;
+            // Existing scene/prefab data predates the motion fields and deserializes
+            // both as zero. Fill that legacy pair while preserving an intentional
+            // zero distance when its duration is explicitly configured.
+            if (source.groundMotionDuration <= 0f && Mathf.Approximately(source.groundMotionDistance, 0f))
+            {
+                source.groundMotionDistance = defaults.groundMotionDistance;
+            }
+            if (source.groundMotionDuration <= 0f) source.groundMotionDuration = defaults.groundMotionDuration;
+            if (source.groundMotionCurve == null || source.groundMotionCurve.length < 2)
+            {
+                source.groundMotionCurve = AnimationCurve.Linear(0f, 0f, source.groundMotionDuration, source.groundMotionDistance);
+            }
 
             normalized[i] = source;
         }
@@ -448,10 +513,10 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     {
         return index switch
         {
-            0 => new AttackStepData { damage = 1, radius = 0.65f, gaugeGain = 2f, fallbackDuration = 0.62f },
-            1 => new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.52f },
-            2 => new AttackStepData { damage = 2, radius = 0.75f, gaugeGain = 2f, fallbackDuration = 0.62f },
-            _ => new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 1.02f }
+            0 => new AttackStepData { damage = 1, radius = 0.65f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.10f, groundMotionDuration = 0.14f },
+            1 => new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.52f, groundMotionDistance = 0.14f, groundMotionDuration = 0.16f },
+            2 => new AttackStepData { damage = 2, radius = 0.75f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.18f, groundMotionDuration = 0.18f },
+            _ => new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 1.02f, groundMotionDistance = 0.22f, groundMotionDuration = 0.20f }
         };
     }
 
