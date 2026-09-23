@@ -157,6 +157,17 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         CombatTimeController.PauseChanged += OnPauseChanged;
     }
 
+    private void Start()
+    {
+        // Existing prefabs receive the missing prototype actions without rewriting their data.
+        if (damageReceiver != null && !actionHandlers.ContainsKey(PlayerActionState.Heal))
+            gameObject.AddComponent<PlayerHeal2D>();
+        if (damageReceiver != null && GetComponent<PlayerRespawn2D>() == null)
+            gameObject.AddComponent<PlayerRespawn2D>();
+        if (parry != null && !actionHandlers.ContainsKey(PlayerActionState.ParryCounter))
+            gameObject.AddComponent<PlayerParryCounter2D>();
+    }
+
     private void OnPauseChanged(bool paused)
     {
         if (paused)
@@ -320,7 +331,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
             return;
         }
 
-        TransitionTo(PlayerActionState.Neutral, reason, false);
+        TransitionTo(PlayerActionState.Neutral, reason, true);
     }
 
     public void CompleteParryAction(string reason)
@@ -358,6 +369,8 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         // Event-driven dialogue can be active while ActionState is still
         // Neutral, so it must be interrupted independently of Interact.
         DialogueController.InterruptActive();
+
+        motor?.CancelFloorDrop();
 
         if (ActionState != PlayerActionState.Hit)
         {
@@ -469,6 +482,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
 
         attack?.CancelAttack(reason);
         motor?.CancelDashFromStateMachine(true);
+        motor?.ResetLocomotion();
         parry?.CancelParryFromStateMachine(true);
         specialSkill?.CancelSkillFromStateMachine();
         damageReceiver?.CancelHitFromStateMachine();
@@ -601,7 +615,12 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         if (motor != null && motor.CanStartDash) legal |= PlayerActionRequest.Dash;
         if (parry != null && parry.CanStartParry) legal |= PlayerActionRequest.Parry;
         if (specialSkill != null && specialSkill.CanStartSkill) legal |= PlayerActionRequest.Special;
-        if (attack != null && attack.CanStartAttackFromStateMachine) legal |= PlayerActionRequest.Attack;
+        if (ActionState == PlayerActionState.ParrySuccess)
+        {
+            if (actionHandlers.TryGetValue(PlayerActionState.ParryCounter, out IPlayerActionStateHandler counter) && counter.CanStartAction)
+                legal |= PlayerActionRequest.Attack;
+        }
+        else if (attack != null && attack.CanStartAttackFromStateMachine) legal |= PlayerActionRequest.Attack;
         if (motor != null && motor.CanStartJump) legal |= PlayerActionRequest.Jump;
         if (interactor != null && interactor.CanStartInteraction()) legal |= PlayerActionRequest.Interact;
 
@@ -619,6 +638,14 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
     {
         PlayerActionRequest request = decision.SelectedRequest;
         PlayerActionState nextAction = decision.NextAction;
+
+        if (request == PlayerActionRequest.Attack && ActionState == PlayerActionState.ParrySuccess)
+        {
+            if (!actionHandlers.TryGetValue(PlayerActionState.ParryCounter, out IPlayerActionStateHandler counter) ||
+                !counter.TryStartAction()) return false;
+            TransitionTo(PlayerActionState.ParryCounter, "AcceptedParryCounter", true);
+            return true;
+        }
 
         switch (request)
         {

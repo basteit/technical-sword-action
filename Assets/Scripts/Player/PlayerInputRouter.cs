@@ -94,7 +94,7 @@ public sealed class PlayerInputRouter : MonoBehaviour
         if (!isActiveAndEnabled || actions == null) return;
         // Resolve Pause before any gameplay edge, regardless of input event order.
         bool pausePressed = TakePress("Pause");
-        if (pausePressed && !DialogueController.GameplayInputBlocked)
+        if (pausePressed)
         {
             if (state != null && state.RequestPause()) NotifyRequest(PlayerActionRequest.Pause);
         }
@@ -108,6 +108,7 @@ public sealed class PlayerInputRouter : MonoBehaviour
 
         MoveValue = move.ReadValue<Vector2>();
         motor?.SetMoveInput(MoveValue);
+        motor?.SetJumpHeld(IsHeld("Jump"));
         Route("Dash", PlayerActionRequest.Dash);
         Route("Parry", PlayerActionRequest.Parry);
         Route("Special", PlayerActionRequest.Special);

@@ -77,7 +77,7 @@ public class PlayerDebugOverlay : MonoBehaviour
         GUI.Label(new Rect(28, 158, 860, 30), $"Attack Timing: {attackTiming}", labelStyle);
         GUI.Label(new Rect(28, 192, 860, 30), $"Attack Stats: {attackStats}", labelStyle);
         GUI.Label(new Rect(28, 226, 600, 30), $"Dash CD: {cd}", labelStyle);
-        GUI.Label(new Rect(28, 260, 600, 30), $"HP: {hp}", labelStyle);
+        GUI.Label(new Rect(28, 260, 600, 30), $"HP: {hp} / Heal: {GetComponent<PlayerHeal2D>()?.RemainingUses} / {stateMachine?.LifeState}", labelStyle);
         GUI.Label(new Rect(28, 294, 600, 30), $"Parry Active: {parryActive} ({parryRemain}s)", labelStyle);
         GUI.Label(new Rect(28, 328, 600, 30), $"Parry Result: {parryLast}", labelStyle);
         GUI.Label(new Rect(28, 362, 600, 30), $"Parry FailLock: {failLock}s", labelStyle);

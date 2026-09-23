@@ -49,11 +49,21 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             foreach (PlayerActionState state in Enum.GetValues(typeof(PlayerActionState)))
             {
-                if (state != PlayerActionState.Neutral && state != PlayerActionState.Attack)
+                if (state != PlayerActionState.Neutral && state != PlayerActionState.Attack && state != PlayerActionState.ParrySuccess)
                 {
                     yield return new TestCaseData(state);
                 }
             }
+        }
+
+        [Test]
+        public void ParrySuccessOnlyAcceptsAttackAsDedicatedCounter()
+        {
+            var decision = PlayerActionResolver.Resolve(PlayerActionState.ParrySuccess,
+                PlayerActionRequest.Gameplay, PlayerActionRequest.Gameplay, PlayerAttackCancelWindow.All);
+            Assert.That(decision.SelectedRequest, Is.EqualTo(PlayerActionRequest.Attack));
+            Assert.That(decision.NextAction, Is.EqualTo(PlayerActionState.ParryCounter));
+            Assert.That(decision.StateRejectedRequests, Is.EqualTo(PlayerActionRequest.Gameplay & ~PlayerActionRequest.Attack));
         }
 
         [TestCaseSource(nameof(EveryGameplayRequestMask))]

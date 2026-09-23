@@ -63,7 +63,9 @@ namespace TechnicalSwordAction.PlayerState
             PlayerActionRequest selectedRequest = SelectHighestPriority(candidates);
             PlayerActionRequest lowerPriorityRequests =
                 candidates & ~selectedRequest;
-            PlayerActionState nextAction = GetNextAction(currentAction, selectedRequest);
+            PlayerActionState nextAction = currentAction == PlayerActionState.ParrySuccess &&
+                selectedRequest == PlayerActionRequest.Attack ? PlayerActionState.ParryCounter :
+                GetNextAction(currentAction, selectedRequest);
 
             return new PlayerActionDecision(
                 currentAction,
@@ -84,6 +86,9 @@ namespace TechnicalSwordAction.PlayerState
             {
                 return PlayerActionRequest.Gameplay;
             }
+
+            if (currentAction == PlayerActionState.ParrySuccess)
+                return PlayerActionRequest.Attack;
 
             if (currentAction != PlayerActionState.Attack)
             {
