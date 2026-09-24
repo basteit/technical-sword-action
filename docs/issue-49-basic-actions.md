@@ -20,7 +20,7 @@ Issue #49 の作業は指定されたGitHub作業フォルダの `codex/49-basic
 | Death / Respawn | 致死被弾でもGameObjectを非アクティブ化せず、Dead状態で速度・重力と操作を停止する。90Fで初期位置または指定spawnPointへ復帰し、HP・Heal残数・ゲージ初期値・入力・ロック・衝突無視をリセットする。y < -20の落下も死亡へ接続する。 |
 | Pause | Esc / Menuを最優先処理する。戦闘時計の既存停止規則を使用し、解除時にゲームプレイ予約を破棄する。 |
 | Neutral復帰 | 中央CompleteActionでexecutorのキャンセルも行う。既存のDisable・死亡・Scene変更の安全リセットに床抜けと空中Dashのリセットを接続する。 |
-| Interact | 単純カウンタ対象を追加する。BのInteract、左トリガー/ShiftのDash、EのInteractを維持する。 |
+| Interact | 単純カウンタ対象を追加する。検証SceneのPlayerにPlayerInteractor2Dを接続し、E/B案内を表示する。BのInteract、左トリガー/ShiftのDash、EのInteractを維持する。 |
 
 タイミング・回復量・追撃の数値は初期値。既存PlayerにはStartで未登録のHeal/CounterとRespawnを補完し、既存handlerは置き換えない。デバッグ表示にHeal残数とLife状態を追加した。
 
@@ -47,3 +47,9 @@ Issue #49 の作業は指定されたGitHub作業フォルダの `codex/49-basic
 - #48の段別Defense/Late Cancel設定データはこのブランチの起点にまだ含まれない。既存の受付APIとの結合確認は後続の統合時に必要。
 - キーボード・マウスと実Xbox系ゲームパッドによる全Action各10回の手動操作受入は未実施。自動テストは実機の手触り確認を代替しない。
 - Heal/Counterの正式アニメーション、Pauseメニューの装飾、最終数値調整は今後の作業。
+
+## 2026-09-25 受入フィードバック
+
+- ParryCounterとHealの専用モーションは未設定。ロジックの確認結果と区別して残課題とし、この段階では修正しない。
+- 水色のInteractカウンタは、検証SceneにPlayerInteractor2DとInteractionPromptViewの配線がなく、案内も操作も動かない不備だった。Sceneと再生成用Builderを修正した。
+- Unity compile: Error 0 / Warning 0。Playモードで対象選択、案内表示、E入力によるカウンタ0→1を確認した。
