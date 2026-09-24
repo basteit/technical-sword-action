@@ -15,6 +15,17 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckRadius = 0.15f;
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField, Range(0f, 1f)] private float jumpReleaseMultiplier = 0.5f;
+    [SerializeField, Min(1)] private int floorDropFrames = 18;
+    private bool jumpHeld;
+    private bool variableJumpActive;
+    private bool airDashUsed;
+    private int groundSuppressFrames;
+    private int floorDropRemaining;
+    private readonly List<Collider2D> droppedFloors = new();
+    public bool AirDashUsed => airDashUsed;
+    public bool IsDroppingThrough => droppedFloors.Count > 0;
+    public void SetJumpHeld(bool held) => jumpHeld = held;
 
     [Header("Dash")]
     [SerializeField] private float dashSpeed = 18f;
@@ -59,7 +70,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     public bool IsGrounded => isGrounded;
     public bool IsDashing => isDashing;
     public bool CanDash => CanStartDash;
-    public bool CanStartDash => isActiveAndEnabled && !isDashing && dashCooldownTimer <= 0f;
+    public bool CanStartDash => isActiveAndEnabled && !isDashing && dashCooldownTimer <= 0f && (isGrounded || !airDashUsed);
     public bool CanStartJump => isActiveAndEnabled && isGrounded && !isDashing;
     public Vector2 Velocity => rb != null ? rb.linearVelocity : Vector2.zero;
     public float DashRemaining => Mathf.Max(0f, dashTimer);
@@ -114,6 +125,12 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     public void CombatTick()
     {
         UpdateGrounded();
+        if (variableJumpActive && !isDashing && !jumpHeld && rb.linearVelocity.y > 0f)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * jumpReleaseMultiplier);
+            variableJumpActive = false;
+        }
+        if (rb.linearVelocity.y <= 0f) variableJumpActive = false;
         UpdateFacing();
         if (stateMachine == null)
         {
@@ -123,12 +140,27 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
     public void CombatTickTimers()
     {
+        if (groundSuppressFrames > 0) groundSuppressFrames--;
+        if (floorDropRemaining > 0 && --floorDropRemaining == 0)
+        {
+            bool overlapping = false;
+            foreach (Collider2D floor in droppedFloors)
+                if (floor != null && ownCollider.bounds.Intersects(floor.bounds)) overlapping = true;
+            if (overlapping) floorDropRemaining = 1;
+            else RestoreDroppedFloors();
+        }
         UpdateDashTimers();
     }
 
     // The state machine calls this after arbitration, before the clock simulates physics.
     public void ApplyCombatVelocity()
     {
+        if (stateMachine != null && stateMachine.LifeState == PlayerLifeState.Dead)
+        {
+            rb.gravityScale = 0f;
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
         if (isDashing)
         {
             rb.linearVelocity = dashDirection * dashSpeed;
@@ -178,6 +210,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         moveInput = 0f;
         DownInput = false;
         jumpDownInput = false;
+        jumpHeld = false;
     }
 
     private void UpdateFacing()
@@ -219,7 +252,16 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
             return;
         }
 
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        isGrounded = false;
+        if (groundSuppressFrames > 0 || rb.linearVelocity.y > 0.05f) return;
+        foreach (Collider2D floor in Physics2D.OverlapCircleAll(groundCheck.position, groundCheckRadius, groundLayer))
+        {
+            if (floor == ownCollider || floor.isTrigger || droppedFloors.Contains(floor) ||
+                Physics2D.GetIgnoreCollision(ownCollider, floor)) continue;
+            isGrounded = true;
+            airDashUsed = false;
+            break;
+        }
     }
 
     public bool TryStartJumpFromStateMachine()
@@ -229,6 +271,12 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
             return false;
         }
 
+        bool down = jumpDownInput;
+        jumpDownInput = false;
+        if (down && TryDropThroughFloor()) return true;
+        isGrounded = false;
+        groundSuppressFrames = 2;
+        variableJumpActive = true;
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         return true;
@@ -250,6 +298,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         }
 
         dashDirection = new Vector2(dashSign, 0f);
+        if (!isGrounded) airDashUsed = true;
         isDashing = true;
         dashTimer = dashDuration;
         dashCooldownTimer = dashCooldown;
@@ -376,12 +425,53 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         CombatTimeController.Unregister(this);
         bool wasDashing = isDashing;
         CancelDashFromStateMachine(true);
+        ResetLocomotion();
         ClearSampledInput();
         if (wasDashing)
         {
             stateMachine?.CompleteAction(PlayerActionState.Dash, "DashDisabled");
         }
     }
+
+    private bool TryDropThroughFloor()
+    {
+        if (groundCheck == null) return false;
+        foreach (Collider2D floor in Physics2D.OverlapCircleAll(groundCheck.position, groundCheckRadius, groundLayer))
+        {
+            PlatformEffector2D effector = floor.GetComponent<PlatformEffector2D>();
+            if (floor.isTrigger || !floor.usedByEffector || effector == null || !effector.enabled || !effector.useOneWay) continue;
+            if (droppedFloors.Contains(floor)) continue;
+            Physics2D.IgnoreCollision(ownCollider, floor, true);
+            droppedFloors.Add(floor);
+        }
+        if (droppedFloors.Count == 0) return false;
+        floorDropRemaining = Mathf.Max(1, floorDropFrames);
+        groundSuppressFrames = floorDropRemaining;
+        isGrounded = false;
+        variableJumpActive = false;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, -2f);
+        return true;
+    }
+
+    private void RestoreDroppedFloors()
+    {
+        foreach (Collider2D floor in droppedFloors)
+            if (floor != null && ownCollider != null) Physics2D.IgnoreCollision(ownCollider, floor, false);
+        droppedFloors.Clear();
+        floorDropRemaining = 0;
+    }
+
+    public void ResetLocomotion()
+    {
+        RestoreDroppedFloors();
+        groundSuppressFrames = 0;
+        airDashUsed = false;
+        variableJumpActive = false;
+        isGrounded = false;
+        ClearSampledInput();
+    }
+
+    public void CancelFloorDrop() { RestoreDroppedFloors(); groundSuppressFrames = 0; }
 
     private void OnDrawGizmosSelected()
     {

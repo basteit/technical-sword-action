@@ -54,6 +54,15 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
     public bool IsHitLocked => hitLockTimer > 0f;
     public float HitLockRemaining => Mathf.Max(0f, hitLockTimer);
     public int CurrentHp => currentHp;
+    public int MaxHp => maxHp;
+    public bool RestoreHealth(int amount)
+    {
+        if (amount <= 0 || currentHp <= 0 || currentHp >= maxHp ||
+            (stateMachine != null && stateMachine.LifeState == PlayerLifeState.Dead)) return false;
+        currentHp = Mathf.Min(maxHp, currentHp + amount);
+        return true;
+    }
+    public void ResetHealth() { CancelHitFromStateMachine(); currentHp = maxHp; }
     public ParryResult LastParryResult { get; private set; } = ParryResult.None;
     public int TotalHitsTaken => totalHitsTaken;
     public int BlockedByParry => blockedByParry;
@@ -141,7 +150,8 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
     public bool TryReceiveHit(int damage, Vector2 sourcePosition, float knockbackForce)
     {
         LastParryResult = ParryResult.None;
-        if (!isActiveAndEnabled || currentHp <= 0 ||
+        if (damage <= 0 || !isActiveAndEnabled || currentHp <= 0 ||
+            (stateMachine != null && stateMachine.LifeState == PlayerLifeState.Dead) ||
             (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick))
         {
             return false;
@@ -226,7 +236,8 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
 
         if (currentHp <= 0)
         {
-            gameObject.SetActive(false);
+            CancelHitFromStateMachine();
+            rb.linearVelocity = Vector2.zero;
         }
 
         return true;

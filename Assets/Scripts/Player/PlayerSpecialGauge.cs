@@ -23,8 +23,10 @@ public class PlayerSpecialGauge : MonoBehaviour
 
     private void Awake()
     {
-        CurrentGauge = Mathf.Clamp(startGauge, 0f, maxGauge);
+        ResetGauge();
     }
+
+    public void ResetGauge() => CurrentGauge = Mathf.Clamp(startGauge, 0f, maxGauge);
 
     public void AddOnAttackHit()
     {
