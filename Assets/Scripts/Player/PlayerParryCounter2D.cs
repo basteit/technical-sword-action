@@ -12,6 +12,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     [SerializeField] private float radius = 1.1f;
     [Header("Video roundhouse profile")]
     [SerializeField] private bool airborneKick;
+    [SerializeField] private Vector2 airborneContactOffset = new Vector2(22f/32f,-22f/32f);
     [SerializeField] private bool invincibleDuringKick = true;
     [SerializeField, Min(1)] private int chargeFrame = 18;
     [SerializeField, Min(1)] private int chargeReleaseFrame = 24;
@@ -141,7 +142,8 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         if (!hitApplied && elapsed >= Mathf.Max(1, hitFrame))
         {
             hitApplied = true;
-            Vector2 foot = (Vector2)transform.position + new Vector2(facing * .85f, -.25f);
+            Vector2 offset=airborneKick?airborneContactOffset:new Vector2(.85f,-.25f);
+            Vector2 foot = (Vector2)transform.position + new Vector2(facing*offset.x,offset.y);
             bool contactsTarget = false;
             foreach (Collider2D c in Physics2D.OverlapCircleAll(foot, radius))
                 if (c.GetComponentInParent<Damageable2D>() == SelectedTarget) { contactsTarget = true; break; }

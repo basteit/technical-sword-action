@@ -1,5 +1,5 @@
 {
-  "revision": "vertical-tumble-kick-readable-rough",
+  "revision": "deeper-action-poses-six-pose-slow-downward-kick",
   "compile": {
     "errors": 0,
     "warnings": 0
@@ -7,30 +7,30 @@
   "editMode": {
     "passed": 181,
     "total": 181,
-    "completedAt": "2026-10-12T19:25:18.7916264Z",
+    "completedAt": "2026-10-12T22:03:35.7738509Z",
     "rerunThisArtRevision": true
   },
   "playMode": {
-    "passed": 131,
-    "total": 131,
-    "completedAt": "2026-10-12T19:24:49.1426013Z"
+    "passed": 135,
+    "total": 135,
+    "completedAt": "2026-10-12T22:02:44.0346201Z"
   },
-  "newPlayCases": 6,
+  "newPlayCases": 4,
   "resetRuns": 40,
   "authoring": {
-    "frames": 112,
+    "frames": 119,
     "cleanExporterTags": 14,
     "layers": 8,
     "humanArtworkReceived": false,
-    "eyeMasks": 112,
-    "cleanExporterFrames": 84,
+    "eyeMasks": 119,
+    "cleanExporterFrames": 91,
     "reopened": true,
     "tags": 18,
     "tagRangesChecked": true,
     "actionPixelsRedrawn": true,
     "referencePixelsOnlyInHiddenReference": true,
     "roughNeutralMatchesRecovery": true,
-    "cleanExporterRerunThisRevision": false
+    "cleanExporterRerunThisRevision": true
   },
   "sourceHashes": {
     "idle": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
@@ -52,9 +52,10 @@
       52,
       53
     ],
-    "roundhouse": "Inverted coil, whole-body rotation about a near-horizontal axis, extended leg sweeping from above to front and down, tucked landing.",
-    "sword": "Connected combo entry poses, planted front-knee compression, continuous horizontal follow-through.",
-    "parry": "Deeper rearward hip and shoulder compression with feet planted, followed by upward deflection."
+    "roundhouse": "19 poses: six slow inverted scissor poses, four fast downward release poses, contact, follow-through and low hand-plant landing.",
+    "sword": "Deep head/shoulder pitch, low hips and wider planted stance; low combo connections; exact contact poses held during hitstop.",
+    "parry": "Planted feet, strongly lowered and rearward head/shoulders, then upward leg-driven deflection.",
+    "kickVfx": "Hollow expanding ring, small contact spark; two short body afterimages at release."
   },
   "floor": {
     "worldTopY": 0,
@@ -77,19 +78,48 @@
     "chargeFrame": 18,
     "chargePose": 6,
     "releaseFrame": 24,
-    "releasePose": 8,
+    "releasePose": 12,
     "hitFrame": 28,
-    "hitPose": 10,
+    "hitPose": 16,
     "renderRates": [
       30,
       60,
       120
     ],
     "mirroredLayouts": true,
-    "hitstopHoldsContact": true
+    "hitstopHoldsContact": true,
+    "slowPoses": 6,
+    "release30FpsFirstObservedPose": 13
   },
   "impactDirection": [
     0.35,
     -1
+  ],
+  "camera": {
+    "normalOrthographicSize": 2.109375,
+    "closeOrthographicSize": 1.6875,
+    "focusY": 1.05,
+    "pixelScaleAt1080p": [
+      8,
+      10
+    ]
+  },
+  "footContact": {
+    "canvasPixels": [
+      54,
+      48
+    ],
+    "worldOffsetFacingRight": [
+      0.6875,
+      -0.6875
+    ],
+    "insideTargetBeforeHitback": true,
+    "bothDirectionsTested": true
+  },
+  "swordContactPoses": [
+    "VerticalSlash_04",
+    "HorizontalSlash_04",
+    "RapidSheathe_05",
+    "IaiSlash_03"
   ]
 }

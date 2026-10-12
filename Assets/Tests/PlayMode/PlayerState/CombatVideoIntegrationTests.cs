@@ -69,19 +69,55 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 if(!release&&Get<bool>(counter,"HasReleasedCharge"))
                 {
                     release=true;
-                    Assert.That(visual.sprite.name,Is.EqualTo("AirRoundhouse_08"),"Release must show the extended rotating leg.");
+                    // A 30fps render can observe frame 25 after advancing two combat frames.
+                    int releaseFrame=Get<int>(counter,"ElapsedFrames");
+                    Assert.That(releaseFrame,Is.InRange(24,25));
+                    Assert.That(visual.sprite.name,Is.EqualTo(releaseFrame==24?"AirRoundhouse_12":"AirRoundhouse_13"),"Release must show the matching extended rotating leg.");
                 }
                 if(Get<int>(counter,"HitCount")>previousHits)
                 {
                     hit=true;
-                    Assert.That(visual.sprite.name,Is.EqualTo("AirRoundhouse_10"),"Hitstop must hold the contact pose.");
+                    Assert.That(visual.sprite.name,Is.EqualTo("AirRoundhouse_16"),"Hitstop must hold the contact pose.");
                     Vector2 shake=Get<Vector2>(presentation,"ShakeOffset");
                     Assert.That(shake.y,Is.LessThan(-Mathf.Abs(shake.x)),"The downward kick must drive a downward impact.");
                     Call(director,"StepCapture",1d/fps);
-                    Assert.That(visual.sprite.name,Is.EqualTo("AirRoundhouse_10"));
+                    Assert.That(visual.sprite.name,Is.EqualTo("AirRoundhouse_16"));
                 }
             }
             Assert.That(charge&&release&&hit,Is.True);
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void EverySwordHitHoldsItsContactPoseInsteadOfItsWindup(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
+            var enemy=(Component)Get<object>(director,"FrontEnemy");int checkedHits=0;
+            string[] expected={"VerticalSlash_04","HorizontalSlash_04","RapidSheathe_05","IaiSlash_03"};
+            for(int i=0;i<220&&checkedHits<4;i++)
+            {
+                Step();int hits=Get<int>(enemy,"HitCount");
+                if(hits<=checkedHits) continue;
+                Assert.That(state.GetComponent<SpriteRenderer>().sprite.name,Is.EqualTo(expected[hits-1]));
+                checkedHits=hits;
+            }
+            Assert.That(checkedHits,Is.EqualTo(4));
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void DownwardKickImpactUsesTheDrawnFootInsideTheSelectedTarget(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
+            var enemy=(Component)Get<object>(director,"RearEnemy");
+            Bounds beforeContact=default;
+            for(int i=0;i<340&&Get<int>(enemy,"HitCount")==0;i++)
+            { beforeContact=enemy.GetComponent<Collider2D>().bounds;Step(); }
+            Assert.That(Get<int>(enemy,"HitCount"),Is.EqualTo(1));
+            var kick=Find("VideoVfxRenderer").GetComponentsInChildren<SpriteRenderer>()
+                .First(r=>r.sprite!=null&&r.sprite.name=="Fx_Kick_01");
+            int facing=mirrored?1:-1;
+            // Contact key's toe is (54,48) in the 64px canvas, pivot (32,26 top-origin).
+            Vector3 expected=state.transform.position+new Vector3(facing*22f/32f,-22f/32f,0);
+            Assert.That(Vector3.Distance(kick.transform.position,expected),Is.LessThan(.001f));
+            Assert.That(beforeContact.Contains(expected),Is.True);
+            Assert.That(state.GetComponent<SpriteRenderer>().sprite.name,Is.EqualTo("AirRoundhouse_16"));
         }
         [TestCase("TargetLost")] [TestCase("CounterDisabled")] [TestCase("PlayerDead")] [TestCase("ForcedHit")]
         public void ChargeInterruptionReleasesTimeGravityInvulnerabilityAndCamera(string interruption)

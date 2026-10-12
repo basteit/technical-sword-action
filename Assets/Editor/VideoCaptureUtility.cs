@@ -38,7 +38,7 @@ public static class VideoCaptureUtility
                 Check(state.ActionState==PlayerActionState.Neutral&&!counter.IsCounterInvincible,"Player remained locked/invincible.");
                 Check(state.GetComponent<PlayerDamageReceiver2D>().CurrentHp==state.GetComponent<PlayerDamageReceiver2D>().MaxHp,"Unexpected player damage.");
                 Check(CombatTimeController.SlowOwnerCount==0&&CombatTimeController.HitstopOwnerCount==0&&Mathf.Approximately(Time.timeScale,1),"Time request remained.");
-                Check(presentation.Zoom==0&&Mathf.Approximately(camera.orthographicSize,2.8125f),"Zoom remained.");
+                Check(presentation.Zoom==0&&Mathf.Approximately(camera.orthographicSize,2.109375f),"Zoom remained.");
                 Check(presentation.DimAlpha==0&&!presentation.IsDimVisible,"Slow dim overlay remained.");
                 Check(presentation.ActiveShakeCount==0&&presentation.ShakeOffset==Vector2.zero&&presentation.FlashAlpha==0,"Shake/flash remained.");
                 Check(!state.GetComponent<PlayerVisualRecovery2D>().IsPlaying,"Recovery animation remained.");

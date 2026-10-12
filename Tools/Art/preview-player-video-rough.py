@@ -58,7 +58,7 @@ durations += [400]
 images[0].save(OUT / 'AirRoundhouse-slow.gif', save_all=True, append_images=images[1:], duration=durations, loop=0, disposal=2)
 
 rows = [('VerticalSlash', [1,2,3,4,5,8]), ('HorizontalSlash', [1,2,3,4,6,8]),
-        ('ParryDeflect', [1,2,3,4,5,6]), ('AirRoundhouse', [6,7,8,9,10,11])]
+        ('ParryDeflect', [1,2,3,4,5,6]), ('AirRoundhouse', [6,9,12,15,16,17])]
 sheet = Image.new('RGB', (6*192, len(rows)*216), '#edf0f5')
 draw = ImageDraw.Draw(sheet)
 for y, (name, indices) in enumerate(rows):

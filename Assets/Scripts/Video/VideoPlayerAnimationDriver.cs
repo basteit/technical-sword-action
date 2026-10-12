@@ -69,9 +69,23 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     {
         // Counter timers run after Animator.Update. Sample the same integer frame
         // after its events, so slow entry and hitstop never hold the previous pose.
-        if(counter==null||!counter.IsActive||!counter.IsAirborneKick||visual==null) return;
-        var motion=library!=null?library.Find("AirRoundhouse"):null;
-        if(motion!=null) visual.sprite=motion.At(counter.ElapsedFrames);
+        if(visual==null||library==null) return;
+        if(counter!=null&&counter.IsActive&&counter.IsAirborneKick)
+        {
+            var motion=library.Find("AirRoundhouse");
+            if(motion!=null) visual.sprite=motion.At(counter.ElapsedFrames);
+            return;
+        }
+        if(attack!=null&&attack.IsAttacking)
+        {
+            var info=animator.GetCurrentAnimatorStateInfo(0);
+            if(info.shortNameHash!=Animator.StringToHash("PlayerVideo_Attack_"+attack.ComboStep)) return;
+            // Animation Events still own damage. Quantize only the sprite lookup,
+            // avoiding a float-key boundary holding the wind-up during hitstop.
+            int frame=Mathf.FloorToInt(info.normalizedTime*info.length*60+.001f);
+            var motion=library.Find(new[]{"VerticalSlash","HorizontalSlash","RapidSheathe","IaiSlash"}[attack.ComboStep-1]);
+            if(motion!=null) visual.sprite=motion.At(frame);
+        }
     }
     private void OnDisable()
     { recovery?.Cancel();if(parry!=null) parry.Succeeded-=OnParried;if(attack!=null) attack.StepStarted-=OnStep;CombatTimeController.Unregister(this);CombatTimeController.UnregisterAnimator(animator,this); }

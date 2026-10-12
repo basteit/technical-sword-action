@@ -42,9 +42,9 @@ public static class CombatVideoSceneBuilder
         }
         var cameraObject = new GameObject("Main Camera", typeof(Camera));
         cameraObject.tag = "MainCamera";
-        cameraObject.transform.position = new Vector3(0, 1.3f, -10);
+        cameraObject.transform.position = new Vector3(0, 1.05f, -10);
         var camera = cameraObject.GetComponent<Camera>();
-        camera.orthographic = true; camera.orthographicSize = 2.8125f;
+        camera.orthographic = true; camera.orthographicSize = 2.109375f;
         camera.backgroundColor = new Color(.98f,.985f,.99f);
         var actor = new GameObject("Player");
         actor.SetActive(false); actor.tag = "Player"; actor.layer = playerLayer;

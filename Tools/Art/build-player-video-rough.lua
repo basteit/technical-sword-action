@@ -67,7 +67,7 @@ local function head(im,hx,hy,angle,view,face)
 end
 local function pose(im,weapon,p)
   if p.roll then local r=p.roll*math.pi/180;drawingRoll={co=math.cos(r),si=math.sin(r)} end
-  local x=p.x or 32;local hy=p.hy or 15;local hip=p.hip or {x,39};local neck={p.hx or x,hy+10}
+  local x=p.x or 32;local hy=p.hy or 15;local hip=p.hip or {x,39};local neck=p.neck or {p.hx or x,hy+10}
   local left=p.left or {{x-7,47},{x-9,56}};local right=p.right or {{x+4,48},{x+6,56}}
   local back=p.view=='back' or p.back;local face=p.face or 1
   local tail=p.tail or {neck[1]-15,neck[2]+18};local anchor={neck[1]-face*7,hy-5}
@@ -99,12 +99,15 @@ local function pose(im,weapon,p)
     local hilt={hand[1]-dx/len*5,hand[2]-dy/len*5}
     line(weapon,hilt,hand,2,C.dark)
     line(weapon,{hand[1]-dy/len*3,hand[2]+dx/len*3},{hand[1]+dy/len*3,hand[2]-dx/len*3},2,C.steel)
-    line(weapon,hand,p.tip,3,C.steel);line(weapon,hand,p.tip,1,C.white)
+    line(weapon,hand,p.tip,4,C.outline);line(weapon,hand,p.tip,2,C.steel);line(weapon,hand,p.tip,1,C.white)
   end
   if p.smear then
     for i=1,#p.smear-1 do line(weapon,p.smear[i],p.smear[i+1],1,cyan) end
   end
   drawingRoll=nil
+  if p.arc then
+    for i=1,#p.arc-1 do line(weapon,p.arc[i],p.arc[i+1],2,cyan);line(weapon,p.arc[i],p.arc[i+1],1,C.white) end
+  end
 end
 local function settleReference(im,lower,lean)
   -- Newly drawn neutral pose, also used by IdleRough. No source pixel is copied.
@@ -160,43 +163,79 @@ local actions={
   {hx=36,hy=18,hip={33,42},angle=12,hand={48,24},elbow={42,31},lhand={40,29},tip={60,5},tail={14,33},hem={19,48},left={{25,49},{18,56}},right={{43,49},{49,56}},smear={{40,41},{51,26},{61,8}}},
   {hx=36,hy=17,hip={32,40},angle=8,hand={46,28},lhand={37,34},tip={57,11},tail={17,42},left={{25,48},{20,56}},right={{41,48},{46,56}}}
  }},
- {name='AirRoundhouse',frames={4,4,4,4,2,3,3,2,2,2,3,3},hit=28,charge=18,release=24,landing=36,branch=36,recovery=36,poses={
+ {name='AirRoundhouse',frames={4,4,4,4,2,1,1,1,1,1,1,1,1,1,1,2,2,2,2},hit=28,charge=18,release=24,landing=36,branch=36,recovery=36,poses={
   {hy=17,hip={32,42},hand={28,34},left={{25,49},{23,57}},right={{39,48},{40,57}}},
   {hy=16,hip={32,39},hand={28,32},left={{26,47},{23,55}},right={{39,44},{35,48}}},
   {hx=30,hy=13,hip={33,37},hand={29,29},left={{39,42},{42,49}},right={{26,39},{18,42}}},
-  {hx=32,hy=14,hip={32,35},angle=-8,back=true,hand={40,31},left={{39,42},{43,47}},right={{25,35},{18,34}}},
-  {hx=30,hy=15,hip={32,34},angle=-12,back=true,hand={39,31},left={{38,43},{40,47}},right={{28,30},{25,27}}},
-  {roll=145,hx=32,hy=17,hip={32,34},angle=-20,view='side',hand={43,28},elbow={44,24},lhand={24,28},lelbow={21,24},tail={14,31},hem={22,37},left={{23,39},{26,48}},right={{41,43},{35,52}}},
-  {roll=165,hx=32,hy=17,hip={32,34},angle=-16,view='three',hand={43,27},elbow={43,23},lhand={24,27},lelbow={21,23},tail={13,26},hem={21,38},left={{22,38},{25,46}},right={{40,44},{32,54}}},
-  {roll=195,hx=32,hy=17,hip={32,34},angle=-10,view='side',hand={44,25},elbow={43,22},lhand={23,27},tail={13,24},hem={21,36},left={{22,35},{22,43}},right={{35,46},{25,57}}},
-  {roll=225,hx=32,hy=17,hip={32,34},angle=-5,view='side',hand={44,26},elbow={44,22},lhand={23,25},tail={14,23},hem={22,33},left={{20,36},{20,44}},right={{28,47},{20,58}},smear={{40,50},{33,58},{23,61}}},
-  {roll=250,hx=32,hy=17,hip={32,34},angle=0,view='side',hand={44,26},elbow={43,22},lhand={23,26},tail={14,21},hem={21,32},left={{20,35},{19,43}},right={{28,47},{21,58}},smear={{38,53},{31,60},{23,62}}},
-  {roll=300,hx=32,hy=18,hip={32,35},angle=7,view='three',hand={41,32},elbow={44,25},lhand={23,30},tail={14,22},hem={21,35},left={{22,40},{26,49}},right={{28,45},{22,57}}},
-  {roll=345,hx=31,hy=22,hip={32,41},angle=6,view='three',hand={44,48},elbow={42,39},lhand={24,44},tail={14,26},hem={22,43},left={{26,48},{22,53}},right={{39,48},{41,54}}}
+  {roll=70,hx=32,hy=17,hip={32,34},hand={42,30},lhand={23,29},hem={20,38},left={{20,34},{23,44}},right={{41,41},{40,52}}},
+  {roll=100,hx=32,hy=17,hip={32,34},hand={43,28},lhand={23,28},hem={20,36},left={{19,32},{22,42}},right={{40,42},{39,53}}},
+  {roll=120,hx=32,hy=17,hip={32,34},angle=-20,view='side',hand={43,28},elbow={44,24},lhand={23,27},lelbow={19,24},tail={12,30},hem={20,36},left={{19,30},{20,40}},right={{40,43},{37,55}}},
+  {roll=132,hx=32,hy=17,hip={32,34},angle=-18,view='side',hand={44,27},elbow={44,23},lhand={23,27},tail={12,28},hem={20,36},left={{19,29},{19,39}},right={{40,44},{36,55}}},
+  {roll=144,hx=32,hy=17,hip={32,34},angle=-16,view='three',hand={44,26},elbow={44,23},lhand={23,26},tail={12,26},hem={20,35},left={{19,28},{18,38}},right={{39,44},{35,55}}},
+  {roll=156,hx=32,hy=17,hip={32,34},angle=-14,view='three',hand={44,25},elbow={44,22},lhand={23,26},tail={12,24},hem={20,35},left={{20,27},{18,37}},right={{38,45},{34,55}}},
+  {roll=168,hx=32,hy=17,hip={32,34},angle=-12,view='side',hand={44,25},elbow={44,22},lhand={23,25},tail={13,23},hem={20,34},left={{20,27},{18,36}},right={{38,45},{33,55}}},
+  {roll=180,hx=32,hy=17,hip={32,34},angle=-10,view='side',hand={44,25},elbow={44,22},lhand={23,25},tail={13,22},hem={20,34},left={{20,26},{18,35}},right={{37,46},{32,56}}},
+  {roll=205,hx=32,hy=17,hip={32,34},angle=-8,view='side',hand={44,25},elbow={44,22},lhand={23,24},tail={13,21},hem={20,33},left={{20,26},{17,35}},right={{35,46},{28,58}},arc={{27,5},{40,7},{49,13}}},
+  {roll=235,hx=32,hy=17,hip={32,34},angle=-5,view='side',hand={44,25},elbow={44,22},lhand={23,24},tail={14,20},hem={20,32},left={{20,26},{17,35}},right={{32,47},{24,59}},arc={{34,3},{48,7},{58,19}}},
+  {roll=260,hx=32,hy=17,hip={32,34},view='side',hand={44,25},elbow={44,22},lhand={23,24},tail={14,20},hem={20,32},left={{20,27},{17,36}},right={{33,46},{34,59}},arc={{42,5},{55,13},{61,28}}},
+  {roll=280,hx=32,hy=17,hip={32,34},angle=3,view='side',hand={44,26},elbow={44,22},lhand={23,25},tail={14,20},hem={20,32},left={{20,28},{17,37}},right={{34,46},{32,60}},arc={{51,10},{60,24},{60,38}}},
+  {roll=300,hx=32,hy=17,hip={32,34},angle=5,view='side',hand={44,28},elbow={44,23},lhand={23,26},tail={13,20},hem={20,33},left={{20,29},{17,38}},right={{36,45},{29,59}},arc={{60,23},{60,39},{54,50}}},
+  {roll=320,hx=32,hy=18,hip={32,35},angle=8,view='three',hand={43,33},elbow={44,26},lhand={22,30},tail={13,20},hem={20,35},left={{22,36},{22,46}},right={{35,47},{27,57}},arc={{60,37},{53,50},{41,57}}},
+  {roll=340,hx=32,hy=22,hip={32,40},angle=10,view='three',hand={43,47},elbow={44,35},lhand={23,42},tail={12,23},hem={20,40},left={{25,43},{22,50}},right={{39,47},{38,56}}},
+  {hx=39,hy=34,neck={34,41},hip={28,46},angle=20,view='side',hand={48,56},elbow={45,46},lhand={27,49},tail={14,24},hem={17,44},left={{21,49},{15,56}},right={{43,47},{48,56}}}
  }}
 }
--- Load the planted front knee, not just the arms. Keep the rear foot anchored
--- over contact/follow-through; the scene owns the additional attack advance.
-for _,i in ipairs({4,5,6}) do actions[1].poses[i].right[1]={49,46} end
-for _,i in ipairs({4,5}) do actions[2].poses[i].right[1]={49,46} end
-for _,i in ipairs({3,4}) do actions[4].poses[i].right[1]={52,47} end
+-- Strong line-of-action keys: the head, shoulder line and hip move together.
+actions[1].poses[2]={hx=24,hy=15,hip={28,41},angle=-22,view='side',hand={25,6},elbow={15,23},lhand={25,10},tip={4,2},tail={13,44},left={{20,49},{16,56}},right={{40,48},{49,56}}}
+actions[1].poses[4]={hx=45,hy=30,neck={39,35},hip={30,44},angle=30,view='side',hand={49,42},elbow={44,35},lhand={45,40},tip={55,61},tail={9,20},hem={13,39},left={{22,48},{13,56}},right={{49,45},{52,56}},arc={{47,4},{59,17},{61,40},{56,59}}}
+actions[1].poses[5]={hx=46,hy=32,neck={39,37},hip={31,45},angle=32,view='side',hand={48,45},elbow={44,38},lhand={44,43},tip={50,61},tail={10,22},hem={13,43},left={{22,49},{13,56}},right={{49,46},{52,56}}}
+actions[1].poses[6]={hx=44,hy=31,neck={38,37},hip={31,44},angle=26,hand={46,44},elbow={43,38},lhand={40,41},tip={50,61},tail={13,24},hem={14,46},left={{23,49},{14,56}},right={{48,46},{52,56}}}
+actions[1].poses[7]={hx=42,hy=29,neck={37,36},hip={31,43},angle=20,hand={44,42},lhand={36,40},tip={49,60},tail={14,29},hem={17,49},left={{23,49},{16,56}},right={{46,47},{50,56}}}
+actions[1].poses[8]={hx=40,hy=27,neck={36,35},hip={32,43},angle=16,hand={42,42},lhand={33,40},tip={48,60},tail={16,34},left={{24,49},{18,56}},right={{45,48},{49,56}}}
+actions[2].poses[1]=actions[1].poses[8]
+actions[2].poses[2]={hx=23,hy=25,neck={28,33},hip={31,44},angle=-25,view='back',headView='side',hand={16,34},elbow={20,32},lhand={22,38},tip={1,23},tail={46,22},hem={44,45},left={{19,49},{16,56}},right={{43,49},{51,56}}}
+actions[2].poses[3]={hx=32,hy=27,neck={32,36},hip={32,44},view='front',hand={34,35},elbow={39,34},lhand={29,36},tip={18,24},tail={17,23},hem={19,44},left={{23,49},{16,56}},right={{47,47},{52,56}},arc={{6,26},{28,20},{48,24}}}
+actions[2].poses[4]={hx=44,hy=28,neck={39,34},hip={32,44},angle=22,view='side',hand={51,34},elbow={45,34},lhand={43,36},tip={63,29},tail={8,24},hem={12,40},left={{23,49},{14,56}},right={{49,46},{54,56}},arc={{5,30},{23,23},{46,24},{62,30}}}
+actions[2].poses[5]={hx=44,hy=30,neck={39,36},hip={33,45},angle=22,view='front',hand={50,40},elbow={44,34},tip={62,46},tail={10,21},hem={13,41},left={{24,49},{16,56}},right={{49,47},{53,56}}}
+actions[2].poses[6]={hx=42,hy=29,neck={37,36},hip={33,44},angle=18,hand={46,43},elbow={43,36},tip={56,57},tail={11,27},hem={15,45},left={{24,49},{17,56}},right={{47,47},{51,56}}}
+actions[2].poses[7]={hx=40,hy=28,neck={36,35},hip={32,43},angle=14,hand={44,43},tip={54,59},tail={13,31},left={{24,49},{18,56}},right={{45,48},{49,56}}}
+actions[2].poses[8]={hx=38,hy=26,neck={35,34},hip={32,43},angle=10,hand={42,42},tip={52,59},tail={15,35},left={{24,49},{18,56}},right={{44,48},{48,56}}}
+actions[3].poses[1]=actions[2].poses[8]
+actions[3].poses[3]=actions[1].poses[4]
+actions[3].poses[4]=actions[2].poses[2]
+actions[3].poses[6]=actions[2].poses[5]
+actions[3].poses[8]={hx=28,hy=28,neck={30,37},hip={31,44},angle=-10,view='front',hand={29,42},tip={14,54},lhand={24,43},tail={15,35},left={{22,49},{17,56}},right={{43,49},{49,56}}}
+actions[3].poses[9]={hx=26,hy=30,neck={29,39},hip={30,45},angle=-12,hand={27,44},lhand={25,44},tail={13,39},left={{21,50},{16,56}},right={{43,50},{49,56}}}
+actions[4].poses[1]=actions[3].poses[9]
+actions[4].poses[2]={hx=24,hy=32,neck={29,40},hip={29,46},angle=-16,view='side',hand={29,43},lhand={25,44},tip={37,41},tail={12,40},left={{20,51},{14,56}},right={{44,50},{51,56}}}
+actions[4].poses[3]={hx=47,hy=35,neck={40,40},hip={28,46},angle=30,view='side',hand={54,36},elbow={45,40},lhand={20,45},tip={63,26},tail={7,29},hem={10,39},left={{20,50},{10,56}},right={{52,47},{56,56}},arc={{4,47},{25,37},{48,29},{62,27}}}
+actions[4].poses[4]=actions[4].poses[3]
+actions[4].poses[5]={hx=45,hy=33,neck={39,39},hip={29,45},angle=25,view='side',hand={51,36},elbow={44,39},tip={63,29},tail={9,24},hem={11,42},left={{21,50},{12,56}},right={{50,47},{55,56}}}
+actions[4].poses[6]={hx=43,hy=30,neck={38,37},hip={31,44},angle=20,hand={45,40},tip={60,48},tail={12,27},left={{22,50},{15,56}},right={{47,48},{52,56}}}
+actions[4].poses[7]={hx=41,hy=28,neck={36,36},hip={31,43},angle=16,hand={34,42},tip={19,55},lhand={26,43},tail={15,32},left={{23,49},{17,56}},right={{45,48},{49,56}}}
+actions[4].poses[8]={hx=38,hy=26,neck={35,34},hip={32,43},angle=10,hand={29,41},lhand={26,42},tail={17,36},left={{24,49},{18,56}},right={{44,48},{48,56}}}
+actions[5].poses[3]={hx=23,hy=29,neck={28,37},hip={34,46},angle=-30,view='side',hand={34,37},elbow={29,41},lhand={30,40},tip={44,12},tail={6,26},hem={20,48},left={{18,51},{15,56}},right={{43,50},{52,56}}}
+actions[5].poses[4]={hx=20,hy=32,neck={26,39},hip={33,47},angle=-34,view='side',hand={31,39},elbow={26,42},lhand={28,42},tip={40,14},tail={5,23},hem={19,49},left={{17,52},{15,56}},right={{43,51},{52,56}}}
+actions[5].poses[5]={hx=38,hy=19,neck={35,29},hip={31,42},angle=15,view='side',hand={48,20},elbow={43,28},lhand={42,26},tip={60,3},tail={10,34},hem={14,45},left={{23,49},{15,56}},right={{44,48},{51,56}},arc={{34,49},{47,35},{58,14}}}
+actions[5].poses[6]={hx=39,hy=21,neck={35,30},hip={32,42},angle=12,hand={49,26},elbow={43,31},lhand={40,32},tip={61,10},tail={12,40},left={{24,49},{17,56}},right={{45,48},{50,56}}}
 local recoveries={
  {name='Recovery_VerticalSlash',frames={4,4,4,4},hit=0,poses={
-  actions[1].poses[8],{hy=15,hand={37,36},tip={47,51}}, {settle=1,lean=0},{idle=true}}},
+  actions[1].poses[8],{hx=37,hy=23,hip={32,42},angle=8,hand={40,40},tip={49,56},left={{25,49},{21,56}},right={{41,49},{45,56}}}, {settle=1,lean=0},{idle=true}}},
  {name='Recovery_HorizontalSlash',frames={4,4,4,4},hit=0,poses={
-  actions[2].poses[8],{hx=31,hy=15,hand={37,36},tip={49,50}}, {settle=1,lean=0},{idle=true}}},
+  actions[2].poses[8],{hx=36,hy=22,hip={32,42},angle=6,hand={40,39},tip={49,54},left={{25,49},{21,56}},right={{41,49},{45,56}}}, {settle=1,lean=0},{idle=true}}},
  {name='Recovery_RapidSheathe',frames={4,4,4,4},hit=0,poses={
-  actions[3].poses[9],{hand={30,36},lhand={25,37}}, {settle=1,lean=0},{idle=true}}},
+  actions[3].poses[9],{hx=29,hy=24,hip={31,43},hand={29,40},lhand={25,41},left={{24,50},{20,56}},right={{41,49},{46,56}}}, {settle=1,lean=0},{idle=true}}},
  {name='Recovery_IaiSlash',frames={4,5,5,4},hit=0,poses={
-  actions[4].poses[8],{hy=15,hand={30,36},lhand={25,37}}, {settle=1,lean=0},{idle=true}}},
+  actions[4].poses[8],{hx=35,hy=22,hip={32,42},hand={29,39},lhand={25,40},left={{25,49},{21,56}},right={{41,49},{45,56}}}, {settle=1,lean=0},{idle=true}}},
  {name='Recovery_ParryDeflect',frames={3,4,4,4},hit=0,poses={
   actions[5].poses[6],{hand={37,36},tip={47,50}}, {settle=1,lean=0},{idle=true}}},
- {name='Recovery_AirRoundhouse',frames={4,5,5,4,5,5,5},hit=0,poses={
-  {hx=28,hy=25,hip={32,43},angle=-8,hand={45,55},lhand={25,47},left={{28,50},{25,57}},right={{39,51},{43,57}}},
-  {hx=29,hy=23,hip={32,42},angle=-6,elbow={40,42},hand={43,49},lhand={26,43},left={{27,50},{25,57}},right={{39,51},{42,57}}},
-  {hx=30,hy=20,hip={32,41},angle=-4,elbow={39,35},hand={40,43},lhand={27,39},left={{27,49},{25,57}},right={{38,50},{41,57}}},
-  {hx=31,hy=17,hip={32,40},angle=-2,hand={38,38},left={{27,48},{26,57}},right={{37,49},{40,57}}},
-  {settle=3,lean=-1},{settle=1,lean=0},{idle=true}}},
+ {name='Recovery_AirRoundhouse',frames={5,5,5,5,5,4,4},hit=0,poses={
+  {hx=39,hy=35,neck={34,42},hip={28,47},angle=22,view='side',hand={48,57},elbow={44,47},lhand={26,48},tail={13,27},hem={16,45},left={{20,50},{15,56}},right={{43,48},{48,56}}},
+  {hx=40,hy=36,neck={35,43},hip={29,48},angle=20,view='side',hand={48,57},elbow={45,48},lhand={27,48},tail={14,34},hem={18,48},left={{21,51},{15,56}},right={{43,49},{48,56}}},
+  {hx=38,hy=31,neck={34,39},hip={30,46},angle=14,hand={46,49},elbow={43,42},lhand={28,45},tail={17,43},left={{23,51},{18,56}},right={{42,49},{46,56}}},
+  {hx=36,hy=26,neck={34,35},hip={31,43},angle=8,hand={43,44},elbow={41,37},lhand={27,42},tail={18,47},left={{25,50},{22,56}},right={{40,49},{44,56}}},
+  {hy=20,hx=34,hip={32,41},angle=4,hand={41,41},elbow={40,34},lhand={25,40},tail={18,45},left={{26,49},{24,56}},right={{38,48},{42,56}}},
+  {settle=2,lean=0},{idle=true}}},
  {name='Recovery_Move',frames={3,4,4},hit=0,poses={{walkStop=true},{settle=1,lean=0},{idle=true}}},
  {name='Recovery_Landing',frames={3,4,4},hit=0,poses={
   {hy=20,hip={32,42},hand={36,39},left={{27,50},{25,57}},right={{38,50},{40,57}}}, {settle=2,lean=0},{idle=true}}}

@@ -116,12 +116,14 @@ for _,kind in ipairs({'Slash','Parry','Kick','Vanish'}) do local first=index+1;l
       end
       if f==1 then poly(img,{{64,50},{67,61},{76,64},{67,67},{64,78},{61,67},{52,64},{61,61}},P.white) end
     elseif kind=='Kick' then
-      ring(img,64,64,8+f*6,math.max(1,6-f),gold,.84);ring(img,64,64,5+f*6,1,white,.84)
-      if f==1 then poly(img,{{64,49},{67,60},{79,64},{67,68},{64,79},{61,68},{49,64},{61,60}},white) end
-      for k=0,15 do local a=k*math.pi/8+.12;local r=9+f*4;local len=8+(k%4)*4
+      -- A small contact spark and a hollow, expanding wave leave the foot visible.
+      local radius=18+f*5
+      ring(img,64,64,radius,math.max(1,4-f),gold,.84);ring(img,64,64,radius+4,1,white,.84)
+      if f==1 then poly(img,{{64,59},{66,62},{70,64},{66,66},{64,70},{62,66},{59,64},{62,62}},white) end
+      for k=0,11 do local a=k*math.pi/6+.12;local r=radius+7;local len=math.max(2,11-f)+(k%3)*3
         line(img,64+math.cos(a)*r,64+math.sin(a)*r*.84,64+math.cos(a)*(r+len),64+math.sin(a)*(r+len)*.84,k%3==0 and 2 or 1,k%2==0 and gold or white)
       end
-      for k=0,7 do local a=k*.8;rect(img,math.floor(64+math.cos(a)*f*5),math.floor(64+math.sin(a)*f*4),2,2,teal) end
+      for k=0,5 do local a=k*math.pi/3;rect(img,math.floor(64+math.cos(a)*(radius+3)),math.floor(64+math.sin(a)*(radius+3)*.84),2,2,teal) end
     else
       for k=1,19 do local a=k*2.399;local r=3+f*(1+k%5);local x=64+math.cos(a)*r;local y=64+math.sin(a)*r-f*2
         poly(img,{{x,y-2},{x+2,y},{x,y+2},{x-2,y}},k%3==0 and teal or gold)

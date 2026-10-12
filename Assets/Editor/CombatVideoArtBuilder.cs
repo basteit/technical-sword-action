@@ -103,7 +103,7 @@ public static class CombatVideoArtBuilder
         machine.AddState("PlayerVideo_ParryFail").motion=Clip("ParryFail",new VideoArtLibrary.Motion{name="Miss",frames=new[]{parry.frames[0]},durations=new[]{18}},false);
         var kick=library.Find("AirRoundhouse");
         machine.AddState("PlayerVideo_Jump").motion=Clip("Jump",new VideoArtLibrary.Motion{name="Jump",frames=new[]{kick.frames[1]},durations=new[]{8}},false);
-        machine.AddState("PlayerVideo_Fall").motion=Clip("Fall",new VideoArtLibrary.Motion{name="Fall",frames=new[]{kick.frames[11]},durations=new[]{8}},false);
+        machine.AddState("PlayerVideo_Fall").motion=Clip("Fall",new VideoArtLibrary.Motion{name="Fall",frames=new[]{kick.frames[^1]},durations=new[]{8}},false);
         foreach(var motion in motions.Where(m=>m.name.StartsWith("Recovery_")))
             machine.AddState("PlayerVideo_"+motion.name).motion=Clip(motion.name,motion,false);
         var enemyController=AssetDatabase.LoadAssetAtPath<AnimatorController>(EnemyControllerPath);

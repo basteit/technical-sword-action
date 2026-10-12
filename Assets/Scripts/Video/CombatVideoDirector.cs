@@ -129,6 +129,8 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
             vfx.EmitAfterimage(player.GetComponent<SpriteRenderer>(),player.GetComponent<PlayerMotor2D>().FacingSign);
         if(counter.IsActive&&counter.ElapsedFrames>=counter.ChargeReleaseFrame&&counter.ElapsedFrames<=counter.HitFrame&&counter.ElapsedFrames%2==0)
             vfx.EmitEyeTrail(player.GetComponent<SpriteRenderer>(),player.GetComponent<PlayerMotor2D>().FacingSign);
+        if(counter.IsActive&&(counter.ElapsedFrames==counter.ChargeReleaseFrame||counter.ElapsedFrames==counter.ChargeReleaseFrame+2))
+            vfx.EmitAfterimage(player.GetComponent<SpriteRenderer>(),player.GetComponent<PlayerMotor2D>().FacingSign);
         if(!attackSent && tick-startTick>=18) { attackSent=true;attack.RequestAttack(); }
         if(attack.IsAttacking && attack.ComboStep<comboStages && attack.IsComboWindowOpen && queuedStep!=attack.ComboStep)
         { queuedStep=attack.ComboStep;attack.RequestAttack(); }

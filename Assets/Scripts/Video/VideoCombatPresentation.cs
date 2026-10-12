@@ -12,8 +12,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField] private VideoArtLibrary library;
     [SerializeField, Range(.1f,1f)] private float chargeScale=.15f;
     [SerializeField, Range(.5f,1f)] private float chargeRealSeconds=.7f;
-    [SerializeField] private float normalSize=2.8125f;
-    [SerializeField] private float closeSize=2.109375f;
+    [SerializeField] private float normalSize=2.109375f;
+    [SerializeField] private float closeSize=1.6875f;
     [SerializeField,Range(0,1)] private float slowDimStrength=.965f;
     [SerializeField,Range(0,1)] private float heroLiftStrength=.6f;
     [SerializeField,Min(.001f)] private float dimFadeInSeconds=3/60f;
@@ -80,7 +80,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         RestorePlayerBody();charged=true;ChargeRealElapsed=0;
         focus=(counter.transform.position+counter.SelectedTarget.transform.position)*.5f;
-        focus.y=1.35f;focus.z=restPosition.z;
+        focus.y=1.05f;focus.z=restPosition.z;
         CombatTimeController.RequestSlow(counter,chargeScale,chargeRealSeconds);
     }
     private void OnRelease() { charged=false;CombatTimeController.ReleaseSlow(counter); }
