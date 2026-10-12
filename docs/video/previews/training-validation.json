@@ -48,5 +48,16 @@
       52,
       53
     ]
+  },
+  "floor": {
+    "blockHeight": 16,
+    "captureVariants": 3,
+    "backgroundLayers": 2,
+    "codeChanged": false,
+    "backgroundRow": 156,
+    "blockWidth": 32,
+    "resetRuns": 40,
+    "worldTopY": 0,
+    "allBelowContactFilled": true
   }
 }

@@ -84,13 +84,23 @@ validateTags(out..'/CaptureDummy.aseprite',enemyBounds,index)
 if app.params['part']=='enemy' then return end
 local b=Sprite(384,216,ColorMode.RGB);b.layers[1].name='White training grid';local im=Image(384,216,ColorMode.RGB)
 rect(im,0,0,384,216,rgba(250,251,253,255))
-rect(im,0,157,384,59,rgba(245,247,250,255))
-for x=0,383,16 do line(im,x,0,x,215,1,rgba(226,232,239,255)) end
-for y=12,215,16 do line(im,0,y,383,y,1,rgba(226,232,239,255)) end
-for x=0,383,64 do line(im,x,0,x,215,1,rgba(206,216,228,255)) end
-for y=28,215,64 do line(im,0,y,383,y,1,rgba(206,216,228,255)) end
-line(im,0,156,383,156,2,rgba(128,148,172,255))
-b:newCel(b.layers[1],1,im,Point(0,0));b:saveAs(out .. '/CaptureTrainingGrid.aseprite');im:saveAs(out .. '/CaptureTrainingGrid.png');b:close()
+for x=0,383,16 do line(im,x,0,x,155,1,rgba(226,232,239,255)) end
+for y=12,155,16 do line(im,0,y,383,y,1,rgba(226,232,239,255)) end
+for x=0,383,64 do line(im,x,0,x,155,1,rgba(206,216,228,255)) end
+for y=28,155,64 do line(im,0,y,383,y,1,rgba(206,216,228,255)) end
+-- Row 156 is world y=0: everything below the planted feet is solid block floor.
+local floor=Image(384,216,ColorMode.RGB)
+rect(floor,0,156,384,60,rgba(119,140,164,255))
+for row=0,3 do local y=156+row*16;local offset=row%2==0 and 0 or -16
+  for x=offset,383,32 do
+    rect(floor,x+1,y,30,15,rgba(164+row%2*4,179+row%2*4,199+row%2*4,255))
+    line(floor,x+2,y+1,x+29,y+1,1,rgba(190,202,218,255))
+    line(floor,x+29,y+2,x+29,y+13,1,rgba(143,160,183,255))
+  end
+end
+b:newCel(b.layers[1],1,im,Point(0,0));local floorLayer=b:newLayer();floorLayer.name='Solid blocks below contact plane'
+b:newCel(floorLayer,1,floor,Point(0,0));im:drawImage(floor,Point(0,0))
+b:saveAs(out .. '/CaptureTrainingGrid.aseprite');im:saveAs(out .. '/CaptureTrainingGrid.png');b:close()
 local fx=Sprite(128,128,ColorMode.RGB);fx.layers[1].name='Pixel effect';index=0;local fxBounds={}
 local fxTimes={Slash={1,1,1,1,2,2,2,2},Parry={2,1,1,1,1,2,2,2},Kick={1,1,2,3,3,3,3,3},Vanish={3,3,3,3,3,3,3,3}}
 for _,kind in ipairs({'Slash','Parry','Kick','Vanish'}) do local first=index+1;local sheet=Image(128*8,128,ColorMode.RGB)
