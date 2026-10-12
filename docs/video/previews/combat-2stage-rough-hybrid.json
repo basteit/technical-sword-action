@@ -1,0 +1,50 @@
+{
+    "frameCount": 230,
+    "fps": 60,
+    "duration": 3.8333333333333337,
+    "playerArtworkIsRough": true,
+    "events": [
+        {
+            "kind": "Slash1",
+            "target": "Enemy_A",
+            "realSeconds": 0.4833333333333333,
+            "tick": 29
+        },
+        {
+            "kind": "Death",
+            "target": "Enemy_A",
+            "realSeconds": 0.8666666666666677,
+            "tick": 50
+        },
+        {
+            "kind": "Slash2",
+            "target": "Enemy_A",
+            "realSeconds": 0.8666666666666677,
+            "tick": 50
+        },
+        {
+            "kind": "RearWindup",
+            "target": "Enemy_B",
+            "realSeconds": 1.3166666666666669,
+            "tick": 75
+        },
+        {
+            "kind": "Parry",
+            "target": "Enemy_B",
+            "realSeconds": 1.7999999999999986,
+            "tick": 104
+        },
+        {
+            "kind": "Death",
+            "target": "Enemy_B",
+            "realSeconds": 2.966666666666661,
+            "tick": 141
+        },
+        {
+            "kind": "Kick",
+            "target": "Enemy_B",
+            "realSeconds": 2.966666666666661,
+            "tick": 141
+        }
+    ]
+}

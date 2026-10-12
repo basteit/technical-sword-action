@@ -499,6 +499,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         {
             handler?.CancelAction();
         }
+        GetComponent<PlayerParryCounter2D>()?.ClearStocks();
 
         ReleaseAllCollisionIgnores();
         ClearActionRequests();
@@ -615,10 +616,11 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         if (motor != null && motor.CanStartDash) legal |= PlayerActionRequest.Dash;
         if (parry != null && parry.CanStartParry) legal |= PlayerActionRequest.Parry;
         if (specialSkill != null && specialSkill.CanStartSkill) legal |= PlayerActionRequest.Special;
-        if (ActionState == PlayerActionState.ParrySuccess)
+        if (ActionState == PlayerActionState.ParrySuccess || ActionState == PlayerActionState.Neutral)
         {
             if (actionHandlers.TryGetValue(PlayerActionState.ParryCounter, out IPlayerActionStateHandler counter) && counter.CanStartAction)
                 legal |= PlayerActionRequest.Attack;
+            else if (attack != null && attack.CanStartAttackFromStateMachine) legal |= PlayerActionRequest.Attack;
         }
         else if (attack != null && attack.CanStartAttackFromStateMachine) legal |= PlayerActionRequest.Attack;
         if (motor != null && motor.CanStartJump) legal |= PlayerActionRequest.Jump;
@@ -639,11 +641,19 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         PlayerActionRequest request = decision.SelectedRequest;
         PlayerActionState nextAction = decision.NextAction;
 
-        if (request == PlayerActionRequest.Attack && ActionState == PlayerActionState.ParrySuccess)
+        if (request == PlayerActionRequest.Attack &&
+            (ActionState == PlayerActionState.ParrySuccess || ActionState == PlayerActionState.Neutral) &&
+            actionHandlers.TryGetValue(PlayerActionState.ParryCounter, out IPlayerActionStateHandler counterCandidate) && counterCandidate.CanStartAction)
         {
             if (!actionHandlers.TryGetValue(PlayerActionState.ParryCounter, out IPlayerActionStateHandler counter) ||
                 !counter.TryStartAction()) return false;
             TransitionTo(PlayerActionState.ParryCounter, "AcceptedParryCounter", true);
+            return true;
+        }
+        if (request == PlayerActionRequest.Attack && ActionState == PlayerActionState.ParrySuccess)
+        {
+            if (attack == null || !attack.TryStartAttackFromStateMachine()) return false;
+            TransitionTo(PlayerActionState.Attack, "AcceptedAttackWithoutCounterTarget", true);
             return true;
         }
 

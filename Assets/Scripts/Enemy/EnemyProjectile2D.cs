@@ -123,7 +123,11 @@ public class EnemyProjectile2D : MonoBehaviour, ICombatTickListener, ICombatHitL
 
         if (other.TryGetComponent(out IDamageReceiver2D receiver))
         {
-            bool applied = receiver.TryReceiveHit(damage, transform.position, knockback);
+            var source = Owner != null ? Owner.GetComponent<Damageable2D>() : null;
+            if(source!=null&&!source.IsAlive) source=null;
+            bool applied = receiver is IContextDamageReceiver2D contextual
+                ? contextual.TryReceiveContextHit(damage, transform.position, knockback, new CombatHitContext2D(source, GetInstanceID()))
+                : receiver.TryReceiveHit(damage, transform.position, knockback);
             if (!applied && !reflected && other.TryGetComponent(out PlayerDamageReceiver2D playerReceiver) && playerReceiver.LastParryResult != ParryResult.None)
             {
                 ReflectFromParry(other.transform);

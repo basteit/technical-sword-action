@@ -1,0 +1,264 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8a386e9db55ce644be22fb14a08c14a, type: 3}
+  m_Name: CombatVideoArt
+  m_EditorClassIdentifier: Assembly-CSharp::VideoArtLibrary
+  playerArtworkIsRough: 1
+  fourStageArtworkIsRough: 1
+  background: {fileID: -9169471958085028774, guid: a7f3d6762793c584195b04bfcb53e992, type: 3}
+  motions:
+  - name: AirRoundhouse
+    frames:
+    - {fileID: 21300000, guid: 36bbd113fa955bb49924fe80eded4dc8, type: 3}
+    - {fileID: 21300000, guid: 0c79ac8b1b734ee429aa901e58acabac, type: 3}
+    - {fileID: 21300000, guid: 0125c7f646a005848af13ad8868008a3, type: 3}
+    - {fileID: 21300000, guid: 37506661b4e7e9b4c82a028f05c5c0cb, type: 3}
+    - {fileID: 21300000, guid: 9e423d3ab88934f46a475cb61b269626, type: 3}
+    - {fileID: 21300000, guid: cc356369b03fb9d4f8f78e5f2caf7afa, type: 3}
+    - {fileID: 21300000, guid: ca8c5b91fbdf95b40abc877aa640b0f0, type: 3}
+    - {fileID: 21300000, guid: bc51e43af9653ce4d9822ca3f1785358, type: 3}
+    - {fileID: 21300000, guid: d6b1df44239174041a4ee7dfd1c77830, type: 3}
+    - {fileID: 21300000, guid: cd989cf40007e9b47b26d6203a5bbd84, type: 3}
+    - {fileID: 21300000, guid: 5d3e0ce58957b4f43a1e46b2d2202ea8, type: 3}
+    - {fileID: 21300000, guid: ffa19219479a46e4a88d6c8ae7b8488b, type: 3}
+    - {fileID: 21300000, guid: 2e5f002ce248b17469b49d2e952b0c1c, type: 3}
+    - {fileID: 21300000, guid: 2a9eb7e431111d246a5f08f61cfccf45, type: 3}
+    durations: 0400000004000000040000000400000002000000030000000300000002000000020000000200000004000000050000000600000009000000
+    hitFrame: 28
+    branchFrame: 54
+    chargeFrame: 18
+  - name: HorizontalSlash
+    frames:
+    - {fileID: 21300000, guid: bd63ead4d5c4b644dbdb30d01e11a545, type: 3}
+    - {fileID: 21300000, guid: e0d201e51beab8f40867c0f119b42e55, type: 3}
+    - {fileID: 21300000, guid: fd7af8020f363d44e9f72bb97ef6782c, type: 3}
+    - {fileID: 21300000, guid: ac356a7ffbb1a6c4fa7df207fb9fe9db, type: 3}
+    - {fileID: 21300000, guid: 1f1c3f6bcf3577948a977751f6288791, type: 3}
+    - {fileID: 21300000, guid: 13625a9e5cba45f4eb8d900bf6132667, type: 3}
+    - {fileID: 21300000, guid: cc6f7b76aab28624d980a8497634a162, type: 3}
+    - {fileID: 21300000, guid: d7af699f0d9e08f4293d2b7dd85ca51a, type: 3}
+    durations: 0300000003000000030000000200000002000000030000000400000006000000
+    hitFrame: 9
+    branchFrame: 20
+    chargeFrame: 0
+  - name: IaiSlash
+    frames:
+    - {fileID: 21300000, guid: c82a9c5e9e09e1d4db58b7d8e4b977ae, type: 3}
+    - {fileID: 21300000, guid: 64a8a5160b72a804f98067cea5335821, type: 3}
+    - {fileID: 21300000, guid: c6f7f22c8514f1d4280a1fa43564ed97, type: 3}
+    - {fileID: 21300000, guid: 0ad4f9d95cac6c14093538e584a4db8b, type: 3}
+    - {fileID: 21300000, guid: 7dd9b5dfdf2c8c840be1c5a73aae57f9, type: 3}
+    - {fileID: 21300000, guid: 035000fe8e72d2a4ba91be399ed60254, type: 3}
+    - {fileID: 21300000, guid: d61e46e6e98b6af418cc703f9bf5134f, type: 3}
+    - {fileID: 21300000, guid: f0f70e0edd01689438bb7773b95caf7f, type: 3}
+    durations: 0400000003000000020000000200000003000000040000000600000006000000
+    hitFrame: 7
+    branchFrame: 22
+    chargeFrame: 0
+  - name: IdleReference
+    frames:
+    - {fileID: 21300000, guid: 51ffc896482d10f46804e09d6370ee66, type: 3}
+    - {fileID: 21300000, guid: 05fe7974e397406498fcada29b9233c2, type: 3}
+    - {fileID: 21300000, guid: d6611cfce19edbd439bbfa8822473373, type: 3}
+    - {fileID: 21300000, guid: 99108cc9f1b467449a44b757b7b53bcf, type: 3}
+    - {fileID: 21300000, guid: e0c2bcd9977ed704f86f31f589a81b4b, type: 3}
+    - {fileID: 21300000, guid: e67f9a4837b1b524b95afb60e0074c0e, type: 3}
+    durations: 060000000600000006000000060000000600000006000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: ParryDeflect
+    frames:
+    - {fileID: 21300000, guid: 85d458a6d8aff564686a02f6c441acfb, type: 3}
+    - {fileID: 21300000, guid: a582b941e4f5ef54aa2cd3164df303b9, type: 3}
+    - {fileID: 21300000, guid: 84dd78ec9829c2e4981ed595f8fba893, type: 3}
+    - {fileID: 21300000, guid: e7e5b133aef5a7d47a2c1e1c4147b201, type: 3}
+    - {fileID: 21300000, guid: 8ed544bf610b88642aaf1b6b191c9752, type: 3}
+    - {fileID: 21300000, guid: f5c3d1f2da39f2140bbeacf484cb6686, type: 3}
+    durations: 030000000300000002000000020000000400000005000000
+    hitFrame: 6
+    branchFrame: 0
+    chargeFrame: 0
+  - name: RapidSheathe
+    frames:
+    - {fileID: 21300000, guid: 5d151480a57d6454a9a3388b1d554d09, type: 3}
+    - {fileID: 21300000, guid: 028bc19c7046b2040be915a39123308f, type: 3}
+    - {fileID: 21300000, guid: fddf55fe5046d8143bc6dbecc6761399, type: 3}
+    - {fileID: 21300000, guid: 9f9e0ed05f7a90e4b80c26af2c037dfa, type: 3}
+    - {fileID: 21300000, guid: 51f5ab2aeb4da734599d17a81e070ac2, type: 3}
+    - {fileID: 21300000, guid: 843ad940bd332f642a80f01776ed243b, type: 3}
+    - {fileID: 21300000, guid: f24c7585bb5b13347a8bb110eda23bcc, type: 3}
+    - {fileID: 21300000, guid: 3e376144b321c93498a3e413e2d7e043, type: 3}
+    - {fileID: 21300000, guid: ebef34403a5cb3a43ae23d1621e610dc, type: 3}
+    durations: 03000000030000000300000002000000020000000200000005000000060000000c000000
+    hitFrame: 11
+    branchFrame: 32
+    chargeFrame: 0
+  - name: VerticalSlash
+    frames:
+    - {fileID: 21300000, guid: caabc6603f436b449868d9891ec8681e, type: 3}
+    - {fileID: 21300000, guid: eb182f2bdb638c042a043222c66e9a26, type: 3}
+    - {fileID: 21300000, guid: 378ebf14b2827ab48bcb2cf5700daa57, type: 3}
+    - {fileID: 21300000, guid: e465b95d0efaa6a48b296ab473f41053, type: 3}
+    - {fileID: 21300000, guid: 45c0c183cf4ce544ea6c73f19599098e, type: 3}
+    - {fileID: 21300000, guid: d9f1db82efb5e6d43b48ab4cc4d89828, type: 3}
+    - {fileID: 21300000, guid: abf7fe5b79217a54fa8a304419565712, type: 3}
+    - {fileID: 21300000, guid: e70d16cbd73577946be96a5f18062435, type: 3}
+    durations: 0400000003000000030000000200000002000000040000000400000006000000
+    hitFrame: 10
+    branchFrame: 22
+    chargeFrame: 0
+  - name: WalkReference
+    frames:
+    - {fileID: 21300000, guid: 1c977fa69aea60f4bbeef92674923cdb, type: 3}
+    - {fileID: 21300000, guid: 5c16d9e5ad81f6a438e36a788268721c, type: 3}
+    - {fileID: 21300000, guid: c44987b512ac1144a98fe520e159ed87, type: 3}
+    - {fileID: 21300000, guid: 23544e5fed4514d4da913b5cd9071a38, type: 3}
+    - {fileID: 21300000, guid: a67f33c5d356d5b41b5a50c811595acd, type: 3}
+    - {fileID: 21300000, guid: 8862b2785dece8445ae9b7d0eaed7930, type: 3}
+    - {fileID: 21300000, guid: daf5fa25c836055439590f9b7cf70a45, type: 3}
+    - {fileID: 21300000, guid: 3d7ed1f70a2c25346b3119406d35a4a9, type: 3}
+    durations: 0500000005000000050000000500000005000000050000000500000005000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: Enemy_Attack
+    frames:
+    - {fileID: 21300000, guid: 6b08e786994c3b141ad3ca7f7600e322, type: 3}
+    - {fileID: 21300000, guid: d886bcc42d3335145add268bf6d28ed0, type: 3}
+    - {fileID: 21300000, guid: 5f16d9f7f1479ea43bb39924a5ab02f6, type: 3}
+    - {fileID: 21300000, guid: ee782c627ed0bdb44aeea1c7b2e70fda, type: 3}
+    durations: 04000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: Enemy_Death
+    frames:
+    - {fileID: 21300000, guid: 90ebbdf5fe1d7c94f9ef241f9f658f22, type: 3}
+    - {fileID: 21300000, guid: bd417b60e3716884ab6cdd72dc467e01, type: 3}
+    - {fileID: 21300000, guid: 52a23284e1c9e9048a72bb319840e54d, type: 3}
+    - {fileID: 21300000, guid: 21e2575a786ada74b8d54326336ccffc, type: 3}
+    - {fileID: 21300000, guid: d53c8379904363c4f95a09494a4d2b54, type: 3}
+    - {fileID: 21300000, guid: b3ad1b8bd631cc64b9c44f0e78611c23, type: 3}
+    durations: 040000000400000004000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: Enemy_Hit
+    frames:
+    - {fileID: 21300000, guid: 7a9697a8fb6e3bd449a3b45cb3596e8c, type: 3}
+    - {fileID: 21300000, guid: 78aa88b1db176d24cb7da999b681126c, type: 3}
+    - {fileID: 21300000, guid: ed343cedd86eaf14db1c802a4a52709a, type: 3}
+    durations: 040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: Enemy_Idle
+    frames:
+    - {fileID: 21300000, guid: 579ffc7e3a2f3d74282c75a594a0ce0f, type: 3}
+    - {fileID: 21300000, guid: 4213a48cb5289a84b8363a68668fee51, type: 3}
+    - {fileID: 21300000, guid: 7c1c3d75664d8b7409a0868c97fa56eb, type: 3}
+    - {fileID: 21300000, guid: d2b49b9168304db4ba5a605f3542ad4c, type: 3}
+    durations: 08000000080000000800000008000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: Enemy_Move
+    frames:
+    - {fileID: 21300000, guid: 9c95abd1f914b354298a5b8bf58ceb42, type: 3}
+    - {fileID: 21300000, guid: 5055e662c9d9b9c4e986ffeffdf89eeb, type: 3}
+    - {fileID: 21300000, guid: 28e43d8ff8d4c924ba0426c06d42254f, type: 3}
+    - {fileID: 21300000, guid: 5f0d674d26b126f4faabebf1f15c4ef8, type: 3}
+    - {fileID: 21300000, guid: c13cba788357b3341b9f2405d33b74a2, type: 3}
+    - {fileID: 21300000, guid: babb89cbc443e2841867def95ac927af, type: 3}
+    durations: 040000000400000004000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: Enemy_Parried
+    frames:
+    - {fileID: 21300000, guid: d02bd6199eb634e4bad5aecc8a7cf0e5, type: 3}
+    - {fileID: 21300000, guid: 3be7ac1a4dae508499aaff9eea5e1ceb, type: 3}
+    - {fileID: 21300000, guid: b56fdb68784831343864dc0c9b69244e, type: 3}
+    - {fileID: 21300000, guid: ed4c2b8a42ab36643bcba7bfdd9749ac, type: 3}
+    durations: 04000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: Enemy_Windup
+    frames:
+    - {fileID: 21300000, guid: 0c821fa265daa5243b18cfeb6c3f3e9f, type: 3}
+    - {fileID: 21300000, guid: d15e7492113cc7844ad7f9d2042f589b, type: 3}
+    - {fileID: 21300000, guid: 1aa58e550f9dbb84a88a753eeb3592b0, type: 3}
+    - {fileID: 21300000, guid: 542fec1a4d3e160488dd23be06e320ac, type: 3}
+    - {fileID: 21300000, guid: 8ad4e188fa6cd594dac428917c7898ce, type: 3}
+    - {fileID: 21300000, guid: 0341e86641715344a94bb33eb32fa27a, type: 3}
+    durations: 050000000500000005000000050000000500000005000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: Fx_Kick
+    frames:
+    - {fileID: 21300000, guid: 1865dfe8d376a4a42b2640169074cccd, type: 3}
+    - {fileID: 21300000, guid: 61d4a528320e75843b1d5194d7c6913c, type: 3}
+    - {fileID: 21300000, guid: 605f9272e17b38a48b4c0e3f24490863, type: 3}
+    - {fileID: 21300000, guid: 225fd214bd4974b4e87f21d4e5caef42, type: 3}
+    - {fileID: 21300000, guid: 7accb1cbef730ff44aa3ec01221a47cc, type: 3}
+    - {fileID: 21300000, guid: e79577e8b62d7844cb89c717960856a5, type: 3}
+    - {fileID: 21300000, guid: 5097b54522d9bbf4a8aaabd8c1c2f45e, type: 3}
+    - {fileID: 21300000, guid: a204055fed3b0b743b47d38b552824ae, type: 3}
+    durations: 0100000001000000020000000300000003000000030000000300000003000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: Fx_Parry
+    frames:
+    - {fileID: 21300000, guid: 37f00514be220a445ba7fd5f491f3583, type: 3}
+    - {fileID: 21300000, guid: 675d877e0d41d98459c8e587eaa473c1, type: 3}
+    - {fileID: 21300000, guid: 3b2e919bdd1391f4aa13d380b13159c0, type: 3}
+    - {fileID: 21300000, guid: dd12bbb276e7e0e4997942bd7dbaf0b6, type: 3}
+    - {fileID: 21300000, guid: cef02f0ad5320e644954b30697122686, type: 3}
+    - {fileID: 21300000, guid: 32beae71cadd7bd4d8cce70c8a20dead, type: 3}
+    - {fileID: 21300000, guid: 2beb56ca9d99a464a996b5e257c19721, type: 3}
+    - {fileID: 21300000, guid: 440bd40e882b60544bf5406fe0985df3, type: 3}
+    durations: 0100000001000000010000000100000002000000020000000200000002000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: Fx_Slash
+    frames:
+    - {fileID: 21300000, guid: 7954b446d00a43c4698226af5477fbb5, type: 3}
+    - {fileID: 21300000, guid: 4850919e599bfa3429011e4ddbc1caae, type: 3}
+    - {fileID: 21300000, guid: dc622d4c0aa55224ab7f8a89af735273, type: 3}
+    - {fileID: 21300000, guid: 5279d26a224aed441a6b2102db4f76e9, type: 3}
+    - {fileID: 21300000, guid: f0a8a4bf97a27c045abc3580fee471f0, type: 3}
+    - {fileID: 21300000, guid: 5375cc5372140f54e8546aa4bc8a7d90, type: 3}
+    - {fileID: 21300000, guid: b1c2b61b6e21ed246896dc3f4da311c4, type: 3}
+    - {fileID: 21300000, guid: e7beaa061f5d4484e9183a9fbf1e0f22, type: 3}
+    durations: 0100000001000000010000000100000002000000020000000200000002000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+  - name: Fx_Vanish
+    frames:
+    - {fileID: 21300000, guid: 73fb458ea97584e4f8f3157b0d7f55fd, type: 3}
+    - {fileID: 21300000, guid: 03512b1d7e4130e43bace090612b70b9, type: 3}
+    - {fileID: 21300000, guid: 57be9856b8f89854a914c24323135139, type: 3}
+    - {fileID: 21300000, guid: 445203fa44d84314193d91de0192b5b0, type: 3}
+    - {fileID: 21300000, guid: 14cf6dd3917027a43a66bd4252bf81d8, type: 3}
+    - {fileID: 21300000, guid: 5f7aafe4b66f7d947b2e5fca60fdaec3, type: 3}
+    - {fileID: 21300000, guid: 345fc1dc6fa2d8c4d9e96a483c8ddadf, type: 3}
+    - {fileID: 21300000, guid: dc2710e64d06ddd42bf444213970e45b, type: 3}
+    durations: 0300000003000000030000000300000003000000030000000300000003000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0

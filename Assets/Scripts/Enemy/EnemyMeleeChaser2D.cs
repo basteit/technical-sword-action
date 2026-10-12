@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Damageable2D))]
@@ -39,6 +41,45 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     private Vector2 facing = Vector2.right;
     private bool advanceStateTimer;
     private bool pendingMeleeHit;
+    private long attackSequence;
+    private bool captureHeld;
+    private readonly HashSet<int> hitReceivers = new();
+    public string CurrentStateName => damageable != null && !damageable.IsAlive ? "Dead" :
+        damageable != null && damageable.IsStunned ? "Stunned" : currentState.ToString();
+    public bool IsWindingUp => currentState == State.AttackWindup;
+    public float WindupRemaining => IsWindingUp ? stateTimer : 0f;
+    public long AttackSequence => attackSequence;
+    public event Action WindupStarted;
+    public event Action AttackStarted;
+
+    public void ResetForCapture(Transform playerTarget, bool held = true)
+    {
+        target = playerTarget;
+        captureHeld = held;
+        currentState = State.Idle;
+        stateTimer = 0f;
+        attackApplied = advanceStateTimer = pendingMeleeHit = false;
+        hitReceivers.Clear();
+        facing = target != null ? ((Vector2)(target.position - transform.position)).normalized : Vector2.right;
+    }
+
+    public bool BeginCaptureAttack()
+    {
+        if (damageable == null || !damageable.IsAlive || damageable.IsStunned || target == null) return false;
+        captureHeld = false;
+        StartWindup();
+        return true;
+    }
+
+    private void StartWindup()
+    {
+        currentState = State.AttackWindup;
+        stateTimer = attackWindupDuration;
+        attackApplied = false;
+        attackSequence++;
+        hitReceivers.Clear();
+        WindupStarted?.Invoke();
+    }
 
     public int CombatTickOrder => 200;
 
@@ -76,6 +117,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     {
         advanceStateTimer = false;
         pendingMeleeHit = false;
+        if (captureHeld || damageable == null || !damageable.IsAlive) return;
         if (target == null)
         {
             TryFindPlayerTarget();
@@ -126,7 +168,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
 
     public void ResolveCombatHits()
     {
-        if (pendingMeleeHit)
+        if (pendingMeleeHit && damageable != null && damageable.IsAlive && !damageable.IsStunned)
         {
             pendingMeleeHit = false;
             TryApplyMeleeHit();
@@ -145,9 +187,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     {
         if (distance >= preferredMinDistance && distance <= attackRange && IsTargetInFront())
         {
-            currentState = State.AttackWindup;
-            stateTimer = attackWindupDuration;
-            attackApplied = false;
+            StartWindup();
             return;
         }
 
@@ -202,6 +242,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
 
     private void TryApplyMeleeHit()
     {
+        AttackStarted?.Invoke();
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRange);
         for (int i = 0; i < hits.Length; i++)
         {
@@ -211,12 +252,15 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
                 continue;
             }
 
-            if (!other.TryGetComponent(out IDamageReceiver2D receiver))
+            IDamageReceiver2D receiver = other.GetComponentInParent<IDamageReceiver2D>();
+            if (receiver == null || !hitReceivers.Add(((Component)receiver).GetInstanceID()))
             {
                 continue;
             }
 
-            receiver.TryReceiveHit(attackDamage, transform.position, attackKnockback);
+            if (receiver is IContextDamageReceiver2D contextual)
+                contextual.TryReceiveContextHit(attackDamage, transform.position, attackKnockback, new CombatHitContext2D(damageable, attackSequence));
+            else receiver.TryReceiveHit(attackDamage, transform.position, attackKnockback);
         }
     }
 

@@ -216,7 +216,9 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     private void UpdateFacing()
     {
         if (!flipSpriteByMoveInput || isDashing ||
-            (stateMachine != null && stateMachine.ActionState == PlayerActionState.Attack))
+            (stateMachine != null && (stateMachine.ActionState == PlayerActionState.Attack ||
+             stateMachine.ActionState == PlayerActionState.Parry || stateMachine.ActionState == PlayerActionState.ParrySuccess ||
+             stateMachine.ActionState == PlayerActionState.ParryFail || stateMachine.ActionState == PlayerActionState.ParryCounter)))
         {
             return;
         }
@@ -231,7 +233,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         }
     }
 
-    private void SetFacing(int sign)
+    public void SetFacing(int sign)
     {
         if (sign == 0 || facingSign == sign)
         {

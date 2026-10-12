@@ -1,0 +1,115 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEditor.Animations;
+using UnityEngine;
+
+public static class CombatVideoArtBuilder
+{
+    public const string Folder="Assets/Animations/Video";
+    public const string ControllerPath=Folder+"/CombatVideoPlayer.controller";
+    public const string EnemyControllerPath=Folder+"/CombatVideoEnemy.controller";
+    public const string LibraryPath="Assets/Settings/CombatVideoArt.asset";
+    [Serializable] private sealed class Manifest { public ActionData[] actions; }
+    [Serializable] private sealed class ActionData { public string name;public int hitFrame,branchFrame,totalFrames,chargeFrame;public FrameData[] frames; }
+    [Serializable] private sealed class FrameData { public int frames,start; }
+    [MenuItem("Tools/Technical Sword Action/Video/Build Art and Clips")]
+    public static void Build()
+    {
+        Directory.CreateDirectory(Folder);AssetDatabase.Refresh();
+        var manifest=JsonUtility.FromJson<Manifest>(File.ReadAllText("Assets/Art/Player/VideoRough/timing-manifest.json"));
+        const string cleanFolder="Assets/Art/Player/VideoClean";
+        bool hasClean=File.Exists(cleanFolder+"/timing-manifest.json");
+        if(hasClean)
+        {
+            var final=JsonUtility.FromJson<Manifest>(File.ReadAllText(cleanFolder+"/timing-manifest.json"));
+            for(int i=0;i<manifest.actions.Length;i++) manifest.actions[i]=final.actions.FirstOrDefault(a=>a.name==manifest.actions[i].name)??manifest.actions[i];
+        }
+        var motions=new List<VideoArtLibrary.Motion>();
+        var paths=Directory.GetFiles("Assets/Art/Player/VideoRough","*.png").Concat(Directory.GetFiles("Assets/Art/Video","*.png"));
+        if(hasClean) paths=paths.Concat(Directory.GetFiles(cleanFolder,"*.png"));
+        var groups=paths.Select(p=>p.Replace('\\','/')).Where(p=>System.Text.RegularExpressions.Regex.IsMatch(p,@"_\d\d\.png$")).GroupBy(p=>Path.GetFileNameWithoutExtension(p)[..^3]);
+        var frames=groups.SelectMany(g=>g.Any(p=>p.StartsWith(cleanFolder))?g.Where(p=>p.StartsWith(cleanFolder)):g).ToArray();
+        foreach(string path in frames)
+        {
+            var importer=(TextureImporter)AssetImporter.GetAtPath(path);
+            importer.textureType=TextureImporterType.Sprite;importer.spriteImportMode=SpriteImportMode.Single;
+            importer.spritePixelsPerUnit=32;importer.filterMode=FilterMode.Point;importer.textureCompression=TextureImporterCompression.Uncompressed;
+            importer.mipmapEnabled=false;importer.alphaIsTransparency=true;
+            var textureSettings=new TextureImporterSettings();importer.ReadTextureSettings(textureSettings);
+            textureSettings.spriteAlignment=(int)SpriteAlignment.Custom;
+            textureSettings.spritePivot=path.Contains("/Player/")||Path.GetFileName(path).StartsWith("Enemy_")?new Vector2(.5f,38f/64):new Vector2(.5f,.5f);
+            importer.SetTextureSettings(textureSettings);
+            importer.SaveAndReimport();
+        }
+        foreach(var group in frames.GroupBy(p=>Path.GetFileNameWithoutExtension(p)[..^3]))
+        {
+            string name=group.Key;int[] durations;
+            var action=manifest.actions.FirstOrDefault(a=>a.name==name);
+            if(action!=null) durations=action.frames.Select(f=>f.frames).ToArray();
+            else if(name=="Fx_Kick") durations=new[]{1,1,2,3,3,3,3,3};
+            else if(name=="Fx_Slash"||name=="Fx_Parry") durations=new[]{1,1,1,1,2,2,2,2};
+            else durations=Enumerable.Repeat(name=="IdleReference"?6:name=="WalkReference"?5:name=="Enemy_Idle"?8:name=="Enemy_Windup"?5:name=="Fx_Vanish"?3:4,group.Count()).ToArray();
+            motions.Add(new VideoArtLibrary.Motion {name=name,frames=group.OrderBy(p=>p).Select(p=>AssetDatabase.LoadAssetAtPath<Sprite>(p)).ToArray(),durations=durations,hitFrame=action?.hitFrame??0,branchFrame=action?.branchFrame??0,chargeFrame=action?.chargeFrame??0});
+        }
+        string backgroundPath="Assets/Art/Video/CaptureRuins.png";
+        var bg=(TextureImporter)AssetImporter.GetAtPath(backgroundPath);bg.textureType=TextureImporterType.Sprite;bg.spritePixelsPerUnit=32;bg.filterMode=FilterMode.Point;bg.textureCompression=TextureImporterCompression.Uncompressed;bg.mipmapEnabled=false;bg.SaveAndReimport();
+        var library=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(LibraryPath);
+        if(library==null) { library=ScriptableObject.CreateInstance<VideoArtLibrary>();AssetDatabase.CreateAsset(library,LibraryPath); }
+        library.motions=motions.ToArray();library.background=AssetDatabase.LoadAssetAtPath<Sprite>(backgroundPath);EditorUtility.SetDirty(library);
+        bool CleanExists(string name)=>frames.Any(p=>p.StartsWith(cleanFolder)&&Path.GetFileNameWithoutExtension(p).StartsWith(name+"_"));
+        library.playerArtworkIsRough=!new[]{"VerticalSlash","HorizontalSlash","ParryDeflect","AirRoundhouse"}.All(CleanExists);
+        library.fourStageArtworkIsRough=library.playerArtworkIsRough||!new[]{"RapidSheathe","IaiSlash"}.All(CleanExists);
+        var controller=AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
+        if(controller==null) controller=AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
+        foreach(var parameter in controller.parameters) controller.RemoveParameter(parameter);
+        controller.AddParameter("ComboStep",AnimatorControllerParameterType.Int);controller.AddParameter("AttackTrigger",AnimatorControllerParameterType.Trigger);
+        var machine=controller.layers[0].stateMachine;foreach(var state in machine.states) machine.RemoveState(state.state);
+        var idle=Clip("Idle",library.Find("IdleReference"),true);var idleState=machine.AddState("PlayerVideo_Idle");idleState.motion=idle;machine.defaultState=idleState;
+        int stage=1;
+        foreach(var action in manifest.actions.Take(4))
+        {
+            var clip=Clip("Attack_"+stage,library.Find(action.name),false);
+            var events=new List<AnimationEvent>();
+            void Event(int frame,string name,int parameter=0)=>events.Add(new AnimationEvent{time=frame/60f,functionName=name,intParameter=parameter});
+            Event(action.hitFrame,"OnAttackHit",stage);
+            if(stage<4) { Event(action.hitFrame+4,"OnComboWindowOpen",stage);Event(action.branchFrame-1,"OnComboWindowClose",stage); }
+            Event(action.hitFrame+4,"OnDefenseCancelWindowOpen");Event(action.branchFrame-2,"OnLateCancelWindowOpen");
+            Event(action.branchFrame,"OnAttackRecovery",stage);Event(action.totalFrames,"OnAttackEnd",stage);
+            AnimationUtility.SetAnimationEvents(clip,events.OrderBy(e=>e.time).ToArray());EditorUtility.SetDirty(clip);
+            machine.AddState("PlayerVideo_Attack_"+stage).motion=clip;stage++;
+        }
+        var parry=library.Find("ParryDeflect");
+        machine.AddState("PlayerVideo_Parry").motion=Clip("Parry",new VideoArtLibrary.Motion{name="Ready",frames=new[]{parry.frames[0]},durations=new[]{12}},false);
+        machine.AddState("PlayerVideo_ParrySuccess").motion=Clip("ParrySuccess",new VideoArtLibrary.Motion{name="Deflect",frames=parry.frames.Skip(2).ToArray(),durations=parry.durations.Skip(2).ToArray()},false);
+        machine.AddState("PlayerVideo_Counter").motion=Clip("Counter",library.Find("AirRoundhouse"),false);
+        var enemyController=AssetDatabase.LoadAssetAtPath<AnimatorController>(EnemyControllerPath);
+        if(enemyController==null) enemyController=AnimatorController.CreateAnimatorControllerAtPath(EnemyControllerPath);
+        var enemyMachine=enemyController.layers[0].stateMachine;foreach(var state in enemyMachine.states) enemyMachine.RemoveState(state.state);
+        foreach(string name in new[]{"Idle","Move","Windup","Attack","Hit","Parried","Death"})
+        {
+            var motion=library.Find("Enemy_"+name);string path=Folder+"/EnemyVideo_"+name+".anim";
+            var clip=AssetDatabase.LoadAssetAtPath<AnimationClip>(path);
+            if(clip==null) { clip=new AnimationClip{name="EnemyVideo_"+name,frameRate=60};AssetDatabase.CreateAsset(clip,path); }
+            SetSpriteKeys(clip,motion,name=="Idle"||name=="Move");
+            var state=enemyMachine.AddState("EnemyVideo_"+name);state.motion=clip;if(name=="Idle") enemyMachine.defaultState=state;
+        }
+        AssetDatabase.SaveAssets();
+    }
+    private static AnimationClip Clip(string name,VideoArtLibrary.Motion motion,bool loop)
+    {
+        string path=Folder+"/PlayerVideo_"+name+".anim";var clip=AssetDatabase.LoadAssetAtPath<AnimationClip>(path);
+        if(clip==null) { clip=new AnimationClip{name="PlayerVideo_"+name,frameRate=60};AssetDatabase.CreateAsset(clip,path); }
+        SetSpriteKeys(clip,motion,loop);return clip;
+    }
+    private static void SetSpriteKeys(AnimationClip clip,VideoArtLibrary.Motion motion,bool loop)
+    {
+        var keys=new List<ObjectReferenceKeyframe>();int elapsed=0;
+        for(int i=0;i<motion.frames.Length;i++) { keys.Add(new ObjectReferenceKeyframe{time=elapsed/60f,value=motion.frames[i]});elapsed+=motion.durations[i]; }
+        keys.Add(new ObjectReferenceKeyframe{time=elapsed/60f,value=motion.frames[^1]});
+        AnimationUtility.SetObjectReferenceCurve(clip,EditorCurveBinding.PPtrCurve("",typeof(SpriteRenderer),"m_Sprite"),keys.ToArray());
+        var settings=AnimationUtility.GetAnimationClipSettings(clip);settings.loopTime=loop;AnimationUtility.SetAnimationClipSettings(clip,settings);EditorUtility.SetDirty(clip);
+    }
+}
