@@ -13,8 +13,10 @@ public static class CombatVideoArtBuilder
     public const string EnemyControllerPath=Folder+"/CombatVideoEnemy.controller";
     public const string LibraryPath="Assets/Settings/CombatVideoArt.asset";
     [Serializable] private sealed class Manifest { public ActionData[] actions; }
-    [Serializable] private sealed class ActionData { public string name;public int hitFrame,branchFrame,totalFrames,chargeFrame;public FrameData[] frames; }
+    [Serializable] private sealed class ActionData { public string name;public int hitFrame,branchFrame,totalFrames,chargeFrame,releaseFrame,landingFrame;public FrameData[] frames; }
     [Serializable] private sealed class FrameData { public int frames,start; }
+    [Serializable] private sealed class EyeManifest { public EyeFrame[] frames; }
+    [Serializable] private sealed class EyeFrame { public string file;public int pixels; }
     [MenuItem("Tools/Technical Sword Action/Video/Build Art and Clips")]
     public static void Build()
     {
@@ -29,10 +31,17 @@ public static class CombatVideoArtBuilder
         }
         var motions=new List<VideoArtLibrary.Motion>();
         var paths=Directory.GetFiles("Assets/Art/Player/VideoRough","*.png").Concat(Directory.GetFiles("Assets/Art/Video","*.png"));
-        if(hasClean) paths=paths.Concat(Directory.GetFiles(cleanFolder,"*.png"));
+        if(hasClean) paths=paths.Concat(SelectCleanFrames(cleanFolder));
         var groups=paths.Select(p=>p.Replace('\\','/')).Where(p=>System.Text.RegularExpressions.Regex.IsMatch(p,@"_\d\d\.png$")).GroupBy(p=>Path.GetFileNameWithoutExtension(p)[..^3]);
         var frames=groups.SelectMany(g=>g.Any(p=>p.StartsWith(cleanFolder))?g.Where(p=>p.StartsWith(cleanFolder)):g).ToArray();
-        foreach(string path in frames)
+        var eyeCounts=new Dictionary<string,int>();
+        foreach(string folder in new[]{"Assets/Art/Player/VideoRough",cleanFolder})
+        {
+            string file=folder+"/eye-mask-manifest.json";if(!File.Exists(file)) continue;
+            foreach(var frame in JsonUtility.FromJson<EyeManifest>(File.ReadAllText(file)).frames)
+                eyeCounts[folder+"/EyeMasks/"+frame.file+".png"]=frame.pixels;
+        }
+        foreach(string path in frames.Concat(eyeCounts.Keys))
         {
             var importer=(TextureImporter)AssetImporter.GetAtPath(path);
             importer.textureType=TextureImporterType.Sprite;importer.spriteImportMode=SpriteImportMode.Single;
@@ -50,9 +59,12 @@ public static class CombatVideoArtBuilder
             var action=manifest.actions.FirstOrDefault(a=>a.name==name);
             if(action!=null) durations=action.frames.Select(f=>f.frames).ToArray();
             else if(name=="Fx_Kick") durations=new[]{1,1,2,3,3,3,3,3};
-            else if(name=="Fx_Slash"||name=="Fx_Parry") durations=new[]{1,1,1,1,2,2,2,2};
+            else if(name=="Fx_Parry") durations=new[]{2,1,1,1,1,2,2,2};
+            else if(name=="Fx_Slash") durations=new[]{1,1,1,1,2,2,2,2};
             else durations=Enumerable.Repeat(name=="IdleReference"?6:name=="WalkReference"?5:name=="Enemy_Idle"?8:name=="Enemy_Windup"?5:name=="Fx_Vanish"?3:4,group.Count()).ToArray();
-            motions.Add(new VideoArtLibrary.Motion {name=name,frames=group.OrderBy(p=>p).Select(p=>AssetDatabase.LoadAssetAtPath<Sprite>(p)).ToArray(),durations=durations,hitFrame=action?.hitFrame??0,branchFrame=action?.branchFrame??0,chargeFrame=action?.chargeFrame??0});
+            var ordered=group.OrderBy(p=>p).ToArray();
+            var eyes=ordered.Select(p=>Path.GetDirectoryName(p).Replace('\\','/')+"/EyeMasks/"+Path.GetFileName(p)).Select(p=>eyeCounts.TryGetValue(p,out int count)&&count>0?AssetDatabase.LoadAssetAtPath<Sprite>(p):null).ToArray();
+            motions.Add(new VideoArtLibrary.Motion {name=name,frames=ordered.Select(p=>AssetDatabase.LoadAssetAtPath<Sprite>(p)).ToArray(),eyeFrames=eyes,durations=durations,hitFrame=action?.hitFrame??0,branchFrame=action?.branchFrame??0,chargeFrame=action?.chargeFrame??0,releaseFrame=action?.releaseFrame??0,landingFrame=action?.landingFrame??0});
         }
         string backgroundPath="Assets/Art/Video/CaptureRuins.png";
         var bg=(TextureImporter)AssetImporter.GetAtPath(backgroundPath);bg.textureType=TextureImporterType.Sprite;bg.spritePixelsPerUnit=32;bg.filterMode=FilterMode.Point;bg.textureCompression=TextureImporterCompression.Uncompressed;bg.mipmapEnabled=false;bg.SaveAndReimport();
@@ -97,6 +109,14 @@ public static class CombatVideoArtBuilder
             var state=enemyMachine.AddState("EnemyVideo_"+name);state.motion=clip;if(name=="Idle") enemyMachine.defaultState=state;
         }
         AssetDatabase.SaveAssets();
+    }
+    private static string[] SelectCleanFrames(string folder)
+    {
+        var manifest=JsonUtility.FromJson<Manifest>(File.ReadAllText(folder+"/timing-manifest.json"));
+        var expected=new HashSet<string>(manifest.actions.SelectMany(a=>Enumerable.Range(1,a.frames.Length).Select(i=>$"{a.name}_{i:D2}.png")));
+        var frames=Directory.GetFiles(folder,"*.png").Where(p=>expected.Contains(Path.GetFileName(p))).ToArray();
+        if(frames.Length!=expected.Count) throw new InvalidOperationException("Cleanup PNGs do not match their timing manifest.");
+        return frames;
     }
     private static AnimationClip Clip(string name,VideoArtLibrary.Motion motion,bool loop)
     {

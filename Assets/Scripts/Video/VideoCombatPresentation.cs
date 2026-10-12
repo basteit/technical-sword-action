@@ -7,32 +7,43 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField] private Camera captureCamera;
     [SerializeField] private PlayerParryCounter2D counter;
     [SerializeField] private VideoVfxRenderer vfx;
-    [SerializeField, Range(.1f,1f)] private float chargeScale=.25f;
+    [SerializeField] private SpriteRenderer playerVisual;
+    [SerializeField] private VideoArtLibrary library;
+    [SerializeField, Range(.1f,1f)] private float chargeScale=.15f;
     [SerializeField, Range(.5f,1f)] private float chargeRealSeconds=.7f;
     [SerializeField] private float normalSize=2.8125f;
     [SerializeField] private float closeSize=2.109375f;
-    [SerializeField,Range(0,.3f)] private float slowDimStrength=.14f;
-    [SerializeField,Min(.001f)] private float dimFadeInSeconds=5/60f;
-    [SerializeField,Min(.001f)] private float dimFadeOutSeconds=6/60f;
+    [SerializeField,Range(0,1)] private float slowDimStrength=.82f;
+    [SerializeField,Range(0,1)] private float heroLiftStrength=.6f;
+    [SerializeField,Min(.001f)] private float dimFadeInSeconds=3/60f;
+    [SerializeField,Min(.001f)] private float dimFadeOutSeconds=3/60f;
     private Vector3 restPosition;
     private bool charged;
     private float zoom,shakeRemaining,shakeStrength;
     private float dimAlpha,dimBlend;
     private SpriteRenderer dimRenderer;
     private Sprite dimSprite;
+    private SpriteRenderer heroLift,eyeLight,eyeGlow;
+    private Material eyeGlowMaterial;
+    private GameObject heroFocus;
+    private float eyeTrailTimer;
     private Vector3 focus;
     private float phaseTime;
     public bool IsCharged=>charged;
     public float Zoom=>zoom;
     public float DimAlpha=>dimAlpha;
     public bool IsDimVisible=>dimRenderer!=null&&dimRenderer.enabled;
+    public bool IsSpotlightVisible=>heroLift!=null&&heroLift.enabled;
+    public bool AreEyesVisible=>eyeLight!=null&&eyeLight.enabled;
     public float ChargeRealElapsed { get; private set; }
     private void Awake()
     {
         if(captureCamera!=null) { restPosition=captureCamera.transform.position;EnsureDimmer(); }
+        if(playerVisual==null&&counter!=null) playerVisual=counter.GetComponent<SpriteRenderer>();
+        EnsureSpotlight();
     }
     private void OnEnable()
-    { counter.ChargeStarted+=OnCharge;counter.HitConfirmed+=OnHit;counter.HitMissed+=OnMiss;counter.Finished+=OnFinished; }
+    { counter.ChargeStarted+=OnCharge;counter.ChargeReleased+=OnRelease;counter.HitConfirmed+=OnHit;counter.HitMissed+=OnMiss;counter.Finished+=OnFinished; }
     private void OnCharge()
     {
         charged=true;ChargeRealElapsed=0;
@@ -40,6 +51,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         focus.y=1.35f;focus.z=restPosition.z;
         CombatTimeController.RequestSlow(counter,chargeScale,chargeRealSeconds);
     }
+    private void OnRelease() { charged=false;CombatTimeController.ReleaseSlow(counter); }
     private void OnHit(Damageable2D enemy,Vector2 foot)
     {
         charged=false;CombatTimeController.ReleaseSlow(counter);
@@ -70,6 +82,13 @@ public sealed class VideoCombatPresentation : MonoBehaviour
             realSeconds/Mathf.Max(.001f,dimming?dimFadeInSeconds:dimFadeOutSeconds));
         dimAlpha=dimBlend*slowDimStrength;
         UpdateDimmer();
+        UpdateSpotlight();
+        if(charged&&dimAlpha>0&&playerVisual!=null)
+        {
+            eyeTrailTimer+=realSeconds;
+            if(eyeTrailTimer>=.1f) { eyeTrailTimer%=.1f;vfx.EmitEyeTrail(playerVisual,counter.GetComponent<PlayerMotor2D>().FacingSign); }
+        }
+        else eyeTrailTimer=0;
     }
     private void EnsureDimmer()
     {
@@ -91,18 +110,47 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         dimRenderer.transform.localScale=new Vector3(height*Mathf.Max(captureCamera.aspect,16/9f),height,1);
         dimRenderer.color=new Color(0,0,0,dimAlpha);dimRenderer.enabled=dimAlpha>0;
     }
+    private void EnsureSpotlight()
+    {
+        if(heroFocus!=null||playerVisual==null) return;
+        heroFocus=new GameObject("VideoHeroFocus");heroFocus.hideFlags=HideFlags.DontSave;
+        heroFocus.transform.SetParent(playerVisual.transform,false);
+        heroLift=heroFocus.AddComponent<SpriteRenderer>();heroLift.sortingOrder=1010;
+        var eyes=new GameObject("EyesOnly");eyes.transform.SetParent(heroFocus.transform,false);
+        eyeLight=eyes.AddComponent<SpriteRenderer>();eyeLight.sortingOrder=1013;
+        var glow=new GameObject("EyeGlowOnly");glow.transform.SetParent(heroFocus.transform,false);
+        eyeGlow=glow.AddComponent<SpriteRenderer>();eyeGlow.sortingOrder=1012;
+        var shader=Shader.Find("TechnicalSwordAction/VideoPixelGlow");
+        if(shader!=null) { eyeGlowMaterial=new Material(shader){hideFlags=HideFlags.DontSave};eyeGlow.sharedMaterial=eyeGlowMaterial; }
+        UpdateSpotlight();
+    }
+    private void UpdateSpotlight()
+    {
+        if(heroLift==null) return;
+        bool visible=dimAlpha>0&&playerVisual!=null&&playerVisual.gameObject.activeInHierarchy;
+        heroLift.enabled=visible;
+        if(playerVisual==null) { eyeLight.enabled=eyeGlow.enabled=false;return; }
+        heroLift.sprite=playerVisual.sprite;heroLift.flipX=eyeLight.flipX=eyeGlow.flipX=playerVisual.flipX;
+        var tint=playerVisual.color;heroLift.color=new Color(tint.r,tint.g,tint.b,tint.a*heroLiftStrength*dimBlend);
+        var mask=library!=null?library.EyesFor(playerVisual.sprite):null;
+        eyeLight.sprite=eyeGlow.sprite=mask;eyeLight.enabled=visible&&mask!=null;eyeGlow.enabled=eyeLight.enabled&&vfx.HybridGlow;
+        eyeLight.color=new Color(.85f,.96f,1,dimBlend);eyeGlow.color=new Color(.65f,.9f,1,.5f*dimBlend);
+    }
     public void ResetPresentation()
     {
-        charged=false;zoom=shakeRemaining=shakeStrength=phaseTime=ChargeRealElapsed=dimAlpha=dimBlend=0;
+        charged=false;zoom=shakeRemaining=shakeStrength=phaseTime=ChargeRealElapsed=dimAlpha=dimBlend=eyeTrailTimer=0;
         if(captureCamera!=null) { captureCamera.transform.position=restPosition;captureCamera.orthographicSize=normalSize; }
         UpdateDimmer();
+        UpdateSpotlight();
         CombatTimeController.ReleaseOwner(counter);
     }
     private void OnDisable()
-    { counter.ChargeStarted-=OnCharge;counter.HitConfirmed-=OnHit;counter.HitMissed-=OnMiss;counter.Finished-=OnFinished;ResetPresentation(); }
+    { counter.ChargeStarted-=OnCharge;counter.ChargeReleased-=OnRelease;counter.HitConfirmed-=OnHit;counter.HitMissed-=OnMiss;counter.Finished-=OnFinished;ResetPresentation(); }
     private void OnDestroy()
     {
         if(dimRenderer!=null) Destroy(dimRenderer.gameObject);
         if(dimSprite!=null) Destroy(dimSprite);
+        if(eyeGlowMaterial!=null) Destroy(eyeGlowMaterial);
+        if(heroFocus!=null) Destroy(heroFocus);
     }
 }

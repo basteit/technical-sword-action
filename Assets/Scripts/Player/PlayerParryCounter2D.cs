@@ -14,6 +14,9 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     [SerializeField] private bool airborneKick;
     [SerializeField] private bool invincibleDuringKick = true;
     [SerializeField, Min(1)] private int chargeFrame = 18;
+    [SerializeField, Min(1)] private int chargeReleaseFrame = 24;
+    [SerializeField, Min(1)] private int landingFrame = 36;
+    [SerializeField, Min(0f)] private float landingRollDistance = .12f;
     [SerializeField, Min(0f)] private float jumpHeight = .55f;
     [SerializeField, Min(0f)] private float maxApproach = .6f;
     [SerializeField] private LayerMask obstacleLayers;
@@ -22,7 +25,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     private Rigidbody2D body;
     private Collider2D bodyCollider;
     private int elapsed;
-    private bool active, hitApplied, charged,confirmedHit;
+    private bool active, hitApplied, charged,confirmedHit,chargeReleased,landed;
     private float savedGravity;
     private Vector2 origin;
     private float approach;
@@ -37,6 +40,10 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public int ElapsedFrames => elapsed;
     public int HitFrame => hitFrame;
     public int ChargeFrame => chargeFrame;
+    public int ChargeReleaseFrame=>chargeReleaseFrame;
+    public int LandingFrame=>landingFrame;
+    public bool HasReleasedCharge=>chargeReleased;
+    public bool HasLanded=>landed;
     public int HitCount { get; private set; }
     public int StartCount { get; private set; }
     public string LastEndReason { get; private set; }
@@ -48,6 +55,8 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         (state.ActionState == PlayerActionState.ParrySuccess || state.ActionState == PlayerActionState.Neutral) && FindEligible() != null;
     public event Action Started;
     public event Action ChargeStarted;
+    public event Action ChargeReleased;
+    public event Action Landed;
     public event Action<Damageable2D, Vector2> HitConfirmed;
     public event Action HitMissed;
     public event Action<bool> Finished;
@@ -83,7 +92,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     {
         if (!CanStartAction) return false;
         SelectedTarget = FindEligible(); stocks.Remove(SelectedTarget);
-        active = true; elapsed = 0; hitApplied = charged = confirmedHit = false; StartCount++;
+        active = true; elapsed = 0; hitApplied = charged = confirmedHit = chargeReleased = landed = false; StartCount++;
         origin = body != null ? body.position : (Vector2)transform.position;
         facing = motor != null ? motor.FacingSign : 1;
         approach = Mathf.Clamp((SelectedTarget.transform.position.x - origin.x) * facing - .85f, 0, maxApproach);
@@ -97,16 +106,22 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         if (!active) return;
         if (!hitApplied && (SelectedTarget == null || !SelectedTarget.IsAlive)) { Finish("TargetLost"); return; }
         if (!airborneKick || body == null) return;
-        float t = Mathf.Clamp01((elapsed + 1f) / Mathf.Max(endFrame, hitFrame + 1));
+        float frame=elapsed+1f;
+        float rise=Mathf.Clamp01(frame/Mathf.Max(1,chargeFrame-2));
+        float fall=Mathf.Clamp01((frame-hitFrame)/Mathf.Max(1,landingFrame-hitFrame));
+        float height=frame<=hitFrame?jumpHeight*(1-(1-rise)*(1-rise)):jumpHeight*(1-fall*fall);
         float x = origin.x + facing * approach * Mathf.Clamp01((elapsed + 1f) / hitFrame);
-        Vector2 desired = new Vector2(x, origin.y + jumpHeight * Mathf.Sin(Mathf.PI * t));
+        x+=facing*landingRollDistance*Mathf.Clamp01((frame-landingFrame)/4f);
+        Vector2 desired = new Vector2(x, origin.y + height);
         Vector2 delta = desired - body.position;
         if (bodyCollider != null && delta.sqrMagnitude > .000001f && obstacleLayers.value != 0)
         {
             var filter = new ContactFilter2D { useLayerMask = true, layerMask = obstacleLayers, useTriggers = false };
             int count = bodyCollider.Cast(delta.normalized, filter, movementHits, delta.magnitude);
             float distance = delta.magnitude;
-            for (int i = 0; i < count; i++) distance = Mathf.Min(distance, Mathf.Max(0f, movementHits[i].distance - .005f));
+            for (int i = 0; i < count; i++)
+                if(Vector2.Dot(delta.normalized,movementHits[i].normal)<-.001f)
+                    distance = Mathf.Min(distance, Mathf.Max(0f, movementHits[i].distance - .005f));
             delta = delta.normalized * distance;
         }
         body.linearVelocity = delta / CombatTimeController.StepSeconds;
@@ -117,6 +132,8 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         elapsed++;
         if (airborneKick && !charged && elapsed >= chargeFrame)
         { charged = true; ChargeStarted?.Invoke(); }
+        if(airborneKick&&charged&&!chargeReleased&&elapsed>=chargeReleaseFrame)
+        { chargeReleased=true;CombatTimeController.ReleaseSlow(this);ChargeReleased?.Invoke(); }
         if (!hitApplied && elapsed >= Mathf.Max(1, hitFrame))
         {
             hitApplied = true;
@@ -129,6 +146,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
             { confirmedHit=true;HitCount++; HitConfirmed?.Invoke(SelectedTarget, foot); }
             else { CombatTimeController.ReleaseSlow(this);HitMissed?.Invoke(); }
         }
+        if(airborneKick&&!landed&&elapsed>=landingFrame) { landed=true;Landed?.Invoke(); }
         if (elapsed >= Mathf.Max(endFrame, hitFrame)) Finish("Complete");
     }
     private void Finish(string reason)
@@ -139,7 +157,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public void CancelAction()
     {
         bool wasActive = active; bool didHit = confirmedHit;
-        active = false; elapsed = 0; hitApplied = charged = confirmedHit = false;
+        active = false; elapsed = 0; hitApplied = charged = confirmedHit = chargeReleased = landed = false;
         if (wasActive && body != null) { body.gravityScale = savedGravity; body.linearVelocity = Vector2.zero; }
         if(SelectedTarget!=null) SelectedTarget.ReleaseStun(this);
         SelectedTarget = null; CombatTimeController.ReleaseOwner(this);

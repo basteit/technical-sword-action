@@ -77,15 +77,28 @@ local function enemy(im,n,state)
   end
 end
 local motions={{'Idle',4},{'Move',6},{'Windup',6},{'Attack',4},{'Hit',3},{'Parried',4},{'Death',6}}
-local s=Sprite(64,64,ColorMode.RGB);s.layers[1].name='Sentinel - armor cloak blade';local index=0
+local s=Sprite(64,64,ColorMode.RGB);s.layers[1].name='Sentinel - armor cloak blade';local index=0;local enemyBounds={}
 for _,m in ipairs(motions) do local first=index+1;local sheet=Image(m[2]*64,64,ColorMode.RGB)
   for n=1,m[2] do index=index+1;if index>1 then s:newEmptyFrame(index) end;s.frames[index].duration=m[1]=='Idle' and .133 or m[1]=='Windup' and .083 or .067
     local im=Image(64,64,ColorMode.RGB);enemy(im,n,m[1]);s:newCel(s.layers[1],index,im,Point(0,0))
     im:saveAs(out .. '/Enemy_' .. m[1] .. '_' .. string.format('%02d',n) .. '.png');sheet:drawImage(im,Point((n-1)*64,0))
   end
   local tag=s:newTag(first,index);tag.name=m[1];sheet:saveAs(out .. '/Enemy_' .. m[1] .. '.png')
+  enemyBounds[#enemyBounds+1]={name=m[1],first=first,last=index,tag=tag}
 end
+for _,b in ipairs(enemyBounds) do b.tag.fromFrame=b.first;b.tag.toFrame=b.last end
 s:newLayer().name='CleanUp';s:saveAs(out .. '/CaptureSentinel.aseprite');s:close()
+local function validateTags(path,bounds,frameCount)
+  local reopened=app.open(path);assert(#reopened.frames==frameCount and #reopened.tags==#bounds)
+  for _,b in ipairs(bounds) do local found=false
+    for _,t in ipairs(reopened.tags) do if t.name==b.name then
+      assert(t.fromFrame.frameNumber==b.first and t.toFrame.frameNumber==b.last,'Incorrect tag range: '..b.name);found=true
+    end end
+    assert(found)
+  end
+  reopened:close()
+end
+validateTags(out..'/CaptureSentinel.aseprite',enemyBounds,index)
 if app.params['part']=='enemy' then return end
 local b=Sprite(384,216,ColorMode.RGB);b.layers[1].name='Far architecture';local im=Image(384,216,ColorMode.RGB)
 rect(im,0,0,384,216,rgba(18,28,43,255))
@@ -107,8 +120,8 @@ for x=0,383,26 do line(im,x,161,x-18,215,1,rgba(20,29,40,255)) end
 for i=1,43 do local x=(i*97)%384;local y=160+(i*13)%54;rect(im,x,y,3+(i%6),1,rgba(58,69,77,255)) end
 line(im,265,158,251,179,1,rgba(9,18,30,255));line(im,251,179,261,193,1,rgba(9,18,30,255))
 b:newCel(b.layers[1],1,im,Point(0,0));b:saveAs(out .. '/CaptureRuins.aseprite');im:saveAs(out .. '/CaptureRuins.png');b:close()
-local fx=Sprite(128,128,ColorMode.RGB);fx.layers[1].name='Pixel effect';index=0
-local fxTimes={Slash={1,1,1,1,2,2,2,2},Parry={1,1,1,1,2,2,2,2},Kick={1,1,2,3,3,3,3,3},Vanish={3,3,3,3,3,3,3,3}}
+local fx=Sprite(128,128,ColorMode.RGB);fx.layers[1].name='Pixel effect';index=0;local fxBounds={}
+local fxTimes={Slash={1,1,1,1,2,2,2,2},Parry={2,1,1,1,1,2,2,2},Kick={1,1,2,3,3,3,3,3},Vanish={3,3,3,3,3,3,3,3}}
 for _,kind in ipairs({'Slash','Parry','Kick','Vanish'}) do local first=index+1;local sheet=Image(128*8,128,ColorMode.RGB)
   for f=1,8 do index=index+1;if index>1 then fx:newEmptyFrame(index) end;fx.frames[index].duration=math.floor(fxTimes[kind][f]/60*1000+.5)/1000
     local img=Image(128,128,ColorMode.RGB);local alpha=math.floor(255*(1-(f-1)/8));local gold=rgba(255,193,93,alpha);local white=rgba(255,246,213,alpha);local teal=rgba(107,203,212,alpha)
@@ -118,9 +131,16 @@ for _,kind in ipairs({'Slash','Parry','Kick','Vanish'}) do local first=index+1;l
       end
       line(img,58,65,70+f*2,62-f,1,white)
     elseif kind=='Parry' then
-      if f<=3 then ring(img,64,64,7+f*5,2,white);line(img,40-f*3,79+f*2,81+f*3,46-f*2,2,gold) end
-      for k=0,7 do local a=k*math.pi/4+.3;local r=8+f*3;line(img,64+math.cos(a)*r,64+math.sin(a)*r,64+math.cos(a)*(r+8),64+math.sin(a)*(r+8),1,k%2==0 and gold or white) end
-      if f==1 then rect(img,62,56,3,17,P.white);rect(img,56,62,17,3,P.white) end
+      if f<=3 then
+        ring(img,64,64,5+f*5,1,gold)
+        line(img,32-f*2,89+f,94+f,37-f,3-f/2,white)
+        line(img,39-f,87,91,44-f,1,gold)
+      end
+      for k=0,9 do local a=k*math.pi/5+.25;local r=9+f*4
+        local length=math.max(2,13-f)+(k%3)*2
+        line(img,64+math.cos(a)*r,64+math.sin(a)*r,64+math.cos(a)*(r+length),64+math.sin(a)*(r+length),k%3==0 and 2 or 1,k%2==0 and gold or white)
+      end
+      if f==1 then poly(img,{{64,50},{67,61},{76,64},{67,67},{64,78},{61,67},{52,64},{61,61}},P.white) end
     elseif kind=='Kick' then
       ring(img,64,64,8+f*6,math.max(1,6-f),gold,.84);ring(img,64,64,5+f*6,1,white,.84)
       if f==1 then poly(img,{{64,49},{67,60},{79,64},{67,68},{64,79},{61,68},{49,64},{61,60}},white) end
@@ -136,5 +156,9 @@ for _,kind in ipairs({'Slash','Parry','Kick','Vanish'}) do local first=index+1;l
     fx:newCel(fx.layers[1],index,img,Point(0,0));img:saveAs(out .. '/Fx_' .. kind .. '_' .. string.format('%02d',f) .. '.png');sheet:drawImage(img,Point((f-1)*128,0))
   end
   local tag=fx:newTag(first,index);tag.name=kind;sheet:saveAs(out .. '/Fx_' .. kind .. '.png')
+  fxBounds[#fxBounds+1]={name=kind,first=first,last=index,tag=tag}
 end
+for _,b in ipairs(fxBounds) do b.tag.fromFrame=b.first;b.tag.toFrame=b.last end
 fx:newLayer().name='Glow overlay (optional, runtime intensity)';fx:saveAs(out .. '/CombatEffects.aseprite');fx:close()
+validateTags(out..'/CombatEffects.aseprite',fxBounds,index)
+local report=assert(io.open(out..'/authoring-validation.json','w'));report:write('{"reopened":true,"tagRangesChecked":true,"enemyFrames":33,"enemyTags":7,"effectFrames":32,"effectTags":4}');report:close()

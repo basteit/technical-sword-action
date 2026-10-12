@@ -47,7 +47,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
             Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
-            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(3.80d,3.88d));
+            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(3.87d,3.95d));
             Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.63f,.71f));
         }
         [TestCase("TargetLost")] [TestCase("CounterDisabled")] [TestCase("PlayerDead")] [TestCase("ForcedHit")]
@@ -110,12 +110,15 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(director,"StartTake",2,true);
             for(int frame=0;frame<fps*5&&!Get<bool>(presentation,"IsCharged");frame++) Call(director,"StepCapture",1d/fps);
             for(int frame=0;frame<Mathf.CeilToInt(fps*.12f);frame++) Call(director,"StepCapture",1d/fps);
-            Assert.That(Get<float>(presentation,"DimAlpha"),Is.EqualTo(.14f).Within(.001f));
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.EqualTo(.82f).Within(.001f));
             Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.True);
+            Assert.That(Get<bool>(presentation,"IsSpotlightVisible"),Is.True);
             Assert.That(Camera.main.transform.Find("VideoSlowDimmer"),Is.Not.Null);
             Call(director,"ResetTake",2);
             Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
             Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsSpotlightVisible"),Is.False);
+            Assert.That(Get<bool>(presentation,"AreEyesVisible"),Is.False);
         }
         [UnityTest] public IEnumerator SceneReloadDuringChargeReleasesAllRequestsAndReferences()
         {
@@ -123,6 +126,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for(int i=0;i<240&&!Get<bool>(presentation,"IsCharged");i++) Step();
             Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.True);
             var previousDimmer=Camera.main.transform.Find("VideoSlowDimmer");
+            var previousFocus=state.transform.Find("VideoHeroFocus");
+            var previousEyeMaterial=previousFocus.Find("EyeGlowOnly").GetComponent<SpriteRenderer>().sharedMaterial;
             Assert.That(previousDimmer,Is.Not.Null);
             yield return EditorSceneManager.LoadSceneInPlayMode("Assets/Scenes/CombatVideo.unity",new LoadSceneParameters(LoadSceneMode.Single));
             yield return null;BindScene();
@@ -133,6 +138,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
             Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.False);
             Assert.That(previousDimmer==null,Is.True,"Previous scene's overlay survived unload.");
+            Assert.That(previousFocus==null,Is.True,"Previous scene's spotlight survived unload.");
+            Assert.That(previousEyeMaterial==null,Is.True,"Previous scene's runtime eye material survived unload.");
             Assert.That(Camera.main.GetComponentsInChildren<SpriteRenderer>(true).Count(r=>r.name=="VideoSlowDimmer"),Is.EqualTo(1));
         }
         [Test] public void PresentationDisableClearsDimAndReenableReusesItsOverlay()
@@ -145,6 +152,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             ((Behaviour)presentation).enabled=false;
             Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
             Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsSpotlightVisible"),Is.False);
+            Assert.That(Get<bool>(presentation,"AreEyesVisible"),Is.False);
             Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
             ((Behaviour)presentation).enabled=true;
             Assert.That(Camera.main.transform.Find("VideoSlowDimmer"),Is.SameAs(dimmer));
@@ -165,8 +174,136 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for(int i=0;i<180&&!Get<bool>(director,"Completed");i++) Step();
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
-            presentation.GetType().GetField("slowDimStrength",Flags).SetValue(presentation,.14f);
+            presentation.GetType().GetField("slowDimStrength",Flags).SetValue(presentation,.82f);
             Call(director,"ResetTake",2);
+        }
+        [TestCase(30)] [TestCase(60)] [TestCase(120)]
+        public void ReleasePrecedesImpactAndLandingIsFastAtEveryRenderRate(int fps)
+        {
+            Call(director,"StartTake",4,true);
+            float impactHeight=0;bool sawRelease=false,sawLanding=false;
+            int previousHits=Get<int>(counter,"HitCount");
+            for(int frame=0;frame<fps*6&&!Get<bool>(director,"Completed");frame++)
+            {
+                Call(director,"StepCapture",1d/fps);
+                if(Get<bool>(counter,"HasReleasedCharge")&&!sawRelease)
+                {
+                    sawRelease=true;
+                    Assert.That((float)clockType.GetProperty("SlowScale").GetValue(null),Is.EqualTo(1));
+                    Assert.That(Get<int>(counter,"HitCount"),Is.EqualTo(previousHits));
+                    Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.True);
+                }
+                if(Get<int>(counter,"HitCount")>previousHits&&impactHeight==0) impactHeight=state.transform.position.y;
+                if(Get<bool>(counter,"HasLanded")&&!sawLanding)
+                {
+                    sawLanding=true;
+                    Assert.That(impactHeight-state.transform.position.y,Is.GreaterThan(.45f));
+                    Assert.That(state.transform.position.y,Is.InRange(.99f,1.02f));
+                    Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.True);
+                }
+            }
+            Assert.That(sawRelease&&sawLanding,Is.True);
+            var marks=((IEnumerable)director.GetType().GetField("Marks",Flags).GetValue(director)).Cast<object>().ToArray();
+            object Mark(string name)=>marks.Single(m=>(string)m.GetType().GetField("kind").GetValue(m)==name);
+            long Tick(string name)=>(long)Mark(name).GetType().GetField("tick").GetValue(Mark(name));
+            double Real(string name)=>(double)Mark(name).GetType().GetField("realSeconds").GetValue(Mark(name));
+            Assert.That(Tick("ChargeRelease")-Tick("ChargeStart"),Is.EqualTo(6));
+            Assert.That(Tick("Kick")-Tick("ChargeRelease"),Is.EqualTo(4));
+            Assert.That(Tick("Landing")-Tick("Kick"),Is.EqualTo(8));
+            Assert.That(Real("Kick")-Real("ChargeRelease"),Is.InRange(.045d,.085d));
+            Assert.That(Get<PlayerActionState>(state,"ActionState"),Is.EqualTo(PlayerActionState.Neutral));
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void ChargeReleaseOrLandingInterruptionClearsSubjectAndTime(bool atLanding)
+        {
+            Call(director,"StartTake",4,true);
+            for(int i=0;i<320&&!Get<bool>(counter,atLanding?"HasLanded":"HasReleasedCharge");i++) Step();
+            Assert.That(Get<bool>(counter,"IsActive"),Is.True);
+            Call(state,"ForceHit","VideoFastRecoveryInterrupt");
+            for(int i=0;i<30;i++) Step();
+            Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsSpotlightVisible"),Is.False);
+            Assert.That(Get<bool>(presentation,"AreEyesVisible"),Is.False);
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
+            Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
+            Assert.That((int)clockType.GetProperty("HitstopOwnerCount").GetValue(null),Is.Zero);
+            Assert.That(state.GetComponent<Rigidbody2D>().gravityScale,Is.EqualTo(3));
+        }
+        [Test] public void OnlyTheVisibleEyeMaskGlowsAndItsTrailFreezesOnPause()
+        {
+            Call(director,"StartTake",2,true);
+            for(int i=0;i<280&&!Get<bool>(presentation,"AreEyesVisible");i++) Step();
+            Assert.That(Get<bool>(presentation,"AreEyesVisible"),Is.True);
+            var focus=state.transform.Find("VideoHeroFocus");
+            var body=focus.GetComponent<SpriteRenderer>();var eyes=focus.Find("EyesOnly").GetComponent<SpriteRenderer>();
+            Assert.That(body.sprite,Is.SameAs(state.GetComponent<SpriteRenderer>().sprite));
+            Assert.That(eyes.sprite,Is.Not.SameAs(body.sprite));
+            Assert.That(eyes.sortingOrder,Is.GreaterThan(Camera.main.transform.Find("VideoSlowDimmer").GetComponent<SpriteRenderer>().sortingOrder));
+            var fx=Find("VideoVfxRenderer");Call(fx,"EmitEyeTrail",state.GetComponent<SpriteRenderer>(),-1);
+            var trail=fx.GetComponentsInChildren<SpriteRenderer>().First(r=>r.sortingOrder==1020);
+            Assert.That(trail.sprite,Is.SameAs(eyes.sprite));Vector3 position=trail.transform.position;Color tint=trail.color;
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
+            for(int i=0;i<60;i++) Step();
+            Assert.That(trail.transform.position,Is.EqualTo(position));Assert.That(trail.color,Is.EqualTo(tint));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
+            Call(director,"ResetTake",2);
+            Assert.That(Get<int>(fx,"ActiveCount"),Is.Zero);Assert.That(Get<bool>(presentation,"AreEyesVisible"),Is.False);
+        }
+        [TestCase(-1)] [TestCase(1)]
+        public void HitbackMovesAwayAndStopsAtWallsThenResets(int direction)
+        {
+            Call(director,"ResetTake",2);var enemy=(Component)Get<object>(director,"FrontEnemy");
+            var driver=enemy.GetComponent(Type.GetType("VideoEnemyAnimationDriver, Assembly-CSharp",true));
+            Vector3 origin=enemy.transform.position;
+            var wall=new GameObject("VideoHitbackWall");wall.layer=LayerMask.NameToLayer("Ground");wall.transform.position=origin+Vector3.right*direction*.7f;
+            wall.AddComponent<BoxCollider2D>().size=new Vector2(.1f,2);Physics2D.SyncTransforms();
+            try
+            {
+                Call(driver,"ApplyHitback",.65f,10,Vector2.right*direction);
+                for(int i=0;i<10;i++) Step();
+                float distance=(enemy.transform.position.x-origin.x)*direction;
+                Assert.That(distance,Is.InRange(.35f,.405f));Assert.That(Get<bool>(driver,"IsHitBacking"),Is.False);
+                Call(director,"ResetTake",2);Assert.That(enemy.transform.position,Is.EqualTo(origin));
+                Assert.That(Get<float>(driver,"LastHitbackDistance"),Is.Zero);
+            }
+            finally { Object.DestroyImmediate(wall); }
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void StrongerSwordStagesAdvanceAndHitbackMoreInBothDirections(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
+            var enemy=(Component)Get<object>(director,"FrontEnemy");var rear=(Component)Get<object>(director,"RearEnemy");
+            var driver=enemy.GetComponent(Type.GetType("VideoEnemyAnimationDriver, Assembly-CSharp",true));
+            int hits=0;float lastDistance=0,lastAdvance=0,lastHitX=state.transform.position.x;
+            for(int i=0;i<360&&!Get<bool>(director,"Completed");i++)
+            {
+                Step();int now=Get<int>(enemy,"HitCount");
+                if(now>hits)
+                {
+                    Assert.That(Get<float>(driver,"LastHitbackDistance"),Is.GreaterThan(lastDistance));
+                    float advance=(state.transform.position.x-lastHitX)*(mirrored?-1:1);
+                    Assert.That(advance,Is.GreaterThan(lastAdvance),"Stronger stage did not advance farther.");
+                    lastAdvance=advance;lastHitX=state.transform.position.x;
+                    lastDistance=Get<float>(driver,"LastHitbackDistance");hits=now;
+                }
+            }
+            Assert.That(hits,Is.EqualTo(4));Assert.That(Get<int>(rear,"HitCount"),Is.EqualTo(1));
+            Assert.That((enemy.transform.position.x-1.1f*(mirrored?-1:1))*(mirrored?-1:1),Is.InRange(.84f,.88f));
+        }
+        [Test] public void ReusedVanishEffectKeepsItsOwnMovingEnemy()
+        {
+            Call(director,"ResetTake",2);var fx=Find("VideoVfxRenderer");
+            var a=(Component)Get<object>(director,"FrontEnemy");var b=(Component)Get<object>(director,"RearEnemy");
+            Call(fx,"EmitFollowing","Vanish",a.transform,Vector2.zero,.6f,0f);
+            Call(fx,"EmitFollowing","Vanish",b.transform,Vector2.zero,.6f,1f);
+            Call(fx,"AdvanceVisuals",0f);Call(fx,"AdvanceVisuals",.5f);
+            Call(fx,"EmitFollowing","Vanish",a.transform,Vector2.zero,.6f,0f);
+            a.transform.position+=Vector3.right;b.transform.position+=Vector3.left;
+            Call(fx,"AdvanceVisuals",0f);Call(fx,"AdvanceVisuals",.01f);
+            var active=fx.GetComponentsInChildren<SpriteRenderer>(true).Where(r=>r.sortingOrder==30&&r.gameObject.activeInHierarchy).ToArray();
+            Assert.That(active.Length,Is.EqualTo(2));
+            Assert.That(active.Any(r=>r.transform.position==a.transform.position),Is.True);
+            Assert.That(active.Any(r=>r.transform.position==b.transform.position),Is.True);
         }
         [TestCase(-1f,0f,true,true)] [TestCase(1f,0f,true,true)]
         [TestCase(-2.2f,0f,true,false)] [TestCase(-1f,1.3f,true,false)] [TestCase(-1f,0f,false,false)]

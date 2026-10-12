@@ -72,15 +72,17 @@ public static class CombatVideoSceneBuilder
         actor.AddComponent<PlayerParry2D>(); actor.AddComponent<PlayerSpecialGauge>();
         var health=actor.AddComponent<PlayerDamageReceiver2D>();Set(health,"normalParryHitStop",2/60f);Set(health,"justParryHitStop",3/60f);
         var counter=actor.AddComponent<PlayerParryCounter2D>();var kick=library.Find("AirRoundhouse");Set(counter,"airborneKick",true);Set(counter,"hitFrame",kick.hitFrame);Set(counter,"chargeFrame",kick.chargeFrame);Set(counter,"endFrame",kick.TotalFrames);Set(counter,"radius",.5f);Set(counter,"obstacleLayers",1 << ground);
+        Set(counter,"chargeReleaseFrame",kick.releaseFrame>0?kick.releaseFrame:24);Set(counter,"landingFrame",kick.landingFrame>0?kick.landingFrame:36);Set(counter,"maxApproach",1.2f);
         actor.AddComponent<PlayerStateMachine>(); actor.AddComponent<VideoPlayerAnimationDriver>();
         var a = Enemy("Enemy_A", new Vector3(1.1f,1,0), enemy, playerLayer, actor.transform,library);
-        var b = Enemy("Enemy_B", new Vector3(-1.15f,1,0), enemy, playerLayer, actor.transform,library);
+        var b = Enemy("Enemy_B", new Vector3(-.85f,1,0), enemy, playerLayer, actor.transform,library);
         var fx=new GameObject("VideoEffects").AddComponent<VideoVfxRenderer>();Set(fx,"library",library);
         string materialPath="Assets/Settings/VideoPixelGlow.mat";var glow=AssetDatabase.LoadAssetAtPath<Material>(materialPath);
         if(glow==null) { glow=new Material(Shader.Find("TechnicalSwordAction/VideoPixelGlow"));AssetDatabase.CreateAsset(glow,materialPath); }
         Set(fx,"glowMaterial",glow);
         var presentation=new GameObject("VideoPresentation").AddComponent<VideoCombatPresentation>();
         Set(presentation,"captureCamera",camera);Set(presentation,"counter",counter);Set(presentation,"vfx",fx);
+        Set(presentation,"playerVisual",render);Set(presentation,"library",library);
         var director = new GameObject("CaptureDirector").AddComponent<CombatVideoDirector>();
         Set(director,"player", actor.GetComponent<PlayerStateMachine>());
         Set(director,"frontEnemy",a); Set(director,"rearEnemy",b);
@@ -99,18 +101,19 @@ public static class CombatVideoSceneBuilder
         if(library!=null) renderer.sprite=library.Find("Enemy_Idle").frames[0];
         var damageable = obj.AddComponent<Damageable2D>();
         Set(damageable,"individualId",name); Set(damageable,"deathDisplayDuration",.65f);
-        Set(damageable,"knockbackPower",.25f); Set(damageable,"lightHitStunDuration",.1f);
+        Set(damageable,"knockbackPower",0f); Set(damageable,"lightHitStunDuration",.1f);
         var ai = obj.AddComponent<EnemyMeleeChaser2D>(); Set(ai,"target",target);
         Set(ai,"attackTargetLayers",1 << playerLayer); Set(ai,"attackWindupDuration",.5f);
         Set(ai,"attackRange",1.9f); Set(ai,"moveSpeed",0f);
         var animation=obj.AddComponent<VideoEnemyAnimationDriver>();Set(animation,"library",library);Set(animation,"player",target);
+        Set(animation,"hitbackObstacles",1<<LayerMask.NameToLayer("Ground"));
         obj.SetActive(true); return damageable;
     }
     private static void ConfigureAttack(PlayerAttack2D attack,VideoArtLibrary library)
     {
         var data=new SerializedObject(attack);var steps=data.FindProperty("attackSteps");
         var motions=new[]{"VerticalSlash","HorizontalSlash","RapidSheathe","IaiSlash"}.Select(library.Find).ToArray();
-        int[] totals=motions.Select(m=>m.TotalFrames).ToArray(),hits=motions.Select(m=>m.hitFrame).ToArray();float[] distance={.08f,.1f,.12f,.15f};
+        int[] totals=motions.Select(m=>m.TotalFrames).ToArray(),hits=motions.Select(m=>m.hitFrame).ToArray();float[] distance={.12f,.2f,.28f,.4f};
         for(int i=0;i<4;i++)
         {
             var step=steps.GetArrayElementAtIndex(i);step.FindPropertyRelative("fallbackDuration").floatValue=totals[i]/60f;

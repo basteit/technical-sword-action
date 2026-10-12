@@ -11,11 +11,20 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     private string motion="Idle";
     private int elapsed;
     [SerializeField] private Vector3 restPosition;
+    [SerializeField] private LayerMask hitbackObstacles;
+    private int hitbackFrame,hitbackFrames;
+    private float hitbackDistance;
+    private Vector3 hitbackOrigin;
+    private Vector2 hitbackDirection;
+    private BoxCollider2D bodyCollider;
+    public bool IsHitBacking=>hitbackFrames>0&&hitbackFrame<hitbackFrames;
+    public float LastHitbackDistance {get;private set;}
     public string MotionName=>motion;
     public int CombatTickOrder=>320;
     private void OnEnable()
     {
         health=GetComponent<Damageable2D>();ai=GetComponent<EnemyMeleeChaser2D>();visual=GetComponentInChildren<SpriteRenderer>();
+        bodyCollider=GetComponent<BoxCollider2D>();
         animator=visual.GetComponent<Animator>();CombatTimeController.RegisterAnimator(animator,this);
         health.HitReceived+=OnHit;health.Parried+=OnParried;health.Died+=OnDeath;health.ResetPerformed+=OnReset;
         ai.AttackStarted+=OnAttack;CombatTimeController.Register(this);
@@ -34,11 +43,13 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     private void OnAttack()=>Play("Attack");
     private void OnReset(Damageable2D source)
     {
+        hitbackFrame=hitbackFrames=0;LastHitbackDistance=0;
         visual.transform.localPosition=restPosition;visual.transform.localRotation=Quaternion.identity;visual.color=Color.white;
         if(animator!=null) animator.Rebind();Play("Idle");
     }
     public void CombatTick()
     {
+        AdvanceHitback();
         if (health.IsAlive)
         {
             string desired=health.IsStunned?(motion=="Hit"?"Hit":"Parried"):
@@ -49,6 +60,29 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
             if(player!=null) visual.flipX=player.position.x<transform.position.x;
         }
         elapsed++;Show();
+    }
+    public void ApplyHitback(float distance,int frames,Vector2 direction)
+    {
+        if(!isActiveAndEnabled) return;
+        hitbackOrigin=transform.position;hitbackDistance=Mathf.Max(0,distance);
+        hitbackDirection=direction.sqrMagnitude>0?direction.normalized:Vector2.right;
+        hitbackFrame=0;hitbackFrames=Mathf.Max(1,frames);LastHitbackDistance=hitbackDistance;
+    }
+    private void AdvanceHitback()
+    {
+        if(!IsHitBacking) return;
+        hitbackFrame++;
+        float t=hitbackFrame/(float)hitbackFrames;
+        Vector2 desired=(Vector2)hitbackOrigin+hitbackDirection*hitbackDistance*(1-(1-t)*(1-t));
+        Vector2 delta=desired-(Vector2)transform.position;
+        if(bodyCollider!=null&&hitbackObstacles.value!=0&&delta.sqrMagnitude>.000001f)
+        {
+            Vector2 size=Vector2.Scale(bodyCollider.size,transform.lossyScale);
+            var hit=Physics2D.BoxCast((Vector2)transform.position+bodyCollider.offset,size,0,delta.normalized,delta.magnitude+.01f,hitbackObstacles);
+            if(hit.collider!=null&&Vector2.Dot(delta.normalized,hit.normal)<-.001f)
+                delta=delta.normalized*Mathf.Max(0,hit.distance-.01f);
+        }
+        transform.position+=(Vector3)delta;
     }
     private void Show()
     {
@@ -64,6 +98,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     }
     private void OnDisable()
     {
+        hitbackFrame=hitbackFrames=0;
         if(health!=null) { health.HitReceived-=OnHit;health.Parried-=OnParried;health.Died-=OnDeath;health.ResetPerformed-=OnReset; }
         if(ai!=null) ai.AttackStarted-=OnAttack;CombatTimeController.Unregister(this);CombatTimeController.UnregisterAnimator(animator,this);
     }

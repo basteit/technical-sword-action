@@ -45,10 +45,10 @@ AirRoundhouse,4,57,4,67,12,anticipation,
 AirRoundhouse,5,58,2,33,16,anticipation,
 AirRoundhouse,6,59,3,50,18,anticipation,ChargeSlow
 AirRoundhouse,7,60,3,50,21,anticipation,
-AirRoundhouse,8,61,2,33,24,anticipation,
-AirRoundhouse,9,62,2,33,26,anticipation,
+AirRoundhouse,8,61,2,33,24,fast-swing,ReleaseSlow
+AirRoundhouse,9,62,2,33,26,fast-swing,
 AirRoundhouse,10,63,2,33,28,active,Hit
-AirRoundhouse,11,64,4,67,30,active,
-AirRoundhouse,12,65,5,83,34,cancel-lock,
-AirRoundhouse,13,66,6,100,39,cancel-lock,
-AirRoundhouse,14,67,9,150,45,cancel-lock,
+AirRoundhouse,11,64,3,50,30,active,
+AirRoundhouse,12,65,3,50,33,cancel-lock,
+AirRoundhouse,13,66,4,67,36,ukemi,Landing
+AirRoundhouse,14,67,4,67,40,stand,

@@ -1,7 +1,7 @@
 {
-    "frameCount": 230,
+    "frameCount": 234,
     "fps": 60,
-    "duration": 3.8333333333333337,
+    "duration": 3.9,
     "playerArtworkIsRough": true,
     "events": [
         {
@@ -35,16 +35,34 @@
             "tick": 104
         },
         {
-            "kind": "Death",
+            "kind": "ChargeStart",
+            "target": "Enemy_B",
+            "realSeconds": 2.2999999999999969,
+            "tick": 131
+        },
+        {
+            "kind": "ChargeRelease",
             "target": "Enemy_B",
             "realSeconds": 2.966666666666661,
+            "tick": 137
+        },
+        {
+            "kind": "Death",
+            "target": "Enemy_B",
+            "realSeconds": 3.0333333333333276,
             "tick": 141
         },
         {
             "kind": "Kick",
             "target": "Enemy_B",
-            "realSeconds": 2.966666666666661,
+            "realSeconds": 3.0333333333333276,
             "tick": 141
+        },
+        {
+            "kind": "Landing",
+            "target": "Enemy_B",
+            "realSeconds": 3.299999999999993,
+            "tick": 149
         }
     ]
 }

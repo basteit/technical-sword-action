@@ -109,7 +109,7 @@ local actions={
   {x=33,hand={45,26},tip={60,9},smear={{43,42},{56,25},{60,8}}},
   {hand={44,25},tip={58,10}}, {hand={43,31},tip={57,21}}, {hand={40,34},tip={53,41}}
  }},
- {name='AirRoundhouse',frames={4,4,4,4,2,3,3,2,2,2,4,5,6,9},hit=28,charge=18,branch=54,poses={
+ {name='AirRoundhouse',frames={4,4,4,4,2,3,3,2,2,2,3,3,4,4},hit=28,charge=18,release=24,landing=36,branch=44,poses={
   {hy=17,hip={32,42},hand={28,34},left={{25,49},{23,57}},right={{39,48},{40,57}}},
   {hy=16,hip={32,39},hand={28,32},left={{26,47},{23,55}},right={{39,44},{35,48}}},
   {hx=30,hy=13,hip={33,37},hand={29,29},left={{39,42},{42,49}},right={{26,39},{18,42}}},
@@ -117,13 +117,13 @@ local actions={
   {hx=30,hy=15,hip={32,34},angle=-12,back=true,hand={39,31},left={{38,43},{40,47}},right={{28,30},{25,27}}},
   {hx=28,hy=16,hip={33,34},angle=-16,back=true,hand={38,31},left={{25,42},{21,45}},right={{41,29},{34,24}}},
   {hx=26,hy=16,hip={34,34},angle=-20,hand={27,30},left={{24,42},{20,45}},right={{45,29},{42,25}}},
-  {hx=25,hy=17,hip={34,34},angle=-22,hand={26,31},left={{24,42},{19,45}},right={{46,31},{50,29}}},
-  {hx=25,hy=17,hip={34,35},angle=-20,hand={25,30},left={{24,42},{20,46}},right={{46,34},{57,33}}},
+  {hx=25,hy=17,hip={34,34},angle=-22,hand={26,31},left={{24,42},{19,45}},right={{46,31},{50,29}},smear={{44,27},{49,28},{54,30}}},
+  {hx=25,hy=17,hip={34,35},angle=-20,hand={25,30},left={{24,42},{20,46}},right={{46,34},{57,33}},smear={{48,28},{54,30},{60,34}}},
   {hx=25,hy=17,hip={34,35},angle=-18,hand={24,30},left={{24,42},{20,46}},right={{47,35},{61,34}},smear={{32,10},{53,19},{62,34}}},
   {hx=27,hy=15,hip={33,36},angle=-10,hand={26,29},left={{26,42},{25,48}},right={{44,38},{55,44}}},
-  {hx=30,hy=15,hip={32,38},hand={31,33},left={{26,47},{25,54}},right={{40,44},{43,50}}},
-  {hy=18,hip={32,42},hand={35,35},left={{26,49},{24,57}},right={{39,49},{42,57}}},
-  {hand={40,34},tip={53,41}}
+  {hx=28,hy=23,hip={33,41},angle=-16,hand={40,45},lhand={24,43},left={{29,46},{26,53}},right={{41,45},{44,50}}},
+  {hx=28,hy=25,hip={32,43},angle=-8,hand={45,55},lhand={25,47},left={{28,50},{25,57}},right={{39,51},{43,57}}},
+  {idle=true}
  }}
 }
 local s=Sprite(64,64,ColorMode.RGB)
@@ -132,7 +132,22 @@ local guides=s:newLayer();guides.name='Guides - ground COM trajectory (toggle)';
 local rough=s:newLayer();rough.name='Rough - pose'
 local blade=s:newLayer();blade.name='Rough - weapon and motion arc'
 local clean=s:newLayer();clean.name='CleanUp - body';local cleanBlade=s:newLayer();cleanBlade.name='CleanUp - weapon'
-local index=0; local manifest={};local csv={'Action,LocalFrame,DocumentFrame,GameFrames,DurationMs,StartGameFrame,Phase,Event'}
+local eyeGuide=s:newLayer();eyeGuide.name='Guides - eye glow mask (toggle)';eyeGuide.isVisible=false
+local cleanEyes=s:newLayer();cleanEyes.name='CleanUp - eye glow mask';cleanEyes.isVisible=false
+local index=0; local manifest={};local eyeManifest={};local tagBounds={};local csv={'Action,LocalFrame,DocumentFrame,GameFrames,DurationMs,StartGameFrame,Phase,Event'}
+local function exportEyes(im,name)
+  -- These three reference colours occur only in the pupils, not the hair or accessory.
+  local mask=Image(64,64,ColorMode.RGB);local count=0
+  for y=0,63 do for x=0,63 do
+    local c=im:getPixel(x,y);local r,g,b=app.pixelColor.rgbaR(c),app.pixelColor.rgbaG(c),app.pixelColor.rgbaB(c)
+    if app.pixelColor.rgbaA(c)>0 and ((r==41 and g==58 and b==157) or (r==62 and g==79 and b==183) or (r==91 and g==110 and b==225)) then
+      mask:drawPixel(x,y,app.pixelColor.rgba(255,255,255,255));count=count+1
+    end
+  end end
+  mask:saveAs(out..'/EyeMasks/'..name..'.png')
+  eyeManifest[#eyeManifest+1]=string.format('{"file":%q,"pixels":%d}',name,count)
+  s:newCel(eyeGuide,index,mask,Point(0,0));s:newCel(cleanEyes,index,Image(64,64,ColorMode.RGB),Point(0,0))
+end
 local function frame(duration)
   index=index+1;if index>1 then s:newEmptyFrame(index) end
   s.frames[index].duration=duration
@@ -142,9 +157,11 @@ for _,r in ipairs({{sprite=idle,name='IdleReference'},{sprite=walk,name='WalkRef
   for i,f in ipairs(r.sprite.frames) do
     frame(f.duration);local im=Image(r.sprite.spec);im:drawSprite(r.sprite,i)
     s:newCel(reference,index,im,Point(0,0));sheet:drawImage(im,Point((i-1)*64,0))
-    im:saveAs(out .. '/' .. r.name .. '_' .. string.format('%02d',i) .. '.png')
+    local name=r.name .. '_' .. string.format('%02d',i)
+    im:saveAs(out .. '/' .. name .. '.png');exportEyes(im,name)
   end
   local tag=s:newTag(first,index);tag.name=r.name
+  tagBounds[#tagBounds+1]={name=r.name,first=first,last=index,tag=tag}
   sheet:saveAs(out .. '/' .. r.name .. '.png')
 end
 for _,a in ipairs(actions) do
@@ -152,7 +169,8 @@ for _,a in ipairs(actions) do
   for i,n in ipairs(a.frames) do
     frame(math.floor(n/60*1000+.5)/1000)
     s:newCel(reference,index,Image(base),Point(0,0))
-    local im=Image(64,64,ColorMode.RGB);local wi=Image(64,64,ColorMode.RGB);pose(im,wi,a.poses[i]);
+    local im=Image(64,64,ColorMode.RGB);local wi=Image(64,64,ColorMode.RGB)
+    if a.poses[i].idle then im=Image(base) else pose(im,wi,a.poses[i]) end
     s:newCel(rough,index,im,Point(0,0));s:newCel(blade,index,wi,Point(0,0))
     s:newCel(clean,index,Image(64,64,ColorMode.RGB),Point(0,0));s:newCel(cleanBlade,index,Image(64,64,ColorMode.RGB),Point(0,0))
     local gi=Image(64,64,ColorMode.RGB)
@@ -161,21 +179,36 @@ for _,a in ipairs(actions) do
     disk(gi,a.poses[i].hip and a.poses[i].hip[1] or 32,a.poses[i].hip and a.poses[i].hip[2] or 40,2,guideColor)
     local gc=s:newCel(guides,index,gi,Point(0,0));gc.data=a.name .. ' / ' .. i .. ' / ' .. n .. ' game frames; floor row 58; root pivot (32,38 bottom-origin)'
     im:drawImage(wi);sheet:drawImage(im,Point((i-1)*64,0))
-    im:saveAs(out .. '/' .. a.name .. '_' .. string.format('%02d',i) .. '.png')
+    local name=a.name .. '_' .. string.format('%02d',i)
+    im:saveAs(out .. '/' .. name .. '.png');exportEyes(im,name)
     local event='';if start==a.hit then event='Hit' end;if a.charge and start==a.charge then event='ChargeSlow' end
+    if start==a.release then event='ReleaseSlow' end;if start==a.landing then event='Landing' end
     local phase=start<a.hit and 'anticipation' or start<a.hit+4 and 'active' or start<(a.branch or 999) and 'cancel-lock' or 'recovery'
+    if a.release and start>=a.release and start<a.hit then phase='fast-swing' end
+    if a.landing and start>=a.landing then phase=start<40 and 'ukemi' or 'stand' end
     csv[#csv+1]=string.format('%s,%d,%d,%d,%d,%d,%s,%s',a.name,i,index,n,math.floor(n/60*1000+.5),start,phase,event)
     mf[#mf+1]=string.format('{"frames":%d,"start":%d}',n,start);start=start+n
   end
   local t=s:newTag(first,index);t.name=a.name
+  tagBounds[#tagBounds+1]={name=a.name,first=first,last=index,tag=t}
   sheet:saveAs(out .. '/' .. a.name .. '.png')
-  manifest[#manifest+1]=string.format('{"name":%q,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"chargeFrame":%d,"frames":[%s]}',a.name,#a.frames,start,a.hit,a.branch or 0,a.charge or 0,table.concat(mf,','))
+  manifest[#manifest+1]=string.format('{"name":%q,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"chargeFrame":%d,"releaseFrame":%d,"landingFrame":%d,"frames":[%s]}',a.name,#a.frames,start,a.hit,a.branch or 0,a.charge or 0,a.release or 0,a.landing or 0,table.concat(mf,','))
 end
+-- Aseprite extends a tag when a new frame is appended at its end. Restore all
+-- intended ranges only after creating the entire document.
+for _,b in ipairs(tagBounds) do b.tag.fromFrame=b.first;b.tag.toFrame=b.last end
 local file=out .. '/Player_actions_rough.aseprite';s:saveAs(file);s:close()
 local reopen=app.open(file)
-assert(#reopen.layers==6 and #reopen.tags==8 and #reopen.frames==index)
-for _,a in ipairs(actions) do local found=false;for _,tag in ipairs(reopen.tags) do if tag.name==a.name then found=true end end;assert(found) end
+assert(#reopen.layers==8 and #reopen.tags==8 and #reopen.frames==index)
+for _,b in ipairs(tagBounds) do
+  local found=false
+  for _,tag in ipairs(reopen.tags) do if tag.name==b.name then
+    assert(tag.fromFrame.frameNumber==b.first and tag.toFrame.frameNumber==b.last,'Incorrect reopened tag range: '..b.name);found=true
+  end end
+  assert(found)
+end
 reopen:close();idle:close();walk:close()
 local f=assert(io.open(out .. '/timing-manifest.json','w'));f:write('{"canvas":64,"ppu":32,"pivot":[32,38],"actions":[' .. table.concat(manifest,',') .. ']}');f:close()
 local c=assert(io.open(out .. '/timing.csv','w'));c:write(table.concat(csv,'\n'));c:close()
-local report=assert(io.open(out .. '/authoring-validation.json','w'));report:write(string.format('{"reopened":true,"layers":6,"tags":8,"frames":%d,"sourceFilesModified":false}',index));report:close()
+local e=assert(io.open(out..'/eye-mask-manifest.json','w'));e:write('{"frames":['..table.concat(eyeManifest,',')..']}');e:close()
+local report=assert(io.open(out .. '/authoring-validation.json','w'));report:write(string.format('{"reopened":true,"tagRangesChecked":true,"layers":8,"tags":8,"frames":%d,"sourceFilesModified":false}',index));report:close()

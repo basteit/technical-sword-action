@@ -4,8 +4,8 @@
     "width": 1920,
     "height": 1080,
     "fps": 60.0,
-    "decodedFrames": 230,
-    "duration": 3.8333333333333335,
+    "decodedFrames": 234,
+    "duration": 3.9,
     "audioStreams": 0
   },
   {
@@ -13,8 +13,8 @@
     "width": 1920,
     "height": 1080,
     "fps": 60.0,
-    "decodedFrames": 291,
-    "duration": 4.85,
+    "decodedFrames": 295,
+    "duration": 4.916666666666667,
     "audioStreams": 0
   },
   {
@@ -22,8 +22,8 @@
     "width": 1920,
     "height": 1080,
     "fps": 60.0,
-    "decodedFrames": 291,
-    "duration": 4.85,
+    "decodedFrames": 295,
+    "duration": 4.916666666666667,
     "audioStreams": 0
   }
 ]

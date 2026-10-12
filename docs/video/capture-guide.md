@@ -4,7 +4,7 @@
 
 ## 素材とScene
 
-主人公ラフは `Assets/Art/Player/VideoRough/Player_actions_rough.aseprite`、67コマ・8タグ・6レイヤー。タイミングの正は同フォルダの `timing-manifest.json`（整数60Hzフレーム）。敵は `Assets/Art/Video/CaptureSentinel.aseprite`、背景は `CaptureRuins.aseprite`、VFXは `CombatEffects.aseprite`。今回のラフは源の待機/歩きのハッシュを維持する。
+主人公ラフは `Assets/Art/Player/VideoRough/Player_actions_rough.aseprite`、67コマ・8タグ・8レイヤー。瞳のガイド/清書レイヤーを含み、全タグの開始/終了コマを保存後の再読込で検証した。タイミングの正は同フォルダの `timing-manifest.json`（整数60Hzフレーム）。瞳の専用PNGは `EyeMasks`、対応と画素数は `eye-mask-manifest.json`。敵は `Assets/Art/Video/CaptureSentinel.aseprite`、背景は `CaptureRuins.aseprite`、VFXは `CombatEffects.aseprite`。元の待機/歩きのハッシュを維持する。
 
 Sceneは `Assets/Scenes/CombatVideo.unity`。Tools → Technical Sword Action → Video → Build Art and Capture Scene で素材/Clip/Animator/Sceneを再生成する。未保存の別Sceneがあると停止する。生成した撮影Sceneも手動変更がある場合は保存してから再生成する。SampleSceneとBasicActionValidationの既存差分を上書きしない。
 
@@ -18,7 +18,7 @@ uloop run-tests --test-mode EditMode --filter-type regex --filter-value Technica
 uloop run-tests --test-mode PlayMode --filter-type regex --filter-value TechnicalSwordAction
 ```
 
-Test Runnerは単独実行する。2026-10-12初版の結果はEditMode 181 / PlayMode 71件 Passed。のけぞり・暗転を加えた修正版はPlayMode 76 / 関連時計のEditMode 24件 Passed。PlayModeに2段/4段・両方向各10回（計40回）、30/60/120fps相当、Pause、対象消失、壁、無敵、被弾による強制中断、死亡、Disable、反撃中Scene再読込、暗転の強度0切替を含む。未保存の既存Sceneを自動で保存・破棄しない。
+Test Runnerは単独実行する。2026-10-12の最新修正版はEditMode 181 / PlayMode 87件 Passed。PlayModeに2段/4段・両方向各10回（計40回）、30/60/120fps相当、Pause、対象消失、壁、無敵、強制中断、死亡、Disable、反撃中Scene再読込、暗転の強度0切替、解除→命中→着地の時刻、瞳/主人公の像とMaterialの復帰、段別の実前進/ヒットバック、再利用VFXの追従を含む。未保存の既存Sceneを自動で保存・破棄しない。
 
 ## 録画
 
@@ -50,16 +50,20 @@ uloop control-play-mode --action Stop
 | 項目 | 設定/結果 |
 |---|---|
 | 形式 | 1920×1080 / H.264 / yuv420p / 60fps / 音声Streamなし |
-| 2段版 | 230フレーム、3.833333秒 |
-| 4段版 | 291フレーム、4.85秒 |
-| タメ | 18〜28戦闘F、0.25倍、実時間0.666667秒 |
+| 2段版 | 234フレーム、3.9秒 |
+| 4段版 | 295フレーム、4.916667秒 |
+| タメ | 18〜24戦闘F、0.15倍、実時間0.666667秒 |
+| 振り抜き | 24Fで通常速度へ戻し、28Fの命中まで4F/0.066667秒 |
+| 着地/受け身/待機 | 28〜36Fの落下（停止を除き0.133333秒）、36〜40F受け身、40〜44F元の待機姿勢。44FでAction終了 |
 | Hitstop | 通常2F、通常/Just Parry 2/3F、蹴り8F |
 | カメラ | 通常ortho 2.8125、タメ2.109375、座標1/32unitスナップ |
-| スロー中の暗さ | 黒の不透明度14%、入り5/60秒・戻り6/60秒。Pause中はフェード停止、リセット/Disableで即解除 |
+| スロー中の暗さ | 黒82%、入り/戻り各3/60秒。主人公は通常色の像を不透明度60%で重ね、瞳のみ白青色の光と8描画Fの残光。Pause中は停止、リセット/Disableで即解除 |
+| 前進/敵ヒットバック | 前進0.12/0.20/0.28/0.40unit、ヒットバック0.08/0.14/0.24/0.40unit、蹴り0.65unit。撮影の敵の一律ノックバックは0で二重移動を防止 |
+| 敵B/蹴り接近 | 初期x=-0.85、最大接近1.2unit。実際に弾いた敵を固定し、開始後の対象変更なし |
 | VFX | 採用確定：ドット本体＋短い加算発光（hybrid=true、2026-10-12のユーザー選択）。純ドット（false）は比較・調整用 |
 | 強度 | VideoVfxRendererのintensityで調整。初期0.8 |
 | 素材版 | 主人公Actionはrough、待機/歩きは提供素材、敵/背景/VFXは制作版 |
 
-4段版は全行程が約4.85秒に収まるため、清書が揃えば採用を第一候補とする。必須36コマのみ清書が先に揃う場合は2段版を完成させ、任意17コマの受領後に4段版を再判定する。現段階の動画を最終完成と扱わない。
+4段版は全行程が約4.92秒に収まるため、清書が揃えば採用を第一候補とする。必須36コマのみ清書が先に揃う場合は2段版を完成させ、任意17コマの受領後に4段版を再判定する。現段階の動画を最終完成と扱わない。
 
 最終書き出しは採用した混合版で `CapturePreview(2,true)` または `CapturePreview(4,true)` を使う。短い発光を接触時へ集中させ、清書統合後に足・刀・敵の反応が隠れないことを再確認する。

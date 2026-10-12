@@ -40,11 +40,13 @@ public static class VideoCaptureUtility
                 Check(CombatTimeController.SlowOwnerCount==0&&CombatTimeController.HitstopOwnerCount==0&&Mathf.Approximately(Time.timeScale,1),"Time request remained.");
                 Check(presentation.Zoom==0&&Mathf.Approximately(camera.orthographicSize,2.8125f),"Zoom remained.");
                 Check(presentation.DimAlpha==0&&!presentation.IsDimVisible,"Slow dim overlay remained.");
+                Check(!presentation.IsSpotlightVisible&&!presentation.AreEyesVisible,"Subject lift or eye light remained.");
                 Check(fx.ActiveCount==0,"VFX remained active.");
                 Check(presentation.ChargeRealElapsed>=.5f&&presentation.ChargeRealElapsed<=1f,"Charge duration outside .5–1 seconds.");
                 records.Add(new RunRecord{stages=stages,mirrored=mirrored,duration=director.RealElapsed,frontHits=director.FrontEnemy.HitCount,rearHits=director.RearEnemy.HitCount,chargeSeconds=presentation.ChargeRealElapsed});
                 director.ResetTake(stages);
                 Check(presentation.DimAlpha==0&&!presentation.IsDimVisible,"Slow dim overlay not reset.");
+                Check(!presentation.IsSpotlightVisible&&!presentation.AreEyesVisible,"Subject/eye overlay not reset.");
                 Check(director.FrontEnemy.CurrentHp==director.FrontEnemy.MaxHp&&director.RearEnemy.CurrentHp==3,"HP not reset.");
                 Check(counter.StockCount==0&&fx.ActiveCount==0,"Stock or VFX not reset.");
                 Check(director.FrontEnemy.GetComponentsInChildren<Collider2D>().All(c=>c.enabled)&&director.RearEnemy.GetComponentsInChildren<Collider2D>().All(c=>c.enabled),"Collider not reset.");
@@ -54,9 +56,11 @@ public static class VideoCaptureUtility
                     Check(renderer.transform.localPosition==Vector3.zero,"Enemy visual origin drifted.");
                     Check(renderer.color==Color.white,"Enemy tint/alpha not reset.");
                     Check(enemy.GetComponent<VideoEnemyAnimationDriver>().MotionName=="Idle"&&enemy.GetComponent<EnemyMeleeChaser2D>().CurrentStateName=="Idle","Enemy motion/AI not reset.");
+                    Check(!enemy.GetComponent<VideoEnemyAnimationDriver>().IsHitBacking,"Enemy hitback not reset.");
                     Check(enemy.GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0).shortNameHash==Animator.StringToHash("EnemyVideo_Idle"),"Enemy Animator not reset.");
                 }
                 Check(state.GetComponent<Rigidbody2D>().gravityScale==3,"Gravity not restored.");
+                Check(state.transform.position==new Vector3(0,1,0)&&Mathf.Approximately(director.FrontEnemy.transform.position.x,mirrored?-1.1f:1.1f)&&Mathf.Approximately(director.RearEnemy.transform.position.x,mirrored?.85f:-.85f),"Actor positions not reset.");
             }
             return JsonUtility.ToJson(new ValidationReport{runsPassed=records.Count,runs=records.ToArray()},true);
         }
