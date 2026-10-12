@@ -194,12 +194,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.True);
                 }
                 if(Get<int>(counter,"HitCount")>previousHits&&impactHeight==0) impactHeight=state.transform.position.y;
-                if(Get<bool>(counter,"HasLanded")&&!sawLanding)
+                if(Marks().Any(m=>(string)m.GetType().GetField("kind").GetValue(m)=="Landing")&&!sawLanding)
                 {
                     sawLanding=true;
                     Assert.That(impactHeight-state.transform.position.y,Is.GreaterThan(.45f));
                     Assert.That(state.transform.position.y,Is.InRange(.99f,1.02f));
-                    Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.True);
+                    Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.False,"Landing releases the action before free visual recovery.");
                 }
             }
             Assert.That(sawRelease&&sawLanding,Is.True);
@@ -217,8 +217,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
         public void ChargeReleaseOrLandingInterruptionClearsSubjectAndTime(bool atLanding)
         {
             Call(director,"StartTake",4,true);
-            for(int i=0;i<320&&!Get<bool>(counter,atLanding?"HasLanded":"HasReleasedCharge");i++) Step();
-            Assert.That(Get<bool>(counter,"IsActive"),Is.True);
+            if(atLanding) WaitForKickRecovery();
+            else for(int i=0;i<320&&!Get<bool>(counter,"HasReleasedCharge");i++) Step();
+            Assert.That(Get<bool>(counter,"IsActive"),Is.EqualTo(!atLanding));
             Call(state,"ForceHit","VideoFastRecoveryInterrupt");
             for(int i=0;i<30;i++) Step();
             Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.False);
@@ -352,6 +353,135 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(counter,"StockCount"),Is.EqualTo(1));
         }
         private void Step()=>Call(director,"StepCapture",1d/60d);
+        private object[] Marks()=>((IEnumerable)director.GetType().GetField("Marks",Flags).GetValue(director)).Cast<object>().ToArray();
+        private Component WaitForKickRecovery()
+        { return WaitForRecovery("AirRoundhouse"); }
+        private Component WaitForRecovery(string motion)
+        {
+            var recovery=state.GetComponent(Type.GetType("PlayerVisualRecovery2D, Assembly-CSharp",true));
+            for(int i=0;i<360&&(!Get<bool>(recovery,"IsPlaying")||Get<string>(recovery,"StateName")!="PlayerVideo_Recovery_"+motion);i++) Step();
+            Assert.That(Get<bool>(recovery,"IsPlaying"),Is.True);return recovery;
+        }
+        [TestCase(1,"VerticalSlash")] [TestCase(2,"HorizontalSlash")]
+        [TestCase(3,"RapidSheathe")] [TestCase(4,"IaiSlash")]
+        public void EachUnqueuedSwordStageShowsItsOwnFreeRecovery(int stage,string motion)
+        {
+            Call(director,"ResetTake",4);Call(state,"RequestAction",PlayerActionRequest.Attack);Step();
+            var attack=state.GetComponent(Type.GetType("PlayerAttack2D, Assembly-CSharp",true));
+            if(stage>1) Call(attack,"StartAttackStep",stage);
+            var recovery=WaitForRecovery(motion);
+            Assert.That(Get<PlayerActionState>(state,"ActionState"),Is.EqualTo(PlayerActionState.Neutral));
+            Assert.That(Get<bool>(state,"BlocksStandardMovement"),Is.False);
+            Assert.That(Get<string>(recovery,"StateName"),Is.EqualTo("PlayerVideo_Recovery_"+motion));
+            Assert.That((bool)Call(state,"RequestAction",PlayerActionRequest.Jump),Is.True);Step();
+            Assert.That(Get<PlayerActionRequest>(state,"LastAcceptedRequest"),Is.EqualTo(PlayerActionRequest.Jump));
+            Assert.That(Get<bool>(recovery,"IsPlaying"),Is.False);
+        }
+        [TestCase(false)] [TestCase(true)] public void SuccessfulAndMissedParriesReturnWithoutLockingAgain(bool success)
+        {
+            Call(director,"ResetTake",2);Call(state,"RequestAction",PlayerActionRequest.Parry);Step();
+            if(success)
+            {
+                var source=(Component)Get<object>(director,"RearEnemy");
+                var context=Activator.CreateInstance(Type.GetType("CombatHitContext2D, Assembly-CSharp",true),source,971L,true);
+                Call(health,"TryReceiveContextHit",1,(Vector2)source.transform.position,0f,context);
+            }
+            var recovery=WaitForRecovery("ParryDeflect");
+            Assert.That(Get<float>(state,"RemainingLock"),Is.Zero);Assert.That(Get<bool>(state,"BlocksStandardMovement"),Is.False);
+            var motor=state.GetComponent(Type.GetType("PlayerMotor2D, Assembly-CSharp",true));Call(motor,"SetMoveInput",Vector2.left);Step();
+            Assert.That(Get<bool>(recovery,"IsPlaying"),Is.False);
+            Assert.That(state.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).shortNameHash,Is.EqualTo(Animator.StringToHash("PlayerVideo_Move")));
+        }
+        [Test] public void NoInputShowsAFreeReturnFromCrouchToTheSuppliedIdle()
+        {
+            Call(director,"StartTake",4,true);var recovery=WaitForKickRecovery();
+            Assert.That(Get<PlayerActionState>(state,"ActionState"),Is.EqualTo(PlayerActionState.Neutral));
+            Assert.That(Get<bool>(state,"BlocksStandardMovement"),Is.False);
+            Assert.That(Get<float>(state,"RemainingLock"),Is.Zero);
+            Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.False);
+            var crouch=state.GetComponent<SpriteRenderer>().sprite;
+            for(int i=0;i<10;i++) Step();
+            Assert.That(Get<bool>(recovery,"IsPlaying"),Is.True);
+            Assert.That(state.GetComponent<SpriteRenderer>().sprite,Is.Not.SameAs(crouch));
+            for(int i=0;i<60&&!Get<bool>(director,"Completed");i++) Step();
+            Assert.That(Get<bool>(director,"Completed"),Is.True);
+            Assert.That(Get<bool>(recovery,"IsPlaying"),Is.False);
+            Assert.That(state.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).shortNameHash,Is.EqualTo(Animator.StringToHash("PlayerVideo_Idle")));
+        }
+        [TestCase(-1)] [TestCase(1)] public void WalkingCancelsRecoveryOnItsFirstTick(int direction)
+        {
+            Call(director,"StartTake",4,true);var recovery=WaitForKickRecovery();
+            var motor=state.GetComponent(Type.GetType("PlayerMotor2D, Assembly-CSharp",true));
+            float before=state.transform.position.x;Call(motor,"SetMoveInput",Vector2.right*direction);Step();
+            Assert.That(Get<bool>(recovery,"IsPlaying"),Is.False);
+            Assert.That((state.transform.position.x-before)*direction,Is.GreaterThan(0));
+            Assert.That(state.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).shortNameHash,Is.EqualTo(Animator.StringToHash("PlayerVideo_Move")));
+            Call(motor,"SetMoveInput",Vector2.zero);Step();
+            Assert.That(Get<bool>(recovery,"IsPlaying"),Is.True);
+            Assert.That(Get<string>(recovery,"StateName"),Is.EqualTo("PlayerVideo_Recovery_Move"));
+        }
+        [TestCase(PlayerActionRequest.Attack)] [TestCase(PlayerActionRequest.Parry)]
+        [TestCase(PlayerActionRequest.Dash)] [TestCase(PlayerActionRequest.Jump)]
+        public void AvailableActionsStartWithoutWaitingForRecovery(PlayerActionRequest request)
+        {
+            Call(director,"StartTake",4,true);var recovery=WaitForKickRecovery();
+            Assert.That((bool)Call(state,"RequestAction",request),Is.True);Step();
+            Assert.That(Get<bool>(recovery,"IsPlaying"),Is.False);
+            Assert.That(Get<PlayerActionRequest>(state,"LastAcceptedRequest"),Is.EqualTo(request));
+            Assert.That(Get<object>(state,"LastRejectionReason").ToString(),Is.EqualTo("None"));
+        }
+        [TestCase(PlayerActionRequest.Special)] [TestCase(PlayerActionRequest.Heal)] [TestCase(PlayerActionRequest.Interact)]
+        public void OtherGameplayRequestsCancelOnlyTheVisualWithoutConsumingInput(PlayerActionRequest request)
+        {
+            Call(director,"StartTake",2,true);var recovery=WaitForKickRecovery();
+            Assert.That((bool)Call(state,"RequestAction",request),Is.True);Call(recovery,"CombatTick");
+            Assert.That(Get<bool>(recovery,"IsPlaying"),Is.False);
+            Assert.That(Get<PlayerActionRequest>(state,"PendingRequests")&request,Is.EqualTo(request));
+            Assert.That(Get<PlayerActionState>(state,"ActionState"),Is.EqualTo(PlayerActionState.Neutral));
+        }
+        [Test] public void RecoveryPauseAndResetLeaveNoPoseOwnership()
+        {
+            Call(director,"StartTake",2,true);var recovery=WaitForKickRecovery();
+            int elapsed=Get<int>(recovery,"ElapsedFrames");var pose=state.GetComponent<SpriteRenderer>().sprite;
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});for(int i=0;i<60;i++) Step();
+            Assert.That(Get<int>(recovery,"ElapsedFrames"),Is.EqualTo(elapsed));Assert.That(state.GetComponent<SpriteRenderer>().sprite,Is.SameAs(pose));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
+            Call(director,"ResetTake",2);Assert.That(Get<bool>(recovery,"IsPlaying"),Is.False);
+            Assert.That(Get<int>(recovery,"ElapsedFrames"),Is.Zero);Assert.That(Get<string>(recovery,"StateName"),Is.Empty);
+        }
+        [TestCase(false)] [TestCase(true)] public void RecoveryDisableOrDeathCancelsImmediately(bool death)
+        {
+            Call(director,"StartTake",2,true);var recovery=WaitForKickRecovery();
+            if(death) Call(state,"SetDead","RecoveryDeathTest");else ((Behaviour)recovery).enabled=false;
+            Assert.That(Get<bool>(recovery,"IsPlaying"),Is.False);Assert.That(Get<int>(recovery,"ElapsedFrames"),Is.Zero);
+            Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.False);
+            ((Behaviour)recovery).enabled=true;Call(director,"ResetTake",2);
+        }
+        [UnityTest] public IEnumerator SceneReloadDuringRecoveryDestroysTheOldReturnAndFlash()
+        {
+            Call(director,"StartTake",2,true);var previousRecovery=WaitForKickRecovery();
+            var previousFlash=Camera.main.transform.Find("VideoImpactFlash");
+            yield return EditorSceneManager.LoadSceneInPlayMode("Assets/Scenes/CombatVideo.unity",new LoadSceneParameters(LoadSceneMode.Single));
+            yield return null;BindScene();
+            Assert.That(previousRecovery==null&&previousFlash==null,Is.True);
+            var recovery=state.GetComponent(Type.GetType("PlayerVisualRecovery2D, Assembly-CSharp",true));
+            Assert.That(Get<bool>(recovery,"IsPlaying"),Is.False);
+            Assert.That(Get<int>(presentation,"ActiveShakeCount"),Is.Zero);Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero);
+        }
+        [Test] public void StrongImpactShakeAndFlashFreezeOnPauseAndSettleCompletely()
+        {
+            Call(director,"StartTake",4,true);int before=Get<int>(counter,"HitCount");
+            for(int i=0;i<340&&Get<int>(counter,"HitCount")==before;i++) Step();
+            Assert.That(Get<int>(counter,"HitCount"),Is.GreaterThan(before));
+            Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.GreaterThan(.12f));
+            Assert.That(Get<float>(presentation,"FlashAlpha"),Is.GreaterThan(0));
+            var position=Camera.main.transform.position;float flash=Get<float>(presentation,"FlashAlpha");
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});for(int i=0;i<60;i++) Step();
+            Assert.That(Camera.main.transform.position,Is.EqualTo(position));Assert.That(Get<float>(presentation,"FlashAlpha"),Is.EqualTo(flash));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});for(int i=0;i<90;i++) Step();
+            Assert.That(Get<int>(presentation,"ActiveShakeCount"),Is.Zero);Assert.That(Get<Vector2>(presentation,"ShakeOffset"),Is.EqualTo(Vector2.zero));
+            Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero);
+        }
         [TestCase(false)] [TestCase(true)]
         public void WallBlocksStartOrImpactWithoutWrongDamageOrResidualOwnership(bool afterStart)
         {

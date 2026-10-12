@@ -79,6 +79,15 @@ local function pose(im,weapon,p)
     for i=1,#p.smear-1 do line(weapon,p.smear[i],p.smear[i+1],1,cyan) end
   end
 end
+local function settleReference(im,lower,lean)
+  -- Finish with the supplied idle artwork, easing the upper body over planted feet.
+  for y=0,63 do for x=0,63 do local c=base:getPixel(x,y)
+    if app.pixelColor.rgbaA(c)>0 then
+      local weight=math.max(0,(58-y)/58)
+      px(im,x+lean*weight,y+lower*weight,c)
+    end
+  end end
+end
 local actions={
  {name='VerticalSlash',frames={4,3,3,2,2,4,4,6},hit=10,branch=22,poses={
   {hand={33,23},tip={26,4}}, {hy=16,hand={35,17},tip={27,0}}, {hand={38,13},tip={37,0}},
@@ -109,7 +118,7 @@ local actions={
   {x=33,hand={45,26},tip={60,9},smear={{43,42},{56,25},{60,8}}},
   {hand={44,25},tip={58,10}}, {hand={43,31},tip={57,21}}, {hand={40,34},tip={53,41}}
  }},
- {name='AirRoundhouse',frames={4,4,4,4,2,3,3,2,2,2,3,3,4,4},hit=28,charge=18,release=24,landing=36,branch=44,poses={
+ {name='AirRoundhouse',frames={4,4,4,4,2,3,3,2,2,2,3,3},hit=28,charge=18,release=24,landing=36,branch=36,recovery=36,poses={
   {hy=17,hip={32,42},hand={28,34},left={{25,49},{23,57}},right={{39,48},{40,57}}},
   {hy=16,hip={32,39},hand={28,32},left={{26,47},{23,55}},right={{39,44},{35,48}}},
   {hx=30,hy=13,hip={33,37},hand={29,29},left={{39,42},{42,49}},right={{26,39},{18,42}}},
@@ -121,11 +130,31 @@ local actions={
   {hx=25,hy=17,hip={34,35},angle=-20,hand={25,30},left={{24,42},{20,46}},right={{46,34},{57,33}},smear={{48,28},{54,30},{60,34}}},
   {hx=25,hy=17,hip={34,35},angle=-18,hand={24,30},left={{24,42},{20,46}},right={{47,35},{61,34}},smear={{32,10},{53,19},{62,34}}},
   {hx=27,hy=15,hip={33,36},angle=-10,hand={26,29},left={{26,42},{25,48}},right={{44,38},{55,44}}},
-  {hx=28,hy=23,hip={33,41},angle=-16,hand={40,45},lhand={24,43},left={{29,46},{26,53}},right={{41,45},{44,50}}},
-  {hx=28,hy=25,hip={32,43},angle=-8,hand={45,55},lhand={25,47},left={{28,50},{25,57}},right={{39,51},{43,57}}},
-  {idle=true}
+  {hx=28,hy=23,hip={33,41},angle=-16,hand={40,45},lhand={24,43},left={{29,49},{26,56}},right={{41,49},{44,55}}}
  }}
 }
+local recoveries={
+ {name='Recovery_VerticalSlash',frames={4,4,4,4},hit=0,poses={
+  actions[1].poses[8],{hy=15,hand={37,36},tip={47,51}}, {settle=1,lean=0},{idle=true}}},
+ {name='Recovery_HorizontalSlash',frames={4,4,4,4},hit=0,poses={
+  actions[2].poses[8],{hx=31,hy=15,hand={37,36},tip={49,50}}, {settle=1,lean=0},{idle=true}}},
+ {name='Recovery_RapidSheathe',frames={4,4,4,4},hit=0,poses={
+  actions[3].poses[9],{hand={30,36},lhand={25,37}}, {settle=1,lean=0},{idle=true}}},
+ {name='Recovery_IaiSlash',frames={4,5,5,4},hit=0,poses={
+  actions[4].poses[8],{hy=15,hand={30,36},lhand={25,37}}, {settle=1,lean=0},{idle=true}}},
+ {name='Recovery_ParryDeflect',frames={3,4,4,4},hit=0,poses={
+  actions[5].poses[6],{hand={37,36},tip={47,50}}, {settle=1,lean=0},{idle=true}}},
+ {name='Recovery_AirRoundhouse',frames={4,5,5,4,5,5,5},hit=0,poses={
+  {hx=28,hy=25,hip={32,43},angle=-8,hand={45,55},lhand={25,47},left={{28,50},{25,57}},right={{39,51},{43,57}}},
+  {hx=29,hy=23,hip={32,42},angle=-6,elbow={40,42},hand={43,49},lhand={26,43},left={{27,50},{25,57}},right={{39,51},{42,57}}},
+  {hx=30,hy=20,hip={32,41},angle=-4,elbow={39,35},hand={40,43},lhand={27,39},left={{27,49},{25,57}},right={{38,50},{41,57}}},
+  {hx=31,hy=17,hip={32,40},angle=-2,hand={38,38},left={{27,48},{26,57}},right={{37,49},{40,57}}},
+  {settle=3,lean=-1},{settle=1,lean=0},{idle=true}}},
+ {name='Recovery_Move',frames={3,4,4},hit=0,poses={{walkStop=true},{settle=1,lean=0},{idle=true}}},
+ {name='Recovery_Landing',frames={3,4,4},hit=0,poses={
+  {hy=20,hip={32,42},hand={36,39},left={{27,50},{25,57}},right={{38,50},{40,57}}}, {settle=2,lean=0},{idle=true}}}
+}
+for _,a in ipairs(recoveries) do actions[#actions+1]=a end
 local s=Sprite(64,64,ColorMode.RGB)
 local reference=s.layers[1];reference.name='Reference - original idle and walk (toggle)';reference.isVisible=false;reference.isEditable=false
 local guides=s:newLayer();guides.name='Guides - ground COM trajectory (toggle)';guides.isVisible=false;guides.opacity=96;guides.isEditable=false
@@ -170,7 +199,10 @@ for _,a in ipairs(actions) do
     frame(math.floor(n/60*1000+.5)/1000)
     s:newCel(reference,index,Image(base),Point(0,0))
     local im=Image(64,64,ColorMode.RGB);local wi=Image(64,64,ColorMode.RGB)
-    if a.poses[i].idle then im=Image(base) else pose(im,wi,a.poses[i]) end
+    if a.poses[i].idle then im=Image(base)
+    elseif a.poses[i].settle then settleReference(im,a.poses[i].settle,a.poses[i].lean or 0)
+    elseif a.poses[i].walkStop then im:drawSprite(walk,#walk.frames)
+    else pose(im,wi,a.poses[i]) end
     s:newCel(rough,index,im,Point(0,0));s:newCel(blade,index,wi,Point(0,0))
     s:newCel(clean,index,Image(64,64,ColorMode.RGB),Point(0,0));s:newCel(cleanBlade,index,Image(64,64,ColorMode.RGB),Point(0,0))
     local gi=Image(64,64,ColorMode.RGB)
@@ -186,20 +218,21 @@ for _,a in ipairs(actions) do
     local phase=start<a.hit and 'anticipation' or start<a.hit+4 and 'active' or start<(a.branch or 999) and 'cancel-lock' or 'recovery'
     if a.release and start>=a.release and start<a.hit then phase='fast-swing' end
     if a.landing and start>=a.landing then phase=start<40 and 'ukemi' or 'stand' end
+    if a.name:find('Recovery_')==1 then phase='free-recovery';event='' end
     csv[#csv+1]=string.format('%s,%d,%d,%d,%d,%d,%s,%s',a.name,i,index,n,math.floor(n/60*1000+.5),start,phase,event)
     mf[#mf+1]=string.format('{"frames":%d,"start":%d}',n,start);start=start+n
   end
   local t=s:newTag(first,index);t.name=a.name
   tagBounds[#tagBounds+1]={name=a.name,first=first,last=index,tag=t}
   sheet:saveAs(out .. '/' .. a.name .. '.png')
-  manifest[#manifest+1]=string.format('{"name":%q,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"chargeFrame":%d,"releaseFrame":%d,"landingFrame":%d,"frames":[%s]}',a.name,#a.frames,start,a.hit,a.branch or 0,a.charge or 0,a.release or 0,a.landing or 0,table.concat(mf,','))
+  manifest[#manifest+1]=string.format('{"name":%q,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"chargeFrame":%d,"releaseFrame":%d,"landingFrame":%d,"recoveryFrame":%d,"frames":[%s]}',a.name,#a.frames,start,a.hit,a.branch or 0,a.charge or 0,a.release or 0,a.landing or 0,a.recovery or a.branch or 0,table.concat(mf,','))
 end
 -- Aseprite extends a tag when a new frame is appended at its end. Restore all
 -- intended ranges only after creating the entire document.
 for _,b in ipairs(tagBounds) do b.tag.fromFrame=b.first;b.tag.toFrame=b.last end
 local file=out .. '/Player_actions_rough.aseprite';s:saveAs(file);s:close()
 local reopen=app.open(file)
-assert(#reopen.layers==8 and #reopen.tags==8 and #reopen.frames==index)
+assert(#reopen.layers==8 and #reopen.tags==16 and #reopen.frames==index)
 for _,b in ipairs(tagBounds) do
   local found=false
   for _,tag in ipairs(reopen.tags) do if tag.name==b.name then
@@ -211,4 +244,4 @@ reopen:close();idle:close();walk:close()
 local f=assert(io.open(out .. '/timing-manifest.json','w'));f:write('{"canvas":64,"ppu":32,"pivot":[32,38],"actions":[' .. table.concat(manifest,',') .. ']}');f:close()
 local c=assert(io.open(out .. '/timing.csv','w'));c:write(table.concat(csv,'\n'));c:close()
 local e=assert(io.open(out..'/eye-mask-manifest.json','w'));e:write('{"frames":['..table.concat(eyeManifest,',')..']}');e:close()
-local report=assert(io.open(out .. '/authoring-validation.json','w'));report:write(string.format('{"reopened":true,"tagRangesChecked":true,"layers":8,"tags":8,"frames":%d,"sourceFilesModified":false}',index));report:close()
+local report=assert(io.open(out .. '/authoring-validation.json','w'));report:write(string.format('{"reopened":true,"tagRangesChecked":true,"layers":8,"tags":16,"frames":%d,"sourceFilesModified":false}',index));report:close()

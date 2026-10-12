@@ -500,6 +500,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
             handler?.CancelAction();
         }
         GetComponent<PlayerParryCounter2D>()?.ClearStocks();
+        GetComponent<PlayerVisualRecovery2D>()?.Cancel();
 
         ReleaseAllCollisionIgnores();
         ClearActionRequests();

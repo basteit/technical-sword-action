@@ -30,8 +30,6 @@ MonoBehaviour:
     - {fileID: 21300000, guid: cd989cf40007e9b47b26d6203a5bbd84, type: 3}
     - {fileID: 21300000, guid: 5d3e0ce58957b4f43a1e46b2d2202ea8, type: 3}
     - {fileID: 21300000, guid: ffa19219479a46e4a88d6c8ae7b8488b, type: 3}
-    - {fileID: 21300000, guid: 2e5f002ce248b17469b49d2e952b0c1c, type: 3}
-    - {fileID: 21300000, guid: 2a9eb7e431111d246a5f08f61cfccf45, type: 3}
     eyeFrames:
     - {fileID: 21300000, guid: 0f855abcfd210b44b8f0263f6c8eba97, type: 3}
     - {fileID: 21300000, guid: 62df008f8af60ba428211dc999798a40, type: 3}
@@ -45,14 +43,13 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 2746d01c9bd06844b9fdadad024ef3df, type: 3}
     - {fileID: 21300000, guid: 85ae600dda8cf4a44a87dffbe03f5645, type: 3}
     - {fileID: 21300000, guid: 415640349fce8c144a22949756873f33, type: 3}
-    - {fileID: 21300000, guid: 0321470a3c39eb04ba4a1c240896d288, type: 3}
-    - {fileID: 21300000, guid: 6f504b61c49c01d43b0f51a549d27767, type: 3}
-    durations: 0400000004000000040000000400000002000000030000000300000002000000020000000200000003000000030000000400000004000000
+    durations: 040000000400000004000000040000000200000003000000030000000200000002000000020000000300000003000000
     hitFrame: 28
-    branchFrame: 44
+    branchFrame: 36
     chargeFrame: 18
     releaseFrame: 24
     landingFrame: 36
+    recoveryFrame: 36
   - name: HorizontalSlash
     frames:
     - {fileID: 21300000, guid: bd63ead4d5c4b644dbdb30d01e11a545, type: 3}
@@ -78,6 +75,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 20
   - name: IaiSlash
     frames:
     - {fileID: 21300000, guid: c82a9c5e9e09e1d4db58b7d8e4b977ae, type: 3}
@@ -103,27 +101,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
-  - name: IdleReference
-    frames:
-    - {fileID: 21300000, guid: 51ffc896482d10f46804e09d6370ee66, type: 3}
-    - {fileID: 21300000, guid: 05fe7974e397406498fcada29b9233c2, type: 3}
-    - {fileID: 21300000, guid: d6611cfce19edbd439bbfa8822473373, type: 3}
-    - {fileID: 21300000, guid: 99108cc9f1b467449a44b757b7b53bcf, type: 3}
-    - {fileID: 21300000, guid: e0c2bcd9977ed704f86f31f589a81b4b, type: 3}
-    - {fileID: 21300000, guid: e67f9a4837b1b524b95afb60e0074c0e, type: 3}
-    eyeFrames:
-    - {fileID: 21300000, guid: 1fd624e696b2752449c49a0ae8c4ac23, type: 3}
-    - {fileID: 21300000, guid: 30cc51c7e67861a498dcac4cd3bd31aa, type: 3}
-    - {fileID: 21300000, guid: 98474db76f7a0cc46ba181192f94426e, type: 3}
-    - {fileID: 21300000, guid: 1d47d6b8e0ccfd649bcbc364d429e0b4, type: 3}
-    - {fileID: 21300000, guid: 5b983c945629fff4a927681cace74eac, type: 3}
-    - {fileID: 21300000, guid: 3a0348e11db5190448e0e028f75aad09, type: 3}
-    durations: 060000000600000006000000060000000600000006000000
-    hitFrame: 0
-    branchFrame: 0
-    chargeFrame: 0
-    releaseFrame: 0
-    landingFrame: 0
+    recoveryFrame: 22
   - name: ParryDeflect
     frames:
     - {fileID: 21300000, guid: 85d458a6d8aff564686a02f6c441acfb, type: 3}
@@ -145,6 +123,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: RapidSheathe
     frames:
     - {fileID: 21300000, guid: 5d151480a57d6454a9a3388b1d554d09, type: 3}
@@ -172,6 +151,153 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 32
+  - name: Recovery_AirRoundhouse
+    frames:
+    - {fileID: 21300000, guid: d05937efd3002984b893f8bc6fdc3676, type: 3}
+    - {fileID: 21300000, guid: 5cf95e3ac8173ae419148149d90f580c, type: 3}
+    - {fileID: 21300000, guid: b58c8d4c72d71a24bbdb9ba8659de1c9, type: 3}
+    - {fileID: 21300000, guid: 67ceb06303a9c46429f5da6aebb0274d, type: 3}
+    - {fileID: 21300000, guid: 3ed0569f16d9fbd46ba5f313390d30c7, type: 3}
+    - {fileID: 21300000, guid: 72879dd526cec724dad05a5a4021a563, type: 3}
+    - {fileID: 21300000, guid: 687e6aa08969be742b02d5ba4e628068, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: ff27f1e8240a7d6428efd0d139f96a58, type: 3}
+    - {fileID: 21300000, guid: 6d2f8487fe989b64182e064fb9f8e2f9, type: 3}
+    - {fileID: 21300000, guid: 3f7d85e8d9c4a604aa9e554797d34309, type: 3}
+    - {fileID: 21300000, guid: efa87e48779cdb44c910acd0dea63485, type: 3}
+    - {fileID: 21300000, guid: 68147b92667742e459d4f2f51028758a, type: 3}
+    - {fileID: 21300000, guid: c07a63a2ed215ae4381ba493348828e1, type: 3}
+    - {fileID: 21300000, guid: 2650ad868997c82459ad6e3755d8d05d, type: 3}
+    durations: 04000000050000000500000004000000050000000500000005000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_HorizontalSlash
+    frames:
+    - {fileID: 21300000, guid: 6503bdc207432eb4f847dc96b46f8e08, type: 3}
+    - {fileID: 21300000, guid: 38d2f6878bcf72740b4352a506542324, type: 3}
+    - {fileID: 21300000, guid: 2dd1c5f026e4f274ab4292ac8fa04621, type: 3}
+    - {fileID: 21300000, guid: 777cd6c54fcf35043abb9437e9c36a06, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: f03c716aa01f94e4cbe20a4f9d78d9c2, type: 3}
+    - {fileID: 21300000, guid: 9bb39604090a0234ea730e1591cba465, type: 3}
+    - {fileID: 21300000, guid: 8d825fdfd0516aa41bcd895930163902, type: 3}
+    - {fileID: 21300000, guid: 7c31ecf44500fe44a87aec4640cac711, type: 3}
+    durations: 04000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_IaiSlash
+    frames:
+    - {fileID: 21300000, guid: ed91ebec86cc4c4499a4943ae635bf57, type: 3}
+    - {fileID: 21300000, guid: 46b45606b7bd9a44bb72356ce795114a, type: 3}
+    - {fileID: 21300000, guid: 7d1828845508d8e40a544a91ea02d5fe, type: 3}
+    - {fileID: 21300000, guid: 80b19947f65b38a468baf64112e5c419, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 959ddbfc6ad44684985ca5c2d9d0d977, type: 3}
+    - {fileID: 21300000, guid: 8b6ed36bdd41ad747a60c16089430bb7, type: 3}
+    - {fileID: 21300000, guid: 2fff04f982cae6544aac6485c16daa27, type: 3}
+    - {fileID: 21300000, guid: d306fd57062054742a1c7f3f5c6749b2, type: 3}
+    durations: 04000000050000000500000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_Landing
+    frames:
+    - {fileID: 21300000, guid: 38ef6e0880ea52745ae27883bd0f007e, type: 3}
+    - {fileID: 21300000, guid: aad64718130d4bb49802bd44b62656fd, type: 3}
+    - {fileID: 21300000, guid: 31baa7bed19a838499fc63f3af5f5b52, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 6f06c51186c25b246958001df1fb9744, type: 3}
+    - {fileID: 21300000, guid: ef0db661d291f8d45806bd254a914d4d, type: 3}
+    - {fileID: 21300000, guid: e4f700922fa33d545a29965208871a65, type: 3}
+    durations: 030000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_Move
+    frames:
+    - {fileID: 21300000, guid: 3edc667e9f1bcf74fa44adb4141fbc1b, type: 3}
+    - {fileID: 21300000, guid: bebebc4a25e5afb4987d5e73954cc5ea, type: 3}
+    - {fileID: 21300000, guid: 58b503e8ca064dd46a3ab7a48d7bf470, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 5cd14380c0f74894cb6f75e436fad912, type: 3}
+    - {fileID: 21300000, guid: ede642ab136a8a84d872555c7bd219be, type: 3}
+    - {fileID: 21300000, guid: 89b0052d188245a4695de114983d4e00, type: 3}
+    durations: 030000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_ParryDeflect
+    frames:
+    - {fileID: 21300000, guid: 92c5ea07f24abbb4486b2d357641a264, type: 3}
+    - {fileID: 21300000, guid: 136eb231e10694e48abb094534897664, type: 3}
+    - {fileID: 21300000, guid: 3c920910074529b44b8311a98d3e7404, type: 3}
+    - {fileID: 21300000, guid: 26a5d7254f0192145b6ac32c42fe42bf, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 4bb6daa3a89fabc4297e7d5ed9a71511, type: 3}
+    - {fileID: 21300000, guid: df90ed115d1bff349924971de266ca8d, type: 3}
+    - {fileID: 21300000, guid: ef43030de0df7464e9f8ed2e958cf33e, type: 3}
+    - {fileID: 21300000, guid: 8ed560dd506f66244b89769ad58f18c7, type: 3}
+    durations: 03000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_RapidSheathe
+    frames:
+    - {fileID: 21300000, guid: dbb0e760899d9bf4eb02e809329b8ea3, type: 3}
+    - {fileID: 21300000, guid: 48b9db39e55a0644c9a2faff5a57ad23, type: 3}
+    - {fileID: 21300000, guid: 87615ce01f969ee4b8a77963df6f417f, type: 3}
+    - {fileID: 21300000, guid: b4b74ea750a21cb4495d207027bd2a4b, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: d487a248e74565f49b7ba32d72f57f73, type: 3}
+    - {fileID: 21300000, guid: 95d1612a7b2e4934098abf9cef478ba6, type: 3}
+    - {fileID: 21300000, guid: d952f06181402f44bb257fa8fc522008, type: 3}
+    - {fileID: 21300000, guid: 2ff88052644387943951e391734bb14e, type: 3}
+    durations: 04000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_VerticalSlash
+    frames:
+    - {fileID: 21300000, guid: e823c34174ac21246a831e3bf6f6e5aa, type: 3}
+    - {fileID: 21300000, guid: 3088facbf79cfec41bec7b2c49acbf30, type: 3}
+    - {fileID: 21300000, guid: 59e64ef68f97b9a47b542558675cd78d, type: 3}
+    - {fileID: 21300000, guid: 09f0ecfcae39a0842b2c16d7f9fd30eb, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 4f317aabe6d8a7a4b9e083d46bc6c124, type: 3}
+    - {fileID: 21300000, guid: 045dc9139c83c8f42914a95353ab6637, type: 3}
+    - {fileID: 21300000, guid: 9b8f6de188632be4b8909c1afeb4971f, type: 3}
+    - {fileID: 21300000, guid: bf33ad303690d8b4aa6696502e3cd5ff, type: 3}
+    durations: 04000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
   - name: VerticalSlash
     frames:
     - {fileID: 21300000, guid: caabc6603f436b449868d9891ec8681e, type: 3}
@@ -197,6 +323,29 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 22
+  - name: IdleReference
+    frames:
+    - {fileID: 21300000, guid: 51ffc896482d10f46804e09d6370ee66, type: 3}
+    - {fileID: 21300000, guid: 05fe7974e397406498fcada29b9233c2, type: 3}
+    - {fileID: 21300000, guid: d6611cfce19edbd439bbfa8822473373, type: 3}
+    - {fileID: 21300000, guid: 99108cc9f1b467449a44b757b7b53bcf, type: 3}
+    - {fileID: 21300000, guid: e0c2bcd9977ed704f86f31f589a81b4b, type: 3}
+    - {fileID: 21300000, guid: e67f9a4837b1b524b95afb60e0074c0e, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 1fd624e696b2752449c49a0ae8c4ac23, type: 3}
+    - {fileID: 21300000, guid: 30cc51c7e67861a498dcac4cd3bd31aa, type: 3}
+    - {fileID: 21300000, guid: 98474db76f7a0cc46ba181192f94426e, type: 3}
+    - {fileID: 21300000, guid: 1d47d6b8e0ccfd649bcbc364d429e0b4, type: 3}
+    - {fileID: 21300000, guid: 5b983c945629fff4a927681cace74eac, type: 3}
+    - {fileID: 21300000, guid: 3a0348e11db5190448e0e028f75aad09, type: 3}
+    durations: 060000000600000006000000060000000600000006000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
   - name: WalkReference
     frames:
     - {fileID: 21300000, guid: 1c977fa69aea60f4bbeef92674923cdb, type: 3}
@@ -222,6 +371,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: Enemy_Attack
     frames:
     - {fileID: 21300000, guid: 6b08e786994c3b141ad3ca7f7600e322, type: 3}
@@ -239,6 +389,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: Enemy_Death
     frames:
     - {fileID: 21300000, guid: 90ebbdf5fe1d7c94f9ef241f9f658f22, type: 3}
@@ -260,6 +411,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: Enemy_Hit
     frames:
     - {fileID: 21300000, guid: 7a9697a8fb6e3bd449a3b45cb3596e8c, type: 3}
@@ -275,6 +427,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: Enemy_Idle
     frames:
     - {fileID: 21300000, guid: 579ffc7e3a2f3d74282c75a594a0ce0f, type: 3}
@@ -292,6 +445,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: Enemy_Move
     frames:
     - {fileID: 21300000, guid: 9c95abd1f914b354298a5b8bf58ceb42, type: 3}
@@ -313,6 +467,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: Enemy_Parried
     frames:
     - {fileID: 21300000, guid: d02bd6199eb634e4bad5aecc8a7cf0e5, type: 3}
@@ -330,6 +485,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: Enemy_Windup
     frames:
     - {fileID: 21300000, guid: 0c821fa265daa5243b18cfeb6c3f3e9f, type: 3}
@@ -351,6 +507,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: Fx_Kick
     frames:
     - {fileID: 21300000, guid: 1865dfe8d376a4a42b2640169074cccd, type: 3}
@@ -376,6 +533,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: Fx_Parry
     frames:
     - {fileID: 21300000, guid: 37f00514be220a445ba7fd5f491f3583, type: 3}
@@ -401,6 +559,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: Fx_Slash
     frames:
     - {fileID: 21300000, guid: 7954b446d00a43c4698226af5477fbb5, type: 3}
@@ -426,6 +585,7 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0
   - name: Fx_Vanish
     frames:
     - {fileID: 21300000, guid: 73fb458ea97584e4f8f3157b0d7f55fd, type: 3}
@@ -451,3 +611,4 @@ MonoBehaviour:
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
+    recoveryFrame: 0

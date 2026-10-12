@@ -26,10 +26,13 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
     private PlayerState lastDrivenState = (PlayerState)(-1);
     private int observedParryCount;
     private float parrySuccessTimer;
+    private PlayerVisualRecovery2D recovery;
 
     private void Awake()
     {
         ResolveReferences();
+        recovery=GetComponent<PlayerVisualRecovery2D>();
+        if(recovery==null) recovery=gameObject.AddComponent<PlayerVisualRecovery2D>();
     }
 
     private void OnEnable()
@@ -65,7 +68,20 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
             return;
         }
 
-        if (parrySuccessTimer > 0f && (state == PlayerState.Idle || state == PlayerState.Move))
+        if(state==PlayerState.Idle&&recovery!=null)
+        {
+            if(recovery.IsPlaying) return;
+            if(animator.runtimeAnimatorController!=null&&lastDrivenState!=PlayerState.Idle&&(int)lastDrivenState>=0)
+            {
+                string recoveryName="PlayerPrototype_Recovery_"+lastDrivenState;
+                var clip=System.Array.Find(animator.runtimeAnimatorController.animationClips,c=>c.name=="PlayerPrototype_Recovery_"+lastDrivenState);
+                if(clip!=null&&recovery.TryPlay(recoveryName,Mathf.RoundToInt(clip.length*60)))
+                { lastDrivenState=(PlayerState)(-1);return; }
+            }
+        }
+        else recovery?.Cancel();
+
+        if (parrySuccessTimer > 0f && state == PlayerState.Idle)
         {
             parrySuccessTimer = Mathf.Max(0f, parrySuccessTimer - CombatTimeController.StepSeconds);
             return;
@@ -142,6 +158,7 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
 
     private void OnDisable()
     {
+        recovery?.Cancel();
         CombatTimeController.Unregister(this);
         CombatTimeController.UnregisterAnimator(animator, this);
     }

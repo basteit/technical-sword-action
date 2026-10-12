@@ -10,7 +10,7 @@ public sealed class VideoArtLibrary : ScriptableObject
         public Sprite[] frames;
         public Sprite[] eyeFrames;
         public int[] durations;
-        public int hitFrame,branchFrame,chargeFrame,releaseFrame,landingFrame;
+        public int hitFrame,branchFrame,chargeFrame,releaseFrame,landingFrame,recoveryFrame;
         public int TotalFrames { get { int n=0; foreach(int duration in durations) n+=duration; return n; } }
         public Sprite At(int gameFrame, bool loop = false)
         {

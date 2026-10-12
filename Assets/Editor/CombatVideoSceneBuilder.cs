@@ -71,9 +71,10 @@ public static class CombatVideoSceneBuilder
         ConfigureAttack(attack,library);
         actor.AddComponent<PlayerParry2D>(); actor.AddComponent<PlayerSpecialGauge>();
         var health=actor.AddComponent<PlayerDamageReceiver2D>();Set(health,"normalParryHitStop",2/60f);Set(health,"justParryHitStop",3/60f);
-        var counter=actor.AddComponent<PlayerParryCounter2D>();var kick=library.Find("AirRoundhouse");Set(counter,"airborneKick",true);Set(counter,"hitFrame",kick.hitFrame);Set(counter,"chargeFrame",kick.chargeFrame);Set(counter,"endFrame",kick.TotalFrames);Set(counter,"radius",.5f);Set(counter,"obstacleLayers",1 << ground);
+        var counter=actor.AddComponent<PlayerParryCounter2D>();var kick=library.Find("AirRoundhouse");Set(counter,"airborneKick",true);Set(counter,"hitFrame",kick.hitFrame);Set(counter,"chargeFrame",kick.chargeFrame);Set(counter,"endFrame",kick.recoveryFrame>0?kick.recoveryFrame:kick.TotalFrames);Set(counter,"radius",.5f);Set(counter,"obstacleLayers",1 << ground);
         Set(counter,"chargeReleaseFrame",kick.releaseFrame>0?kick.releaseFrame:24);Set(counter,"landingFrame",kick.landingFrame>0?kick.landingFrame:36);Set(counter,"maxApproach",1.2f);
-        actor.AddComponent<PlayerStateMachine>(); actor.AddComponent<VideoPlayerAnimationDriver>();
+        Set(counter,"landingRollDistance",0f);
+        actor.AddComponent<PlayerStateMachine>();actor.AddComponent<PlayerVisualRecovery2D>();Set(actor.AddComponent<VideoPlayerAnimationDriver>(),"library",library);
         var a = Enemy("Enemy_A", new Vector3(1.1f,1,0), enemy, playerLayer, actor.transform,library);
         var b = Enemy("Enemy_B", new Vector3(-.85f,1,0), enemy, playerLayer, actor.transform,library);
         var fx=new GameObject("VideoEffects").AddComponent<VideoVfxRenderer>();Set(fx,"library",library);

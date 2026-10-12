@@ -7,7 +7,8 @@ for _,l in ipairs(s.layers) do
   if name:find('rough') or name:find('guide') or name:find('reference') then l.isVisible=false end
   if name:find('eye glow mask') then l.isVisible=false;if name:find('cleanup') then eyeLayer=l end end
 end
-local specs={{'VerticalSlash',10,22,0,true},{'HorizontalSlash',9,20,0,true},{'RapidSheathe',11,32,0,false},{'IaiSlash',7,22,0,false},{'ParryDeflect',6,0,0,true},{'AirRoundhouse',28,44,18,true}}
+local specs={{'VerticalSlash',10,22,0,true},{'HorizontalSlash',9,20,0,true},{'RapidSheathe',11,32,0,false},{'IaiSlash',7,22,0,false},{'ParryDeflect',6,0,0,true},{'AirRoundhouse',28,36,18,true},
+ {'Recovery_VerticalSlash',0,0,0,true},{'Recovery_HorizontalSlash',0,0,0,true},{'Recovery_RapidSheathe',0,0,0,false},{'Recovery_IaiSlash',0,0,0,false},{'Recovery_ParryDeflect',0,0,0,true},{'Recovery_AirRoundhouse',0,0,0,true},{'Recovery_Move',0,0,0,false},{'Recovery_Landing',0,0,0,false}}
 local manifest={};local eyeManifest={}
 local function eyesFor(im,frame)
   local mask=Image(64,64,ColorMode.RGB);local count=0
@@ -51,12 +52,12 @@ for _,a in ipairs(specs) do
       assert(elapsed>a[2],'Cleanup ends before its hit: '..a[1]);sheet:saveAs(out..'/'..a[1]..'.png')
       local release,landing=0,0
       if a[1]=='AirRoundhouse' then
-        assert(elapsed==44,'Roundhouse timing must stay 44F; coordinate changes before integration')
-        for _,f in ipairs({18,24,28,36,40}) do assert(startFrames[f],'Missing roundhouse pose boundary at '..f..'F') end
+        assert(elapsed==36,'Roundhouse action must end at landing, 36F; author the standing return in Recovery_AirRoundhouse')
+        for _,f in ipairs({18,24,28}) do assert(startFrames[f],'Missing roundhouse pose boundary at '..f..'F') end
         assert(visibleEyes>0,'Supply CleanUp - eye glow mask when the pupil colours change')
         release=24;landing=36
       end
-      manifest[#manifest+1]=string.format('{"name":%q,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"chargeFrame":%d,"releaseFrame":%d,"landingFrame":%d,"frames":[%s]}',a[1],#images,elapsed,a[2],a[3],a[4],release,landing,table.concat(frames,','))
+      manifest[#manifest+1]=string.format('{"name":%q,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"chargeFrame":%d,"releaseFrame":%d,"landingFrame":%d,"recoveryFrame":%d,"frames":[%s]}',a[1],#images,elapsed,a[2],a[3],a[4],release,landing,a[3],table.concat(frames,','))
     end
   end
 end

@@ -35,10 +35,22 @@
             "tick": 104
         },
         {
+            "kind": "RecoveryStart:PlayerVideo_Recovery_IaiSlash",
+            "target": "",
+            "realSeconds": 2.1333333333333308,
+            "tick": 120
+        },
+        {
             "kind": "RearWindup",
             "target": "Enemy_B",
             "realSeconds": 2.33333333333333,
             "tick": 132
+        },
+        {
+            "kind": "RecoveryEnd:PlayerVideo_Recovery_IaiSlash",
+            "target": "",
+            "realSeconds": 2.416666666666663,
+            "tick": 137
         },
         {
             "kind": "Parry",
@@ -75,6 +87,18 @@
             "target": "Enemy_B",
             "realSeconds": 4.316666666666657,
             "tick": 206
+        },
+        {
+            "kind": "RecoveryStart:PlayerVideo_Recovery_AirRoundhouse",
+            "target": "",
+            "realSeconds": 4.333333333333323,
+            "tick": 207
+        },
+        {
+            "kind": "RecoveryEnd:PlayerVideo_Recovery_AirRoundhouse",
+            "target": "",
+            "realSeconds": 4.866666666666655,
+            "tick": 239
         }
     ]
 }

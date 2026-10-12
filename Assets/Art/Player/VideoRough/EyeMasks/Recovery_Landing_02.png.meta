@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2a9eb7e431111d246a5f08f61cfccf45
+guid: ef0db661d291f8d45806bd254a914d4d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -18148478813685711
-    second: AirRoundhouse_14_0
+      213: -7905665773548857573
+    second: Recovery_Landing_02_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: AirRoundhouse_14_0
+      name: Recovery_Landing_02_0
       rect:
         serializedVersion: 2
-        x: 11
-        y: 4
-        width: 45
-        height: 57
+        x: 0
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 138b81ffd068fbff0800000000000000
-      internalID: -18148478813685711
+      spriteID: b1718ae6dde694290800000000000000
+      internalID: -7905665773548857573
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      AirRoundhouse_14_0: -18148478813685711
+      Recovery_Landing_02_0: -7905665773548857573
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

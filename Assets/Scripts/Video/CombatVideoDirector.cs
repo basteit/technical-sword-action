@@ -20,6 +20,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     private PlayerAttack2D attack;
     private PlayerParry2D parry;
     private PlayerParryCounter2D counter;
+    private PlayerVisualRecovery2D recovery;
     private long startTick, rearWindupTick, successTick;
     private int queuedStep;
     private bool attackSent, rearStarted, parrySent, counterSent;
@@ -37,7 +38,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     public int CombatTickOrder=>-200;
     private void Awake()
     {
-        attack=player.GetComponent<PlayerAttack2D>();parry=player.GetComponent<PlayerParry2D>();counter=player.GetComponent<PlayerParryCounter2D>();
+        attack=player.GetComponent<PlayerAttack2D>();parry=player.GetComponent<PlayerParry2D>();counter=player.GetComponent<PlayerParryCounter2D>();recovery=player.GetComponent<PlayerVisualRecovery2D>();
     }
     private void OnEnable()
     { CombatTimeController.Register(this); }
@@ -47,6 +48,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         attack.HitConfirmed+=OnSlash;parry.Succeeded+=OnParry;
         frontEnemy.Died+=OnDeath;rearEnemy.Died+=OnDeath;counter.HitConfirmed+=OnKick;counter.Finished+=OnCounterFinished;
         counter.ChargeStarted+=OnCharge;counter.ChargeReleased+=OnRelease;counter.Landed+=OnLanding;
+        if(recovery!=null) { recovery.Started+=OnRecoveryStarted;recovery.Ended+=OnRecoveryEnded; }
         ResetTake(comboStages);
     }
     private void MarkEvent(string kind,Damageable2D target)
@@ -56,13 +58,14 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         int direction=player.GetComponent<PlayerMotor2D>().FacingSign;
         target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyHitback(new[]{.08f,.14f,.24f,.4f}[step-1],6+step,Vector2.right*direction);
         MarkEvent("Slash"+step,target);vfx.Emit("Slash",point,new[]{.5f,.6f,.72f,.9f}[step-1],direction);
-        presentation.Shake(.045f,.025f);
+        var directionVector=step==1?new Vector2(direction*.2f,-1):new Vector2(direction,step==3?-.3f:.15f);
+        presentation.ShakeDirectional(new[]{.09f,.10f,.11f,.14f}[step-1],new[]{.04f,.055f,.075f,.11f}[step-1],directionVector,2.5f);
     }
     private void OnParry(Damageable2D target,ParryResult result)
     {
         successTick=CombatTimeController.TickCount;MarkEvent("Parry",target);
         if(target!=null) vfx.Emit("Parry",Vector2.Lerp(player.transform.position,target.transform.position,.45f)+Vector2.up*.12f,1.05f,player.GetComponent<PlayerMotor2D>().FacingSign);
-        presentation.Shake(.06f,.04f);
+        presentation.ShakeDirectional(.12f,.095f,new Vector2(player.GetComponent<PlayerMotor2D>().FacingSign,.6f),3.5f);
     }
     private void OnKick(Damageable2D target,Vector2 point)
     {
@@ -72,6 +75,8 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     private void OnCharge()=>MarkEvent("ChargeStart",counter.SelectedTarget);
     private void OnRelease()=>MarkEvent("ChargeRelease",counter.SelectedTarget);
     private void OnLanding()=>MarkEvent("Landing",counter.SelectedTarget);
+    private void OnRecoveryStarted(string name) { if(Running) MarkEvent("RecoveryStart:"+name,null); }
+    private void OnRecoveryEnded(string name,bool completed) { if(Running) MarkEvent((completed?"RecoveryEnd:":"RecoveryCancel:")+name,null); }
     private void OnCounterFinished(bool hit)
     {
         if(!hit && Running)
@@ -145,7 +150,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     private void AdvanceVisuals(float dt)
     {
         vfx.AdvanceVisuals(dt);presentation.AdvanceVisuals(dt);
-        if(Running && deathReal>=0 && RealElapsed-deathReal>=.85d && !counter.IsActive)
+        if(Running && deathReal>=0 && RealElapsed-deathReal>=.85d && !counter.IsActive && (recovery==null||!recovery.IsPlaying))
         { Running=false;Completed=true;player.GetComponent<PlayerInputRouter>().enabled=true;player.ClearBufferedGameplayInput(); }
     }
     private void OnDisable()
@@ -154,5 +159,6 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         if(attack!=null) attack.HitConfirmed-=OnSlash;if(parry!=null) parry.Succeeded-=OnParry;
         if(frontEnemy!=null) frontEnemy.Died-=OnDeath;if(rearEnemy!=null) rearEnemy.Died-=OnDeath;
         if(counter!=null) { counter.HitConfirmed-=OnKick;counter.Finished-=OnCounterFinished;counter.ChargeStarted-=OnCharge;counter.ChargeReleased-=OnRelease;counter.Landed-=OnLanding; }
+        if(recovery!=null) { recovery.Started-=OnRecoveryStarted;recovery.Ended-=OnRecoveryEnded; }
     }
 }

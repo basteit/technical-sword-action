@@ -40,12 +40,15 @@ public static class VideoCaptureUtility
                 Check(CombatTimeController.SlowOwnerCount==0&&CombatTimeController.HitstopOwnerCount==0&&Mathf.Approximately(Time.timeScale,1),"Time request remained.");
                 Check(presentation.Zoom==0&&Mathf.Approximately(camera.orthographicSize,2.8125f),"Zoom remained.");
                 Check(presentation.DimAlpha==0&&!presentation.IsDimVisible,"Slow dim overlay remained.");
+                Check(presentation.ActiveShakeCount==0&&presentation.ShakeOffset==Vector2.zero&&presentation.FlashAlpha==0,"Shake/flash remained.");
+                Check(!state.GetComponent<PlayerVisualRecovery2D>().IsPlaying,"Recovery animation remained.");
                 Check(!presentation.IsSpotlightVisible&&!presentation.AreEyesVisible,"Subject lift or eye light remained.");
                 Check(fx.ActiveCount==0,"VFX remained active.");
                 Check(presentation.ChargeRealElapsed>=.5f&&presentation.ChargeRealElapsed<=1f,"Charge duration outside .5–1 seconds.");
                 records.Add(new RunRecord{stages=stages,mirrored=mirrored,duration=director.RealElapsed,frontHits=director.FrontEnemy.HitCount,rearHits=director.RearEnemy.HitCount,chargeSeconds=presentation.ChargeRealElapsed});
                 director.ResetTake(stages);
                 Check(presentation.DimAlpha==0&&!presentation.IsDimVisible,"Slow dim overlay not reset.");
+                Check(!state.GetComponent<PlayerVisualRecovery2D>().IsPlaying&&presentation.ActiveShakeCount==0&&presentation.FlashAlpha==0,"Recovery/impact feedback not reset.");
                 Check(!presentation.IsSpotlightVisible&&!presentation.AreEyesVisible,"Subject/eye overlay not reset.");
                 Check(director.FrontEnemy.CurrentHp==director.FrontEnemy.MaxHp&&director.RearEnemy.CurrentHp==3,"HP not reset.");
                 Check(counter.StockCount==0&&fx.ActiveCount==0,"Stock or VFX not reset.");

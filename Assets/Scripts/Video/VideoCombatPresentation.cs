@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>Single camera transform owner. Shake, pan and zoom are composed before pixel snapping.</summary>
@@ -19,7 +20,12 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField,Min(.001f)] private float dimFadeOutSeconds=3/60f;
     private Vector3 restPosition;
     private bool charged;
-    private float zoom,shakeRemaining,shakeStrength;
+    private float zoom;
+    private sealed class Impulse { public float age,duration,strength,cycles;public Vector2 direction; }
+    private readonly List<Impulse> impulses=new();
+    private Vector2 shakeOffset;
+    private float flashRemaining,flashStrength,flashDuration;
+    private SpriteRenderer flashRenderer;
     private float dimAlpha,dimBlend;
     private SpriteRenderer dimRenderer;
     private Sprite dimSprite;
@@ -28,10 +34,12 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     private GameObject heroFocus;
     private float eyeTrailTimer;
     private Vector3 focus;
-    private float phaseTime;
     public bool IsCharged=>charged;
     public float Zoom=>zoom;
     public float DimAlpha=>dimAlpha;
+    public Vector2 ShakeOffset=>shakeOffset;
+    public int ActiveShakeCount=>impulses.Count;
+    public float FlashAlpha=>flashRenderer!=null&&flashRenderer.enabled?flashRenderer.color.a:0;
     public bool IsDimVisible=>dimRenderer!=null&&dimRenderer.enabled;
     public bool IsSpotlightVisible=>heroLift!=null&&heroLift.enabled;
     public bool AreEyesVisible=>eyeLight!=null&&eyeLight.enabled;
@@ -43,7 +51,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         EnsureSpotlight();
     }
     private void OnEnable()
-    { counter.ChargeStarted+=OnCharge;counter.ChargeReleased+=OnRelease;counter.HitConfirmed+=OnHit;counter.HitMissed+=OnMiss;counter.Finished+=OnFinished; }
+    { counter.ChargeStarted+=OnCharge;counter.ChargeReleased+=OnRelease;counter.HitConfirmed+=OnHit;counter.HitMissed+=OnMiss;counter.Finished+=OnFinished;counter.Landed+=OnLanding; }
     private void OnCharge()
     {
         charged=true;ChargeRealElapsed=0;
@@ -56,25 +64,35 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         charged=false;CombatTimeController.ReleaseSlow(counter);
         CombatTimeController.RequestHitstop(counter,8*CombatTimeController.StepSeconds);
-        Shake(.16f,.11f);vfx.Emit("Kick",foot,1.1f,1);
+        ShakeDirectional(.22f,.20f,new Vector2(counter.GetComponent<PlayerMotor2D>().FacingSign,.25f),2.75f);
+        flashRemaining=flashDuration=3/60f;flashStrength=.12f;
+        vfx.Emit("Kick",foot,1.1f,1);
     }
-    private void OnFinished(bool hit) { charged=false;CombatTimeController.ReleaseOwner(counter); }
+    private void OnLanding()=>ShakeDirectional(.11f,.065f,Vector2.down,1.5f);
+    private void OnFinished(bool hit)
+    { charged=false;CombatTimeController.ReleaseOwner(counter);if(!hit) ResetPresentation(); }
     private void OnMiss() { charged=false;CombatTimeController.ReleaseSlow(counter); }
     public void Shake(float realSeconds,float strength)
-    { shakeRemaining=Mathf.Max(shakeRemaining,realSeconds);shakeStrength=Mathf.Max(shakeStrength,strength); }
+    { ShakeDirectional(realSeconds,strength,new Vector2(1,.35f),3); }
+    public void ShakeDirectional(float realSeconds,float strength,Vector2 direction,float cycles=3)
+    {
+        if(realSeconds<=0||strength<=0) return;
+        impulses.Add(new Impulse{duration=realSeconds,strength=strength,direction=direction.normalized,cycles=cycles});
+    }
     public void AdvanceVisuals(float realSeconds)
     {
         if(CombatTimeController.IsPaused || captureCamera==null) return;
-        phaseTime+=realSeconds;
         if(charged && !CombatTimeController.IsHitStopped) ChargeRealElapsed+=realSeconds;
         zoom=Mathf.MoveTowards(zoom,charged ? 1 : 0,realSeconds/(charged ? .1f : .22f));
         Vector3 position=Vector3.Lerp(restPosition,focus,zoom);
-        if(shakeRemaining>0)
+        shakeOffset=Vector2.zero;
+        for(int i=impulses.Count-1;i>=0;i--)
         {
-            shakeRemaining=Mathf.Max(0,shakeRemaining-realSeconds);
-            position+=new Vector3(Mathf.Sin(phaseTime*113),Mathf.Cos(phaseTime*137),0)*shakeStrength*(shakeRemaining/.16f);
-            if(shakeRemaining==0) shakeStrength=0;
+            var impulse=impulses[i];float t=Mathf.Clamp01(impulse.age/impulse.duration);
+            shakeOffset+=impulse.direction*impulse.strength*(1-t)*(1-t)*Mathf.Cos(t*Mathf.PI*2*impulse.cycles);
+            impulse.age+=realSeconds;if(impulse.age>=impulse.duration) impulses.RemoveAt(i);
         }
+        shakeOffset=Vector2.ClampMagnitude(shakeOffset,.28f);position+=(Vector3)shakeOffset;
         position.x=Mathf.Round(position.x*32)/32;position.y=Mathf.Round(position.y*32)/32;
         captureCamera.transform.position=position;captureCamera.orthographicSize=Mathf.Lerp(normalSize,closeSize,zoom);
         bool dimming=charged&&CombatTimeController.SlowScale<1;
@@ -82,6 +100,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
             realSeconds/Mathf.Max(.001f,dimming?dimFadeInSeconds:dimFadeOutSeconds));
         dimAlpha=dimBlend*slowDimStrength;
         UpdateDimmer();
+        flashRemaining=Mathf.Max(0,flashRemaining-realSeconds);
+        if(flashRenderer!=null) { flashRenderer.color=new Color(1,1,1,flashStrength*flashRemaining/Mathf.Max(.001f,flashDuration));flashRenderer.enabled=flashRemaining>0; }
         UpdateSpotlight();
         if(charged&&dimAlpha>0&&playerVisual!=null)
         {
@@ -100,6 +120,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         overlay.transform.SetParent(captureCamera.transform,false);
         dimRenderer=overlay.AddComponent<SpriteRenderer>();dimRenderer.sprite=dimSprite;
         dimRenderer.sortingOrder=1000;dimRenderer.enabled=false;
+        var flash=new GameObject("VideoImpactFlash");flash.hideFlags=HideFlags.DontSave;flash.transform.SetParent(captureCamera.transform,false);
+        flashRenderer=flash.AddComponent<SpriteRenderer>();flashRenderer.sprite=dimSprite;flashRenderer.sortingOrder=1001;flashRenderer.enabled=false;
         UpdateDimmer();
     }
     private void UpdateDimmer()
@@ -109,6 +131,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         float height=captureCamera.orthographicSize*2;
         dimRenderer.transform.localScale=new Vector3(height*Mathf.Max(captureCamera.aspect,16/9f),height,1);
         dimRenderer.color=new Color(0,0,0,dimAlpha);dimRenderer.enabled=dimAlpha>0;
+        if(flashRenderer!=null) { flashRenderer.transform.localPosition=dimRenderer.transform.localPosition;flashRenderer.transform.localScale=dimRenderer.transform.localScale; }
     }
     private void EnsureSpotlight()
     {
@@ -138,17 +161,19 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     }
     public void ResetPresentation()
     {
-        charged=false;zoom=shakeRemaining=shakeStrength=phaseTime=ChargeRealElapsed=dimAlpha=dimBlend=eyeTrailTimer=0;
+        charged=false;zoom=ChargeRealElapsed=dimAlpha=dimBlend=eyeTrailTimer=flashRemaining=flashStrength=flashDuration=0;
+        impulses.Clear();shakeOffset=Vector2.zero;if(flashRenderer!=null) flashRenderer.enabled=false;
         if(captureCamera!=null) { captureCamera.transform.position=restPosition;captureCamera.orthographicSize=normalSize; }
         UpdateDimmer();
         UpdateSpotlight();
         CombatTimeController.ReleaseOwner(counter);
     }
     private void OnDisable()
-    { counter.ChargeStarted-=OnCharge;counter.ChargeReleased-=OnRelease;counter.HitConfirmed-=OnHit;counter.HitMissed-=OnMiss;counter.Finished-=OnFinished;ResetPresentation(); }
+    { counter.ChargeStarted-=OnCharge;counter.ChargeReleased-=OnRelease;counter.HitConfirmed-=OnHit;counter.HitMissed-=OnMiss;counter.Finished-=OnFinished;counter.Landed-=OnLanding;ResetPresentation(); }
     private void OnDestroy()
     {
         if(dimRenderer!=null) Destroy(dimRenderer.gameObject);
+        if(flashRenderer!=null) Destroy(flashRenderer.gameObject);
         if(dimSprite!=null) Destroy(dimSprite);
         if(eyeGlowMaterial!=null) Destroy(eyeGlowMaterial);
         if(heroFocus!=null) Destroy(heroFocus);
