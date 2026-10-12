@@ -18,7 +18,7 @@ uloop run-tests --test-mode EditMode --filter-type regex --filter-value Technica
 uloop run-tests --test-mode PlayMode --filter-type regex --filter-value TechnicalSwordAction
 ```
 
-Test Runnerは単独実行する。2026-10-12の結果はEditMode 181 / PlayMode 71件 Passed。PlayModeに2段/4段・両方向各10回（計40回）、30/60/120fps相当、Pause、対象消失、壁、無敵、被弾による強制中断、死亡、Disable、反撃中Scene再読込を含む。未保存の既存Sceneを自動で保存・破棄しない。
+Test Runnerは単独実行する。2026-10-12初版の結果はEditMode 181 / PlayMode 71件 Passed。のけぞり・暗転を加えた修正版はPlayMode 76 / 関連時計のEditMode 24件 Passed。PlayModeに2段/4段・両方向各10回（計40回）、30/60/120fps相当、Pause、対象消失、壁、無敵、被弾による強制中断、死亡、Disable、反撃中Scene再読込、暗転の強度0切替を含む。未保存の既存Sceneを自動で保存・破棄しない。
 
 ## 録画
 
@@ -55,6 +55,7 @@ uloop control-play-mode --action Stop
 | タメ | 18〜28戦闘F、0.25倍、実時間0.666667秒 |
 | Hitstop | 通常2F、通常/Just Parry 2/3F、蹴り8F |
 | カメラ | 通常ortho 2.8125、タメ2.109375、座標1/32unitスナップ |
+| スロー中の暗さ | 黒の不透明度14%、入り5/60秒・戻り6/60秒。Pause中はフェード停止、リセット/Disableで即解除 |
 | VFX | 採用確定：ドット本体＋短い加算発光（hybrid=true、2026-10-12のユーザー選択）。純ドット（false）は比較・調整用 |
 | 強度 | VideoVfxRendererのintensityで調整。初期0.8 |
 | 素材版 | 主人公Actionはrough、待機/歩きは提供素材、敵/背景/VFXは制作版 |

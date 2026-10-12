@@ -62,6 +62,19 @@ local function enemy(im,n,state)
   line(im,x+10,28+dy,hx,hy,4,P.dark);rect(im,hx,hy,3,3,P.gold)
   line(im,hx-3,hy+2,tx,ty,3,P.ink);line(im,hx,hy,tx,ty,2,P.edge);line(im,hx,hy,tx,ty,1,P.light)
   if state=='Windup' and n>=3 then ring(im,tx,ty+5,3,1,P.gold) end
+  if state=='Parried' then
+    -- Facing right: the impact drives the shoulders, head and blade left.
+    -- Keep the planted feet and waist so the counter's contact stays aligned.
+    local recoil=({0,8,5,2})[n] or 2
+    local upright=Image(im);im:clear()
+    for y=0,63 do
+      local shift=y<44 and -math.floor(math.max(0,(44-y)/34)*recoil+.5) or 0
+      for xx=0,63 do
+        local color=upright:getPixel(xx,y)
+        if app.pixelColor.rgbaA(color)>0 then px(im,xx+shift,y,color) end
+      end
+    end
+  end
 end
 local motions={{'Idle',4},{'Move',6},{'Windup',6},{'Attack',4},{'Hit',3},{'Parried',4},{'Death',6}}
 local s=Sprite(64,64,ColorMode.RGB);s.layers[1].name='Sentinel - armor cloak blade';local index=0
@@ -73,6 +86,7 @@ for _,m in ipairs(motions) do local first=index+1;local sheet=Image(m[2]*64,64,C
   local tag=s:newTag(first,index);tag.name=m[1];sheet:saveAs(out .. '/Enemy_' .. m[1] .. '.png')
 end
 s:newLayer().name='CleanUp';s:saveAs(out .. '/CaptureSentinel.aseprite');s:close()
+if app.params['part']=='enemy' then return end
 local b=Sprite(384,216,ColorMode.RGB);b.layers[1].name='Far architecture';local im=Image(384,216,ColorMode.RGB)
 rect(im,0,0,384,216,rgba(18,28,43,255))
 for y=0,155 do rect(im,0,y,384,1,rgba(15+math.floor(y/18),24+math.floor(y/13),39+math.floor(y/10),255)) end

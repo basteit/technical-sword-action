@@ -637,6 +637,9 @@ MonoBehaviour:
   chargeRealSeconds: 0.7
   normalSize: 2.8125
   closeSize: 2.109375
+  slowDimStrength: 0.14
+  dimFadeInSeconds: 0.083333336
+  dimFadeOutSeconds: 0.1
 --- !u!4 &625693431
 Transform:
   m_ObjectHideFlags: 0

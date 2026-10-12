@@ -39,10 +39,12 @@ public static class VideoCaptureUtility
                 Check(state.GetComponent<PlayerDamageReceiver2D>().CurrentHp==state.GetComponent<PlayerDamageReceiver2D>().MaxHp,"Unexpected player damage.");
                 Check(CombatTimeController.SlowOwnerCount==0&&CombatTimeController.HitstopOwnerCount==0&&Mathf.Approximately(Time.timeScale,1),"Time request remained.");
                 Check(presentation.Zoom==0&&Mathf.Approximately(camera.orthographicSize,2.8125f),"Zoom remained.");
+                Check(presentation.DimAlpha==0&&!presentation.IsDimVisible,"Slow dim overlay remained.");
                 Check(fx.ActiveCount==0,"VFX remained active.");
                 Check(presentation.ChargeRealElapsed>=.5f&&presentation.ChargeRealElapsed<=1f,"Charge duration outside .5–1 seconds.");
                 records.Add(new RunRecord{stages=stages,mirrored=mirrored,duration=director.RealElapsed,frontHits=director.FrontEnemy.HitCount,rearHits=director.RearEnemy.HitCount,chargeSeconds=presentation.ChargeRealElapsed});
                 director.ResetTake(stages);
+                Check(presentation.DimAlpha==0&&!presentation.IsDimVisible,"Slow dim overlay not reset.");
                 Check(director.FrontEnemy.CurrentHp==director.FrontEnemy.MaxHp&&director.RearEnemy.CurrentHp==3,"HP not reset.");
                 Check(counter.StockCount==0&&fx.ActiveCount==0,"Stock or VFX not reset.");
                 Check(director.FrontEnemy.GetComponentsInChildren<Collider2D>().All(c=>c.enabled)&&director.RearEnemy.GetComponentsInChildren<Collider2D>().All(c=>c.enabled),"Collider not reset.");

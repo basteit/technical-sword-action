@@ -56,6 +56,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(director,"StartTake",2,true);
             for(int i=0;i<240&&!Get<bool>(presentation,"IsCharged");i++) Step();
             Assert.That(Get<bool>(presentation,"IsCharged"),Is.True);
+            for(int i=0;i<5;i++) Step();
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.GreaterThan(0));
             int hits=Get<int>(counter,"HitCount");
             if(interruption=="TargetLost") ((Component)Get<object>(counter,"SelectedTarget")).gameObject.SetActive(false);
             if(interruption=="CounterDisabled") ((Behaviour)counter).enabled=false;
@@ -66,6 +68,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.False);
             Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
             Assert.That(Get<float>(presentation,"Zoom"),Is.Zero);
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
+            Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.False);
             Assert.That(state.GetComponent<Rigidbody2D>().gravityScale,Is.EqualTo(interruption=="PlayerDead"?0:3));
             ((Behaviour)counter).enabled=true;
             Call(director,"ResetTake",2);Assert.That(state.GetComponent<Rigidbody2D>().gravityScale,Is.EqualTo(3));
@@ -87,27 +91,82 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(director,"StartTake",2,true);
             for(int i=0;i<240&&!Get<bool>(presentation,"IsCharged");i++) Step();
             int elapsed=Get<int>(counter,"ElapsedFrames");float charge=Get<float>(presentation,"ChargeRealElapsed");
+            float dim=Get<float>(presentation,"DimAlpha");
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
             for(int i=0;i<120;i++) Step();
             Assert.That(Get<int>(counter,"ElapsedFrames"),Is.EqualTo(elapsed));
             Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.EqualTo(charge));
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.EqualTo(dim));
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
             for(int i=0;i<180&&!Get<bool>(director,"Completed");i++) Step();
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.False);
             Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
+        }
+        [TestCase(30)] [TestCase(60)] [TestCase(120)]
+        public void SlowDimCoversChargeAndClearsImmediatelyOnResetAtEveryRenderRate(int fps)
+        {
+            Call(director,"StartTake",2,true);
+            for(int frame=0;frame<fps*5&&!Get<bool>(presentation,"IsCharged");frame++) Call(director,"StepCapture",1d/fps);
+            for(int frame=0;frame<Mathf.CeilToInt(fps*.12f);frame++) Call(director,"StepCapture",1d/fps);
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.EqualTo(.14f).Within(.001f));
+            Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.True);
+            Assert.That(Camera.main.transform.Find("VideoSlowDimmer"),Is.Not.Null);
+            Call(director,"ResetTake",2);
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
+            Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.False);
         }
         [UnityTest] public IEnumerator SceneReloadDuringChargeReleasesAllRequestsAndReferences()
         {
             Call(director,"StartTake",2,true);
             for(int i=0;i<240&&!Get<bool>(presentation,"IsCharged");i++) Step();
             Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.True);
+            var previousDimmer=Camera.main.transform.Find("VideoSlowDimmer");
+            Assert.That(previousDimmer,Is.Not.Null);
             yield return EditorSceneManager.LoadSceneInPlayMode("Assets/Scenes/CombatVideo.unity",new LoadSceneParameters(LoadSceneMode.Single));
             yield return null;BindScene();
             Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.False);
             Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
             Assert.That((int)clockType.GetProperty("HitstopOwnerCount").GetValue(null),Is.Zero);
             Assert.That(Get<float>(presentation,"Zoom"),Is.Zero);
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
+            Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.False);
+            Assert.That(previousDimmer==null,Is.True,"Previous scene's overlay survived unload.");
+            Assert.That(Camera.main.GetComponentsInChildren<SpriteRenderer>(true).Count(r=>r.name=="VideoSlowDimmer"),Is.EqualTo(1));
+        }
+        [Test] public void PresentationDisableClearsDimAndReenableReusesItsOverlay()
+        {
+            Call(director,"StartTake",2,true);
+            for(int i=0;i<240&&!Get<bool>(presentation,"IsCharged");i++) Step();
+            for(int i=0;i<6;i++) Step();
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.GreaterThan(0));
+            var dimmer=Camera.main.transform.Find("VideoSlowDimmer");
+            ((Behaviour)presentation).enabled=false;
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
+            Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.False);
+            Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
+            ((Behaviour)presentation).enabled=true;
+            Assert.That(Camera.main.transform.Find("VideoSlowDimmer"),Is.SameAs(dimmer));
+            for(int i=0;i<180&&!Get<bool>(director,"Completed");i++) Step();
+            Assert.That(Get<bool>(director,"Completed"),Is.True);
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
+            Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.False);
+        }
+        [Test] public void SettingDimStrengthToZeroDuringChargeLeavesNoDarknessAfterwards()
+        {
+            Call(director,"StartTake",2,true);
+            for(int i=0;i<240&&!Get<bool>(presentation,"IsCharged");i++) Step();
+            for(int i=0;i<6;i++) Step();
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.GreaterThan(0));
+            presentation.GetType().GetField("slowDimStrength",Flags).SetValue(presentation,0f);Step();
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
+            Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.False);
+            for(int i=0;i<180&&!Get<bool>(director,"Completed");i++) Step();
+            Assert.That(Get<bool>(director,"Completed"),Is.True);
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
+            presentation.GetType().GetField("slowDimStrength",Flags).SetValue(presentation,.14f);
+            Call(director,"ResetTake",2);
         }
         [TestCase(-1f,0f,true,true)] [TestCase(1f,0f,true,true)]
         [TestCase(-2.2f,0f,true,false)] [TestCase(-1f,1.3f,true,false)] [TestCase(-1f,0f,false,false)]
