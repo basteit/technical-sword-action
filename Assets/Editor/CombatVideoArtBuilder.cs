@@ -79,7 +79,9 @@ public static class CombatVideoArtBuilder
         foreach(var parameter in controller.parameters) controller.RemoveParameter(parameter);
         controller.AddParameter("ComboStep",AnimatorControllerParameterType.Int);controller.AddParameter("AttackTrigger",AnimatorControllerParameterType.Trigger);
         var machine=controller.layers[0].stateMachine;foreach(var state in machine.states) machine.RemoveState(state.state);
-        var idle=Clip("Idle",library.Find("IdleReference"),true);var idleState=machine.AddState("PlayerVideo_Idle");idleState.motion=idle;machine.defaultState=idleState;
+        var idleMotion=library.playerArtworkIsRough?library.Find("IdleRough")??library.Find("IdleReference"):library.Find("IdleReference");
+        var moveMotion=library.playerArtworkIsRough?library.Find("WalkRough")??library.Find("WalkReference"):library.Find("WalkReference");
+        var idle=Clip("Idle",idleMotion,true);var idleState=machine.AddState("PlayerVideo_Idle");idleState.motion=idle;machine.defaultState=idleState;
         int stage=1;
         foreach(var action in manifest.actions.Take(4))
         {
@@ -97,7 +99,7 @@ public static class CombatVideoArtBuilder
         machine.AddState("PlayerVideo_Parry").motion=Clip("Parry",new VideoArtLibrary.Motion{name="Ready",frames=new[]{parry.frames[0]},durations=new[]{12}},false);
         machine.AddState("PlayerVideo_ParrySuccess").motion=Clip("ParrySuccess",new VideoArtLibrary.Motion{name="Deflect",frames=parry.frames.Skip(2).ToArray(),durations=parry.durations.Skip(2).ToArray()},false);
         machine.AddState("PlayerVideo_Counter").motion=Clip("Counter",library.Find("AirRoundhouse"),false);
-        machine.AddState("PlayerVideo_Move").motion=Clip("Move",library.Find("WalkReference"),true);
+        machine.AddState("PlayerVideo_Move").motion=Clip("Move",moveMotion,true);
         machine.AddState("PlayerVideo_ParryFail").motion=Clip("ParryFail",new VideoArtLibrary.Motion{name="Miss",frames=new[]{parry.frames[0]},durations=new[]{18}},false);
         var kick=library.Find("AirRoundhouse");
         machine.AddState("PlayerVideo_Jump").motion=Clip("Jump",new VideoArtLibrary.Motion{name="Jump",frames=new[]{kick.frames[1]},durations=new[]{8}},false);

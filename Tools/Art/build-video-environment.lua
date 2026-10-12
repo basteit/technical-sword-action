@@ -88,17 +88,10 @@ for x=0,383,16 do line(im,x,0,x,155,1,rgba(226,232,239,255)) end
 for y=12,155,16 do line(im,0,y,383,y,1,rgba(226,232,239,255)) end
 for x=0,383,64 do line(im,x,0,x,155,1,rgba(206,216,228,255)) end
 for y=28,155,64 do line(im,0,y,383,y,1,rgba(206,216,228,255)) end
--- Row 156 is world y=0: everything below the planted feet is solid block floor.
+-- Row 156 is world y=0. A single flat colour marks the solid floor mass.
 local floor=Image(384,216,ColorMode.RGB)
-rect(floor,0,156,384,60,rgba(119,140,164,255))
-for row=0,3 do local y=156+row*16;local offset=row%2==0 and 0 or -16
-  for x=offset,383,32 do
-    rect(floor,x+1,y,30,15,rgba(164+row%2*4,179+row%2*4,199+row%2*4,255))
-    line(floor,x+2,y+1,x+29,y+1,1,rgba(190,202,218,255))
-    line(floor,x+29,y+2,x+29,y+13,1,rgba(143,160,183,255))
-  end
-end
-b:newCel(b.layers[1],1,im,Point(0,0));local floorLayer=b:newLayer();floorLayer.name='Solid blocks below contact plane'
+rect(floor,0,156,384,60,rgba(164,179,199,255))
+b:newCel(b.layers[1],1,im,Point(0,0));local floorLayer=b:newLayer();floorLayer.name='Flat solid floor below contact plane'
 b:newCel(floorLayer,1,floor,Point(0,0));im:drawImage(floor,Point(0,0))
 b:saveAs(out .. '/CaptureTrainingGrid.aseprite');im:saveAs(out .. '/CaptureTrainingGrid.png');b:close()
 local fx=Sprite(128,128,ColorMode.RGB);fx.layers[1].name='Pixel effect';index=0;local fxBounds={}

@@ -1,5 +1,5 @@
 {
-  "revision": "white-training-shadow-blink",
+  "revision": "fully-redrawn-motion-flat-floor",
   "compile": {
     "errors": 0,
     "warnings": 0
@@ -7,31 +7,34 @@
   "editMode": {
     "passed": 181,
     "total": 181,
-    "completedAt": "2026-10-12T12:04:43.8528897Z"
+    "completedAt": "2026-10-12T12:04:43.8528897Z",
+    "rerunThisArtRevision": false
   },
   "playMode": {
     "passed": 125,
     "total": 125,
-    "completedAt": "2026-10-12T12:09:12.3567347Z"
+    "completedAt": "2026-10-12T12:57:45.9415276Z"
   },
-  "newPlayCases": 17,
+  "newPlayCases": 0,
   "resetRuns": 40,
   "authoring": {
-    "frames": 98,
+    "frames": 112,
     "cleanExporterTags": 14,
     "layers": 8,
     "humanArtworkReceived": false,
-    "eyeMasks": 98,
+    "eyeMasks": 112,
     "cleanExporterFrames": 84,
     "reopened": true,
-    "tags": 16,
-    "tagRangesChecked": true
+    "tags": 18,
+    "tagRangesChecked": true,
+    "actionPixelsRedrawn": true,
+    "referencePixelsOnlyInHiddenReference": true,
+    "roughNeutralMatchesRecovery": true
   },
   "sourceHashes": {
     "idle": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
     "walk": "92FC9E07636331D2D6B5AAC363DC3AC6A53E030608DB1533D9CAE1505AE5F107"
   },
-  "fixedFailure": "Pause at landing previously ended the capture before recovery began; capture progression now freezes with the combat clock.",
   "console": {
     "warnings": 0,
     "errors": 0
@@ -47,17 +50,25 @@
       52,
       52,
       53
-    ]
+    ],
+    "roundhouse": "Back-facing coiled hip with head turned to enemy, horizontal foot sweep, front-to-back follow-through; no downward heel drop.",
+    "sword": "Rearward load, deep forward weight transfer, opposing shoulder and hip rotation, hair/coat follow-through.",
+    "parry": "Knee compression, shoulder recoil, then blade deflection driven from the legs."
   },
   "floor": {
-    "blockHeight": 16,
-    "captureVariants": 3,
-    "backgroundLayers": 2,
-    "codeChanged": false,
-    "backgroundRow": 156,
-    "blockWidth": 32,
-    "resetRuns": 40,
     "worldTopY": 0,
-    "allBelowContactFilled": true
+    "backgroundRow": 156,
+    "backgroundLayers": 2,
+    "rgba": [
+      164,
+      179,
+      199,
+      255
+    ],
+    "coloursBelowContact": 1,
+    "pattern": false,
+    "allBelowContactFilled": true,
+    "captureVariants": 3,
+    "resetRuns": 40
   }
 }

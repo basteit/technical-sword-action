@@ -4,7 +4,7 @@
 
 ## 素材とScene
 
-主人公ラフは `Assets/Art/Player/VideoRough/Player_actions_rough.aseprite`、98コマ・16タグ・8レイヤー。瞳のガイド/清書レイヤーと動作別の復帰タグを含み、全タグの開始/終了コマを保存後の再読込で検証した。タイミングの正は同フォルダの `timing-manifest.json`（整数60Hzフレーム）。瞳の専用PNGは `EyeMasks`、対応と画素数は `eye-mask-manifest.json`。敵は `Assets/Art/Video/CaptureDummy.aseprite`、白いグリッド背景と、接地位置より下を埋める灰青色のブロック床は `CaptureTrainingGrid.aseprite`、VFXは `CombatEffects.aseprite`。元の待機/歩きのハッシュを維持する。
+主人公ラフは `Assets/Art/Player/VideoRough/Player_actions_rough.aseprite`、112コマ・18タグ・8レイヤー。瞳のガイド/清書レイヤーと動作別の復帰タグを含み、全タグの開始/終了コマを保存後の再読込で検証した。タイミングの正は同フォルダの `timing-manifest.json`（整数60Hzフレーム）。瞳の専用PNGは `EyeMasks`、対応と画素数は `eye-mask-manifest.json`。敵は `Assets/Art/Video/CaptureDummy.aseprite`、白いグリッド背景と、接地位置より下を埋める灰青色一色の床は `CaptureTrainingGrid.aseprite`、VFXは `CombatEffects.aseprite`。元の待機/歩きのハッシュを維持する。
 
 Sceneは `Assets/Scenes/CombatVideo.unity`。Tools → Technical Sword Action → Video → Build Art and Capture Scene で素材/Clip/Animator/Sceneを再生成する。未保存の別Sceneがあると停止する。生成した撮影Sceneも手動変更がある場合は保存してから再生成する。SampleSceneとBasicActionValidationの既存差分を上書きしない。
 
@@ -66,10 +66,14 @@ uloop control-play-mode --action Stop
 | 敵B/蹴り接近 | 初期x=-0.85、最大接近1.2unit。実際に弾いた敵を固定し、開始後の対象変更なし |
 | VFX | 採用確定：ドット本体＋短い加算発光（hybrid=true、2026-10-12のユーザー選択）。純ドット（false）は比較・調整用 |
 | 強度 | VideoVfxRendererのintensityで調整。初期0.8 |
-| 床 | 接地位置world y=0（背景の上端から156行）より下はすべて不透明な灰青色のブロック面。白いグリッドは床より上だけ。32×16pxのブロックを半幅ずつずらし、別Asepriteレイヤーで編集可能 |
+| 床 | 接地位置world y=0（背景の上端から156行）より下はすべて不透明な灰青色一色（RGB 164/179/199）。模様・継ぎ目・縁取りなし。白いグリッドは床より上だけ。別Asepriteレイヤーで編集可能 |
 | VFXサイズ/背景対策 | 斬撃0.65/0.80/1.00/1.25、パリィ1.25、蹴り1.55倍。白い背景でも読める暗い1pxの縁・深い金色/青緑色。通常命中の短い停止は維持 |
-| 素材版 | 主人公Actionはrough、待機/歩きは提供素材、敵/背景/VFXは制作版 |
+| 素材版 | 主人公は頭を含め全身を新規作画したrough。撮影中の待機/歩きも同じ作画のIdleRough/WalkRough。提供素材は非表示参照に保持し、必須清書が揃った際に待機/歩きへ再接続。敵/背景/VFXは制作版 |
 
 4段版は全行程が約4.92秒に収まるため、清書が揃えば採用を第一候補とする。復帰を含む必須53コマが先に揃う場合は2段版を完成させ、4段追加25コマの受領後に4段版を再判定する。現段階の動画を最終完成と扱わない。
 
 最終書き出しは採用した混合版で `CapturePreview(2,true)` または `CapturePreview(4,true)` を使う。短い発光を接触時へ集中させ、清書統合後に足・刀・敵の反応が隠れないことを再確認する。
+
+2026-10-12 全身描き直し版: 斬撃は溜め/踏み込み/振り抜き、パリィは沈み込み/肩の反動/押し返し、回し蹴りは腰の高さで膝を畳む→水平の払い→背面への振り抜きへ変更。Action/命中/スロー/着地の整数フレームは維持。ラフの待機/歩きの接続変更後、compile Error 0 / Warning 0、PlayMode125/125 Passed（12:57:45 UTC）。EditMode181件は直前の戦闘コード版の結果を保持し、今回は再実行していない。
+
+最終素材で40回再実行と候補3本の再収録/全フレームデコードを実施。2段3.9秒/4段4.916667秒、1080p60/音声なし、Console Error 0 / Warning 0。検証の詳細は`previews/training-validation.json`。

@@ -41,7 +41,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: dcf1aa6bdbd4c914787c421f27b84aee, type: 3}
     - {fileID: 21300000, guid: 2e935ea33e4f14c408bcd0b958214b3d, type: 3}
     - {fileID: 21300000, guid: 2746d01c9bd06844b9fdadad024ef3df, type: 3}
-    - {fileID: 21300000, guid: 85ae600dda8cf4a44a87dffbe03f5645, type: 3}
+    - {fileID: 0}
     - {fileID: 21300000, guid: 415640349fce8c144a22949756873f33, type: 3}
     durations: 040000000400000004000000040000000200000003000000030000000200000002000000020000000300000003000000
     hitFrame: 28
@@ -61,12 +61,12 @@ MonoBehaviour:
     - {fileID: 21300000, guid: cc6f7b76aab28624d980a8497634a162, type: 3}
     - {fileID: 21300000, guid: d7af699f0d9e08f4293d2b7dd85ca51a, type: 3}
     eyeFrames:
-    - {fileID: 21300000, guid: 80ec5de57be12004aa299e4bc0bc9a2d, type: 3}
+    - {fileID: 0}
     - {fileID: 0}
     - {fileID: 21300000, guid: 7dcc6c724b100314d90f3a29f105b643, type: 3}
     - {fileID: 21300000, guid: 4dc0dba29ccdcd14dba0ec1155ca5e37, type: 3}
     - {fileID: 21300000, guid: 0d05c5de95cfd56449ac869c40411140, type: 3}
-    - {fileID: 21300000, guid: f8b194552682496469472c8e3ddbdc83, type: 3}
+    - {fileID: 0}
     - {fileID: 21300000, guid: 4aa74454e75f426439be1524e393af20, type: 3}
     - {fileID: 21300000, guid: 28297ca6e8e00be469115fbee92b9eea, type: 3}
     durations: 0300000003000000030000000200000002000000030000000400000006000000
@@ -102,6 +102,28 @@ MonoBehaviour:
     releaseFrame: 0
     landingFrame: 0
     recoveryFrame: 22
+  - name: IdleRough
+    frames:
+    - {fileID: 21300000, guid: 02133f89baa50744ea0409b20b6dfeb8, type: 3}
+    - {fileID: 21300000, guid: 94ebc8e6624aec7468c427e9e0e940c0, type: 3}
+    - {fileID: 21300000, guid: 105468861075cf848b5f98992d4ee30c, type: 3}
+    - {fileID: 21300000, guid: 5a8d25126710bc74a8df700f40f02eb2, type: 3}
+    - {fileID: 21300000, guid: a762e9dcfe0acdf4da12651e48825b97, type: 3}
+    - {fileID: 21300000, guid: 094f3ad66e2c1884da5efddfa6c43aa2, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: c53b910643c216b41a148fb292c4b52c, type: 3}
+    - {fileID: 21300000, guid: 5cd9528c27d805f4eb7359e3807da757, type: 3}
+    - {fileID: 21300000, guid: 98b975264f7f38442893a2beac36850e, type: 3}
+    - {fileID: 21300000, guid: fa71e1f5f465adc43953f23066241859, type: 3}
+    - {fileID: 21300000, guid: 46c7fab062cbe3342b9d33ce800ad629, type: 3}
+    - {fileID: 21300000, guid: 6db90c31be468ec42aafdfb24e6be8f4, type: 3}
+    durations: 060000000600000006000000060000000600000006000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
   - name: ParryDeflect
     frames:
     - {fileID: 21300000, guid: 85d458a6d8aff564686a02f6c441acfb, type: 3}
@@ -139,7 +161,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 2694149d33b75b54585895f967a82782, type: 3}
     - {fileID: 21300000, guid: 0df71c0652e4df9468fa7146e28a5b78, type: 3}
     - {fileID: 21300000, guid: aaa70c5f5a43c684c8c9ec632c06ff99, type: 3}
-    - {fileID: 21300000, guid: aa41ef74fafcc7a4ea664ae501319f71, type: 3}
+    - {fileID: 0}
     - {fileID: 21300000, guid: b97ed78a9cd4a5644b8ef311e583927f, type: 3}
     - {fileID: 21300000, guid: ddad076b4a1b56c46b83fb539f7169c9, type: 3}
     - {fileID: 21300000, guid: fb821cb034b2b784aaa63708c2385cf2, type: 3}
@@ -324,6 +346,32 @@ MonoBehaviour:
     releaseFrame: 0
     landingFrame: 0
     recoveryFrame: 22
+  - name: WalkRough
+    frames:
+    - {fileID: 21300000, guid: 79eed05e528b5734f9e8a588bcf61a29, type: 3}
+    - {fileID: 21300000, guid: 86f30078863ad6f408c8cb478e8b6500, type: 3}
+    - {fileID: 21300000, guid: 5128f9f9f62ab564f8667e3dabac5af2, type: 3}
+    - {fileID: 21300000, guid: 41578004912e46e48b2ba0a9e2ad41b9, type: 3}
+    - {fileID: 21300000, guid: 0297760a6c677aa4faa11d8bc09c6c94, type: 3}
+    - {fileID: 21300000, guid: 38d9d510a38551c4baac670e203bcbb7, type: 3}
+    - {fileID: 21300000, guid: 9eea9dfefdf0b334c8a3d52cef6f4d64, type: 3}
+    - {fileID: 21300000, guid: 8878c20a58e722a4fbe095e2e948ce05, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 66a3d4f4848f06a488b062a25aaf962d, type: 3}
+    - {fileID: 21300000, guid: f031fb4383a3a1748b508ba6ba395f5a, type: 3}
+    - {fileID: 21300000, guid: 80468e10513205745b108b7c9a5f8838, type: 3}
+    - {fileID: 21300000, guid: b0f1497486ad07e4294295e401762627, type: 3}
+    - {fileID: 21300000, guid: 109ef77f090cae2469c6f1e50551492d, type: 3}
+    - {fileID: 21300000, guid: c15309dc6c2ab1c438b4108dc9724a05, type: 3}
+    - {fileID: 21300000, guid: 2b0729ec1e8b6224da801d8ce7fb30f9, type: 3}
+    - {fileID: 21300000, guid: 6d3e9b85189305b40a51b45d0f0c5902, type: 3}
+    durations: 0500000005000000050000000500000005000000050000000500000005000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
   - name: IdleReference
     frames:
     - {fileID: 21300000, guid: 51ffc896482d10f46804e09d6370ee66, type: 3}
