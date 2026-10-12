@@ -1,7 +1,7 @@
 using TechnicalSwordAction.PlayerState;
 using UnityEngine;
 
-public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListener
+public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     [SerializeField] private VideoArtLibrary library;
     private Animator animator;
@@ -10,6 +10,8 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     private PlayerAttack2D attack;
     private PlayerMotor2D motor;
     private PlayerVisualRecovery2D recovery;
+    private PlayerParryCounter2D counter;
+    private SpriteRenderer visual;
     private int lastStep=1;
     private string driven="";
     private PlayerState lastMotion=PlayerState.Idle;
@@ -20,6 +22,7 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     {
         animator=GetComponent<Animator>();state=GetComponent<PlayerStateMachine>();parry=GetComponent<PlayerParry2D>();
         attack=GetComponent<PlayerAttack2D>();motor=GetComponent<PlayerMotor2D>();recovery=GetComponent<PlayerVisualRecovery2D>();
+        counter=GetComponent<PlayerParryCounter2D>();visual=GetComponent<SpriteRenderer>();
         CombatTimeController.Register(this);CombatTimeController.RegisterAnimator(animator,this);
         parry.Succeeded+=OnParried;attack.StepStarted+=OnStep;
     }
@@ -62,6 +65,14 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     }
     private void Play(string clip)
     { if(driven==clip) return;animator.Play("PlayerVideo_"+clip,0,0);driven=clip; }
+    public void CombatTickTimers()
+    {
+        // Counter timers run after Animator.Update. Sample the same integer frame
+        // after its events, so slow entry and hitstop never hold the previous pose.
+        if(counter==null||!counter.IsActive||!counter.IsAirborneKick||visual==null) return;
+        var motion=library!=null?library.Find("AirRoundhouse"):null;
+        if(motion!=null) visual.sprite=motion.At(counter.ElapsedFrames);
+    }
     private void OnDisable()
     { recovery?.Cancel();if(parry!=null) parry.Succeeded-=OnParried;if(attack!=null) attack.StepStarted-=OnStep;CombatTimeController.Unregister(this);CombatTimeController.UnregisterAnimator(animator,this); }
 }

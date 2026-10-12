@@ -1,5 +1,5 @@
 {
-  "revision": "fully-redrawn-motion-flat-floor",
+  "revision": "vertical-tumble-kick-readable-rough",
   "compile": {
     "errors": 0,
     "warnings": 0
@@ -7,15 +7,15 @@
   "editMode": {
     "passed": 181,
     "total": 181,
-    "completedAt": "2026-10-12T12:04:43.8528897Z",
-    "rerunThisArtRevision": false
+    "completedAt": "2026-10-12T19:25:18.7916264Z",
+    "rerunThisArtRevision": true
   },
   "playMode": {
-    "passed": 125,
-    "total": 125,
-    "completedAt": "2026-10-12T12:57:45.9415276Z"
+    "passed": 131,
+    "total": 131,
+    "completedAt": "2026-10-12T19:24:49.1426013Z"
   },
-  "newPlayCases": 0,
+  "newPlayCases": 6,
   "resetRuns": 40,
   "authoring": {
     "frames": 112,
@@ -29,7 +29,8 @@
     "tagRangesChecked": true,
     "actionPixelsRedrawn": true,
     "referencePixelsOnlyInHiddenReference": true,
-    "roughNeutralMatchesRecovery": true
+    "roughNeutralMatchesRecovery": true,
+    "cleanExporterRerunThisRevision": false
   },
   "sourceHashes": {
     "idle": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
@@ -51,9 +52,9 @@
       52,
       53
     ],
-    "roundhouse": "Back-facing coiled hip with head turned to enemy, horizontal foot sweep, front-to-back follow-through; no downward heel drop.",
-    "sword": "Rearward load, deep forward weight transfer, opposing shoulder and hip rotation, hair/coat follow-through.",
-    "parry": "Knee compression, shoulder recoil, then blade deflection driven from the legs."
+    "roundhouse": "Inverted coil, whole-body rotation about a near-horizontal axis, extended leg sweeping from above to front and down, tucked landing.",
+    "sword": "Connected combo entry poses, planted front-knee compression, continuous horizontal follow-through.",
+    "parry": "Deeper rearward hip and shoulder compression with feet planted, followed by upward deflection."
   },
   "floor": {
     "worldTopY": 0,
@@ -70,5 +71,25 @@
     "allBelowContactFilled": true,
     "captureVariants": 3,
     "resetRuns": 40
-  }
+  },
+  "counterSpriteSynchronization": {
+    "phase": "After counter timer events and Animator.Update",
+    "chargeFrame": 18,
+    "chargePose": 6,
+    "releaseFrame": 24,
+    "releasePose": 8,
+    "hitFrame": 28,
+    "hitPose": 10,
+    "renderRates": [
+      30,
+      60,
+      120
+    ],
+    "mirroredLayouts": true,
+    "hitstopHoldsContact": true
+  },
+  "impactDirection": [
+    0.35,
+    -1
+  ]
 }

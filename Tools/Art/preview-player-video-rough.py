@@ -39,7 +39,7 @@ for action in actions:
             durations.append(round(min(frame['frames'], cut-frame['start'])/60*1000))
     images[0].save(OUT / f'{action["name"]}.gif', save_all=True, append_images=images[1:], duration=durations, loop=0, disposal=2)
 
-# Readable in isolation: the actual slow charge, fast sweep, contact hold and recovery.
+# Readable in isolation: inverted coil, fast downward tumble, contact and recovery.
 images, durations = [], []
 for part in [lookup['AirRoundhouse'], lookup['Recovery_AirRoundhouse']]:
     for i, frame in enumerate(part['frames']):

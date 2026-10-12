@@ -41,7 +41,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: dcf1aa6bdbd4c914787c421f27b84aee, type: 3}
     - {fileID: 21300000, guid: 2e935ea33e4f14c408bcd0b958214b3d, type: 3}
     - {fileID: 21300000, guid: 2746d01c9bd06844b9fdadad024ef3df, type: 3}
-    - {fileID: 0}
+    - {fileID: 21300000, guid: 85ae600dda8cf4a44a87dffbe03f5645, type: 3}
     - {fileID: 21300000, guid: 415640349fce8c144a22949756873f33, type: 3}
     durations: 040000000400000004000000040000000200000003000000030000000200000002000000020000000300000003000000
     hitFrame: 28
@@ -61,12 +61,12 @@ MonoBehaviour:
     - {fileID: 21300000, guid: cc6f7b76aab28624d980a8497634a162, type: 3}
     - {fileID: 21300000, guid: d7af699f0d9e08f4293d2b7dd85ca51a, type: 3}
     eyeFrames:
-    - {fileID: 0}
+    - {fileID: 21300000, guid: 80ec5de57be12004aa299e4bc0bc9a2d, type: 3}
     - {fileID: 0}
     - {fileID: 21300000, guid: 7dcc6c724b100314d90f3a29f105b643, type: 3}
     - {fileID: 21300000, guid: 4dc0dba29ccdcd14dba0ec1155ca5e37, type: 3}
     - {fileID: 21300000, guid: 0d05c5de95cfd56449ac869c40411140, type: 3}
-    - {fileID: 0}
+    - {fileID: 21300000, guid: f8b194552682496469472c8e3ddbdc83, type: 3}
     - {fileID: 21300000, guid: 4aa74454e75f426439be1524e393af20, type: 3}
     - {fileID: 21300000, guid: 28297ca6e8e00be469115fbee92b9eea, type: 3}
     durations: 0300000003000000030000000200000002000000030000000400000006000000

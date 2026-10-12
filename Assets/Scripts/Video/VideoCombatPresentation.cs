@@ -88,7 +88,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         charged=false;CombatTimeController.ReleaseSlow(counter);
         CombatTimeController.RequestHitstop(counter,8*CombatTimeController.StepSeconds);
-        ShakeDirectional(.25f,.24f,new Vector2(counter.GetComponent<PlayerMotor2D>().FacingSign,.25f),2.75f);
+        ShakeDirectional(.25f,.24f,new Vector2(counter.GetComponent<PlayerMotor2D>().FacingSign*.35f,-1),2.75f);
         flashRemaining=flashDuration=3/60f;flashStrength=.12f;
         vfx.Emit("Kick",foot,1.55f,1);
     }

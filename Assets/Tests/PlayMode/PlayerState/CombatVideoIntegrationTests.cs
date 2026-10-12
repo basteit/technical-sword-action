@@ -50,6 +50,39 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(3.87d,3.95d));
             Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.63f,.71f));
         }
+        [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
+        [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
+        public void CounterShowsChargeReleaseAndContactPosesOnTheirEvents(int fps,bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
+            var visual=state.GetComponent<SpriteRenderer>();
+            bool charge=false,release=false,hit=false;int previousHits=Get<int>(counter,"HitCount");
+            for(int frame=0;frame<fps*6&&!hit;frame++)
+            {
+                Call(director,"StepCapture",1d/fps);
+                if(!charge&&Get<bool>(presentation,"IsCharged"))
+                {
+                    charge=true;
+                    Assert.That(visual.enabled,Is.True);
+                    Assert.That(visual.sprite.name,Is.EqualTo("AirRoundhouse_06"),"Slow must start with the inverted coil, not hidden anticipation.");
+                }
+                if(!release&&Get<bool>(counter,"HasReleasedCharge"))
+                {
+                    release=true;
+                    Assert.That(visual.sprite.name,Is.EqualTo("AirRoundhouse_08"),"Release must show the extended rotating leg.");
+                }
+                if(Get<int>(counter,"HitCount")>previousHits)
+                {
+                    hit=true;
+                    Assert.That(visual.sprite.name,Is.EqualTo("AirRoundhouse_10"),"Hitstop must hold the contact pose.");
+                    Vector2 shake=Get<Vector2>(presentation,"ShakeOffset");
+                    Assert.That(shake.y,Is.LessThan(-Mathf.Abs(shake.x)),"The downward kick must drive a downward impact.");
+                    Call(director,"StepCapture",1d/fps);
+                    Assert.That(visual.sprite.name,Is.EqualTo("AirRoundhouse_10"));
+                }
+            }
+            Assert.That(charge&&release&&hit,Is.True);
+        }
         [TestCase("TargetLost")] [TestCase("CounterDisabled")] [TestCase("PlayerDead")] [TestCase("ForcedHit")]
         public void ChargeInterruptionReleasesTimeGravityInvulnerabilityAndCamera(string interruption)
         {

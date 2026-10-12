@@ -10,8 +10,17 @@ local C={outline=rgba(34,32,52,255),dark=rgba(52,49,72,255),hair=rgba(216,220,23
 C.steel=C.shade
 local cyan=app.pixelColor.rgba(109,192,201,255)
 local guideColor=app.pixelColor.rgba(228,155,83,255)
+-- Rotate the drawn anatomy before rasterizing, rather than rotating a finished bitmap.
+-- Each tumble key has its own knees, arms, coat and hair; the head/hip relation rolls too.
+local drawingRoll=nil
+local function pointOnCanvas(x,y)
+  if not drawingRoll then return x,y end
+  local dx,dy=x-32,y-32
+  return 32+dx*drawingRoll.co-dy*drawingRoll.si,32+dx*drawingRoll.si+dy*drawingRoll.co
+end
 local function px(im,x,y,c) x=math.floor(x+.5);y=math.floor(y+.5);if x>=0 and x<im.width and y>=0 and y<im.height then im:drawPixel(x,y,c) end end
 local function disk(im,x,y,r,c)
+  x,y=pointOnCanvas(x,y)
   for yy=math.floor(y-r),math.ceil(y+r) do for xx=math.floor(x-r),math.ceil(x+r) do
     if (xx-x)^2+(yy-y)^2<=r*r then px(im,xx,yy,c) end
   end end
@@ -21,6 +30,7 @@ local function line(im,a,b,w,c)
   for i=0,d do local t=i/d;disk(im,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t,w/2,c) end
 end
 local function poly(im,p,c)
+  if drawingRoll then local transformed={};for _,v in ipairs(p) do local x,y=pointOnCanvas(v[1],v[2]);transformed[#transformed+1]={x,y} end;p=transformed end
   for y=0,63 do
     local xs={}
     for i=1,#p do local a=p[i];local b=p[i%#p+1]
@@ -56,6 +66,7 @@ local function head(im,hx,hy,angle,view,face)
   end
 end
 local function pose(im,weapon,p)
+  if p.roll then local r=p.roll*math.pi/180;drawingRoll={co=math.cos(r),si=math.sin(r)} end
   local x=p.x or 32;local hy=p.hy or 15;local hip=p.hip or {x,39};local neck={p.hx or x,hy+10}
   local left=p.left or {{x-7,47},{x-9,56}};local right=p.right or {{x+4,48},{x+6,56}}
   local back=p.view=='back' or p.back;local face=p.face or 1
@@ -93,6 +104,7 @@ local function pose(im,weapon,p)
   if p.smear then
     for i=1,#p.smear-1 do line(weapon,p.smear[i],p.smear[i+1],1,cyan) end
   end
+  drawingRoll=nil
 end
 local function settleReference(im,lower,lean)
   -- Newly drawn neutral pose, also used by IdleRough. No source pixel is copied.
@@ -110,17 +122,17 @@ local actions={
   {hx=35,hy=19,hip={32,40},angle=7,hand={42,38},tip={54,54},left={{25,48},{21,56}},right={{40,48},{45,56}}}
  }},
  {name='HorizontalSlash',frames={3,3,3,2,2,3,4,6},hit=9,branch=20,poses={
-  {hx=28,hy=20,hip={31,42},angle=-10,view='back',hand={22,33},lhand={26,34},tip={3,28},tail={44,35},hem={39,53},left={{23,49},{18,56}},right={{41,49},{46,56}}},
+  {hx=35,hy=19,hip={32,40},angle=7,hand={39,39},elbow={41,32},lhand={32,38},tip={48,55},tail={18,40},left={{25,48},{21,56}},right={{40,48},{45,56}}},
   {hx=25,hy=21,hip={29,42},angle=-17,view='back',hand={18,32},lhand={23,34},tip={1,29},tail={43,27},hem={42,49},left={{21,49},{16,56}},right={{39,49},{46,56}}},
   {hx=32,hy=21,hip={31,42},view='front',hand={40,34},lhand={34,35},tip={55,28},tail={14,32},hem={18,50},left={{22,49},{16,56}},right={{42,49},{48,56}}},
   {hx=40,hy=22,hip={33,42},angle=16,view='side',hand={49,33},elbow={46,33},lhand={42,35},tip={63,30},tail={12,27},hem={16,44},left={{24,49},{16,56}},right={{45,49},{52,56}},smear={{4,35},{22,29},{48,28},{63,30}}},
   {hx=38,hy=22,hip={34,42},angle=12,view='front',hand={47,36},tip={62,40},tail={14,22},hem={16,43},left={{25,49},{18,56}},right={{44,49},{51,56}}},
-  {hx=35,hy=22,hip={34,42},view='back',hand={29,37},elbow={39,34},tip={7,40},tail={49,24},hem={49,45},left={{26,49},{20,56}},right={{42,49},{48,56}}},
-  {hx=33,hy=20,hip={33,41},view='three',hand={36,38},tip={20,53},tail={42,40},left={{25,49},{22,56}},right={{41,49},{46,56}}},
+  {hx=35,hy=22,hip={34,42},angle=8,view='front',hand={44,39},elbow={42,33},tip={57,50},tail={12,31},hem={17,48},left={{26,49},{20,56}},right={{42,49},{48,56}}},
+  {hx=33,hy=20,hip={33,41},view='three',hand={41,38},tip={54,52},tail={15,37},left={{25,49},{22,56}},right={{41,49},{46,56}}},
   {hx=34,hy=18,hip={32,40},hand={40,37},tip={52,53},left={{26,48},{22,56}},right={{39,48},{43,56}}}
  }},
  {name='RapidSheathe',frames={3,3,3,2,2,2,5,6,12},hit=11,branch=32,poses={
-  {hx=27,hy=17,hip={30,41},angle=-12,hand={25,22},tip={10,4},tail={15,41},left={{23,49},{19,56}},right={{40,48},{45,56}}},
+  {hx=34,hy=18,hip={32,40},hand={40,37},tip={52,53},tail={16,40},left={{26,48},{22,56}},right={{39,48},{43,56}}},
   {hx=36,hy=18,hip={32,41},angle=10,hand={44,24},tip={57,3},tail={12,29},left={{23,49},{17,56}},right={{42,49},{48,56}}},
   {hx=41,hy=24,hip={33,43},angle=22,view='side',hand={49,40},tip={59,60},tail={13,21},hem={15,45},left={{23,49},{16,56}},right={{44,49},{51,56}},smear={{38,2},{60,17},{63,49}}},
   {hx=29,hy=22,hip={32,43},angle=-12,view='back',hand={22,34},tip={1,31},tail={49,27},hem={48,45},left={{23,49},{16,56}},right={{44,49},{51,56}},smear={{4,31},{28,27},{63,34}}},
@@ -131,7 +143,7 @@ local actions={
   {hx=30,hy=22,hip={31,42},angle=-7,hand={27,38},lhand={25,39},left={{24,49},{20,56}},right={{40,49},{46,56}}}
  }},
  {name='IaiSlash',frames={4,3,2,2,3,4,6,6},hit=7,branch=22,poses={
-  {hx=28,hy=23,hip={30,43},angle=-10,hand={27,39},lhand={25,40},tail={19,44},left={{22,49},{17,56}},right={{41,50},{47,56}}},
+  {hx=30,hy=22,hip={31,42},angle=-7,hand={27,38},lhand={25,39},tail={19,44},left={{24,49},{20,56}},right={{40,49},{46,56}}},
   {hx=27,hy=25,hip={29,44},angle=-10,view='side',hand={29,38},lhand={25,40},tip={39,36},left={{21,49},{15,56}},right={{42,50},{49,56}}},
   {hx=43,hy=28,hip={32,44},angle=26,view='side',hand={50,34},elbow={47,39},lhand={22,43},tip={63,26},tail={9,26},hem={11,42},left={{22,49},{12,56}},right={{46,49},{55,56}},smear={{6,41},{27,35},{63,26}}},
   {hx=43,hy=27,hip={33,44},angle=24,hand={51,34},tip={63,25},tail={10,22},hem={11,42},left={{23,49},{13,56}},right={{46,49},{55,56}}},
@@ -144,7 +156,7 @@ local actions={
   {hx=32,hy=19,hip={32,42},hand={41,32},lhand={37,35},tip={49,10},left={{24,49},{20,56}},right={{41,49},{47,56}}},
   {hx=29,hy=21,hip={32,43},angle=-12,hand={41,31},lhand={36,34},tip={50,8},left={{23,50},{18,56}},right={{42,49},{49,56}}},
   {hx=25,hy=22,hip={32,44},angle=-20,view='side',hand={39,32},elbow={34,35},lhand={34,35},tip={48,9},tail={11,38},hem={19,51},left={{22,50},{16,56}},right={{42,50},{50,56}}},
-  {hx=22,hy=25,hip={31,45},angle=-24,view='side',hand={37,34},elbow={31,37},lhand={32,37},tip={46,11},tail={7,31},hem={17,49},left={{21,51},{16,56}},right={{42,50},{50,56}}},
+  {hx=21,hy=26,hip={29,46},angle=-28,view='side',hand={34,35},elbow={28,38},lhand={30,38},tip={43,12},tail={7,30},hem={17,49},left={{19,51},{16,56}},right={{42,50},{50,56}}},
   {hx=36,hy=18,hip={33,42},angle=12,hand={48,24},elbow={42,31},lhand={40,29},tip={60,5},tail={14,33},hem={19,48},left={{25,49},{18,56}},right={{43,49},{49,56}},smear={{40,41},{51,26},{61,8}}},
   {hx=36,hy=17,hip={32,40},angle=8,hand={46,28},lhand={37,34},tip={57,11},tail={17,42},left={{25,48},{20,56}},right={{41,48},{46,56}}}
  }},
@@ -154,15 +166,20 @@ local actions={
   {hx=30,hy=13,hip={33,37},hand={29,29},left={{39,42},{42,49}},right={{26,39},{18,42}}},
   {hx=32,hy=14,hip={32,35},angle=-8,back=true,hand={40,31},left={{39,42},{43,47}},right={{25,35},{18,34}}},
   {hx=30,hy=15,hip={32,34},angle=-12,back=true,hand={39,31},left={{38,43},{40,47}},right={{28,30},{25,27}}},
-  {hx=26,hy=17,hip={35,35},angle=-18,view='back',headView='side',hand={21,31},elbow={25,28},lhand={36,27},tail={14,39},hem={19,38},left={{25,42},{20,49}},right={{46,35},{40,43}}},
-  {hx=27,hy=17,hip={35,35},angle=-16,view='back',headView='three',hand={20,29},elbow={24,30},lhand={36,25},tail={12,33},hem={18,36},left={{25,42},{20,48}},right={{47,35},{41,42}}},
-  {hx=28,hy=18,hip={35,35},angle=-12,view='side',hand={20,31},elbow={23,32},lhand={35,26},tail={12,24},hem={17,36},left={{26,43},{22,49}},right={{48,35},{54,35}},smear={{37,42},{48,40},{57,36}}},
-  {hx=29,hy=18,hip={35,35},angle=-10,view='three',hand={20,32},lhand={35,26},tail={13,18},hem={17,33},left={{27,43},{23,49}},right={{49,35},{60,34}},smear={{35,41},{51,39},{62,35}}},
-  {hx=29,hy=18,hip={35,35},angle=-9,view='front',hand={20,32},lhand={36,26},tail={15,15},hem={17,32},left={{27,43},{23,49}},right={{49,35},{60,34}},smear={{27,40},{48,39},{62,35}}},
-  {hx=37,hy=20,hip={34,38},angle=8,view='back',hand={45,31},lhand={32,30},tail={54,30},hem={49,41},left={{40,45},{43,51}},right={{24,36},{14,35}},smear={{8,36},{23,40},{39,39}}},
-  {hx=28,hy=23,hip={33,41},angle=-16,hand={40,45},lhand={24,43},left={{29,49},{26,56}},right={{41,49},{44,55}}}
+  {roll=145,hx=32,hy=17,hip={32,34},angle=-20,view='side',hand={43,28},elbow={44,24},lhand={24,28},lelbow={21,24},tail={14,31},hem={22,37},left={{23,39},{26,48}},right={{41,43},{35,52}}},
+  {roll=165,hx=32,hy=17,hip={32,34},angle=-16,view='three',hand={43,27},elbow={43,23},lhand={24,27},lelbow={21,23},tail={13,26},hem={21,38},left={{22,38},{25,46}},right={{40,44},{32,54}}},
+  {roll=195,hx=32,hy=17,hip={32,34},angle=-10,view='side',hand={44,25},elbow={43,22},lhand={23,27},tail={13,24},hem={21,36},left={{22,35},{22,43}},right={{35,46},{25,57}}},
+  {roll=225,hx=32,hy=17,hip={32,34},angle=-5,view='side',hand={44,26},elbow={44,22},lhand={23,25},tail={14,23},hem={22,33},left={{20,36},{20,44}},right={{28,47},{20,58}},smear={{40,50},{33,58},{23,61}}},
+  {roll=250,hx=32,hy=17,hip={32,34},angle=0,view='side',hand={44,26},elbow={43,22},lhand={23,26},tail={14,21},hem={21,32},left={{20,35},{19,43}},right={{28,47},{21,58}},smear={{38,53},{31,60},{23,62}}},
+  {roll=300,hx=32,hy=18,hip={32,35},angle=7,view='three',hand={41,32},elbow={44,25},lhand={23,30},tail={14,22},hem={21,35},left={{22,40},{26,49}},right={{28,45},{22,57}}},
+  {roll=345,hx=31,hy=22,hip={32,41},angle=6,view='three',hand={44,48},elbow={42,39},lhand={24,44},tail={14,26},hem={22,43},left={{26,48},{22,53}},right={{39,48},{41,54}}}
  }}
 }
+-- Load the planted front knee, not just the arms. Keep the rear foot anchored
+-- over contact/follow-through; the scene owns the additional attack advance.
+for _,i in ipairs({4,5,6}) do actions[1].poses[i].right[1]={49,46} end
+for _,i in ipairs({4,5}) do actions[2].poses[i].right[1]={49,46} end
+for _,i in ipairs({3,4}) do actions[4].poses[i].right[1]={52,47} end
 local recoveries={
  {name='Recovery_VerticalSlash',frames={4,4,4,4},hit=0,poses={
   actions[1].poses[8],{hy=15,hand={37,36},tip={47,51}}, {settle=1,lean=0},{idle=true}}},
@@ -248,7 +265,10 @@ for _,a in ipairs(actions) do
     local gi=Image(64,64,ColorMode.RGB)
     for x=0,63,3 do px(gi,x,58,guideColor) end
     for y=0,63,3 do px(gi,32,y,cyan) end
-    disk(gi,a.poses[i].hip and a.poses[i].hip[1] or 32,a.poses[i].hip and a.poses[i].hip[2] or 40,2,guideColor)
+    local hip=a.poses[i].hip or {32,40}
+    if a.poses[i].roll then local r=a.poses[i].roll*math.pi/180;drawingRoll={co=math.cos(r),si=math.sin(r)} end
+    disk(gi,hip[1],hip[2],2,guideColor)
+    drawingRoll=nil
     local gc=s:newCel(guides,index,gi,Point(0,0));gc.data=a.name .. ' / ' .. i .. ' / ' .. n .. ' game frames; floor row 58; root pivot (32,38 bottom-origin)'
     im:drawImage(wi);sheet:drawImage(im,Point((i-1)*64,0))
     local name=a.name .. '_' .. string.format('%02d',i)
