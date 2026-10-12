@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 827949e8c788eb04aa3c53b43086741a
+guid: 6e06b8be55559fd43a7003487d1b91d4
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -127,7 +127,7 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: CaptureRuins
+  - name: CaptureTrainingGrid
     originalName: 
     pivot: {x: 0.5, y: 0}
     alignment: 9
@@ -139,7 +139,7 @@ ScriptedImporter:
       y: 4
       width: 384
       height: 216
-    spriteID: 772bd7a7d02419144a41afef73b7b3b8
+    spriteID: 7e5ccbda85893f342a95348c815d879d
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -153,17 +153,17 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 946467503
+      value0: 3703739330
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: CaptureRuins
+    name: CaptureTrainingGrid
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: CaptureRuins
+    - name: CaptureTrainingGrid
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
@@ -171,7 +171,7 @@ ScriptedImporter:
         y: 0
         width: 384
         height: 216
-      spriteId: 772bd7a7d02419144a41afef73b7b3b8
+      spriteId: 7e5ccbda85893f342a95348c815d879d
     linkedCells: []
     tileCells: []
     tileSetIndex: 0

@@ -66,7 +66,7 @@ public static class CombatVideoArtBuilder
             var eyes=ordered.Select(p=>Path.GetDirectoryName(p).Replace('\\','/')+"/EyeMasks/"+Path.GetFileName(p)).Select(p=>eyeCounts.TryGetValue(p,out int count)&&count>0?AssetDatabase.LoadAssetAtPath<Sprite>(p):null).ToArray();
             motions.Add(new VideoArtLibrary.Motion {name=name,frames=ordered.Select(p=>AssetDatabase.LoadAssetAtPath<Sprite>(p)).ToArray(),eyeFrames=eyes,durations=durations,hitFrame=action?.hitFrame??0,branchFrame=action?.branchFrame??0,chargeFrame=action?.chargeFrame??0,releaseFrame=action?.releaseFrame??0,landingFrame=action?.landingFrame??0,recoveryFrame=action?.recoveryFrame??0});
         }
-        string backgroundPath="Assets/Art/Video/CaptureRuins.png";
+        string backgroundPath="Assets/Art/Video/CaptureTrainingGrid.png";
         var bg=(TextureImporter)AssetImporter.GetAtPath(backgroundPath);bg.textureType=TextureImporterType.Sprite;bg.spritePixelsPerUnit=32;bg.filterMode=FilterMode.Point;bg.textureCompression=TextureImporterCompression.Uncompressed;bg.mipmapEnabled=false;bg.SaveAndReimport();
         var library=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(LibraryPath);
         if(library==null) { library=ScriptableObject.CreateInstance<VideoArtLibrary>();AssetDatabase.CreateAsset(library,LibraryPath); }

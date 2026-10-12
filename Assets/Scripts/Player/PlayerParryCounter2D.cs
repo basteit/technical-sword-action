@@ -19,6 +19,8 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     [SerializeField, Min(0f)] private float landingRollDistance = .12f;
     [SerializeField, Min(0f)] private float jumpHeight = .55f;
     [SerializeField, Min(0f)] private float maxApproach = .6f;
+    [SerializeField] private bool blinkApproach;
+    [SerializeField, Min(1)] private int blinkTravelFrames = 2;
     [SerializeField] private LayerMask obstacleLayers;
     private PlayerStateMachine state;
     private PlayerMotor2D motor;
@@ -37,6 +39,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public bool IsActive => active;
     public bool IsCounterInvincible => active && airborneKick && invincibleDuringKick;
     public bool IsAirborneKick => airborneKick;
+    public bool UsesBlinkApproach => airborneKick && blinkApproach;
     public int ElapsedFrames => elapsed;
     public int HitFrame => hitFrame;
     public int ChargeFrame => chargeFrame;
@@ -107,10 +110,11 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         if (!hitApplied && (SelectedTarget == null || !SelectedTarget.IsAlive)) { Finish("TargetLost"); return; }
         if (!airborneKick || body == null) return;
         float frame=elapsed+1f;
-        float rise=Mathf.Clamp01(frame/Mathf.Max(1,chargeFrame-2));
+        float travelFrames=blinkApproach?Mathf.Max(1,blinkTravelFrames):hitFrame;
+        float rise=Mathf.Clamp01(frame/(blinkApproach?travelFrames:Mathf.Max(1,chargeFrame-2)));
         float fall=Mathf.Clamp01((frame-hitFrame)/Mathf.Max(1,landingFrame-hitFrame));
         float height=frame<=hitFrame?jumpHeight*(1-(1-rise)*(1-rise)):jumpHeight*(1-fall*fall);
-        float x = origin.x + facing * approach * Mathf.Clamp01((elapsed + 1f) / hitFrame);
+        float x = origin.x + facing * approach * Mathf.Clamp01(frame / travelFrames);
         x+=facing*landingRollDistance*Mathf.Clamp01((frame-landingFrame)/4f);
         Vector2 desired = new Vector2(x, origin.y + height);
         Vector2 delta = desired - body.position;

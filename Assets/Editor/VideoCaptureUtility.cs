@@ -43,6 +43,7 @@ public static class VideoCaptureUtility
                 Check(presentation.ActiveShakeCount==0&&presentation.ShakeOffset==Vector2.zero&&presentation.FlashAlpha==0,"Shake/flash remained.");
                 Check(!state.GetComponent<PlayerVisualRecovery2D>().IsPlaying,"Recovery animation remained.");
                 Check(!presentation.IsSpotlightVisible&&!presentation.AreEyesVisible,"Subject lift or eye light remained.");
+                Check(presentation.IsPlayerBodyVisible&&!presentation.IsTransitShadowVisible,"Blink visibility remained.");
                 Check(fx.ActiveCount==0,"VFX remained active.");
                 Check(presentation.ChargeRealElapsed>=.5f&&presentation.ChargeRealElapsed<=1f,"Charge duration outside .5–1 seconds.");
                 records.Add(new RunRecord{stages=stages,mirrored=mirrored,duration=director.RealElapsed,frontHits=director.FrontEnemy.HitCount,rearHits=director.RearEnemy.HitCount,chargeSeconds=presentation.ChargeRealElapsed});
@@ -50,6 +51,7 @@ public static class VideoCaptureUtility
                 Check(presentation.DimAlpha==0&&!presentation.IsDimVisible,"Slow dim overlay not reset.");
                 Check(!state.GetComponent<PlayerVisualRecovery2D>().IsPlaying&&presentation.ActiveShakeCount==0&&presentation.FlashAlpha==0,"Recovery/impact feedback not reset.");
                 Check(!presentation.IsSpotlightVisible&&!presentation.AreEyesVisible,"Subject/eye overlay not reset.");
+                Check(presentation.IsPlayerBodyVisible&&!presentation.IsTransitShadowVisible,"Blink visibility not reset.");
                 Check(director.FrontEnemy.CurrentHp==director.FrontEnemy.MaxHp&&director.RearEnemy.CurrentHp==3,"HP not reset.");
                 Check(counter.StockCount==0&&fx.ActiveCount==0,"Stock or VFX not reset.");
                 Check(director.FrontEnemy.GetComponentsInChildren<Collider2D>().All(c=>c.enabled)&&director.RearEnemy.GetComponentsInChildren<Collider2D>().All(c=>c.enabled),"Collider not reset.");
@@ -57,9 +59,11 @@ public static class VideoCaptureUtility
                 {
                     var renderer=enemy.GetComponentInChildren<SpriteRenderer>();
                     Check(renderer.transform.localPosition==Vector3.zero,"Enemy visual origin drifted.");
+                    Check(renderer.transform.localRotation==Quaternion.identity,"Enemy launch rotation not reset.");
                     Check(renderer.color==Color.white,"Enemy tint/alpha not reset.");
                     Check(enemy.GetComponent<VideoEnemyAnimationDriver>().MotionName=="Idle"&&enemy.GetComponent<EnemyMeleeChaser2D>().CurrentStateName=="Idle","Enemy motion/AI not reset.");
                     Check(!enemy.GetComponent<VideoEnemyAnimationDriver>().IsHitBacking,"Enemy hitback not reset.");
+                    Check(!enemy.GetComponent<VideoEnemyAnimationDriver>().IsLaunched&&enemy.GetComponent<VideoEnemyAnimationDriver>().LastLaunchHeight==0,"Enemy launch not reset.");
                     Check(enemy.GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0).shortNameHash==Animator.StringToHash("EnemyVideo_Idle"),"Enemy Animator not reset.");
                 }
                 Check(state.GetComponent<Rigidbody2D>().gravityScale==3,"Gravity not restored.");

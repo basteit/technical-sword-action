@@ -14,7 +14,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField, Range(.5f,1f)] private float chargeRealSeconds=.7f;
     [SerializeField] private float normalSize=2.8125f;
     [SerializeField] private float closeSize=2.109375f;
-    [SerializeField,Range(0,1)] private float slowDimStrength=.82f;
+    [SerializeField,Range(0,1)] private float slowDimStrength=.965f;
     [SerializeField,Range(0,1)] private float heroLiftStrength=.6f;
     [SerializeField,Min(.001f)] private float dimFadeInSeconds=3/60f;
     [SerializeField,Min(.001f)] private float dimFadeOutSeconds=3/60f;
@@ -33,6 +33,9 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     private Material eyeGlowMaterial;
     private GameObject heroFocus;
     private float eyeTrailTimer;
+    private SpriteRenderer transitShadow;
+    private bool ownsHiddenBody;
+    private float shadowGroundY;
     private Vector3 focus;
     public bool IsCharged=>charged;
     public float Zoom=>zoom;
@@ -43,6 +46,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     public bool IsDimVisible=>dimRenderer!=null&&dimRenderer.enabled;
     public bool IsSpotlightVisible=>heroLift!=null&&heroLift.enabled;
     public bool AreEyesVisible=>eyeLight!=null&&eyeLight.enabled;
+    public bool IsTransitShadowVisible=>transitShadow!=null&&transitShadow.enabled;
+    public bool IsPlayerBodyVisible=>playerVisual!=null&&playerVisual.enabled;
     public float ChargeRealElapsed { get; private set; }
     private void Awake()
     {
@@ -51,10 +56,29 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         EnsureSpotlight();
     }
     private void OnEnable()
-    { counter.ChargeStarted+=OnCharge;counter.ChargeReleased+=OnRelease;counter.HitConfirmed+=OnHit;counter.HitMissed+=OnMiss;counter.Finished+=OnFinished;counter.Landed+=OnLanding; }
+    { counter.Started+=OnCounterStarted;counter.ChargeStarted+=OnCharge;counter.ChargeReleased+=OnRelease;counter.HitConfirmed+=OnHit;counter.HitMissed+=OnMiss;counter.Finished+=OnFinished;counter.Landed+=OnLanding; }
+    private void OnCounterStarted()
+    {
+        if(!counter.UsesBlinkApproach||playerVisual==null) return;
+        int facing=counter.GetComponent<PlayerMotor2D>().FacingSign;
+        Vector2 from=playerVisual.transform.position;
+        Vector2 to=counter.SelectedTarget.transform.position-new Vector3(facing*.85f,0,0);
+        vfx.EmitTransitSilhouette(playerVisual,facing,from,Vector2.one,.5f);
+        vfx.EmitTransitSilhouette(playerVisual,facing,Vector2.Lerp(from,to,.45f)+Vector2.up*.2f,new Vector2(1.7f,.45f),.28f);
+        vfx.EmitTransitSilhouette(playerVisual,facing,to+Vector2.up*.45f,new Vector2(1.4f,.25f),.18f);
+        shadowGroundY=from.y-1+.03f;
+        ownsHiddenBody=playerVisual.enabled;
+        if(ownsHiddenBody) playerVisual.enabled=false;
+        if(transitShadow!=null) { transitShadow.sprite=playerVisual.sprite;transitShadow.flipX=playerVisual.flipX;transitShadow.enabled=true; }
+    }
+    private void RestorePlayerBody()
+    {
+        if(ownsHiddenBody&&playerVisual!=null) playerVisual.enabled=true;
+        ownsHiddenBody=false;if(transitShadow!=null) transitShadow.enabled=false;
+    }
     private void OnCharge()
     {
-        charged=true;ChargeRealElapsed=0;
+        RestorePlayerBody();charged=true;ChargeRealElapsed=0;
         focus=(counter.transform.position+counter.SelectedTarget.transform.position)*.5f;
         focus.y=1.35f;focus.z=restPosition.z;
         CombatTimeController.RequestSlow(counter,chargeScale,chargeRealSeconds);
@@ -64,13 +88,13 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         charged=false;CombatTimeController.ReleaseSlow(counter);
         CombatTimeController.RequestHitstop(counter,8*CombatTimeController.StepSeconds);
-        ShakeDirectional(.22f,.20f,new Vector2(counter.GetComponent<PlayerMotor2D>().FacingSign,.25f),2.75f);
+        ShakeDirectional(.25f,.24f,new Vector2(counter.GetComponent<PlayerMotor2D>().FacingSign,.25f),2.75f);
         flashRemaining=flashDuration=3/60f;flashStrength=.12f;
-        vfx.Emit("Kick",foot,1.1f,1);
+        vfx.Emit("Kick",foot,1.55f,1);
     }
     private void OnLanding()=>ShakeDirectional(.11f,.065f,Vector2.down,1.5f);
     private void OnFinished(bool hit)
-    { charged=false;CombatTimeController.ReleaseOwner(counter);if(!hit) ResetPresentation(); }
+    { RestorePlayerBody();charged=false;CombatTimeController.ReleaseOwner(counter);if(!hit) ResetPresentation(); }
     private void OnMiss() { charged=false;CombatTimeController.ReleaseSlow(counter); }
     public void Shake(float realSeconds,float strength)
     { ShakeDirectional(realSeconds,strength,new Vector2(1,.35f),3); }
@@ -103,6 +127,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         flashRemaining=Mathf.Max(0,flashRemaining-realSeconds);
         if(flashRenderer!=null) { flashRenderer.color=new Color(1,1,1,flashStrength*flashRemaining/Mathf.Max(.001f,flashDuration));flashRenderer.enabled=flashRemaining>0; }
         UpdateSpotlight();
+        if(transitShadow!=null&&transitShadow.enabled&&counter!=null)
+            transitShadow.transform.localPosition=new Vector3(0,shadowGroundY-counter.transform.position.y,0);
         if(charged&&dimAlpha>0&&playerVisual!=null)
         {
             eyeTrailTimer+=realSeconds;
@@ -145,12 +171,16 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         eyeGlow=glow.AddComponent<SpriteRenderer>();eyeGlow.sortingOrder=1012;
         var shader=Shader.Find("TechnicalSwordAction/VideoPixelGlow");
         if(shader!=null) { eyeGlowMaterial=new Material(shader){hideFlags=HideFlags.DontSave};eyeGlow.sharedMaterial=eyeGlowMaterial; }
+        var shadow=new GameObject("BlinkGroundShadow");shadow.transform.SetParent(heroFocus.transform,false);
+        shadow.transform.localScale=new Vector3(1.6f,.08f,1);
+        transitShadow=shadow.AddComponent<SpriteRenderer>();transitShadow.sortingOrder=9;
+        transitShadow.color=new Color(0,0,0,.25f);transitShadow.enabled=false;
         UpdateSpotlight();
     }
     private void UpdateSpotlight()
     {
         if(heroLift==null) return;
-        bool visible=dimAlpha>0&&playerVisual!=null&&playerVisual.gameObject.activeInHierarchy;
+        bool visible=dimAlpha>0&&playerVisual!=null&&playerVisual.enabled&&playerVisual.gameObject.activeInHierarchy;
         heroLift.enabled=visible;
         if(playerVisual==null) { eyeLight.enabled=eyeGlow.enabled=false;return; }
         heroLift.sprite=playerVisual.sprite;heroLift.flipX=eyeLight.flipX=eyeGlow.flipX=playerVisual.flipX;
@@ -161,6 +191,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     }
     public void ResetPresentation()
     {
+        RestorePlayerBody();
         charged=false;zoom=ChargeRealElapsed=dimAlpha=dimBlend=eyeTrailTimer=flashRemaining=flashStrength=flashDuration=0;
         impulses.Clear();shakeOffset=Vector2.zero;if(flashRenderer!=null) flashRenderer.enabled=false;
         if(captureCamera!=null) { captureCamera.transform.position=restPosition;captureCamera.orthographicSize=normalSize; }
@@ -169,7 +200,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         CombatTimeController.ReleaseOwner(counter);
     }
     private void OnDisable()
-    { counter.ChargeStarted-=OnCharge;counter.ChargeReleased-=OnRelease;counter.HitConfirmed-=OnHit;counter.HitMissed-=OnMiss;counter.Finished-=OnFinished;counter.Landed-=OnLanding;ResetPresentation(); }
+    { counter.Started-=OnCounterStarted;counter.ChargeStarted-=OnCharge;counter.ChargeReleased-=OnRelease;counter.HitConfirmed-=OnHit;counter.HitMissed-=OnMiss;counter.Finished-=OnFinished;counter.Landed-=OnLanding;ResetPresentation(); }
     private void OnDestroy()
     {
         if(dimRenderer!=null) Destroy(dimRenderer.gameObject);

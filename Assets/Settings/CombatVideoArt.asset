@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VideoArtLibrary
   playerArtworkIsRough: 1
   fourStageArtworkIsRough: 1
-  background: {fileID: -9169471958085028774, guid: a7f3d6762793c584195b04bfcb53e992, type: 3}
+  background: {fileID: -2414837325451676550, guid: 8af4ceaa040a21d4094f51706068b96e, type: 3}
   motions:
   - name: AirRoundhouse
     frames:
@@ -36,7 +36,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 460f5494f695f3b45b5f0876aecc2002, type: 3}
     - {fileID: 0}
     - {fileID: 0}
-    - {fileID: 0}
+    - {fileID: 21300000, guid: 3c8b18bb9b13ca242bc53b0caa749e4f, type: 3}
     - {fileID: 21300000, guid: d1c032365c4ed6647b6538e215295c3f, type: 3}
     - {fileID: 21300000, guid: dcf1aa6bdbd4c914787c421f27b84aee, type: 3}
     - {fileID: 21300000, guid: 2e935ea33e4f14c408bcd0b958214b3d, type: 3}
@@ -62,7 +62,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: d7af699f0d9e08f4293d2b7dd85ca51a, type: 3}
     eyeFrames:
     - {fileID: 21300000, guid: 80ec5de57be12004aa299e4bc0bc9a2d, type: 3}
-    - {fileID: 21300000, guid: e9e467cdfabb25a4ea2a4a3bc2f7f2da, type: 3}
+    - {fileID: 0}
     - {fileID: 21300000, guid: 7dcc6c724b100314d90f3a29f105b643, type: 3}
     - {fileID: 21300000, guid: 4dc0dba29ccdcd14dba0ec1155ca5e37, type: 3}
     - {fileID: 21300000, guid: 0d05c5de95cfd56449ac869c40411140, type: 3}

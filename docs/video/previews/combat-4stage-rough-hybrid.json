@@ -59,6 +59,12 @@
             "tick": 161
         },
         {
+            "kind": "CounterStart",
+            "target": "Enemy_B",
+            "realSeconds": 3.0333333333333276,
+            "tick": 171
+        },
+        {
             "kind": "ChargeStart",
             "target": "Enemy_B",
             "realSeconds": 3.3166666666666599,

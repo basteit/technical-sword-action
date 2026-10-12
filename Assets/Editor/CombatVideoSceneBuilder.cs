@@ -37,7 +37,7 @@ public static class CombatVideoSceneBuilder
         floorBody.size = new Vector2(24, .5f);
         if(library!=null)
         {
-            var backdrop=new GameObject("CaptureRuins").AddComponent<SpriteRenderer>();
+            var backdrop=new GameObject("TrainingGrid").AddComponent<SpriteRenderer>();
             backdrop.sprite=library.background;backdrop.sortingOrder=-20;backdrop.transform.position=new Vector3(0,1.5f,0);
         }
         var cameraObject = new GameObject("Main Camera", typeof(Camera));
@@ -45,7 +45,7 @@ public static class CombatVideoSceneBuilder
         cameraObject.transform.position = new Vector3(0, 1.3f, -10);
         var camera = cameraObject.GetComponent<Camera>();
         camera.orthographic = true; camera.orthographicSize = 2.8125f;
-        camera.backgroundColor = new Color(.025f,.045f,.08f);
+        camera.backgroundColor = new Color(.98f,.985f,.99f);
         var actor = new GameObject("Player");
         actor.SetActive(false); actor.tag = "Player"; actor.layer = playerLayer;
         actor.transform.position = new Vector3(0, 1, 0);
@@ -74,6 +74,7 @@ public static class CombatVideoSceneBuilder
         var counter=actor.AddComponent<PlayerParryCounter2D>();var kick=library.Find("AirRoundhouse");Set(counter,"airborneKick",true);Set(counter,"hitFrame",kick.hitFrame);Set(counter,"chargeFrame",kick.chargeFrame);Set(counter,"endFrame",kick.recoveryFrame>0?kick.recoveryFrame:kick.TotalFrames);Set(counter,"radius",.5f);Set(counter,"obstacleLayers",1 << ground);
         Set(counter,"chargeReleaseFrame",kick.releaseFrame>0?kick.releaseFrame:24);Set(counter,"landingFrame",kick.landingFrame>0?kick.landingFrame:36);Set(counter,"maxApproach",1.2f);
         Set(counter,"landingRollDistance",0f);
+        Set(counter,"blinkApproach",true);Set(counter,"blinkTravelFrames",2);
         actor.AddComponent<PlayerStateMachine>();actor.AddComponent<PlayerVisualRecovery2D>();Set(actor.AddComponent<VideoPlayerAnimationDriver>(),"library",library);
         var a = Enemy("Enemy_A", new Vector3(1.1f,1,0), enemy, playerLayer, actor.transform,library);
         var b = Enemy("Enemy_B", new Vector3(-.85f,1,0), enemy, playerLayer, actor.transform,library);
@@ -96,7 +97,7 @@ public static class CombatVideoSceneBuilder
     {
         var obj = new GameObject(name); obj.SetActive(false); obj.layer = layer; obj.transform.position = position;
         var collider = obj.AddComponent<BoxCollider2D>(); collider.size = new Vector2(.5f,1.6f); collider.isTrigger = true;
-        var graphics=new GameObject("SentinelVisual");graphics.transform.SetParent(obj.transform,false);
+        var graphics=new GameObject("TrainingDummyVisual");graphics.transform.SetParent(obj.transform,false);
         var renderer=graphics.AddComponent<SpriteRenderer>();renderer.sortingOrder=8;
         graphics.AddComponent<Animator>().runtimeAnimatorController=AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(CombatVideoArtBuilder.EnemyControllerPath);
         if(library!=null) renderer.sprite=library.Find("Enemy_Idle").frames[0];

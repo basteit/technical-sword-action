@@ -110,7 +110,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(director,"StartTake",2,true);
             for(int frame=0;frame<fps*5&&!Get<bool>(presentation,"IsCharged");frame++) Call(director,"StepCapture",1d/fps);
             for(int frame=0;frame<Mathf.CeilToInt(fps*.12f);frame++) Call(director,"StepCapture",1d/fps);
-            Assert.That(Get<float>(presentation,"DimAlpha"),Is.EqualTo(.82f).Within(.001f));
+            Assert.That(Get<float>(presentation,"DimAlpha"),Is.EqualTo(.965f).Within(.001f));
             Assert.That(Get<bool>(presentation,"IsDimVisible"),Is.True);
             Assert.That(Get<bool>(presentation,"IsSpotlightVisible"),Is.True);
             Assert.That(Camera.main.transform.Find("VideoSlowDimmer"),Is.Not.Null);
@@ -174,7 +174,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for(int i=0;i<180&&!Get<bool>(director,"Completed");i++) Step();
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
-            presentation.GetType().GetField("slowDimStrength",Flags).SetValue(presentation,.82f);
+            presentation.GetType().GetField("slowDimStrength",Flags).SetValue(presentation,.965f);
             Call(director,"ResetTake",2);
         }
         [TestCase(30)] [TestCase(60)] [TestCase(120)]
@@ -289,7 +289,122 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 }
             }
             Assert.That(hits,Is.EqualTo(4));Assert.That(Get<int>(rear,"HitCount"),Is.EqualTo(1));
-            Assert.That((enemy.transform.position.x-1.1f*(mirrored?-1:1))*(mirrored?-1:1),Is.InRange(.84f,.88f));
+            Assert.That((enemy.transform.position.x-1.1f*(mirrored?-1:1))*(mirrored?-1:1),Is.InRange(1.14f,1.18f));
+        }
+        [TestCase(2,false,60)] [TestCase(4,true,60)] [TestCase(4,false,30)] [TestCase(4,true,120)]
+        public void BlinkReachesActualTargetInTwoTicksAndRevealsOnlyAtCharge(int stages,bool mirrored,int fps)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",stages,true);
+            for(int i=0;i<fps*5&&!Get<bool>(counter,"IsActive");i++) Call(director,"StepCapture",1d/fps);
+            Assert.That(Get<bool>(counter,"UsesBlinkApproach"),Is.True);
+            Assert.That(Get<bool>(presentation,"IsPlayerBodyVisible"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsTransitShadowVisible"),Is.True);
+            var enemy=(Component)Get<object>(counter,"SelectedTarget");
+            for(int i=0;i<8&&Get<int>(counter,"ElapsedFrames")<2;i++) Call(director,"StepCapture",1d/fps);
+            float expected=enemy.transform.position.x+(mirrored?-.85f:.85f);
+            Assert.That(state.transform.position.x,Is.EqualTo(expected).Within(.015f));
+            Assert.That(state.transform.position.y,Is.EqualTo(1.55f).Within(.02f));
+            Vector3 arrival=state.transform.position;
+            for(int i=0;i<fps&&!Get<bool>(presentation,"IsCharged");i++)
+            {
+                Assert.That(Get<bool>(presentation,"IsPlayerBodyVisible"),Is.False,"A windup body was exposed before slow charge.");
+                Call(director,"StepCapture",1d/fps);
+                Assert.That(Vector3.Distance(state.transform.position,arrival),Is.LessThan(.025f));
+                Assert.That(Get<object>(counter,"SelectedTarget"),Is.SameAs(enemy));
+            }
+            Assert.That(Get<bool>(presentation,"IsCharged"),Is.True);
+            Assert.That(Get<bool>(presentation,"IsPlayerBodyVisible"),Is.True);
+            Assert.That(Get<bool>(presentation,"IsTransitShadowVisible"),Is.False);
+            Assert.That(Get<int>(counter,"HitCount"),Is.Zero);
+        }
+        [TestCase("TargetLost")] [TestCase("CounterDisabled")] [TestCase("PresentationDisabled")]
+        [TestCase("PlayerDead")] [TestCase("ForcedHit")] [TestCase("Reset")]
+        public void BlinkInterruptionRestoresBodyAndRemovesShadow(string interruption)
+        {
+            Call(director,"StartTake",2,true);
+            for(int i=0;i<240&&!Get<bool>(counter,"IsActive");i++) Step();
+            Assert.That(Get<bool>(presentation,"IsPlayerBodyVisible"),Is.False);
+            if(interruption=="TargetLost") ((Component)Get<object>(counter,"SelectedTarget")).gameObject.SetActive(false);
+            if(interruption=="CounterDisabled") ((Behaviour)counter).enabled=false;
+            if(interruption=="PresentationDisabled") ((Behaviour)presentation).enabled=false;
+            if(interruption=="PlayerDead") Call(state,"SetDead","VideoBlinkDeath");
+            if(interruption=="ForcedHit") Call(state,"ForceHit","VideoBlinkInterrupt");
+            if(interruption=="Reset") Call(director,"ResetTake",2);
+            Step();
+            Assert.That(Get<bool>(presentation,"IsPlayerBodyVisible"),Is.True);
+            Assert.That(Get<bool>(presentation,"IsTransitShadowVisible"),Is.False);
+            ((Behaviour)counter).enabled=true;((Behaviour)presentation).enabled=true;Call(director,"ResetTake",2);
+            Assert.That(Get<int>(Find("VideoVfxRenderer"),"ActiveCount"),Is.Zero);
+        }
+        [Test] public void BlinkPauseFreezesPositionShadowAndSilhouettes()
+        {
+            Call(director,"StartTake",2,true);
+            for(int i=0;i<240&&!Get<bool>(counter,"IsActive");i++) Step();
+            Vector3 position=state.transform.position;int elapsed=Get<int>(counter,"ElapsedFrames");
+            var fx=Find("VideoVfxRenderer");int effects=Get<int>(fx,"ActiveCount");
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
+            for(int i=0;i<60;i++) Step();
+            Assert.That(state.transform.position,Is.EqualTo(position));Assert.That(Get<int>(counter,"ElapsedFrames"),Is.EqualTo(elapsed));
+            Assert.That(Get<bool>(presentation,"IsTransitShadowVisible"),Is.True);Assert.That(Get<int>(fx,"ActiveCount"),Is.EqualTo(effects));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
+            for(int i=0;i<240&&!Get<bool>(director,"Completed");i++) Step();
+            Assert.That(Get<bool>(director,"Completed"),Is.True);
+        }
+        [TestCase(-1)] [TestCase(1)]
+        public void BlinkCannotPassThroughAnObstacleThatAppearsDuringTravel(int direction)
+        {
+            Call(director,"ResetTake",2);
+            var motor=state.GetComponent(Type.GetType("PlayerMotor2D, Assembly-CSharp",true));Call(motor,"SetFacing",direction);
+            var enemy=(Component)Get<object>(director,"RearEnemy");enemy.transform.position=state.transform.position+Vector3.right*direction*1.85f;
+            Physics2D.SyncTransforms();Call(counter,"RegisterParriedEnemy",enemy);Call(state,"RequestAction",PlayerActionRequest.Attack);Step();
+            float wallX=state.transform.position.x+direction*.35f;
+            var wall=new GameObject("BlinkTravelWall");wall.layer=LayerMask.NameToLayer("Ground");wall.transform.position=new Vector3(wallX,2,0);
+            wall.AddComponent<BoxCollider2D>().size=new Vector2(.1f,6);Physics2D.SyncTransforms();
+            try
+            {
+                for(int i=0;i<110&&Get<bool>(counter,"IsActive");i++) Step();
+                Assert.That((state.transform.position.x-wallX)*direction,Is.LessThan(-.2f));
+                Assert.That(Get<int>(enemy,"HitCount"),Is.Zero);Assert.That(Get<int>(counter,"HitCount"),Is.Zero);
+                Assert.That(Get<bool>(presentation,"IsPlayerBodyVisible"),Is.True);
+            }
+            finally { Object.DestroyImmediate(wall); }
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void KickLaunchesOnlyItsTargetAndPauseFreezesTheTrajectory(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
+            var enemy=(Component)Get<object>(director,"RearEnemy");var driver=enemy.GetComponent(Type.GetType("VideoEnemyAnimationDriver, Assembly-CSharp",true));
+            Vector3 origin=enemy.transform.position;
+            for(int i=0;i<330&&!Get<bool>(driver,"IsLaunched");i++) Step();
+            Assert.That(Get<bool>(driver,"IsLaunched"),Is.True);Assert.That(Get<int>(enemy,"DeathCount"),Is.EqualTo(1));
+            for(int i=0;i<16;i++) Step();
+            Vector3 airborne=enemy.transform.position;Quaternion rotation=enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation;
+            double real=Get<double>(director,"RealElapsed");
+            Assert.That(airborne.y-origin.y,Is.GreaterThan(.8f));Assert.That(rotation,Is.Not.EqualTo(Quaternion.identity));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});for(int i=0;i<60;i++) Step();
+            Assert.That(enemy.transform.position,Is.EqualTo(airborne));Assert.That(enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation,Is.EqualTo(rotation));
+            Assert.That(Get<double>(director,"RealElapsed"),Is.EqualTo(real));Assert.That(Get<bool>(director,"Completed"),Is.False,"Pause must not end the take between landing and recovery start.");
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
+            for(int i=0;i<180&&!Get<bool>(director,"Completed");i++) Step();
+            Assert.That((enemy.transform.position.x-origin.x)*(mirrored?1:-1),Is.EqualTo(2.25f).Within(.02f));
+            Assert.That(Get<int>(enemy,"HitCount"),Is.EqualTo(1));
+            Call(director,"ResetTake",4);Assert.That(Get<bool>(driver,"IsLaunched"),Is.False);
+            Assert.That(enemy.transform.position,Is.EqualTo(origin));Assert.That(enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation,Is.EqualTo(Quaternion.identity));
+        }
+        [TestCase(-1)] [TestCase(1)]
+        public void LaunchedEnemyCannotCrossATallWall(int direction)
+        {
+            Call(director,"ResetTake",2);var enemy=(Component)Get<object>(director,"FrontEnemy");var driver=enemy.GetComponent(Type.GetType("VideoEnemyAnimationDriver, Assembly-CSharp",true));
+            Vector3 origin=enemy.transform.position;var wall=new GameObject("LaunchWall");wall.layer=LayerMask.NameToLayer("Ground");wall.transform.position=origin+Vector3.right*direction*.7f;
+            wall.AddComponent<BoxCollider2D>().size=new Vector2(.1f,6);Physics2D.SyncTransforms();
+            try
+            {
+                Call(driver,"ApplyLaunch",2.25f,1.05f,20,Vector2.right*direction);
+                for(int i=0;i<20;i++) Step();
+                Assert.That((enemy.transform.position.x-origin.x)*direction,Is.InRange(.3f,.405f));
+                Assert.That(Get<bool>(driver,"IsLaunched"),Is.False);
+            }
+            finally { Object.DestroyImmediate(wall); }
         }
         [Test] public void ReusedVanishEffectKeepsItsOwnMovingEnemy()
         {

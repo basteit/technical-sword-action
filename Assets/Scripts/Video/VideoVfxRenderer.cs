@@ -9,7 +9,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
     [SerializeField] private bool hybridGlow=true;
     [SerializeField,Range(0,1)] private float intensity=.8f;
     private sealed class Effect
-    { public GameObject root;public SpriteRenderer sprite,glow;public VideoArtLibrary.Motion motion;public float age,duration,initialAlpha;public bool permitsGlow,fresh,fade;public Transform follow;public Vector2 offset,drift; }
+    { public GameObject root;public SpriteRenderer sprite,glow;public VideoArtLibrary.Motion motion;public float age,duration;public bool permitsGlow,fresh,fade;public Transform follow;public Vector2 offset,drift;public Color tint,glowTint; }
     private readonly List<Effect> pool=new();
     public bool HybridGlow { get=>hybridGlow;set=>hybridGlow=value; }
     public int ActiveCount { get { int n=0;foreach(var e in pool) if(e.root.activeSelf) n++;return n; } }
@@ -41,10 +41,11 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         var eyes=library.EyesFor(player.sprite);if(eyes==null) return;
         var effect=Obtain();effect.motion=new VideoArtLibrary.Motion{name="EyeTrail",frames=new[]{eyes},durations=new[]{8}};
         effect.age=0;effect.duration=8/60f;effect.permitsGlow=effect.fresh=effect.fade=true;
-        effect.follow=null;effect.drift=Vector2.right*(-facing*1.8f);effect.initialAlpha=.8f;
+        effect.follow=null;effect.drift=Vector2.right*(-facing*1.8f);
+        effect.tint=new Color(.75f,.95f,1,.8f);effect.glowTint=new Color(.65f,.9f,1,.4f);
         effect.root.transform.position=player.transform.position;effect.root.transform.localScale=new Vector3(facing,1,1);
-        effect.sprite.sprite=effect.glow.sprite=eyes;effect.sprite.color=new Color(.75f,.95f,1,effect.initialAlpha);
-        effect.glow.color=new Color(.65f,.9f,1,.4f);effect.glow.transform.localScale=Vector3.one;
+        effect.sprite.sprite=effect.glow.sprite=eyes;effect.sprite.color=effect.tint;
+        effect.glow.color=effect.glowTint;effect.glow.transform.localScale=Vector3.one;
         effect.sprite.sortingOrder=1020;effect.glow.sortingOrder=1019;
         effect.sprite.enabled=true;effect.glow.enabled=hybridGlow;effect.root.SetActive(true);EmissionCount++;
     }
@@ -70,6 +71,15 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         e.sprite.sprite=player.sprite;e.sprite.color=new Color(.12f,.14f,.22f,.24f*intensity);e.sprite.enabled=true;e.glow.enabled=false;
         e.root.SetActive(true);EmissionCount++;
     }
+    public void EmitTransitSilhouette(SpriteRenderer player,int facing,Vector2 position,Vector2 scale,float opacity)
+    {
+        var e=Obtain();e.motion=new VideoArtLibrary.Motion{name="TransitSilhouette",frames=new[]{player.sprite},durations=new[]{10}};
+        e.age=0;e.duration=10/60f;e.permitsGlow=false;e.fresh=e.fade=true;e.follow=null;e.drift=Vector2.zero;
+        e.tint=new Color(0,0,0,opacity*intensity);e.glowTint=Color.clear;
+        e.root.transform.position=position;e.root.transform.localScale=new Vector3(scale.x*facing,scale.y,1);
+        e.sprite.sprite=player.sprite;e.sprite.color=e.tint;e.sprite.sortingOrder=12;e.glow.sortingOrder=11;
+        e.sprite.enabled=true;e.glow.enabled=false;e.root.SetActive(true);EmissionCount++;
+    }
     public void AdvanceVisuals(float realSeconds)
     {
         if(CombatTimeController.IsPaused) return;
@@ -85,8 +95,8 @@ public sealed class VideoVfxRenderer : MonoBehaviour
             if(e.fade)
             {
                 float opacity=Mathf.Clamp01(1-e.age/e.duration);
-                e.sprite.color=new Color(.75f,.95f,1,e.initialAlpha*opacity);
-                e.glow.color=new Color(.65f,.9f,1,.4f*opacity);
+                e.sprite.color=new Color(e.tint.r,e.tint.g,e.tint.b,e.tint.a*opacity);
+                e.glow.color=new Color(e.glowTint.r,e.glowTint.g,e.glowTint.b,e.glowTint.a*opacity);
             }
             if(e.age>=0)
             { e.sprite.sprite=e.glow.sprite=e.motion.At(Mathf.FloorToInt(e.age*60)); }

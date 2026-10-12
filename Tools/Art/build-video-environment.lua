@@ -20,64 +20,46 @@ local function ring(im,cx,cy,r,width,c,squash)
     if math.abs(d-r)<=width/2 then px(im,x,y,c) end
   end end
 end
+local E={ink=rgba(48,60,78,255),body=rgba(205,213,224,255),joint=rgba(133,148,167,255),amber=rgba(233,123,40,255),red=rgba(212,61,58,255),blue=rgba(39,145,184,255)}
+local function disk(im,cx,cy,r,c)
+  for y=cy-r,cy+r do for x=cx-r,cx+r do if (x-cx)^2+(y-cy)^2<=r*r then px(im,x,y,c) end end end
+end
 local function enemy(im,n,state)
-  local x=31;local dy=0;local tilt=0
-  if state=='Idle' then dy=(n==2 or n==3) and 1 or 0 end
-  if state=='Move' then dy=n%2;tilt=(n%2)*2 end
-  if state=='Windup' then x=30-n;dy=math.floor(n/3) end
-  if state=='Attack' then x=33+n;dy=1 end
-  if state=='Hit' then x=32-math.min(n,3);dy=2 end
-  if state=='Parried' then x=29;dy=3;tilt=-3 end
-  if state=='Death' and n<=2 then state='Hit';x=32-n;dy=2+n end
+  -- A training dummy: one round head, one chest indicator, simple joints and rod.
+  local hx,hy=32,16;local hipx,hipy=32,39;local core=E.joint
+  local hand={45,33};local tip={57,45};local left={25,55};local right={39,55}
+  if state=='Idle' then hy=16+((n==2 or n==3) and 1 or 0) end
+  if state=='Move' then hx=34;left={24+(n%3)*2,55};right={40-(n%3)*2,55} end
+  if state=='Windup' then hx=30-math.floor(n/3);hy=17;hand={39,23-math.floor(n/2)};tip={43-n,3};core=n<5 and E.amber or E.red end
+  if state=='Attack' then hx=36;hy=19;hipx=34;hand={46,28+n};tip={60,19+n*6};core=E.red end
+  if state=='Hit' then hx=27;hy=20;hipx=30;hand={39,37};tip={50,50} end
+  if state=='Parried' then local recoil=({3,10,8,6})[n];hx=32-recoil;hy=20;hipx=30;hand={40-recoil,24};tip={47-recoil,7};core=E.blue end
   if state=='Death' then
-    local q=math.min(n/6,1)
-    poly(im,{{24,38},{40,35},{48,48},{44,56},{17,56}},P.ink)
-    rect(im,25+math.floor(q*8),41,16,8,P.metal);rect(im,30+math.floor(q*8),42,9,3,P.gold)
-    line(im,18,52,52,55,3,P.edge);line(im,26,53,20,57,3,P.dark)
-    for k=1,5 do rect(im,18+k*6,48+(k%3)*2,2,2,P.gold) end
+    local spread=(n-1)*2
+    disk(im,30-spread,29+math.min(n,3),6,E.ink);disk(im,30-spread,29+math.min(n,3),4,E.body)
+    rect(im,29+spread,38,12,12,E.ink);rect(im,31+spread,40,8,8,E.body)
+    line(im,27-spread,44,18-spread,53,3,E.ink);line(im,37+spread,45,48+spread,53,3,E.ink)
+    line(im,45,39,58,45,2,E.ink)
     return
   end
-  -- Masked bronze sentinel: cloak, segmented greaves, shoulder plates, blade.
-  poly(im,{{x-11,23+dy},{x+7,24+dy},{x+13,52},{x-17,55}},P.ink)
-  for k=0,3 do line(im,x-10+k*5,31+dy,x-15+k*6,52,1,P.dark) end
-  line(im,x-5,40+dy,x-8-tilt,53,5,P.dark);line(im,x+5,40+dy,x+8+tilt,53,5,P.metal)
-  rect(im,x-11-tilt,54,8,4,P.ink);rect(im,x+4+tilt,54,9,4,P.ink)
-  rect(im,x-10-tilt,54,7,1,P.edge);rect(im,x+5+tilt,54,7,1,P.gold)
-  poly(im,{{x-9,24+dy},{x+9,24+dy},{x+8,39+dy},{x-8,39+dy}},P.metal)
-  poly(im,{{x-8,25+dy},{x+8,25+dy},{x+6,29+dy},{x-6,30+dy}},P.edge)
-  line(im,x-6,31+dy,x+6,31+dy,2,P.gold);line(im,x-5,35+dy,x+5,35+dy,1,P.dark)
-  rect(im,x-7,39+dy,15,4,P.ink);rect(im,x-3,40+dy,5,2,P.gold)
-  poly(im,{{x-10,9+dy},{x+8,10+dy},{x+10,23+dy},{x+3,28+dy},{x-8,22+dy}},P.ink)
-  poly(im,{{x-8,10+dy},{x+6,11+dy},{x+8,21+dy},{x+2,24+dy},{x-7,20+dy}},P.metal)
-  poly(im,{{x+1,12+dy},{x+6,12+dy},{x+8,20+dy},{x+1,23+dy}},P.edge)
-  line(im,x-6,18+dy,x+7,17+dy,2,P.ink);line(im,x-3,18+dy,x+6,17+dy,1,P.light)
-  line(im,x-6,10+dy,x-12,3+dy,2,P.gold);line(im,x+3,10+dy,x+8,5+dy,2,P.edge)
-  poly(im,{{x-13,24+dy},{x-7,23+dy},{x-6,30+dy},{x-14,31+dy}},P.edge)
-  poly(im,{{x+6,24+dy},{x+13,24+dy},{x+14,32+dy},{x+7,31+dy}},P.gold)
-  local hx,hy=x+15,36+dy;local tx,ty=54,45
-  if state=='Windup' then hx=x+12;hy=24-n;tx=x+17-n;ty=2 end
-  if state=='Attack' then hx=44;hy=31;tx=59;ty=22+(n-1)*5 end
-  if state=='Parried' then hx=40;hy=30;tx=54;ty=math.max(7,21-n*4) end
-  if state=='Hit' then hx=40;hy=38;tx=54;ty=47 end
-  line(im,x+10,28+dy,hx,hy,4,P.dark);rect(im,hx,hy,3,3,P.gold)
-  line(im,hx-3,hy+2,tx,ty,3,P.ink);line(im,hx,hy,tx,ty,2,P.edge);line(im,hx,hy,tx,ty,1,P.light)
-  if state=='Windup' and n>=3 then ring(im,tx,ty+5,3,1,P.gold) end
-  if state=='Parried' then
-    -- Facing right: the impact drives the shoulders, head and blade left.
-    -- Keep the planted feet and waist so the counter's contact stays aligned.
-    local recoil=({0,8,5,2})[n] or 2
-    local upright=Image(im);im:clear()
-    for y=0,63 do
-      local shift=y<44 and -math.floor(math.max(0,(44-y)/34)*recoil+.5) or 0
-      for xx=0,63 do
-        local color=upright:getPixel(xx,y)
-        if app.pixelColor.rgbaA(color)>0 then px(im,xx+shift,y,color) end
-      end
-    end
+  line(im,hipx-3,hipy,left[1],left[2],4,E.ink);line(im,hipx+3,hipy,right[1],right[2],4,E.ink)
+  line(im,left[1]-3,left[2],left[1]+3,left[2],3,E.ink);line(im,right[1]-3,right[2],right[1]+3,right[2],3,E.ink)
+  disk(im,hipx,hipy,3,E.joint)
+  line(im,hx,hy+6,hipx,hipy,12,E.ink);line(im,hx,hy+7,hipx,hipy-3,8,E.body)
+  local cx=math.floor((hx+hipx)/2+.5);rect(im,cx-3,29,6,6,core)
+  line(im,hx+5,hy+12,hand[1],hand[2],4,E.ink);disk(im,hand[1],hand[2],2,E.joint)
+  line(im,hx-5,hy+12,hipx-10,36,4,E.ink);disk(im,hipx-10,36,2,E.joint)
+  disk(im,hx,hy,7,E.ink);disk(im,hx,hy,5,E.body)
+  line(im,hx+2,hy-2,hx+2,hy+2,2,E.ink)
+  line(im,hand[1]-2,hand[2]+2,tip[1],tip[2],3,E.ink)
+  line(im,hand[1],hand[2],tip[1],tip[2],1,(state=='Windup' or state=='Attack') and E.red or E.joint)
+  if state=='Windup' then
+    ring(im,tip[1],tip[2]+4,3+(n>=5 and 1 or 0),1,core)
+    if n>=5 then line(im,tip[1]-6,tip[2]+4,tip[1]-4,tip[2]+4,1,core);line(im,tip[1]+4,tip[2]+4,tip[1]+6,tip[2]+4,1,core) end
   end
 end
 local motions={{'Idle',4},{'Move',6},{'Windup',6},{'Attack',4},{'Hit',3},{'Parried',4},{'Death',6}}
-local s=Sprite(64,64,ColorMode.RGB);s.layers[1].name='Sentinel - armor cloak blade';local index=0;local enemyBounds={}
+local s=Sprite(64,64,ColorMode.RGB);s.layers[1].name='Training dummy - body joints timing rod';local index=0;local enemyBounds={}
 for _,m in ipairs(motions) do local first=index+1;local sheet=Image(m[2]*64,64,ColorMode.RGB)
   for n=1,m[2] do index=index+1;if index>1 then s:newEmptyFrame(index) end;s.frames[index].duration=m[1]=='Idle' and .133 or m[1]=='Windup' and .083 or .067
     local im=Image(64,64,ColorMode.RGB);enemy(im,n,m[1]);s:newCel(s.layers[1],index,im,Point(0,0))
@@ -87,7 +69,7 @@ for _,m in ipairs(motions) do local first=index+1;local sheet=Image(m[2]*64,64,C
   enemyBounds[#enemyBounds+1]={name=m[1],first=first,last=index,tag=tag}
 end
 for _,b in ipairs(enemyBounds) do b.tag.fromFrame=b.first;b.tag.toFrame=b.last end
-s:newLayer().name='CleanUp';s:saveAs(out .. '/CaptureSentinel.aseprite');s:close()
+s:newLayer().name='CleanUp';s:saveAs(out .. '/CaptureDummy.aseprite');s:close()
 local function validateTags(path,bounds,frameCount)
   local reopened=app.open(path);assert(#reopened.frames==frameCount and #reopened.tags==#bounds)
   for _,b in ipairs(bounds) do local found=false
@@ -98,33 +80,22 @@ local function validateTags(path,bounds,frameCount)
   end
   reopened:close()
 end
-validateTags(out..'/CaptureSentinel.aseprite',enemyBounds,index)
+validateTags(out..'/CaptureDummy.aseprite',enemyBounds,index)
 if app.params['part']=='enemy' then return end
-local b=Sprite(384,216,ColorMode.RGB);b.layers[1].name='Far architecture';local im=Image(384,216,ColorMode.RGB)
-rect(im,0,0,384,216,rgba(18,28,43,255))
-for y=0,155 do rect(im,0,y,384,1,rgba(15+math.floor(y/18),24+math.floor(y/13),39+math.floor(y/10),255)) end
-for x=0,383,32 do line(im,x,25,x,150,1,rgba(34,51,66,255)) end
-for y=30,150,24 do line(im,0,y,383,y,1,rgba(31,48,62,255)) end
-ring(im,196,61,38,2,rgba(44,69,82,255));ring(im,196,61,31,1,rgba(50,76,88,255));ring(im,196,61,24,1,rgba(47,70,83,255))
-for i=0,11 do local a=i*math.pi/6;line(im,196+math.cos(a)*27,61+math.sin(a)*27,196+math.cos(a)*36,61+math.sin(a)*36,1,rgba(75,93,95,255)) end
-poly(im,{{196,24},{205,60},{196,97},{187,60}},rgba(28,43,58,255))
-for _,x in ipairs({18,83,291,352}) do
-  rect(im,x,12,14,142,rgba(26,39,53,255));rect(im,x,12,3,142,rgba(48,66,78,255));rect(im,x+9,13,2,139,rgba(15,25,38,255))
-  rect(im,x-4,11,22,5,rgba(54,71,82,255));rect(im,x-5,150,24,6,rgba(56,72,82,255))
-  for y=29,136,19 do rect(im,x+2,y,10,2,rgba(77,84,80,255)) end
-  rect(im,x+4,68,3,15,rgba(57,132,149,255));rect(im,x+5,70,1,10,rgba(129,199,204,255))
-end
-rect(im,0,156,384,60,rgba(31,40,51,255));rect(im,0,156,384,2,rgba(118,127,132,255));rect(im,0,158,384,2,rgba(58,72,82,255))
-for y=167,215,13 do line(im,0,y,383,y,1,rgba(18,27,39,255)) end
-for x=0,383,26 do line(im,x,161,x-18,215,1,rgba(20,29,40,255)) end
-for i=1,43 do local x=(i*97)%384;local y=160+(i*13)%54;rect(im,x,y,3+(i%6),1,rgba(58,69,77,255)) end
-line(im,265,158,251,179,1,rgba(9,18,30,255));line(im,251,179,261,193,1,rgba(9,18,30,255))
-b:newCel(b.layers[1],1,im,Point(0,0));b:saveAs(out .. '/CaptureRuins.aseprite');im:saveAs(out .. '/CaptureRuins.png');b:close()
+local b=Sprite(384,216,ColorMode.RGB);b.layers[1].name='White training grid';local im=Image(384,216,ColorMode.RGB)
+rect(im,0,0,384,216,rgba(250,251,253,255))
+rect(im,0,157,384,59,rgba(245,247,250,255))
+for x=0,383,16 do line(im,x,0,x,215,1,rgba(226,232,239,255)) end
+for y=12,215,16 do line(im,0,y,383,y,1,rgba(226,232,239,255)) end
+for x=0,383,64 do line(im,x,0,x,215,1,rgba(206,216,228,255)) end
+for y=28,215,64 do line(im,0,y,383,y,1,rgba(206,216,228,255)) end
+line(im,0,156,383,156,2,rgba(128,148,172,255))
+b:newCel(b.layers[1],1,im,Point(0,0));b:saveAs(out .. '/CaptureTrainingGrid.aseprite');im:saveAs(out .. '/CaptureTrainingGrid.png');b:close()
 local fx=Sprite(128,128,ColorMode.RGB);fx.layers[1].name='Pixel effect';index=0;local fxBounds={}
 local fxTimes={Slash={1,1,1,1,2,2,2,2},Parry={2,1,1,1,1,2,2,2},Kick={1,1,2,3,3,3,3,3},Vanish={3,3,3,3,3,3,3,3}}
 for _,kind in ipairs({'Slash','Parry','Kick','Vanish'}) do local first=index+1;local sheet=Image(128*8,128,ColorMode.RGB)
   for f=1,8 do index=index+1;if index>1 then fx:newEmptyFrame(index) end;fx.frames[index].duration=math.floor(fxTimes[kind][f]/60*1000+.5)/1000
-    local img=Image(128,128,ColorMode.RGB);local alpha=math.floor(255*(1-(f-1)/8));local gold=rgba(255,193,93,alpha);local white=rgba(255,246,213,alpha);local teal=rgba(107,203,212,alpha)
+    local img=Image(128,128,ColorMode.RGB);local alpha=math.floor(255*(1-(f-1)/8));local gold=rgba(210,126,35,alpha);local white=rgba(255,246,213,alpha);local teal=rgba(38,148,177,alpha)
     if kind=='Slash' then
       for i=0,80 do local a=(-1.15+i/80*2.0);local r=16+f*2;local x=52+math.cos(a)*r;local y=64+math.sin(a)*r*.85
         if i<80-f*5 then rect(img,math.floor(x),math.floor(y),2,2,i>48 and white or teal) end
@@ -153,6 +124,14 @@ for _,kind in ipairs({'Slash','Parry','Kick','Vanish'}) do local first=index+1;l
         poly(img,{{x,y-2},{x+2,y},{x,y+2},{x-2,y}},k%3==0 and teal or gold)
       end
     end
+    -- Keep white highlights readable against the white training grid.
+    local edged=Image(128,128,ColorMode.RGB)
+    for y=0,127 do for x=0,127 do local c=img:getPixel(x,y)
+      if app.pixelColor.rgbaA(c)>0 then
+        for _,d in ipairs({{-1,0},{1,0},{0,-1},{0,1}}) do px(edged,x+d[1],y+d[2],rgba(64,73,91,math.floor(app.pixelColor.rgbaA(c)*.8))) end
+      end
+    end end
+    edged:drawImage(img,Point(0,0));img=edged
     fx:newCel(fx.layers[1],index,img,Point(0,0));img:saveAs(out .. '/Fx_' .. kind .. '_' .. string.format('%02d',f) .. '.png');sheet:drawImage(img,Point((f-1)*128,0))
   end
   local tag=fx:newTag(first,index);tag.name=kind;sheet:saveAs(out .. '/Fx_' .. kind .. '.png')

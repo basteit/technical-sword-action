@@ -48,6 +48,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         attack.HitConfirmed+=OnSlash;parry.Succeeded+=OnParry;
         frontEnemy.Died+=OnDeath;rearEnemy.Died+=OnDeath;counter.HitConfirmed+=OnKick;counter.Finished+=OnCounterFinished;
         counter.ChargeStarted+=OnCharge;counter.ChargeReleased+=OnRelease;counter.Landed+=OnLanding;
+        counter.Started+=OnCounterStarted;
         if(recovery!=null) { recovery.Started+=OnRecoveryStarted;recovery.Ended+=OnRecoveryEnded; }
         ResetTake(comboStages);
     }
@@ -56,23 +57,24 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     private void OnSlash(Damageable2D target,int step,Vector2 point)
     {
         int direction=player.GetComponent<PlayerMotor2D>().FacingSign;
-        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyHitback(new[]{.08f,.14f,.24f,.4f}[step-1],6+step,Vector2.right*direction);
-        MarkEvent("Slash"+step,target);vfx.Emit("Slash",point,new[]{.5f,.6f,.72f,.9f}[step-1],direction);
+        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyHitback(new[]{.10f,.18f,.30f,.58f}[step-1],6+step,Vector2.right*direction);
+        MarkEvent("Slash"+step,target);vfx.Emit("Slash",point,new[]{.65f,.8f,1f,1.25f}[step-1],direction);
         var directionVector=step==1?new Vector2(direction*.2f,-1):new Vector2(direction,step==3?-.3f:.15f);
         presentation.ShakeDirectional(new[]{.09f,.10f,.11f,.14f}[step-1],new[]{.04f,.055f,.075f,.11f}[step-1],directionVector,2.5f);
     }
     private void OnParry(Damageable2D target,ParryResult result)
     {
         successTick=CombatTimeController.TickCount;MarkEvent("Parry",target);
-        if(target!=null) vfx.Emit("Parry",Vector2.Lerp(player.transform.position,target.transform.position,.45f)+Vector2.up*.12f,1.05f,player.GetComponent<PlayerMotor2D>().FacingSign);
+        if(target!=null) vfx.Emit("Parry",Vector2.Lerp(player.transform.position,target.transform.position,.45f)+Vector2.up*.12f,1.25f,player.GetComponent<PlayerMotor2D>().FacingSign);
         presentation.ShakeDirectional(.12f,.095f,new Vector2(player.GetComponent<PlayerMotor2D>().FacingSign,.6f),3.5f);
     }
     private void OnKick(Damageable2D target,Vector2 point)
     {
-        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyHitback(.65f,10,Vector2.right*player.GetComponent<PlayerMotor2D>().FacingSign);
+        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyLaunch(2.25f,1.05f,20,Vector2.right*player.GetComponent<PlayerMotor2D>().FacingSign);
         MarkEvent("Kick",target);
     }
     private void OnCharge()=>MarkEvent("ChargeStart",counter.SelectedTarget);
+    private void OnCounterStarted()=>MarkEvent("CounterStart",counter.SelectedTarget);
     private void OnRelease()=>MarkEvent("ChargeRelease",counter.SelectedTarget);
     private void OnLanding()=>MarkEvent("Landing",counter.SelectedTarget);
     private void OnRecoveryStarted(string name) { if(Running) MarkEvent("RecoveryStart:"+name,null); }
@@ -123,7 +125,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     {
         if(!Running) return;
         long tick=CombatTimeController.TickCount;
-        if(counter.IsActive && counter.ElapsedFrames>0 && counter.ElapsedFrames<18 && counter.ElapsedFrames%3==0)
+        if(counter.IsActive && !counter.UsesBlinkApproach && counter.ElapsedFrames>0 && counter.ElapsedFrames<counter.ChargeFrame && counter.ElapsedFrames%3==0)
             vfx.EmitAfterimage(player.GetComponent<SpriteRenderer>(),player.GetComponent<PlayerMotor2D>().FacingSign);
         if(counter.IsActive&&counter.ElapsedFrames>=counter.ChargeReleaseFrame&&counter.ElapsedFrames<=counter.HitFrame&&counter.ElapsedFrames%2==0)
             vfx.EmitEyeTrail(player.GetComponent<SpriteRenderer>(),player.GetComponent<PlayerMotor2D>().FacingSign);
@@ -143,12 +145,14 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     {
         if(clock==null) clock=FindFirstObjectByType<CombatTimeController>();
         if(!clock.ManualAdvanceOnly) throw new InvalidOperationException("Capture requires manual clock advancement.");
-        RealElapsed+=realSeconds;clock.AdvanceFrame(realSeconds);AdvanceVisuals((float)realSeconds);
+        if(!CombatTimeController.IsPaused) RealElapsed+=realSeconds;
+        clock.AdvanceFrame(realSeconds);AdvanceVisuals((float)realSeconds);
     }
     private void LateUpdate()
-    { if(clock!=null && !clock.ManualAdvanceOnly) { if(Running) RealElapsed+=Time.unscaledDeltaTime;AdvanceVisuals(Time.unscaledDeltaTime); } }
+    { if(clock!=null && !clock.ManualAdvanceOnly) { if(Running&&!CombatTimeController.IsPaused) RealElapsed+=Time.unscaledDeltaTime;AdvanceVisuals(Time.unscaledDeltaTime); } }
     private void AdvanceVisuals(float dt)
     {
+        if(CombatTimeController.IsPaused) return;
         vfx.AdvanceVisuals(dt);presentation.AdvanceVisuals(dt);
         if(Running && deathReal>=0 && RealElapsed-deathReal>=.85d && !counter.IsActive && (recovery==null||!recovery.IsPlaying))
         { Running=false;Completed=true;player.GetComponent<PlayerInputRouter>().enabled=true;player.ClearBufferedGameplayInput(); }
@@ -158,7 +162,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         Running=false;CombatTimeController.Unregister(this);
         if(attack!=null) attack.HitConfirmed-=OnSlash;if(parry!=null) parry.Succeeded-=OnParry;
         if(frontEnemy!=null) frontEnemy.Died-=OnDeath;if(rearEnemy!=null) rearEnemy.Died-=OnDeath;
-        if(counter!=null) { counter.HitConfirmed-=OnKick;counter.Finished-=OnCounterFinished;counter.ChargeStarted-=OnCharge;counter.ChargeReleased-=OnRelease;counter.Landed-=OnLanding; }
+        if(counter!=null) { counter.HitConfirmed-=OnKick;counter.Finished-=OnCounterFinished;counter.Started-=OnCounterStarted;counter.ChargeStarted-=OnCharge;counter.ChargeReleased-=OnRelease;counter.Landed-=OnLanding; }
         if(recovery!=null) { recovery.Started-=OnRecoveryStarted;recovery.Ended-=OnRecoveryEnded; }
     }
 }

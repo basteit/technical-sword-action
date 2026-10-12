@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a7f3d6762793c584195b04bfcb53e992
+guid: 8af4ceaa040a21d4094f51706068b96e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -9169471958085028774
-    second: CaptureRuins_0
+      213: -2414837325451676550
+    second: CaptureTrainingGrid_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: CaptureRuins_0
+      name: CaptureTrainingGrid_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a54bf6806dd7fb080800000000000000
-      internalID: -9169471958085028774
+      spriteID: a7439123f36cc7ed0800000000000000
+      internalID: -2414837325451676550
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      CaptureRuins_0: -9169471958085028774
+      CaptureTrainingGrid_0: -2414837325451676550
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
