@@ -33,7 +33,11 @@ local function enemy(im,n,state)
   if state=='Windup' then hx=30-math.floor(n/3);hy=17;hand={39,23-math.floor(n/2)};tip={43-n,3};core=n<5 and E.amber or E.red end
   if state=='Attack' then hx=36;hy=19;hipx=34;hand={46,28+n};tip={60,19+n*6};core=E.red end
   if state=='Hit' then hx=27;hy=20;hipx=30;hand={39,37};tip={50,50} end
-  if state=='Parried' then local recoil=({3,10,8,6})[n];hx=32-recoil;hy=20;hipx=30;hand={40-recoil,24};tip={47-recoil,7};core=E.blue end
+  if state=='Parried' then
+    -- The weapon separates upward immediately; the torso follows without moving the feet.
+    hx=({26,21,22,24})[n];hy=({18,20,20,20})[n];hipx=30
+    hand=({{44,27},{39,20},{36,21},{35,23}})[n];tip=({{63,18},{42,1},{35,1},{33,3}})[n];core=E.blue
+  end
   if state=='Death' then
     local spread=(n-1)*2
     disk(im,30-spread,29+math.min(n,3),6,E.ink);disk(im,30-spread,29+math.min(n,3),4,E.body)
@@ -105,16 +109,23 @@ for _,kind in ipairs({'Slash','Parry','Kick','Vanish'}) do local first=index+1;l
       end
       line(img,58,65,70+f*2,62-f,1,white)
     elseif kind=='Parry' then
-      if f<=3 then
-        ring(img,64,64,5+f*5,1,gold)
-        line(img,32-f*2,89+f,94+f,37-f,3-f/2,white)
-        line(img,39-f,87,91,44-f,1,gold)
+      -- One blade-aligned peak; the fan flies upward toward the deflected weapon.
+      if f<=2 then
+        line(img,28-f*3,91+f,101+f*3,30-f*2,f==1 and 3 or 1,white)
+        line(img,31,94,100,37,1,gold)
+        if f==1 then
+          poly(img,{{64,56},{66,62},{72,64},{66,66},{64,72},{62,66},{56,64},{62,62}},white)
+          line(img,24,64,109,64,1,gold)
+        end
       end
-      for k=0,9 do local a=k*math.pi/5+.25;local r=9+f*4
-        local length=math.max(2,13-f)+(k%3)*2
+      for k=0,6 do
+        local a=-math.pi*.86+k*.105;local r=9+f*5
+        local length=math.max(2,12-f*2)+(k%3)*3
         line(img,64+math.cos(a)*r,64+math.sin(a)*r,64+math.cos(a)*(r+length),64+math.sin(a)*(r+length),k%3==0 and 2 or 1,k%2==0 and gold or white)
       end
-      if f==1 then poly(img,{{64,50},{67,61},{76,64},{67,67},{64,78},{61,67},{52,64},{61,61}},P.white) end
+      if f>=3 and f<=6 then
+        for k=0,2 do local x=64-(f*6+k*9);local y=64-(f*5+k*4);rect(img,x,y,2,2,gold) end
+      end
     elseif kind=='Kick' then
       -- A small contact spark and a hollow, expanding wave leave the foot visible.
       local radius=18+f*5

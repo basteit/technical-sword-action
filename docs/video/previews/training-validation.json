@@ -1,5 +1,5 @@
 {
-  "revision": "deeper-action-poses-six-pose-slow-downward-kick",
+  "revision": "stable-light-parry-contact-and-impact",
   "compile": {
     "errors": 0,
     "warnings": 0
@@ -7,15 +7,15 @@
   "editMode": {
     "passed": 181,
     "total": 181,
-    "completedAt": "2026-10-12T22:03:35.7738509Z",
+    "completedAt": "2026-10-13T03:12:49.1710808Z",
     "rerunThisArtRevision": true
   },
   "playMode": {
-    "passed": 135,
-    "total": 135,
-    "completedAt": "2026-10-12T22:02:44.0346201Z"
+    "passed": 141,
+    "total": 141,
+    "completedAt": "2026-10-13T03:10:32.3046450Z"
   },
-  "newPlayCases": 4,
+  "newPlayCases": 6,
   "resetRuns": 40,
   "authoring": {
     "frames": 119,
@@ -30,7 +30,11 @@
     "actionPixelsRedrawn": true,
     "referencePixelsOnlyInHiddenReference": true,
     "roughNeutralMatchesRecovery": true,
-    "cleanExporterRerunThisRevision": true
+    "cleanExporterRerunThisRevision": true,
+    "partialExporterTags": 2,
+    "partialExporterFrames": 12,
+    "partialEmptyTagRejected": true,
+    "partialUnknownTagRejected": true
   },
   "sourceHashes": {
     "idle": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
@@ -54,7 +58,7 @@
     ],
     "roundhouse": "19 poses: six slow inverted scissor poses, four fast downward release poses, contact, follow-through and low hand-plant landing.",
     "sword": "Deep head/shoulder pitch, low hips and wider planted stance; low combo connections; exact contact poses held during hitstop.",
-    "parry": "Planted feet, strongly lowered and rearward head/shoulders, then upward leg-driven deflection.",
+    "parry": "Stable feet/hips, immediate blade contact, a short outward/upward beat, restrained torso recoil. Weapon separation and directed sparks start at contact.",
     "kickVfx": "Hollow expanding ring, small contact spark; two short body afterimages at release."
   },
   "floor": {
@@ -121,5 +125,27 @@
     "HorizontalSlash_04",
     "RapidSheathe_05",
     "IaiSlash_03"
-  ]
+  ],
+  "lightParry": {
+    "weight": "Light",
+    "normalHitstopFrames": 2,
+    "justHitstopFrames": 3,
+    "contactCanvasPixels": [
+      51,
+      18
+    ],
+    "effectScale": 1.1,
+    "immediateSuccessPose": 3,
+    "cameraStrength": 0.135,
+    "cameraSeconds": 0.11666666666666667,
+    "cameraCycles": 1.25,
+    "darkFlashAt60fps": [
+      0.12,
+      0.06,
+      0
+    ],
+    "mirroredAndRenderRatesTested": true,
+    "pauseAndResetTested": true,
+    "heavyParryArtworkImplemented": false
+  }
 }

@@ -16,6 +16,7 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     private string driven="";
     private PlayerState lastMotion=PlayerState.Idle;
     private PlayerActionState lastAction = (PlayerActionState)(-1);
+    private long parryStartTick;
     public bool IsRecovering=>recovery!=null&&recovery.IsPlaying;
     public int CombatTickOrder => 310;
     private void OnEnable()
@@ -28,7 +29,14 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     }
     private void OnStep(int step) { lastStep=step;driven="Attack_"+step; }
     private void OnParried(Damageable2D source, ParryResult result)
-    { recovery?.Cancel();Play("ParrySuccess");lastAction=PlayerActionState.ParrySuccess; }
+    {
+        recovery?.Cancel();parryStartTick=CombatTimeController.TickCount;
+        Play("ParrySuccess");lastAction=PlayerActionState.ParrySuccess;
+        // The collision can occur after Animator.Update in this tick.
+        // Freeze the actual blade contact immediately when hitstop begins.
+        var motion=library!=null?library.Find("ParryDeflect"):null;
+        if(visual!=null&&motion!=null) visual.sprite=motion.frames[2];
+    }
     public void ResetVisual()
     { recovery?.Cancel();lastAction=PlayerActionState.Neutral;lastMotion=PlayerState.Idle;lastStep=1;driven="";animator.Rebind();Play("Idle");animator.Update(0); }
     public void CombatTick()
@@ -70,6 +78,13 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
         // Counter timers run after Animator.Update. Sample the same integer frame
         // after its events, so slow entry and hitstop never hold the previous pose.
         if(visual==null||library==null) return;
+        if(state.ActionState==PlayerActionState.ParrySuccess)
+        {
+            var motion=library.Find("ParryDeflect");
+            if(motion!=null)
+                visual.sprite=motion.At(motion.durations[0]+motion.durations[1]+(int)(CombatTimeController.TickCount-parryStartTick));
+            return;
+        }
         if(counter!=null&&counter.IsActive&&counter.IsAirborneKick)
         {
             var motion=library.Find("AirRoundhouse");

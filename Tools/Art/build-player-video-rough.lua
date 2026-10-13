@@ -214,10 +214,13 @@ actions[4].poses[5]={hx=45,hy=33,neck={39,39},hip={29,45},angle=25,view='side',h
 actions[4].poses[6]={hx=43,hy=30,neck={38,37},hip={31,44},angle=20,hand={45,40},tip={60,48},tail={12,27},left={{22,50},{15,56}},right={{47,48},{52,56}}}
 actions[4].poses[7]={hx=41,hy=28,neck={36,36},hip={31,43},angle=16,hand={34,42},tip={19,55},lhand={26,43},tail={15,32},left={{23,49},{17,56}},right={{45,48},{49,56}}}
 actions[4].poses[8]={hx=38,hy=26,neck={35,34},hip={32,43},angle=10,hand={29,41},lhand={26,42},tail={17,36},left={{24,49},{18,56}},right={{44,48},{48,56}}}
-actions[5].poses[3]={hx=23,hy=29,neck={28,37},hip={34,46},angle=-30,view='side',hand={34,37},elbow={29,41},lhand={30,40},tip={44,12},tail={6,26},hem={20,48},left={{18,51},{15,56}},right={{43,50},{52,56}}}
-actions[5].poses[4]={hx=20,hy=32,neck={26,39},hip={33,47},angle=-34,view='side',hand={31,39},elbow={26,42},lhand={28,42},tip={40,14},tail={5,23},hem={19,49},left={{17,52},{15,56}},right={{43,51},{52,56}}}
-actions[5].poses[5]={hx=38,hy=19,neck={35,29},hip={31,42},angle=15,view='side',hand={48,20},elbow={43,28},lhand={42,26},tip={60,3},tail={10,34},hem={14,45},left={{23,49},{15,56}},right={{44,48},{51,56}},arc={{34,49},{47,35},{58,14}}}
-actions[5].poses[6]={hx=39,hy=21,neck={35,30},hip={32,42},angle=12,hand={49,26},elbow={43,31},lhand={40,32},tip={61,10},tail={12,40},left={{24,49},{17,56}},right={{45,48},{50,56}}}
+-- Light parry: stable base, a short outward/upward blade beat, then restrained recoil.
+actions[5].poses[1]={hx=32,hy=20,neck={32,30},hip={32,42},view='side',hand={42,33},elbow={39,31},lhand={37,35},tip={49,11},tail={18,41},left={{24,49},{17,56}},right={{44,48},{51,56}}}
+actions[5].poses[2]={hx=31,hy=21,neck={31,31},hip={32,43},angle=-5,view='side',hand={43,34},elbow={39,32},lhand={38,36},tip={50,12},tail={17,42},left={{24,50},{17,56}},right={{44,49},{51,56}}}
+actions[5].poses[3]={hx=33,hy=21,neck={32,31},hip={32,43},angle=5,view='side',hand={48,32},elbow={41,31},lhand={43,35},tip={53,7},tail={16,41},hem={19,49},left={{23,50},{17,56}},right={{45,48},{51,56}},arc={{45,36},{51,26},{54,14}}}
+actions[5].poses[4]={hx=34,hy=20,neck={32,30},hip={32,42},angle=8,view='side',hand={49,24},elbow={41,29},lhand={44,29},tip={62,4},tail={14,42},hem={18,48},left={{24,49},{17,56}},right={{45,48},{51,56}},arc={{50,29},{56,17},{61,6}}}
+actions[5].poses[5]={hx=33,hy=20,neck={32,30},hip={32,42},angle=5,view='side',hand={47,24},elbow={40,29},lhand={42,29},tip={60,3},tail={15,43},hem={19,49},left={{24,49},{17,56}},right={{44,48},{51,56}}}
+actions[5].poses[6]={hx=32,hy=20,neck={32,30},hip={32,42},view='side',hand={43,31},elbow={39,30},lhand={38,34},tip={53,9},tail={17,42},left={{24,49},{17,56}},right={{44,48},{51,56}}}
 local recoveries={
  {name='Recovery_VerticalSlash',frames={4,4,4,4},hit=0,poses={
   actions[1].poses[8],{hx=37,hy=23,hip={32,42},angle=8,hand={40,40},tip={49,56},left={{25,49},{21,56}},right={{41,49},{45,56}}}, {settle=1,lean=0},{idle=true}}},

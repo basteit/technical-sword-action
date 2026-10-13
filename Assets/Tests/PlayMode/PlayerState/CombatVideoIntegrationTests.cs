@@ -101,6 +101,36 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             Assert.That(checkedHits,Is.EqualTo(4));
         }
+        [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
+        [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
+        public void LightParryFreezesTheBladeContactAndItsShortImpactThenResets(int fps,bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
+            var parry=state.GetComponent(Type.GetType("PlayerParry2D, Assembly-CSharp",true));
+            for(int i=0;i<fps*5&&Get<int>(parry,"SuccessCount")==0;i++) Call(director,"StepCapture",1d/fps);
+            Assert.That(Get<int>(parry,"SuccessCount"),Is.EqualTo(1));
+            var visual=state.GetComponent<SpriteRenderer>();
+            Assert.That(visual.sprite.name,Is.EqualTo("ParryDeflect_03"));
+            var effect=Find("VideoVfxRenderer").GetComponentsInChildren<SpriteRenderer>()
+                .First(r=>r.sprite!=null&&r.sprite.name=="Fx_Parry_01");
+            int facing=mirrored?1:-1;
+            Vector3 contact=state.transform.position+new Vector3(facing*19/32f,8/32f,0);
+            Assert.That(Vector3.Distance(effect.transform.position,contact),Is.LessThan(.001f));
+            var flash=GameObject.Find("VideoImpactFlash").GetComponent<SpriteRenderer>();
+            Assert.That(flash.color.r+flash.color.g+flash.color.b,Is.Zero);
+            Assert.That(Get<float>(presentation,"FlashAlpha"),Is.GreaterThan(0));
+            var position=Camera.main.transform.position;float alpha=Get<float>(presentation,"FlashAlpha");
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
+            for(int i=0;i<fps;i++) Call(director,"StepCapture",1d/fps);
+            Assert.That(visual.sprite.name,Is.EqualTo("ParryDeflect_03"));
+            Assert.That(Camera.main.transform.position,Is.EqualTo(position));
+            Assert.That(Get<float>(presentation,"FlashAlpha"),Is.EqualTo(alpha));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
+            Call(director,"ResetTake",4);
+            Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero);
+            Assert.That(Get<int>(presentation,"ActiveShakeCount"),Is.Zero);
+            Assert.That(Get<int>(Find("VideoVfxRenderer"),"ActiveCount"),Is.Zero);
+        }
         [TestCase(false)] [TestCase(true)]
         public void DownwardKickImpactUsesTheDrawnFootInsideTheSelectedTarget(bool mirrored)
         {
@@ -659,6 +689,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(counter,"HitCount"),Is.GreaterThan(before));
             Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.GreaterThan(.12f));
             Assert.That(Get<float>(presentation,"FlashAlpha"),Is.GreaterThan(0));
+            Assert.That(GameObject.Find("VideoImpactFlash").GetComponent<SpriteRenderer>().color.r,Is.EqualTo(1),"Kick must clear the parry's dark flash tint.");
             var position=Camera.main.transform.position;float flash=Get<float>(presentation,"FlashAlpha");
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});for(int i=0;i<60;i++) Step();
             Assert.That(Camera.main.transform.position,Is.EqualTo(position));Assert.That(Get<float>(presentation,"FlashAlpha"),Is.EqualTo(flash));

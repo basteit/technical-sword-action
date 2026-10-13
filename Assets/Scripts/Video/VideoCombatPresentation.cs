@@ -25,6 +25,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     private readonly List<Impulse> impulses=new();
     private Vector2 shakeOffset;
     private float flashRemaining,flashStrength,flashDuration;
+    private Color flashTint=Color.white;
     private SpriteRenderer flashRenderer;
     private float dimAlpha,dimBlend;
     private SpriteRenderer dimRenderer;
@@ -89,7 +90,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         charged=false;CombatTimeController.ReleaseSlow(counter);
         CombatTimeController.RequestHitstop(counter,8*CombatTimeController.StepSeconds);
         ShakeDirectional(.25f,.24f,new Vector2(counter.GetComponent<PlayerMotor2D>().FacingSign*.35f,-1),2.75f);
-        flashRemaining=flashDuration=3/60f;flashStrength=.12f;
+        flashRemaining=flashDuration=3/60f;flashStrength=.12f;flashTint=Color.white;
         vfx.Emit("Kick",foot,1.55f,1);
     }
     private void OnLanding()=>ShakeDirectional(.11f,.065f,Vector2.down,1.5f);
@@ -98,6 +99,12 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     private void OnMiss() { charged=false;CombatTimeController.ReleaseSlow(counter); }
     public void Shake(float realSeconds,float strength)
     { ShakeDirectional(realSeconds,strength,new Vector2(1,.35f),3); }
+    public void PresentLightParry(int facing)
+    {
+        // A single beat and return carries the impact, while the hero keeps a stable base.
+        ShakeDirectional(7/60f,.135f,new Vector2(-facing,-.3f),1.25f);
+        flashRemaining=flashDuration=3/60f;flashStrength=.18f;flashTint=Color.black;
+    }
     public void ShakeDirectional(float realSeconds,float strength,Vector2 direction,float cycles=3)
     {
         if(realSeconds<=0||strength<=0) return;
@@ -125,7 +132,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         dimAlpha=dimBlend*slowDimStrength;
         UpdateDimmer();
         flashRemaining=Mathf.Max(0,flashRemaining-realSeconds);
-        if(flashRenderer!=null) { flashRenderer.color=new Color(1,1,1,flashStrength*flashRemaining/Mathf.Max(.001f,flashDuration));flashRenderer.enabled=flashRemaining>0; }
+        if(flashRenderer!=null) { flashRenderer.color=new Color(flashTint.r,flashTint.g,flashTint.b,flashStrength*flashRemaining/Mathf.Max(.001f,flashDuration));flashRenderer.enabled=flashRemaining>0; }
         UpdateSpotlight();
         if(transitShadow!=null&&transitShadow.enabled&&counter!=null)
             transitShadow.transform.localPosition=new Vector3(0,shadowGroundY-counter.transform.position.y,0);
@@ -193,6 +200,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         RestorePlayerBody();
         charged=false;zoom=ChargeRealElapsed=dimAlpha=dimBlend=eyeTrailTimer=flashRemaining=flashStrength=flashDuration=0;
+        flashTint=Color.white;
         impulses.Clear();shakeOffset=Vector2.zero;if(flashRenderer!=null) flashRenderer.enabled=false;
         if(captureCamera!=null) { captureCamera.transform.position=restPosition;captureCamera.orthographicSize=normalSize; }
         UpdateDimmer();

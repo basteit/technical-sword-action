@@ -9,6 +9,16 @@ for _,l in ipairs(s.layers) do
 end
 local specs={{'VerticalSlash',10,22,0,true},{'HorizontalSlash',9,20,0,true},{'RapidSheathe',11,32,0,false},{'IaiSlash',7,22,0,false},{'ParryDeflect',6,0,0,true},{'AirRoundhouse',28,36,18,true},
  {'Recovery_VerticalSlash',0,0,0,true},{'Recovery_HorizontalSlash',0,0,0,true},{'Recovery_RapidSheathe',0,0,0,false},{'Recovery_IaiSlash',0,0,0,false},{'Recovery_ParryDeflect',0,0,0,true},{'Recovery_AirRoundhouse',0,0,0,true},{'Recovery_Move',0,0,0,false},{'Recovery_Landing',0,0,0,false}}
+-- Incremental handoff: list every currently completed tag. Unlisted actions stay rough in Unity.
+if app.params['only'] then
+  local requested={};for name in app.params['only']:gmatch('[^,]+') do requested[name:match('^%s*(.-)%s*$')]=true end
+  local filtered={}
+  for _,a in ipairs(specs) do if requested[a[1]] then
+    requested[a[1]]=nil;a[5]=true;filtered[#filtered+1]=a
+  end end
+  for name in pairs(requested) do error('Unknown cleanup Action tag: '..name) end
+  assert(#filtered>0,'No cleanup Action tags requested');specs=filtered
+end
 local manifest={};local eyeManifest={}
 local function eyesFor(im,frame)
   local mask=Image(64,64,ColorMode.RGB);local count=0

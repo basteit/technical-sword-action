@@ -149,9 +149,9 @@ MonoBehaviour:
     eyeFrames:
     - {fileID: 21300000, guid: c78436c9565ede646830e5e04b912a5d, type: 3}
     - {fileID: 21300000, guid: 26af05c511806404ba0a34822c6f8f3b, type: 3}
-    - {fileID: 21300000, guid: 32d3283ec4a68f9488a2c7422fc4fb5f, type: 3}
+    - {fileID: 0}
     - {fileID: 21300000, guid: 93e7abbb022cb394e8146fc57da8c244, type: 3}
-    - {fileID: 21300000, guid: 236e85e421a93a84c8dd6ca9be3aa0cf, type: 3}
+    - {fileID: 0}
     - {fileID: 21300000, guid: 9ba467103917e644081cab87c3c0fadc, type: 3}
     durations: 030000000300000002000000020000000400000005000000
     hitFrame: 6
