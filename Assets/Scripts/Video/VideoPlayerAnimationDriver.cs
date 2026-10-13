@@ -51,6 +51,7 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
             {
                 PlayerActionState.Attack=>new[]{"VerticalSlash","HorizontalSlash","RapidSheathe","IaiSlash"}[lastStep-1],
                 PlayerActionState.ParryCounter=>"AirRoundhouse",
+                PlayerActionState.Dash=>"Dash",
                 PlayerActionState.ParrySuccess or PlayerActionState.ParryFail or PlayerActionState.Parry=>"ParryDeflect",
                 _=>lastMotion==PlayerState.Move?"Move":lastMotion==PlayerState.Fall||lastMotion==PlayerState.Jump?"Landing":""
             };
@@ -67,6 +68,7 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
             PlayerActionState.ParrySuccess => "ParrySuccess",
             PlayerActionState.ParryFail=>"ParryFail",
             PlayerActionState.ParryCounter => "Counter",
+            PlayerActionState.Dash => "Dash",
             _=>motion==PlayerState.Move?"Move":motion==PlayerState.Jump?"Jump":motion==PlayerState.Fall?"Fall":"Idle"
         };
         Play(clip);lastAction=action;lastMotion=motion;

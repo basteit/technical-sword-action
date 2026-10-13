@@ -254,6 +254,18 @@ for i=1,8 do local a=(i-1)*math.pi/4;local stride=math.sin(a)*8
   move.poses[i]={hx=35,hy=15+math.abs(math.cos(a)),hip={33,40},angle=5,hand={40,37-stride*.25},lhand={26,37+stride*.25},tail={18-stride*.3,41},hem={23-stride*.3,53},left={{29-stride*.5,48},{30-stride,56-math.max(0,math.cos(a))*3}},right={{35+stride*.5,48},{35+stride,56-math.max(0,-math.cos(a))*3}}}
 end
 actions[#actions+1]=move
+local showcaseOnly=app.params['showcase-only']=='true'
+if showcaseOnly then
+  local dash={name='Dash',frames={2,3,3,4},hit=0,poses={
+    {hx=39,hy=31,neck={34,39},hip={30,46},angle=18,view='side',hand={43,48},elbow={43,40},lhand={27,46},tail={13,24},hem={16,43},left={{21,50},{15,56}},right={{43,48},{48,56}}},
+    {hx=44,hy=27,neck={37,34},hip={29,43},angle=24,view='side',hand={37,43},elbow={42,35},lhand={42,30},tip={16,53},tail={9,20},hem={13,42},left={{21,47},{11,54}},right={{45,47},{52,56}}},
+    {hx=45,hy=27,neck={38,34},hip={30,43},angle=22,view='side',hand={38,43},elbow={43,35},lhand={44,30},tip={16,54},tail={8,21},hem={12,41},left={{22,48},{12,56}},right={{45,45},{51,52}}},
+    {hx=41,hy=26,neck={36,34},hip={31,43},angle=17,view='side',hand={40,42},elbow={43,35},lhand={41,31},tip={20,55},tail={11,25},hem={15,45},left={{24,48},{17,56}},right={{44,47},{51,56}}}
+  }}
+  actions={dash,{name='Recovery_Dash',frames={3,4,4},hit=0,poses={
+    dash.poses[4],{hx=37,hy=22,neck={34,32},hip={32,42},angle=8,hand={40,40},tip={29,56},left={{25,49},{21,56}},right={{41,48},{46,56}}},{idle=true}
+  }}}
+end
 local s=Sprite(64,64,ColorMode.RGB)
 local reference=s.layers[1];reference.name='Reference - original idle and walk (toggle)';reference.isVisible=false;reference.isEditable=false
 local guides=s:newLayer();guides.name='Guides - ground COM trajectory (toggle)';guides.isVisible=false;guides.opacity=96;guides.isEditable=false
@@ -280,7 +292,7 @@ local function frame(duration)
   index=index+1;if index>1 then s:newEmptyFrame(index) end
   s.frames[index].duration=duration
 end
-for _,r in ipairs({{sprite=idle,name='IdleReference'},{sprite=walk,name='WalkReference'}}) do
+for _,r in ipairs(showcaseOnly and {} or {{sprite=idle,name='IdleReference'},{sprite=walk,name='WalkReference'}}) do
   local first=index+1;local sheet=Image(#r.sprite.frames*64,64,ColorMode.RGB)
   for i,f in ipairs(r.sprite.frames) do
     frame(f.duration);local im=Image(r.sprite.spec);im:drawSprite(r.sprite,i)
@@ -322,6 +334,7 @@ for _,a in ipairs(actions) do
     if a.landing and start>=a.landing then phase=start<40 and 'ukemi' or 'stand' end
     if a.name:find('Recovery_')==1 then phase='free-recovery';event='' end
     if a.name=='IdleRough' or a.name=='WalkRough' then phase='loop';event='' end
+    if a.name=='Dash' then phase='movement';event='' end
     csv[#csv+1]=string.format('%s,%d,%d,%d,%d,%d,%s,%s',a.name,i,index,n,math.floor(n/60*1000+.5),start,phase,event)
     mf[#mf+1]=string.format('{"frames":%d,"start":%d}',n,start);start=start+n
   end
@@ -333,9 +346,9 @@ end
 -- Aseprite extends a tag when a new frame is appended at its end. Restore all
 -- intended ranges only after creating the entire document.
 for _,b in ipairs(tagBounds) do b.tag.fromFrame=b.first;b.tag.toFrame=b.last end
-local file=out .. '/Player_actions_rough.aseprite';s:saveAs(file);s:close()
+local file=out .. (showcaseOnly and '/Player_mobility_rough.aseprite' or '/Player_actions_rough.aseprite');s:saveAs(file);s:close()
 local reopen=app.open(file)
-assert(#reopen.layers==8 and #reopen.tags==18 and #reopen.frames==index)
+assert(#reopen.layers==8 and #reopen.tags==(showcaseOnly and 2 or 18) and #reopen.frames==index)
 for _,b in ipairs(tagBounds) do
   local found=false
   for _,tag in ipairs(reopen.tags) do if tag.name==b.name then
@@ -347,4 +360,4 @@ reopen:close();idle:close();walk:close()
 local f=assert(io.open(out .. '/timing-manifest.json','w'));f:write('{"canvas":64,"ppu":32,"pivot":[32,38],"actions":[' .. table.concat(manifest,',') .. ']}');f:close()
 local c=assert(io.open(out .. '/timing.csv','w'));c:write(table.concat(csv,'\n'));c:close()
 local e=assert(io.open(out..'/eye-mask-manifest.json','w'));e:write('{"frames":['..table.concat(eyeManifest,',')..']}');e:close()
-local report=assert(io.open(out .. '/authoring-validation.json','w'));report:write(string.format('{"reopened":true,"tagRangesChecked":true,"layers":8,"tags":18,"frames":%d,"sourceFilesModified":false,"actionPixelsRedrawn":true,"referencePixelsOnlyInHiddenReference":true}',index));report:close()
+local report=assert(io.open(out .. '/authoring-validation.json','w'));report:write(string.format('{"reopened":true,"tagRangesChecked":true,"layers":8,"tags":%d,"frames":%d,"sourceFilesModified":false,"actionPixelsRedrawn":true,"referencePixelsOnlyInHiddenReference":true}',#tagBounds,index));report:close()

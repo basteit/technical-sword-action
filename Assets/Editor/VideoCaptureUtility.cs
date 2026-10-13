@@ -13,10 +13,13 @@ public static class VideoCaptureUtility
     [Serializable] private sealed class RunRecord { public int stages;public bool mirrored;public double duration;public int frontHits,rearHits;public float chargeSeconds; }
     [Serializable] private sealed class ValidationReport { public int runsPassed;public RunRecord[] runs; }
     private static void Check(bool condition,string message) { if(!condition) throw new InvalidOperationException(message); }
-    public static string ValidateResetRuns()
+    public static string ValidateResetRuns()=>ValidateRuns(false);
+    public static string ValidateDefenseCancelResetRuns()=>ValidateRuns(true);
+    private static string ValidateRuns(bool defenseCancel)
     {
         Check(Application.isPlaying,"PlayMode required.");
         var director=UnityEngine.Object.FindFirstObjectByType<CombatVideoDirector>();
+        Check(director.DefenseCancelTake==defenseCancel,"Open the matching capture scene before validation.");
         var clock=UnityEngine.Object.FindFirstObjectByType<CombatTimeController>();
         var camera=Camera.main;var fx=UnityEngine.Object.FindFirstObjectByType<VideoVfxRenderer>();
         var presentation=UnityEngine.Object.FindFirstObjectByType<VideoCombatPresentation>();
@@ -32,9 +35,10 @@ public static class VideoCaptureUtility
                 for(int frame=0;frame<360&&!director.Completed;frame++) director.StepCapture(1d/60d);
                 Check(director.Completed,$"{stages} stages, mirror {mirrored}, run {run}: take did not finish. " + string.Join(",",director.Marks.Select(m=>m.kind+":"+m.target)));
                 Check(director.RealElapsed>=3&&director.RealElapsed<=6,"Duration outside 3–6 seconds.");
-                Check(director.FrontEnemy.HitCount==stages&&director.FrontEnemy.DeathCount==1,"Front enemy duplicate/missing hit or death.");
+                Check(director.FrontEnemy.HitCount==stages+(defenseCancel?1:0)&&director.FrontEnemy.DeathCount==1,"Front enemy duplicate/missing hit or death.");
                 Check(director.RearEnemy.HitCount==1&&director.RearEnemy.DeathCount==1&&counter.HitCount-before==1,"Counter did not hit exactly once.");
                 Check(director.Marks.Single(m=>m.kind=="Parry").target==director.Marks.Single(m=>m.kind=="Kick").target,"Counter target differs from parried source.");
+                if(defenseCancel) Check(director.AttackWasCancelledForParry&&director.ReturnDashObserved,"Attack cancel or return dash did not occur.");
                 Check(state.ActionState==PlayerActionState.Neutral&&!counter.IsCounterInvincible,"Player remained locked/invincible.");
                 Check(state.GetComponent<PlayerDamageReceiver2D>().CurrentHp==state.GetComponent<PlayerDamageReceiver2D>().MaxHp,"Unexpected player damage.");
                 Check(CombatTimeController.SlowOwnerCount==0&&CombatTimeController.HitstopOwnerCount==0&&Mathf.Approximately(Time.timeScale,1),"Time request remained.");
@@ -67,18 +71,21 @@ public static class VideoCaptureUtility
                     Check(enemy.GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0).shortNameHash==Animator.StringToHash("EnemyVideo_Idle"),"Enemy Animator not reset.");
                 }
                 Check(state.GetComponent<Rigidbody2D>().gravityScale==3,"Gravity not restored.");
-                Check(state.transform.position==new Vector3(0,1,0)&&Mathf.Approximately(director.FrontEnemy.transform.position.x,mirrored?-1.1f:1.1f)&&Mathf.Approximately(director.RearEnemy.transform.position.x,mirrored?.85f:-.85f),"Actor positions not reset.");
+                Check(state.transform.position==new Vector3(0,1,0)&&Mathf.Approximately(director.FrontEnemy.transform.position.x,mirrored?-1.1f:1.1f)&&Mathf.Approximately(director.RearEnemy.transform.position.x,mirrored?(defenseCancel?1.45f:.85f):(defenseCancel?-1.45f:-.85f)),"Actor positions not reset.");
             }
             return JsonUtility.ToJson(new ValidationReport{runsPassed=records.Count,runs=records.ToArray()},true);
         }
         finally { director.MirrorLayout=false;director.ResetTake(2);clock.ManualAdvanceOnly=previousManual; }
     }
 
-    public static string CapturePreview(int stages=2,bool hybrid=true)
+    public static string CapturePreview(int stages=2,bool hybrid=true)=>Capture(stages,hybrid,false);
+    public static string CaptureDefenseCancelPreview(int stages=2,bool hybrid=true)=>Capture(stages,hybrid,true);
+    private static string Capture(int stages,bool hybrid,bool defenseCancel)
     {
         Check(Application.isPlaying,"PlayMode required.");
         var director=UnityEngine.Object.FindFirstObjectByType<CombatVideoDirector>();var clock=UnityEngine.Object.FindFirstObjectByType<CombatTimeController>();
-        string folder=Path.GetFullPath($".uloop/outputs/video/{stages}stage-{(hybrid?"hybrid":"pixel")}");Directory.CreateDirectory(folder);
+        Check(director.DefenseCancelTake==defenseCancel,"Open the matching scene; original previews must be preserved.");
+        string folder=Path.GetFullPath($".uloop/outputs/video/{(defenseCancel?"defense-cancel-":"")}{stages}stage-{(hybrid?"hybrid":"pixel")}");Directory.CreateDirectory(folder);
         bool previous=clock.ManualAdvanceOnly;clock.ManualAdvanceOnly=true;
         director.MirrorLayout=false;director.StartTake(stages,hybrid);
         var target=new RenderTexture(1920,1080,24,RenderTextureFormat.ARGB32);target.Create();
@@ -96,7 +103,7 @@ public static class VideoCaptureUtility
             }
             Check(director.Completed,"Capture did not complete.");
             var art=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(CombatVideoArtBuilder.LibraryPath);
-            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,playerArtworkIsRough=stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough,events=director.Marks.ToArray()},true));
+            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,playerArtworkIsRough=defenseCancel||(stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough),takeKind=defenseCancel?"defense-cancel":"sequential",events=director.Marks.ToArray()},true));
             return folder;
         }
         finally
@@ -105,5 +112,5 @@ public static class VideoCaptureUtility
             director.ResetTake(stages);clock.ManualAdvanceOnly=previous;
         }
     }
-    [Serializable] private sealed class CaptureReport { public int frameCount,fps;public double duration;public bool playerArtworkIsRough;public CombatVideoDirector.Mark[] events; }
+    [Serializable] private sealed class CaptureReport { public int frameCount,fps;public double duration;public bool playerArtworkIsRough;public string takeKind;public CombatVideoDirector.Mark[] events; }
 }

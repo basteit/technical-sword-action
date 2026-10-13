@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public static class CombatVideoSceneBuilder
 {
     public const string ScenePath = "Assets/Scenes/CombatVideo.unity";
+    public const string DefenseCancelScenePath = "Assets/Scenes/CombatVideoDefenseCancel.unity";
     [MenuItem("Tools/Technical Sword Action/Video/Build Art and Capture Scene")]
     public static void BuildAll()
     {
@@ -21,6 +22,11 @@ public static class CombatVideoSceneBuilder
     }
     [MenuItem("Tools/Technical Sword Action/Video/Build Capture Scene")]
     public static void Build()
+    { BuildCaptureScene(ScenePath,false); }
+    [MenuItem("Tools/Technical Sword Action/Video/Build Defense Cancel Showcase Scene")]
+    public static void BuildDefenseCancel()
+    { BuildCaptureScene(DefenseCancelScenePath,true); }
+    private static void BuildCaptureScene(string scenePath,bool defenseCancel)
     {
         for (int i = 0; i < SceneManager.sceneCount; i++)
             if (SceneManager.GetSceneAt(i).isDirty)
@@ -62,6 +68,7 @@ public static class CombatVideoSceneBuilder
         animator.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(CombatVideoArtBuilder.ControllerPath);
         if(library!=null) render.sprite=library.Find("IdleReference").frames[0];
         var motor = actor.AddComponent<PlayerMotor2D>();
+        if(defenseCancel) Set(motor,"dashSpeed",6f);
         Set(motor, "groundCheck", feet.transform); Set(motor, "groundLayer", 1 << ground);
         Set(motor,"applyRecommendedPhysicsSettings",false);body.interpolation=RigidbodyInterpolation2D.None;
         var attack = actor.AddComponent<PlayerAttack2D>();
@@ -77,7 +84,8 @@ public static class CombatVideoSceneBuilder
         Set(counter,"blinkApproach",true);Set(counter,"blinkTravelFrames",2);
         actor.AddComponent<PlayerStateMachine>();actor.AddComponent<PlayerVisualRecovery2D>();Set(actor.AddComponent<VideoPlayerAnimationDriver>(),"library",library);
         var a = Enemy("Enemy_A", new Vector3(1.1f,1,0), enemy, playerLayer, actor.transform,library);
-        var b = Enemy("Enemy_B", new Vector3(-.85f,1,0), enemy, playerLayer, actor.transform,library);
+        var bPosition=new Vector3(defenseCancel?-1.45f:-.85f,1,0);
+        var b = Enemy("Enemy_B", bPosition, enemy, playerLayer, actor.transform,library);
         var fx=new GameObject("VideoEffects").AddComponent<VideoVfxRenderer>();Set(fx,"library",library);
         string materialPath="Assets/Settings/VideoPixelGlow.mat";var glow=AssetDatabase.LoadAssetAtPath<Material>(materialPath);
         if(glow==null) { glow=new Material(Shader.Find("TechnicalSwordAction/VideoPixelGlow"));AssetDatabase.CreateAsset(glow,materialPath); }
@@ -89,8 +97,10 @@ public static class CombatVideoSceneBuilder
         Set(director,"player", actor.GetComponent<PlayerStateMachine>());
         Set(director,"frontEnemy",a); Set(director,"rearEnemy",b);
         Set(director,"presentation",presentation);Set(director,"vfx",fx);
+        Set(director,"defenseCancelTake",defenseCancel);
+        if(defenseCancel) Set(director,"rearStart",bPosition);
         actor.SetActive(true);
-        EditorSceneManager.SaveScene(scene, ScenePath);
+        EditorSceneManager.SaveScene(scene, scenePath);
         AssetDatabase.SaveAssets();
     }
     private static Damageable2D Enemy(string name, Vector3 position, int layer, int playerLayer, Transform target,VideoArtLibrary library)
@@ -135,6 +145,8 @@ public static class CombatVideoSceneBuilder
     { var s = new SerializedObject(target); s.FindProperty(name).boolValue = value; s.ApplyModifiedPropertiesWithoutUndo(); }
     internal static void Set(Object target, string name, string value)
     { var s = new SerializedObject(target); s.FindProperty(name).stringValue = value; s.ApplyModifiedPropertiesWithoutUndo(); }
+    internal static void Set(Object target,string name,Vector3 value)
+    { var s=new SerializedObject(target);s.FindProperty(name).vector3Value=value;s.ApplyModifiedPropertiesWithoutUndo(); }
     private static void Visual(GameObject obj, Vector2 size, Color color)
     {
         var r = obj.GetComponent<SpriteRenderer>();

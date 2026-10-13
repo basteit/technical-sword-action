@@ -674,3 +674,37 @@ MonoBehaviour:
     releaseFrame: 0
     landingFrame: 0
     recoveryFrame: 0
+  - name: Dash
+    frames:
+    - {fileID: 21300000, guid: 301983a741ffbb54ca9ec9ec26e8d442, type: 3}
+    - {fileID: 21300000, guid: c38c5eedfffa5774db1de2e481ed08f7, type: 3}
+    - {fileID: 21300000, guid: 6664663025e7f134186074ec3b8b7be6, type: 3}
+    - {fileID: 21300000, guid: 089d01c9ec3c54b4f85dda1acf92093f, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 4c08092fa4ebece4189b3dfd3139e875, type: 3}
+    - {fileID: 21300000, guid: 80fb095c978389146bd767f37cb1bbb7, type: 3}
+    - {fileID: 21300000, guid: d8d60a4ff61c2e94dabc5650f50d5281, type: 3}
+    - {fileID: 21300000, guid: 09f4418f8c07b9c4693c96705166d38e, type: 3}
+    durations: 02000000030000000300000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_Dash
+    frames:
+    - {fileID: 21300000, guid: fde539e416c174b4685a743ce6c8c217, type: 3}
+    - {fileID: 21300000, guid: fca7db49a79282a489f5f66ec1133c36, type: 3}
+    - {fileID: 21300000, guid: 344a7e8ec83accf4596dfc29b405e5ea, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 14c742f8b25252d499aadf3b57e247cd, type: 3}
+    - {fileID: 21300000, guid: 1b15af8cc199711408ec27eca1cd3d89, type: 3}
+    - {fileID: 21300000, guid: 35b270af9dc2fb5449218909576901c9, type: 3}
+    durations: 030000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0

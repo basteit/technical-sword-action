@@ -1216,6 +1216,7 @@ MonoBehaviour:
   frontEnemy: {fileID: 550565035}
   rearEnemy: {fileID: 132085609}
   comboStages: 2
+  defenseCancelTake: 0
   presentation: {fileID: 2043710621}
   vfx: {fileID: 2028738715}
   playerStart: {x: 0, y: 1, z: 0}

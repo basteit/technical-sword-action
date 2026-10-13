@@ -22,6 +22,10 @@ public static class CombatVideoArtBuilder
     {
         Directory.CreateDirectory(Folder);AssetDatabase.Refresh();
         var manifest=JsonUtility.FromJson<Manifest>(File.ReadAllText("Assets/Art/Player/VideoRough/timing-manifest.json"));
+        const string showcaseFolder="Assets/Art/Player/VideoShowcase";
+        bool hasShowcase=File.Exists(showcaseFolder+"/timing-manifest.json");
+        if(hasShowcase)
+            manifest.actions=manifest.actions.Concat(JsonUtility.FromJson<Manifest>(File.ReadAllText(showcaseFolder+"/timing-manifest.json")).actions).ToArray();
         const string cleanFolder="Assets/Art/Player/VideoClean";
         bool hasClean=File.Exists(cleanFolder+"/timing-manifest.json");
         if(hasClean)
@@ -31,11 +35,12 @@ public static class CombatVideoArtBuilder
         }
         var motions=new List<VideoArtLibrary.Motion>();
         var paths=SelectCleanFrames("Assets/Art/Player/VideoRough").Concat(Directory.GetFiles("Assets/Art/Player/VideoRough","*Reference_??.png")).Concat(Directory.GetFiles("Assets/Art/Video","*.png"));
+        if(hasShowcase) paths=paths.Concat(SelectCleanFrames(showcaseFolder));
         if(hasClean) paths=paths.Concat(SelectCleanFrames(cleanFolder));
         var groups=paths.Select(p=>p.Replace('\\','/')).Where(p=>System.Text.RegularExpressions.Regex.IsMatch(p,@"_\d\d\.png$")).GroupBy(p=>Path.GetFileNameWithoutExtension(p)[..^3]);
         var frames=groups.SelectMany(g=>g.Any(p=>p.StartsWith(cleanFolder))?g.Where(p=>p.StartsWith(cleanFolder)):g).ToArray();
         var eyeCounts=new Dictionary<string,int>();
-        foreach(string folder in new[]{"Assets/Art/Player/VideoRough",cleanFolder})
+        foreach(string folder in new[]{"Assets/Art/Player/VideoRough",showcaseFolder,cleanFolder})
         {
             string file=folder+"/eye-mask-manifest.json";if(!File.Exists(file)) continue;
             foreach(var frame in JsonUtility.FromJson<EyeManifest>(File.ReadAllText(file)).frames)
@@ -100,6 +105,8 @@ public static class CombatVideoArtBuilder
         machine.AddState("PlayerVideo_ParrySuccess").motion=Clip("ParrySuccess",new VideoArtLibrary.Motion{name="Deflect",frames=parry.frames.Skip(2).ToArray(),durations=parry.durations.Skip(2).ToArray()},false);
         machine.AddState("PlayerVideo_Counter").motion=Clip("Counter",library.Find("AirRoundhouse"),false);
         machine.AddState("PlayerVideo_Move").motion=Clip("Move",moveMotion,true);
+        var dash=library.Find("Dash");
+        if(dash!=null) machine.AddState("PlayerVideo_Dash").motion=Clip("Dash",dash,false);
         machine.AddState("PlayerVideo_ParryFail").motion=Clip("ParryFail",new VideoArtLibrary.Motion{name="Miss",frames=new[]{parry.frames[0]},durations=new[]{18}},false);
         var kick=library.Find("AirRoundhouse");
         machine.AddState("PlayerVideo_Jump").motion=Clip("Jump",new VideoArtLibrary.Motion{name="Jump",frames=new[]{kick.frames[1]},durations=new[]{8}},false);

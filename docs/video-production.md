@@ -214,3 +214,13 @@ PlayModeで接地と画面下端までの床を確認し、2/4段×通常/反転
 - [1段目の全コマ説明](video/first-slash-authoring-guide.md)と[19日までのユーザー作業](video/user-tasks-to-oct19.md)を作成。縦斬り8＋復帰4枚から順次受領できるExporterの`only`を追加。検証専用文書で部分2タグ/12枚・通常14タグ/91枚、選んだタグの空コマ/未知タグを拒否することを確認。検証文書は人の清書として取り込んでいない。
 - 主人公Aseprite119コマ/18タグ/8レイヤー、瞳119枚、復帰末尾/ラフ待機一致、単色床、元idle/walkのSHA256を維持。人の必須清書60＋4段追加25枚は未受領。受領ごとの部分統合と、最終接触/VFX調整、再検証/最終録画が残る。#69/#70/#71/#72/#74/#76はOpen、#73/#75はClosedを維持。
 - Unity起動時の未保存BasicActionValidationは `.uloop/outputs/parry-reference/BasicActionValidation-editor-recovery.unity`へSaveAsCopyして保持し、元Sceneファイルを上書きせず撮影Sceneへ切り替えた。ユーザーの既存未コミット差分は別途そのまま保持。
+
+## 2026-10-14 追加の魅力紹介：攻撃キャンセルから反撃・再攻撃
+
+- 他の場面案として、攻撃途中のパリィ→背後蹴り→着地ダッシュ→元の敵への再攻撃、二連パリィ→連続反撃、回避で背後取り→居合を提案。最初の案を追加Sceneで試作し、4段/居合で締める版を推奨した。[構成と再現手順](video/additional-showcase-proposal.md)。
+- 新Sceneは`Assets/Scenes/CombatVideoDefenseCancel.unity`。防御受付のAttackからParryへの実キャンセル、同じ攻撃元への反撃、着地での無敵/ロック解放、新Dash入力、Dash終了後の通常コンボを使う。判定/HPを直接進行させず、通常のState/Animation Event/物理から成立させる。
+- 既存撮影Sceneは別設定のまま保持。追加Sceneの敵Bはx=-1.45、ダッシュ6unit/s、敵AのHP3/8、蹴り吹き飛び横1.75unitで画面へ収める。元の速度/位置/HP/横2.25unitは維持。録画APIはScene種類を検査し、元動画の出力先を保護する。
+- 追加ダッシュは別Asepriteの7コマ/2タグ/8レイヤー。Dash4コマ/12F＋自由復帰3コマ/11F、瞳7枚/保存再読込/タグ範囲を検証。既存119コマのラフや人の作画中ファイルへ追記しない。追加7枚の人の清書は#69や19日までの必須作業に加えない。
+- Unity compile/Console Error 0 / Warning 0。PlayMode158/158（2026-10-13 16:38:25 UTC）・EditMode181/181（16:40:19 UTC）Passed。追加17件は2/4段×30/60/120fps×両向き、40回反復、Dash中のPause/Reset、対象消失/Counter Disable/死亡時に自動再接近しないことを確認。既存Sceneの141件と40回反復も通った。最終PlayModeでは新Scene40回の再実行を別途記録。
+- 追加動画は2段で締める版225F/3.75秒、4段で締める版283F/4.716667秒。1080p60/無音、スロー/停止を含む全フレームをデコードした。[推奨4段](video/previews/combat-defense-cancel-4stage-rough-hybrid.mp4) / [比較2段](video/previews/combat-defense-cancel-2stage-rough-hybrid.mp4) / [検証](video/previews/defense-cancel-validation.json)。
+- 元の主人公ラフ、idle/walk、候補3動画は前commit20acf1aとバイト一致で保持。追加は魅力紹介のラフで、#69の当初動画の完成判定を置き換えない。人の清書未受領と正式完成までの残作業は維持。
