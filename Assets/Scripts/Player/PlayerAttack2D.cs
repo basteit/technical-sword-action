@@ -32,6 +32,10 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     [SerializeField] private Animator animator;
     [SerializeField] private string attackTriggerName = "AttackTrigger";
     [SerializeField] private string comboStepParamName = "ComboStep";
+    [SerializeField] private string directStatePrefix;
+    [SerializeField, Min(0)] private int lightHitstopFrames;
+    public event System.Action<int> StepStarted;
+    public event System.Action<Damageable2D, int, Vector2> HitConfirmed;
 
     [Header("Hit Base")]
     [SerializeField] private Transform hitPoint;
@@ -42,9 +46,9 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     [SerializeField] private AttackStepData[] attackSteps =
     {
         new AttackStepData { damage = 1, radius = 0.65f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.10f, groundMotionDuration = 0.14f },
-        new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.52f, groundMotionDistance = 0.14f, groundMotionDuration = 0.16f },
+        new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.14f, groundMotionDuration = 0.16f },
         new AttackStepData { damage = 2, radius = 0.75f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.18f, groundMotionDuration = 0.18f },
-        new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 1.02f, groundMotionDistance = 0.22f, groundMotionDuration = 0.20f }
+        new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 0.62f, groundMotionDistance = 0.22f, groundMotionDuration = 0.20f }
     };
 
     [Header("Air Attack Movement")]
@@ -252,12 +256,14 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
         if (animator != null)
         {
+            if (!string.IsNullOrEmpty(directStatePrefix)) animator.Play(directStatePrefix + comboStep, 0, 0f);
             animator.SetInteger(comboStepHash, comboStep);
             animator.ResetTrigger(attackTriggerHash);
             animator.SetTrigger(attackTriggerHash);
         }
 
         PlayClip(attackSwingClip, 0.9f);
+        StepStarted?.Invoke(comboStep);
     }
 
     public void OnAttackHit(int step)
@@ -278,7 +284,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         for (int i = 0; i < hits.Length; i++)
         {
             Damageable2D damageable = hits[i].GetComponentInParent<Damageable2D>();
-            if (damageable == null || !damagedTargets.Add(damageable))
+            if (damageable == null || !damageable.IsAlive || !damagedTargets.Add(damageable))
             {
                 continue;
             }
@@ -289,7 +295,8 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
                 knockbackDir = transform.right;
             }
 
-            damageable.TakeHit(data.damage, knockbackDir);
+            if (!damageable.TryTakeHit(data.damage, knockbackDir)) continue;
+            HitConfirmed?.Invoke(damageable, step, hitPoint.position);
             hitSomething = true;
         }
 
@@ -304,6 +311,12 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         }
 
         PlayClip(hitConfirmClip, 1f);
+        if (lightHitstopFrames > 0) CombatTimeController.RequestHitstop(this, lightHitstopFrames * CombatTimeController.StepSeconds);
+    }
+
+    public void OnAttackRecovery(int step)
+    {
+        if (CanProcessAnimationEvent(step)) CompleteAttackStep(step, "Recovery");
     }
 
     public void OnComboWindowOpen(int step)
@@ -429,6 +442,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
     private void ResetAttackState(bool updateAnimator)
     {
+        CombatTimeController.ReleaseOwner(this);
         isAttacking = false;
         comboStep = 0;
         comboWindowOpen = false;
@@ -514,9 +528,9 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         return index switch
         {
             0 => new AttackStepData { damage = 1, radius = 0.65f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.10f, groundMotionDuration = 0.14f },
-            1 => new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.52f, groundMotionDistance = 0.14f, groundMotionDuration = 0.16f },
+            1 => new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.14f, groundMotionDuration = 0.16f },
             2 => new AttackStepData { damage = 2, radius = 0.75f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.18f, groundMotionDuration = 0.18f },
-            _ => new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 1.02f, groundMotionDistance = 0.22f, groundMotionDuration = 0.20f }
+            _ => new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 0.62f, groundMotionDistance = 0.22f, groundMotionDuration = 0.20f }
         };
     }
 

@@ -43,6 +43,11 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     private int successCount;
     private int justSuccessCount;
     private int missCount;
+    private PlayerMotor2D motor;
+    private PlayerParryCounter2D counter;
+    [SerializeField, Min(0f)] private float maxParryHeightDifference = 1.25f;
+    public Damageable2D LastParriedEnemy { get; private set; }
+    public event System.Action<Damageable2D, ParryResult> Succeeded;
 
     public bool IsParryActive => parryActive;
     public bool IsFailLocked => failLockTimer > 0f;
@@ -65,6 +70,8 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
     private void Awake()
     {
+        motor = GetComponent<PlayerMotor2D>();
+        counter = GetComponent<PlayerParryCounter2D>();
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
@@ -164,6 +171,7 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         parryElapsed = 0f;
         cooldownTimer = parryCooldown;
         LastParryResult = ParryResult.None;
+        LastParriedEnemy = null;
         attemptCount++;
         return true;
     }
@@ -175,14 +183,24 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
     public bool TryResolveParry(Vector2 sourcePosition, out ParryResult result)
     {
-        if (!parryActive)
+        return ResolveParry(sourcePosition, null, true, out result);
+    }
+
+    public bool TryResolveSourceParry(Vector2 contactPosition, Damageable2D source, bool parryable, out ParryResult result)
+    {
+        return ResolveParry(contactPosition, source, parryable, out result);
+    }
+
+    private bool ResolveParry(Vector2 sourcePosition, Damageable2D source, bool parryable, out ParryResult result)
+    {
+        if (!parryActive || !parryable || (source != null && !source.IsAlive))
         {
             result = ParryResult.None;
             return false;
         }
 
         float dist = Vector2.Distance(transform.position, sourcePosition);
-        if (dist > parrySnapDistance)
+        if (dist > parrySnapDistance || Mathf.Abs(transform.position.y - sourcePosition.y) > maxParryHeightDifference)
         {
             result = ParryResult.None;
             return false;
@@ -206,6 +224,16 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         }
 
         successCount++;
+        LastParriedEnemy = source;
+        if (source != null)
+        {
+            float dx = source.transform.position.x - transform.position.x;
+            if (Mathf.Abs(dx) > .001f) motor?.SetFacing(dx > 0 ? 1 : -1);
+            source.ApplyParryStun(result);
+            if (counter == null) counter = GetComponent<PlayerParryCounter2D>();
+            counter?.RegisterParriedEnemy(source);
+        }
+        Succeeded?.Invoke(source, result);
         stateMachine?.ChangeActionPhase(
             PlayerActionState.Parry,
             PlayerActionState.ParrySuccess,
@@ -228,6 +256,7 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         failLockTimer = 0f;
         successLockTimer = 0f;
         LastParryResult = ParryResult.None;
+        LastParriedEnemy = null;
 
         if (clearCooldown)
         {

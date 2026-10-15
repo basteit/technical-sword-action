@@ -24,6 +24,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private Mouse mouse;
         private Gamepad pad;
         private InputActionAsset actions;
+        private readonly List<Behaviour> disabledSceneRouters=new();
+        private readonly List<InputDevice> disabledNativeDevices=new();
+        private InputSettings.EditorInputBehaviorInPlayMode previousEditorInputBehavior;
+        private InputSettings.BackgroundBehavior previousBackgroundBehavior;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -32,6 +36,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
             clock = (Component)Object.FindFirstObjectByType(clockType);
             savedManual = Get<bool>(clock, "ManualAdvanceOnly");
             clockType.GetProperty("ManualAdvanceOnly").SetValue(clock, true);
+            var routerType=Type.GetType("PlayerInputRouter, Assembly-CSharp",true);
+            foreach(Behaviour sceneRouter in Object.FindObjectsByType(routerType,FindObjectsSortMode.None))
+                if(sceneRouter.enabled) { sceneRouter.enabled=false;disabledSceneRouters.Add(sceneRouter); }
+            // This fixture owns virtual devices. A filming panel can hold editor focus,
+            // and a real held key must not seed the router's initial Held snapshot.
+            previousEditorInputBehavior=InputSystem.settings.editorInputBehaviorInPlayMode;
+            previousBackgroundBehavior=InputSystem.settings.backgroundBehavior;
+            InputSystem.settings.editorInputBehaviorInPlayMode=InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+            InputSystem.settings.backgroundBehavior=InputSettings.BackgroundBehavior.IgnoreFocus;
+            foreach(var device in InputSystem.devices)
+                if(device.native&&device.enabled) { InputSystem.DisableDevice(device);disabledNativeDevices.Add(device); }
             keyboard = InputSystem.AddDevice<Keyboard>();
             mouse = InputSystem.AddDevice<Mouse>();
             pad = InputSystem.AddDevice<Gamepad>();
@@ -74,6 +89,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
             InputSystem.RemoveDevice(keyboard);
             InputSystem.RemoveDevice(mouse);
             InputSystem.RemoveDevice(pad);
+            foreach(var device in disabledNativeDevices)if(device.added)InputSystem.EnableDevice(device);
+            disabledNativeDevices.Clear();
+            InputSystem.settings.editorInputBehaviorInPlayMode=previousEditorInputBehavior;
+            InputSystem.settings.backgroundBehavior=previousBackgroundBehavior;
+            foreach(var sceneRouter in disabledSceneRouters) if(sceneRouter!=null) sceneRouter.enabled=true;
+            disabledSceneRouters.Clear();
             clockType.GetProperty("ManualAdvanceOnly").SetValue(clock, savedManual);
             yield return null;
         }

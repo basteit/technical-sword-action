@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
@@ -11,6 +13,9 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     }
 
     [SerializeField] private int maxHp = 5;
+    [SerializeField] private string individualId;
+    [SerializeField, Min(0f)] private float deathDisplayDuration;
+    [SerializeField, Min(0f)] private float lightHitStunDuration;
     [SerializeField] private bool blockContactPushFromPlayer = true;
     [SerializeField] private LayerMask playerBodyLayers;
     [SerializeField] private float knockbackPower = 5.5f;
@@ -43,8 +48,23 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     private float stunTimer;
     private float currentBreak;
     private float breakResistTimer;
+    private float deathTimer;
+    private Collider2D[] bodyColliders;
+    private bool[] initialColliderStates;
+    private readonly Dictionary<object,float> stunHolds=new();
+    private readonly List<object> stunHoldOwners=new();
 
-    public bool IsStunned => stunTimer > 0f;
+    public string IndividualId => string.IsNullOrEmpty(individualId) ? GetInstanceID().ToString() : individualId;
+    public bool IsAlive => isActiveAndEnabled && currentHp > 0;
+    public float StunRemaining { get { float n=Mathf.Max(0f,stunTimer);foreach(float value in stunHolds.Values) n=Mathf.Max(n,value);return n; } }
+    public int HitCount { get; private set; }
+    public int DeathCount { get; private set; }
+    public event Action<Damageable2D, int, Vector2> HitReceived;
+    public event Action<Damageable2D, ParryResult> Parried;
+    public event Action<Damageable2D, Vector2> Died;
+    public event Action<Damageable2D> ResetPerformed;
+
+    public bool IsStunned => StunRemaining > 0f;
     public float CurrentBreak => currentBreak;
     public float BreakThreshold => breakThreshold;
     public int CurrentHp => currentHp;
@@ -65,6 +85,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         stunTimer = 0f;
         breakResistTimer = 0f;
         currentBreak = 0f;
+        stunHolds.Clear();
         knockbackVelocity = Vector2.zero;
         if (spriteRenderer != null)
         {
@@ -80,6 +101,9 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         }
 
         currentHp = maxHp;
+        bodyColliders = GetComponentsInChildren<Collider2D>(true);
+        initialColliderStates = new bool[bodyColliders.Length];
+        for (int i = 0; i < bodyColliders.Length; i++) initialColliderStates[i] = bodyColliders[i].enabled;
 
         if (audioSource == null)
         {
@@ -107,6 +131,15 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     public void CombatTickTimers()
     {
+        stunHoldOwners.Clear();stunHoldOwners.AddRange(stunHolds.Keys);
+        foreach(object owner in stunHoldOwners)
+        { float value=CombatTimeController.AdvanceTimer(stunHolds[owner]);if(value<=0) stunHolds.Remove(owner);else stunHolds[owner]=value; }
+        if (currentHp <= 0)
+        {
+            deathTimer = CombatTimeController.AdvanceTimer(deathTimer);
+            if (deathTimer <= 0f) gameObject.SetActive(false);
+            return;
+        }
         if (breakResistTimer > 0f)
         {
             breakResistTimer = CombatTimeController.AdvanceTimer(breakResistTimer);
@@ -149,14 +182,21 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     public void TakeHit(int damage, Vector2 direction)
     {
-        if (!isActiveAndEnabled || currentHp <= 0 ||
+        TryTakeHit(damage, direction);
+    }
+
+    public bool TryTakeHit(int damage, Vector2 direction)
+    {
+        if (damage <= 0 || !isActiveAndEnabled || currentHp <= 0 ||
             (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick))
         {
-            return;
+            return false;
         }
 
         currentHp = Mathf.Max(0, currentHp - damage);
+        HitCount++;
         AddBreak(damage * hitBreakMultiplier);
+        stunTimer = Mathf.Max(stunTimer, lightHitStunDuration);
 
         Vector2 dir = direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.right;
         knockbackVelocity = dir * knockbackPower;
@@ -173,11 +213,17 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         }
 
         CombatCameraFeedback2D.PlayHitShake();
+        HitReceived?.Invoke(this, damage, dir);
 
         if (currentHp <= 0)
         {
-            gameObject.SetActive(false);
+            DeathCount++;
+            deathTimer = deathDisplayDuration;
+            foreach (Collider2D body in bodyColliders) if (body != null) body.enabled = false;
+            Died?.Invoke(this, dir);
+            if (deathTimer <= 0f) gameObject.SetActive(false);
         }
+        return true;
     }
 
     public void ApplyParryStun(ParryResult result)
@@ -198,6 +244,33 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
             stunTimer = normalParryStunDuration;
             AddBreak(parryNormalBreakGain);
         }
+        if (result != ParryResult.None) Parried?.Invoke(this, result);
+    }
+
+    public void ExtendStun(float combatSeconds)
+    {
+        if (IsAlive) stunTimer = Mathf.Max(stunTimer, combatSeconds);
+    }
+    public void AcquireStun(object owner,float combatSeconds)
+    { if(owner!=null&&IsAlive) stunHolds[owner]=Mathf.Max(0,combatSeconds); }
+    public void ReleaseStun(object owner) { if(owner!=null) stunHolds.Remove(owner); }
+
+    public void ResetForCapture(Vector3 position, int hp)
+    {
+        gameObject.SetActive(true);
+        transform.position = position;
+        maxHp = Mathf.Max(1, hp);
+        currentHp = maxHp;
+        flashTimer = stunTimer = deathTimer = currentBreak = breakResistTimer = 0f;
+        stunHolds.Clear();
+        HitCount = DeathCount = 0;
+        knockbackVelocity = Vector2.zero;
+        if (spriteRenderer != null) spriteRenderer.color = defaultColor;
+        if (bodyColliders != null)
+            for (int i = 0; i < bodyColliders.Length; i++) if (bodyColliders[i] != null) bodyColliders[i].enabled = initialColliderStates[i];
+        if (TryGetComponent(out Rigidbody2D body)) { body.linearVelocity = Vector2.zero; body.angularVelocity = 0; }
+        CombatTimeController.ReleaseOwner(this);
+        ResetPerformed?.Invoke(this);
     }
 
     private void AddBreak(float value)
