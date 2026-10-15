@@ -105,7 +105,7 @@ FFmpegが必要。PATH上の実行ファイル、または既存のローカル�
 
 ## 元の待機・歩きの確認動画
 
-[6秒の確認動画](previews/studio-idle-walk-original.mp4)は、`Assets/Art/Player/Player_idle.aseprite` と `Player_walk.aseprite` をAseprite本体から毎回読み出し、スタジオのCameraで撮影したもの。敵・ギミック・HUDを隠し、10倍の整数拡大・固定カメラで左右の歩きを確認できる。
+[6秒の確認動画・通常ゲーム相当の距離](previews/studio-idle-walk-game-scale.mp4)は、`Assets/Art/Player/Player_idle.aseprite` と `Player_walk.aseprite` をAseprite本体から毎回読み出し、スタジオのCameraで撮影したもの。敵・ギミック・HUDを隠し、通常のSampleScene／BasicActionValidationと同じカメラサイズ5・固定カメラで左右の歩きを確認できる。[以前のアップ版](previews/studio-idle-walk-original.mp4)も比較用に保持する。
 
 | 実時間 | 動き |
 |---|---|
@@ -115,7 +115,7 @@ FFmpegが必要。PATH上の実行ファイル、または既存のローカル�
 | 3.4–5.0秒 | 左へ歩く |
 | 5.0–6.0秒 | 左向きの待機 |
 
-待機は6コマ×100ms、歩きは8コマ×80msの元のタイミングを使う。60fpsへ時刻でサンプリングするため、歩きの各コマは4または5フレーム表示となる。歩行速度は確認用の2unit/s。黒い接地ガイド専用の `Layer 1` だけを書き出し時に非表示にし、キャラクター・元ファイル・ゲーム本編の素材設定は変更しない。未知の絵がガイドレイヤーに追加された場合は、非表示処理を拒否する。
+待機は6コマ×100ms、歩きは8コマ×80msの元のタイミングを使う。60fpsへ時刻でサンプリングするため、歩きの各コマは4または5フレーム表示となる。歩行速度は確認用の3unit/s（以前のアップ版は2unit/s）。通常ゲームの画角に合わせ、今回は1080pで1ドット3.375pxとなるPoint描画を使う。黒い接地ガイド専用の `Layer 1` だけを書き出し時に非表示にし、キャラクター・元ファイル・ゲーム本編の素材設定は変更しない。未知の絵がガイドレイヤーに追加された場合は、非表示処理を拒否する。
 
 再収録する場合はスタジオをPlayにし、プロジェクト直下のPowerShellで順に実行する。Asepriteの既定パスはユーザー指定のSteam版。異なる環境では `VideoStudioReferenceCapture.cs` のパスを変更する。
 
@@ -124,7 +124,7 @@ uloop execute-dynamic-code --code 'return VideoStudioReferenceCapture.Capture();
 ./Tools/Video/encode-idle-walk.ps1
 ```
 
-360枚すべてを戦闘時計で1/60秒ずつ進めて撮影し、描画速度に依存する録画落ちを避ける。連番PNGは `.uloop/outputs/video/studio-idle-walk-original/`、MP4とタイミングJSONは `docs/video/previews/studio-idle-walk-original.*` に出力。撮影後はカメラ・歩行速度・入力・Animator・敵／ギミックの表示を復元してリセットする。通常のF9録画では引き続き現在のゲーム素材を使用する。
+360枚すべてを戦闘時計で1/60秒ずつ進めて撮影し、描画速度に依存する録画落ちを避ける。連番PNGは `.uloop/outputs/video/studio-idle-walk-game-scale/`、MP4とタイミングJSONは `docs/video/previews/studio-idle-walk-game-scale.*` に出力。撮影後はカメラ・歩行速度・入力・Animator・敵／ギミックの表示を復元してリセットする。通常のF9録画では引き続き現在のゲーム素材を使用する。
 
 ## 従来の動画制作との関係
 

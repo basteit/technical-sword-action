@@ -5,13 +5,13 @@ Push-Location $motionVideoRoot
 try {
     if(-not $FfmpegPath){$FfmpegPath=(Get-ChildItem -LiteralPath '.uloop/outputs/python-deps/imageio_ffmpeg/binaries' -Filter 'ffmpeg-win*.exe' | Select-Object -First 1).FullName}
     if(-not $FfmpegPath){throw 'Provide -FfmpegPath.'}
-    $motionSource='.uloop/outputs/video/studio-idle-walk-original'
+    $motionSource='.uloop/outputs/video/studio-idle-walk-game-scale'
     $motionMetadata=Get-Content -Raw -LiteralPath "$motionSource/events.json" | ConvertFrom-Json
     if($motionMetadata.takeKind -ne 'original-idle-walk' -or $motionMetadata.fps -ne 60 -or $motionMetadata.frameCount -ne 360){throw 'Invalid motion capture metadata.'}
     for($motionFrame=0;$motionFrame -lt $motionMetadata.frameCount;$motionFrame++){
         if(-not(Test-Path -LiteralPath (Join-Path $motionSource ('frame-{0:D4}.png' -f $motionFrame)))){throw "Missing frame $motionFrame"}
     }
-    $motionOutput='docs/video/previews/studio-idle-walk-original.mp4'
+    $motionOutput='docs/video/previews/studio-idle-walk-game-scale.mp4'
     & $FfmpegPath -hide_banner -loglevel error -framerate 60 -i "$motionSource/frame-%04d.png" -frames:v $motionMetadata.frameCount -c:v libx264 -crf 16 -preset slow -pix_fmt yuv420p -an -movflags +faststart -y $motionOutput
     if($LASTEXITCODE -ne 0){throw 'Encoding failed.'}
     Copy-Item -LiteralPath "$motionSource/events.json" -Destination ($motionOutput -replace '\.mp4$','.json')

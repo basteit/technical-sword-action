@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 public static class VideoStudioReferenceCapture
 {
     private const int Fps = 60, Width = 1920, Height = 1080;
-    private const float WalkSpeed = 2f;
+    private const float WalkSpeed = 3f, CaptureCameraSize = 5f;
     private const string AsepritePath = "C:/Program Files (x86)/Steam/steamapps/common/Aseprite/Aseprite.exe";
     private const string SourceFolder = "Assets/Art/Player/";
     private static readonly Segment[] Segments =
@@ -40,7 +40,8 @@ public static class VideoStudioReferenceCapture
         public string scene, takeKind="original-idle-walk", sampling="native milliseconds, sampled at 60 fps";
         public int fps=Fps, width=Width, height=Height, frameCount;
         public double duration;
-        public float walkSpeed=WalkSpeed, cameraSize=1.6875f, finalX;
+        public float walkSpeed=WalkSpeed, cameraSize=CaptureCameraSize, finalX;
+        public string cameraReferenceScene="Assets/Scenes/SampleScene.unity";
         public bool audio=false, originalArtwork=true, sourceFloorGuideHidden=true;
         public MotionRecord[] motions;
         public Segment[] segments;
@@ -74,7 +75,7 @@ public static class VideoStudioReferenceCapture
         if(studio==null || VideoStudioCapture.IsBusy) throw new InvalidOperationException("An idle filming studio is required.");
         string sourceOutput=Path.GetFullPath(".uloop/outputs/idle-walk-reference");
         ExportOriginals(sourceOutput);
-        string output=Path.GetFullPath(".uloop/outputs/video/studio-idle-walk-original");
+        string output=Path.GetFullPath(".uloop/outputs/video/studio-idle-walk-game-scale");
         Directory.CreateDirectory(output);
         using var idle=LoadMotion("idle", sourceOutput);
         using var walk=LoadMotion("walk", sourceOutput);
@@ -113,7 +114,8 @@ public static class VideoStudioReferenceCapture
             motorSettings.ApplyModifiedPropertiesWithoutUndo();
             body.interpolation=RigidbodyInterpolation2D.None;
             body.position=new Vector2(0,1); player.transform.position=body.position; motor.SetFacing(1);
-            studio.FollowCamera=false; studio.CameraSize=1.6875f; studio.FixedCameraCenter=new Vector2(1.6f,1.05f);
+            studio.FollowCamera=false; studio.CameraSize=CaptureCameraSize;
+            studio.FixedCameraCenter=new Vector2(WalkSpeed*Segments.First(s=>s.direction>0).frameCount/Fps/2,1.05f);
             // Settle contact before recording; only the original sprites are sampled below.
             for(int warmup=0;warmup<4;warmup++) studio.StepStudio(1d/Fps);
             foreach(var segment in Segments)
