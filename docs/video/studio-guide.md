@@ -128,6 +128,19 @@ uloop execute-dynamic-code --code 'return VideoStudioReferenceCapture.Capture();
 
 360枚すべてを戦闘時計で1/60秒ずつ進めて撮影し、描画速度に依存する録画落ちを避ける。連番PNGは `.uloop/outputs/video/studio-idle-walk-standard/`、MP4とタイミングJSONは `docs/video/previews/studio-idle-walk-standard.*` に出力。撮影後はカメラ・歩行速度・入力・Animator・敵／ギミックの表示を復元してリセットする。通常のF9録画では引き続き現在のゲーム素材を使用する。
 
+### 中間の距離で標準速度を確認する
+
+[中間画角の待機・歩き](previews/studio-idle-walk-standard-medium.mp4)は、以前のアップ版と通常ゲーム画角版の間として、1080pで1ドット6px（カメラサイズ2.8125）を使う。主人公は画面高の約3割に収まり、標準速度4.4019/床上実測約4.2057unit/sで左右へ歩く。歩行範囲の中央へ固定カメラを置き、元の待機6×100ms/歩き8×80msを維持する。6秒・1080p60・無音。
+
+```powershell
+uloop execute-dynamic-code --code 'return VideoStudioReferenceCapture.CaptureMedium();'
+./Tools/Video/encode-idle-walk.ps1 -Take standard-medium
+```
+
+通常の標準版や過去の比較動画は保持し、カメラ変更はこの撮影中だけ適用して終了時に復元する。
+
+[検証記録](previews/idle-walk-medium-validation.json)：360枚の元Sprite/タイミングと画面内の収まり、速度実測、カメラ/入力/表示の復元、MP4全フレームのデコードを確認。Unity compile/収録後ConsoleはError 0 / Warning 0。
+
 ### 採用時の速度比較（上が現在の標準）
 
 [採用時の同時再生版](previews/studio-idle-walk-speed-comparison.mp4)は、採用前の通常画角版（移動設定3unit/s）を1.0倍とし、**上が移動1.5倍、下が移動2.0倍**。上を標準として採用した。両方とも同じ開始位置・カメラ中心・サイズ5・6秒の入力を使い、歩き8コマ×80msの再生速度を維持する。上下版は各Camera画像の余白を縦に切り取って並べ、キャラクターの表示倍率を変えない。

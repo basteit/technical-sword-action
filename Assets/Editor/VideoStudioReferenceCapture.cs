@@ -72,9 +72,11 @@ public static class VideoStudioReferenceCapture
     }
 
     public static string Capture() => CaptureTake(1f,true);
+    // Six screen pixels per source pixel at 1080p, between the close and game-scale takes.
+    public static string CaptureMedium() => CaptureTake(1f,true,true);
     // Preserve the previous 3 unit/s comparison reference and its existing output names.
     public static string Capture(float speedMultiplier) => CaptureTake(speedMultiplier,false);
-    private static string CaptureTake(float speedMultiplier,bool standard)
+    private static string CaptureTake(float speedMultiplier,bool standard,bool medium=false)
     {
         if(speedMultiplier!=1f && speedMultiplier!=1.5f && speedMultiplier!=2f)
             throw new ArgumentOutOfRangeException(nameof(speedMultiplier),"Use 1, 1.5 or 2 times the current preview speed.");
@@ -83,7 +85,8 @@ public static class VideoStudioReferenceCapture
         if(studio==null || VideoStudioCapture.IsBusy) throw new InvalidOperationException("An idle filming studio is required.");
         string sourceOutput=Path.GetFullPath(".uloop/outputs/idle-walk-reference");
         ExportOriginals(sourceOutput);
-        string takeName=standard?"standard":speedMultiplier==1f?"game-scale":speedMultiplier==1.5f?"speed-1p5x":"speed-2x";
+        string takeName=medium?"standard-medium":standard?"standard":speedMultiplier==1f?"game-scale":speedMultiplier==1.5f?"speed-1p5x":"speed-2x";
+        float cameraSize=medium?Height/(2f*32*6):CaptureCameraSize;
         string output=Path.GetFullPath(".uloop/outputs/video/studio-idle-walk-"+takeName);
         Directory.CreateDirectory(output);
         using var idle=LoadMotion("idle", sourceOutput);
@@ -125,7 +128,7 @@ public static class VideoStudioReferenceCapture
             motorSettings.ApplyModifiedPropertiesWithoutUndo();
             body.interpolation=RigidbodyInterpolation2D.None;
             body.position=new Vector2(0,1); player.transform.position=body.position; motor.SetFacing(1);
-            studio.FollowCamera=false; studio.CameraSize=CaptureCameraSize;
+            studio.FollowCamera=false; studio.CameraSize=cameraSize;
             studio.FixedCameraCenter=new Vector2(WalkSpeed*Segments.First(s=>s.direction>0).frameCount/Fps/2,1.05f);
             // Measure the baseline after contact settles so labels describe actual movement,
             // including the existing floor friction. All variants keep the same camera.
@@ -135,6 +138,8 @@ public static class VideoStudioReferenceCapture
             baselineMeasuredSpeed=Mathf.Abs(body.linearVelocity.x);
             if(baselineMeasuredSpeed<=0) throw new InvalidOperationException("Could not measure baseline walking speed.");
             commandedSpeed=referenceSpeed+baselineMeasuredSpeed*(speedMultiplier-1f);
+            if(medium)
+                studio.FixedCameraCenter=new Vector2(baselineMeasuredSpeed*Segments.First(s=>s.direction>0).frameCount/Fps/2,1.05f);
             motorSettings.FindProperty("moveSpeed").floatValue=commandedSpeed;
             motorSettings.ApplyModifiedPropertiesWithoutUndo();
             motor.ClearSampledInput();body.linearVelocity=Vector2.zero;
@@ -167,7 +172,8 @@ public static class VideoStudioReferenceCapture
                 scene=studio.gameObject.scene.path, frameCount=frame, duration=frame/(double)Fps, finalX=body.position.x,
                 walkSpeed=commandedSpeed,requestedSpeedMultiplier=speedMultiplier,baselineMeasuredSpeed=baselineMeasuredSpeed,
                 measuredMoveSpeed=walkDistance/walkSeconds,actualSpeedMultiplier=walkDistance/walkSeconds/baselineMeasuredSpeed,
-                cameraCenter=studio.FixedCameraCenter,
+                cameraSize=cameraSize,cameraCenter=studio.FixedCameraCenter,
+                cameraReferenceScene=medium?"": "Assets/Scenes/SampleScene.unity",
                 standardWalkSpeed=standard,speedReference=standard?"approved-2026-10-16":"previous-game-scale",
                 motions=new[]
                 {
