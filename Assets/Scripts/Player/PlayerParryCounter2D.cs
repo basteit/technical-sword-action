@@ -10,7 +10,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     [SerializeField, Min(1)] private int endFrame = 24;
     [SerializeField, Min(1)] private int damage = 3;
     [SerializeField] private float radius = 1.1f;
-    [Header("Video roundhouse profile")]
+    [Header("Video aerial counter profile")]
     [SerializeField] private bool airborneKick;
     [SerializeField] private Vector2 airborneContactOffset = new Vector2(22f/32f,-22f/32f);
     [SerializeField] private bool invincibleDuringKick = true;
@@ -22,6 +22,11 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     [SerializeField, Min(0f)] private float maxApproach = .6f;
     [SerializeField] private bool blinkApproach;
     [SerializeField, Min(1)] private int blinkTravelFrames = 2;
+    [SerializeField] private bool overheadHeelDrop;
+    [SerializeField, Min(0f)] private float overheadHeight = 1.35f;
+    [SerializeField, Min(0f)] private float heelImpactHeight = 1.15f;
+    [SerializeField] private Vector2 heelContactOffset = new Vector2(10f/32f,-22f/32f);
+    [SerializeField] private float heelTargetHeadOffsetX = 7f/32f;
     [SerializeField] private LayerMask obstacleLayers;
     private PlayerStateMachine state;
     private PlayerMotor2D motor;
@@ -31,6 +36,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     private bool active, hitApplied, charged,confirmedHit,chargeReleased,landed;
     private float savedGravity;
     private Vector2 origin;
+    private Vector2 hoverPosition;
     private float approach;
     private int facing;
     private readonly List<Damageable2D> stocks = new();
@@ -41,6 +47,9 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public bool IsCounterInvincible => active && airborneKick && invincibleDuringKick;
     public bool IsAirborneKick => airborneKick;
     public bool UsesBlinkApproach => airborneKick && blinkApproach;
+    public bool IsOverheadHeelDrop => airborneKick && overheadHeelDrop;
+    public Vector2 HoverPosition => hoverPosition;
+    public Vector2 ContactPoint => (Vector2)transform.position + new Vector2(facing * (IsOverheadHeelDrop?heelContactOffset.x:airborneContactOffset.x),IsOverheadHeelDrop?heelContactOffset.y:airborneContactOffset.y);
     public int ElapsedFrames => elapsed;
     public int HitFrame => hitFrame;
     public int ChargeFrame => chargeFrame;
@@ -99,6 +108,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         active = true; elapsed = 0; hitApplied = charged = confirmedHit = chargeReleased = landed = false; StartCount++;
         origin = body != null ? body.position : (Vector2)transform.position;
         facing = motor != null ? motor.FacingSign : 1;
+        hoverPosition = (Vector2)SelectedTarget.transform.position + new Vector2(facing*(heelTargetHeadOffsetX-heelContactOffset.x),overheadHeight);
         approach = Mathf.Clamp((SelectedTarget.transform.position.x - origin.x) * facing - .85f, 0, maxApproach);
         if (body != null) { savedGravity = body.gravityScale; if (airborneKick) body.gravityScale = 0; }
         SelectedTarget.AcquireStun(this,Mathf.Max(hitFrame, endFrame) * CombatTimeController.StepSeconds + .1f);
@@ -118,6 +128,22 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         float x = origin.x + facing * approach * Mathf.Clamp01(frame / travelFrames);
         x+=facing*landingRollDistance*Mathf.Clamp01((frame-landingFrame)/4f);
         Vector2 desired = new Vector2(x, origin.y + height);
+        if(overheadHeelDrop)
+        {
+            float arrive=Mathf.Clamp01(frame/Mathf.Max(1,blinkTravelFrames));
+            desired=Vector2.Lerp(origin,hoverPosition,arrive);
+            if(frame>chargeReleaseFrame)
+            {
+                float strike=Mathf.Clamp01((frame-chargeReleaseFrame)/Mathf.Max(1,hitFrame-chargeReleaseFrame));
+                desired.y=hoverPosition.y-(overheadHeight-heelImpactHeight)*strike*strike;
+            }
+            if(frame>hitFrame)
+            {
+                float drop=Mathf.Clamp01((frame-hitFrame)/Mathf.Max(1,landingFrame-hitFrame));
+                float impactY=hoverPosition.y-overheadHeight+heelImpactHeight;
+                desired.y=Mathf.Lerp(impactY,origin.y,1-(1-drop)*(1-drop));
+            }
+        }
         Vector2 delta = desired - body.position;
         if (bodyCollider != null && delta.sqrMagnitude > .000001f && obstacleLayers.value != 0)
         {
@@ -127,6 +153,8 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
             for (int i = 0; i < count; i++)
                 if(Vector2.Dot(delta.normalized,movementHits[i].normal)<-.001f)
                     distance = Mathf.Min(distance, Mathf.Max(0f, movementHits[i].distance - .005f));
+            if(overheadHeelDrop&&frame<=blinkTravelFrames&&distance<delta.magnitude-.001f)
+            { Finish("ApproachBlocked");return; }
             delta = delta.normalized * distance;
         }
         body.linearVelocity = delta / CombatTimeController.StepSeconds;
@@ -142,7 +170,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         if (!hitApplied && elapsed >= Mathf.Max(1, hitFrame))
         {
             hitApplied = true;
-            Vector2 offset=airborneKick?airborneContactOffset:new Vector2(.85f,-.25f);
+            Vector2 offset=airborneKick?(overheadHeelDrop?heelContactOffset:airborneContactOffset):new Vector2(.85f,-.25f);
             Vector2 foot = (Vector2)transform.position + new Vector2(facing*offset.x,offset.y);
             bool contactsTarget = false;
             foreach (Collider2D c in Physics2D.OverlapCircleAll(foot, radius))

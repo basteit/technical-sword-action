@@ -323,6 +323,7 @@ MonoBehaviour:
   chargeRealSeconds: 0.7
   normalSize: 2.109375
   closeSize: 1.6875
+  adaptiveFocusHeight: 0
   slowDimStrength: 0.965
   heroLiftStrength: 0.6
   dimFadeInSeconds: 0.05
@@ -535,6 +536,11 @@ MonoBehaviour:
   maxApproach: 1.2
   blinkApproach: 1
   blinkTravelFrames: 2
+  overheadHeelDrop: 1
+  overheadHeight: 1.35
+  heelImpactHeight: 1.15
+  heelContactOffset: {x: 0.3125, y: -0.6875}
+  heelTargetHeadOffsetX: 0.21875
   obstacleLayers:
     serializedVersion: 2
     m_Bits: 8
@@ -700,9 +706,9 @@ MonoBehaviour:
   - damage: 1
     radius: 0.6
     gaugeGain: 2
-    fallbackDuration: 0.46666667
+    fallbackDuration: 0.6333333
     groundMotionDistance: 0.12
-    groundMotionDuration: 0.16666667
+    groundMotionDuration: 0.28333333
     useGroundMotionCurve: 1
     groundMotionCurve:
       serializedVersion: 2
@@ -711,15 +717,15 @@ MonoBehaviour:
         time: 0
         value: 0
         inSlope: 0
-        outSlope: 0.71999997
+        outSlope: 0.42352942
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.16666667
+        time: 0.28333333
         value: 0.12
-        inSlope: 0.71999997
+        inSlope: 0.42352942
         outSlope: 0
         tangentMode: 0
         weightedMode: 0

@@ -64,7 +64,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         if(!counter.UsesBlinkApproach||playerVisual==null) return;
         int facing=counter.GetComponent<PlayerMotor2D>().FacingSign;
         Vector2 from=playerVisual.transform.position;
-        Vector2 to=counter.SelectedTarget.transform.position-new Vector3(facing*.85f,0,0);
+        Vector2 to=counter.IsOverheadHeelDrop?counter.HoverPosition:(Vector2)counter.SelectedTarget.transform.position-new Vector2(facing*.85f,0);
         vfx.EmitTransitSilhouette(playerVisual,facing,from,Vector2.one,.5f);
         vfx.EmitTransitSilhouette(playerVisual,facing,Vector2.Lerp(from,to,.45f)+Vector2.up*.2f,new Vector2(1.7f,.45f),.28f);
         vfx.EmitTransitSilhouette(playerVisual,facing,to+Vector2.up*.45f,new Vector2(1.4f,.25f),.18f);
@@ -82,7 +82,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         RestorePlayerBody();charged=true;ChargeRealElapsed=0;
         focus=(counter.transform.position+counter.SelectedTarget.transform.position)*.5f;
-        focus.y=adaptiveFocusHeight?counter.transform.position.y-.5f:1.05f;focus.z=restPosition.z;
+        focus.y=counter.IsOverheadHeelDrop?focus.y-.15f:adaptiveFocusHeight?counter.transform.position.y-.5f:1.05f;focus.z=restPosition.z;
         CombatTimeController.RequestSlow(counter,chargeScale,chargeRealSeconds);
     }
     private void OnRelease() { charged=false;CombatTimeController.ReleaseSlow(counter); }
@@ -92,7 +92,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         CombatTimeController.RequestHitstop(counter,8*CombatTimeController.StepSeconds);
         ShakeDirectional(.25f,.24f,new Vector2(counter.GetComponent<PlayerMotor2D>().FacingSign*.35f,-1),2.75f);
         flashRemaining=flashDuration=3/60f;flashStrength=.12f;flashTint=Color.white;
-        vfx.Emit("Kick",foot,1.55f,1);
+        vfx.Emit(counter.IsOverheadHeelDrop?"HeelLightning":"Kick",foot,counter.IsOverheadHeelDrop?1f:1.55f,1);
     }
     private void OnLanding()=>ShakeDirectional(.11f,.065f,Vector2.down,1.5f);
     private void OnFinished(bool hit)

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListener
+public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     [SerializeField] private VideoArtLibrary library;
     [SerializeField] private Transform player;
@@ -18,6 +18,8 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     private Vector3 hitbackOrigin;
     private Vector2 hitbackDirection;
     private BoxCollider2D bodyCollider;
+    private Sprite deathContactSprite;
+    private long deathContactTick=-1;
     public bool IsHitBacking=>hitbackFrames>0&&hitbackFrame<hitbackFrames;
     public float LastHitbackDistance {get;private set;}
     public bool IsLaunched=>IsHitBacking&&launchHeight>0;
@@ -43,11 +45,18 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     }
     private void OnHit(Damageable2D source,int damage,Vector2 direction) { if(source.IsAlive) Play("Hit"); }
     private void OnParried(Damageable2D source,ParryResult result)=>Play("Parried");
-    private void OnDeath(Damageable2D source,Vector2 direction)=>Play("Death");
+    private void OnDeath(Damageable2D source,Vector2 direction)
+    {
+        // Keep the body at the actual contact during hitstop. Collapsing immediately
+        // moves the head away from the heel before the viewer can read the hit.
+        deathContactSprite=visual.sprite;deathContactTick=CombatTimeController.TickCount;
+        Play("Death");if(deathContactSprite!=null) visual.sprite=deathContactSprite;
+    }
     private void OnAttack()=>Play("Attack");
     private void OnReset(Damageable2D source)
     {
         hitbackFrame=hitbackFrames=0;LastHitbackDistance=launchHeight=LastLaunchHeight=0;
+        deathContactSprite=null;deathContactTick=-1;
         visual.transform.localPosition=restPosition;visual.transform.localRotation=Quaternion.identity;visual.color=Color.white;
         if(animator!=null) animator.Rebind();Play("Idle");
     }
@@ -72,6 +81,12 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
         hitbackDirection=direction.sqrMagnitude>0?direction.normalized:Vector2.right;
         hitbackFrame=0;hitbackFrames=Mathf.Max(1,frames);LastHitbackDistance=hitbackDistance;
         launchHeight=LastLaunchHeight=0;visual.transform.localRotation=Quaternion.identity;
+    }
+    public void CombatTickTimers()
+    {
+        if(deathContactSprite==null) return;
+        if(CombatTimeController.TickCount==deathContactTick) visual.sprite=deathContactSprite;
+        else { deathContactSprite=null;deathContactTick=-1; }
     }
     public void ApplyLaunch(float distance,float height,int frames,Vector2 direction)
     {

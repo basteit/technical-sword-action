@@ -7,6 +7,7 @@ public sealed class VideoArtLibrary : ScriptableObject
     [Serializable] public sealed class Motion
     {
         public string name;
+        public bool provisional;
         public Sprite[] frames;
         public Sprite[] eyeFrames;
         public int[] durations;

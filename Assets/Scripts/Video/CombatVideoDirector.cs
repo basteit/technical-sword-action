@@ -63,7 +63,9 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     {
         int direction=player.GetComponent<PlayerMotor2D>().FacingSign;
         target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyHitback(new[]{.10f,.18f,.30f,.58f}[step-1],6+step,Vector2.right*direction);
-        MarkEvent((defenseCancelTake&&!returnAttackSent?"OpeningSlash":"Slash")+step,target);vfx.Emit("Slash",point,new[]{.65f,.8f,1f,1.25f}[step-1],direction);
+        MarkEvent((defenseCancelTake&&!returnAttackSent?"OpeningSlash":"Slash")+step,target);
+        if(step!=1||!player.GetComponent<VideoPlayerAnimationDriver>().Art.Find("VerticalSlash").provisional)
+            vfx.Emit("Slash",point,new[]{.65f,.8f,1f,1.25f}[step-1],direction);
         var directionVector=step==1?new Vector2(direction*.2f,-1):new Vector2(direction,step==3?-.3f:.15f);
         presentation.ShakeDirectional(new[]{.09f,.10f,.11f,.14f}[step-1],new[]{.04f,.055f,.075f,.11f}[step-1],directionVector,2.5f);
     }
@@ -78,7 +80,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     }
     private void OnKick(Damageable2D target,Vector2 point)
     {
-        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyLaunch(defenseCancelTake?1.75f:2.25f,1.05f,20,Vector2.right*player.GetComponent<PlayerMotor2D>().FacingSign);
+        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyLaunch(counter.IsOverheadHeelDrop?1.4f:defenseCancelTake?1.75f:2.25f,counter.IsOverheadHeelDrop?.18f:1.05f,20,Vector2.right*player.GetComponent<PlayerMotor2D>().FacingSign);
         MarkEvent("Kick",target);
     }
     private void OnCharge()=>MarkEvent("ChargeStart",counter.SelectedTarget);
@@ -157,7 +159,8 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     {
         var motor=player.GetComponent<PlayerMotor2D>();
         var ai=rearEnemy.GetComponent<EnemyMeleeChaser2D>();
-        if(!rearStarted&&tick-startTick>=6)
+        int openingHit=player.GetComponent<VideoPlayerAnimationDriver>().Art.Find("VerticalSlash").hitFrame;
+        if(!rearStarted&&tick-startTick>=6+Mathf.Max(0,openingHit-10))
         { rearStarted=true;ai.BeginCaptureAttack();MarkEvent("RearWindup",rearEnemy); }
         if(!attackSent&&tick-startTick>=18)
         { attackSent=true;attack.RequestAttack(); }

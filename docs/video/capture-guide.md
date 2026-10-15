@@ -6,6 +6,8 @@
 
 ## 素材とScene
 
+2026-10-16：攻撃1段目は受領した9コマの仮提出へ部分差し替え、反撃は頭上ワープ/かかと落とし/落雷へ更新。[素材・同期点・既存Sceneへの適用手順](attack1-submission-and-heel-drop.md)。1段目の後ろ髪/復帰は今回の通しに要求せず、全体清書の完了とは区別する。既存119コマのラフは履歴/未提出Actionのフォールバックとして保持する。
+
 主人公ラフは `Assets/Art/Player/VideoRough/Player_actions_rough.aseprite`、119コマ・18タグ・8レイヤー。瞳のガイド/清書レイヤーと動作別の復帰タグを含み、全タグの開始/終了コマを保存後の再読込で検証した。タイミングの正は同フォルダの `timing-manifest.json`（整数60Hzフレーム）。瞳の専用PNGは `EyeMasks`、対応と画素数は `eye-mask-manifest.json`。敵は `Assets/Art/Video/CaptureDummy.aseprite`、白いグリッド背景と、接地位置より下を埋める灰青色一色の床は `CaptureTrainingGrid.aseprite`、VFXは `CombatEffects.aseprite`。元の待機/歩きのハッシュを維持する。
 
 Sceneは `Assets/Scenes/CombatVideo.unity`。Tools → Technical Sword Action → Video → Build Art and Capture Scene で素材/Clip/Animator/Sceneを再生成する。未保存の別Sceneがあると停止する。生成した撮影Sceneも手動変更がある場合は保存してから再生成する。SampleSceneとBasicActionValidationの既存差分を上書きしない。
@@ -15,7 +17,7 @@ Sceneは `Assets/Scenes/CombatVideo.unity`。Tools → Technical Sword Action �
 ## 検証
 
 ```powershell
-uloop compile --wait-for-domain-reload true
+uloop compile
 uloop run-tests --test-mode EditMode --filter-type regex --filter-value TechnicalSwordAction
 uloop run-tests --test-mode PlayMode --filter-type regex --filter-value TechnicalSwordAction
 ```

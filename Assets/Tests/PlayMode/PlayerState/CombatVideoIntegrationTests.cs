@@ -47,7 +47,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
             Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
-            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(3.87d,3.95d));
+            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.07d,4.15d));
             Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.63f,.71f));
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
@@ -64,7 +64,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 {
                     charge=true;
                     Assert.That(visual.enabled,Is.True);
-                    Assert.That(visual.sprite.name,Is.EqualTo("AirRoundhouse_06"),"Slow must start with the inverted coil, not hidden anticipation.");
+                    Assert.That(visual.sprite.name,Is.EqualTo("AirRoundhouse_06"),"Slow must start with the raised heel above the selected enemy.");
                 }
                 if(!release&&Get<bool>(counter,"HasReleasedCharge"))
                 {
@@ -72,7 +72,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     // A 30fps render can observe frame 25 after advancing two combat frames.
                     int releaseFrame=Get<int>(counter,"ElapsedFrames");
                     Assert.That(releaseFrame,Is.InRange(24,25));
-                    Assert.That(visual.sprite.name,Is.EqualTo(releaseFrame==24?"AirRoundhouse_12":"AirRoundhouse_13"),"Release must show the matching extended rotating leg.");
+                    Assert.That(visual.sprite.name,Is.EqualTo(releaseFrame==24?"AirRoundhouse_12":"AirRoundhouse_13"),"Release must show the heel starting its downward arc.");
                 }
                 if(Get<int>(counter,"HitCount")>previousHits)
                 {
@@ -91,7 +91,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
             var enemy=(Component)Get<object>(director,"FrontEnemy");int checkedHits=0;
-            string[] expected={"VerticalSlash_04","HorizontalSlash_04","RapidSheathe_05","IaiSlash_03"};
+            string[] expected={"VerticalSlash_05","HorizontalSlash_04","RapidSheathe_05","IaiSlash_03"};
             for(int i=0;i<220&&checkedHits<4;i++)
             {
                 Step();int hits=Get<int>(enemy,"HitCount");
@@ -141,10 +141,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             { beforeContact=enemy.GetComponent<Collider2D>().bounds;Step(); }
             Assert.That(Get<int>(enemy,"HitCount"),Is.EqualTo(1));
             var kick=Find("VideoVfxRenderer").GetComponentsInChildren<SpriteRenderer>()
-                .First(r=>r.sprite!=null&&r.sprite.name=="Fx_Kick_01");
+                .First(r=>r.sprite!=null&&r.sprite.name=="Fx_HeelLightning_01");
             int facing=mirrored?1:-1;
-            // Contact key's toe is (54,48) in the 64px canvas, pivot (32,26 top-origin).
-            Vector3 expected=state.transform.position+new Vector3(facing*22f/32f,-22f/32f,0);
+            // Heel contact is (42,48), pivot (32,26 top-origin).
+            Vector3 expected=state.transform.position+new Vector3(facing*10f/32f,-22f/32f,0);
             Assert.That(Vector3.Distance(kick.transform.position,expected),Is.LessThan(.001f));
             Assert.That(beforeContact.Contains(expected),Is.True);
             Assert.That(state.GetComponent<SpriteRenderer>().sprite.name,Is.EqualTo("AirRoundhouse_16"));
@@ -172,6 +172,95 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(state.GetComponent<Rigidbody2D>().gravityScale,Is.EqualTo(interruption=="PlayerDead"?0:3));
             ((Behaviour)counter).enabled=true;
             Call(director,"ResetTake",2);Assert.That(state.GetComponent<Rigidbody2D>().gravityScale,Is.EqualTo(3));
+        }
+        [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
+        [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
+        public void HeelDropWarpsAboveTheParriedSourceHoldsItsPositionAndHitsItsHead(int fps,bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            bool sawArrival=false,sawCharge=false,sawHit=false;Vector2 hover=default;
+            var enemy=(Component)Get<object>(director,"RearEnemy");
+            for(int i=0;i<fps*6&&!sawHit;i++)
+            {
+                Call(director,"StepCapture",1d/fps);
+                int elapsed=Get<int>(counter,"ElapsedFrames");
+                if(Get<bool>(counter,"IsActive")&&elapsed>=2&&elapsed<18)
+                {
+                    sawArrival=true;hover=Get<Vector2>(counter,"HoverPosition");
+                    Assert.That(Vector2.Distance(state.transform.position,hover),Is.LessThan(.005f));
+                    Assert.That(hover.y-enemy.transform.position.y,Is.EqualTo(1.35f).Within(.005f));
+                    Assert.That(Mathf.Abs(hover.x-enemy.transform.position.x),Is.EqualTo(3/32f).Within(.005f));
+                    Assert.That(Get<bool>(presentation,"IsPlayerBodyVisible"),Is.False);
+                }
+                if(Get<bool>(presentation,"IsCharged"))
+                {
+                    sawCharge=true;Assert.That(Vector2.Distance(state.transform.position,hover),Is.LessThan(.005f));
+                    Assert.That(Get<object>(counter,"SelectedTarget"),Is.SameAs(enemy));
+                    Assert.That(Get<bool>(presentation,"IsPlayerBodyVisible"),Is.True);
+                }
+                if(Get<int>(enemy,"HitCount")>0)
+                {
+                    sawHit=true;Vector2 contact=Get<Vector2>(counter,"ContactPoint");
+                    Assert.That(contact.x,Is.EqualTo(enemy.transform.position.x+(mirrored?1:-1)*7/32f).Within(.005f));
+                    Assert.That(contact.y-enemy.transform.position.y,Is.InRange(.4f,.55f));
+                    Assert.That(state.transform.position.y,Is.LessThan(hover.y));
+                    Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.True);
+                }
+            }
+            Assert.That(sawArrival&&sawCharge&&sawHit,Is.True);
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void CeilingBlocksTheOverheadWarpAndReleasesAllCounterOwnership(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            for(int i=0;i<230&&!Marks().Any(m=>(string)m.GetType().GetField("kind").GetValue(m)=="Parry");i++) Step();
+            var enemy=(Component)Get<object>(director,"RearEnemy");
+            var ceiling=new GameObject("HeelDropCeiling");ceiling.layer=LayerMask.NameToLayer("Ground");
+            ceiling.transform.position=new Vector3(enemy.transform.position.x,2.9f,0);
+            ceiling.AddComponent<BoxCollider2D>().size=new Vector2(1.6f,.1f);Physics2D.SyncTransforms();
+            try
+            {
+                for(int i=0;i<40;i++) Step();
+                Assert.That(Get<string>(counter,"LastEndReason"),Is.EqualTo("ApproachBlocked"));
+                Assert.That(Get<bool>(counter,"IsActive"),Is.False);Assert.That(Get<int>(enemy,"HitCount"),Is.Zero);
+                Assert.That(Get<bool>(counter,"IsCounterInvincible"),Is.False);
+                Assert.That(Get<object>(counter,"SelectedTarget"),Is.Null);
+                Assert.That(Get<bool>(presentation,"IsPlayerBodyVisible"),Is.True);
+                Assert.That(Get<bool>(presentation,"IsTransitShadowVisible"),Is.False);
+                Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
+                Assert.That(state.GetComponent<Rigidbody2D>().gravityScale,Is.EqualTo(3));
+            }
+            finally { Object.DestroyImmediate(ceiling); }
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void EnemyKeepsItsContactPoseThroughHeelHitstopThenCollapses(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            var enemy=(Component)Get<object>(director,"RearEnemy");var renderer=enemy.GetComponentInChildren<SpriteRenderer>();
+            Sprite before=null;
+            for(int i=0;i<300&&Get<int>(enemy,"HitCount")==0;i++) { before=renderer.sprite;Step(); }
+            Assert.That(Get<int>(enemy,"HitCount"),Is.EqualTo(1));
+            Assert.That(renderer.sprite,Is.SameAs(before));
+            for(int i=0;i<6;i++) { Step();Assert.That(renderer.sprite,Is.SameAs(before)); }
+            for(int i=0;i<10;i++) Step();
+            Assert.That(renderer.sprite.name,Does.StartWith("Enemy_Death_"));
+        }
+        [Test] public void SubmittedAttackPreservesItsPixelScaleAndCumulativeNativeTiming()
+        {
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            var art=Get<object>(driver,"Art");var action=Call(art,"Find","VerticalSlash");
+            var frames=Get<Sprite[]>(action,"frames");
+            Assert.That(frames.Length,Is.EqualTo(9));
+            Assert.That(Get<bool>(action,"provisional"),Is.True);
+            Assert.That(Get<int[]>(action,"durations"),Is.EqualTo(new[]{4,4,5,4,4,4,4,5,4}));
+            Assert.That(Get<int>(action,"hitFrame"),Is.EqualTo(17));
+            foreach(var sprite in frames)
+            {
+                Assert.That(sprite.rect.size,Is.EqualTo(new Vector2(128,128)));
+                Assert.That(sprite.pivot,Is.EqualTo(new Vector2(32,38)));
+                Assert.That(sprite.pixelsPerUnit,Is.EqualTo(32));
+            }
+            Assert.That(Get<bool>(art,"playerArtworkIsRough"),Is.True,"One provisional action does not finish the remaining artwork.");
         }
         [Test] public void KickInvulnerabilityRejectsAnotherAttackerAndEndsOnReset()
         {
@@ -400,9 +489,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(presentation,"IsTransitShadowVisible"),Is.True);
             var enemy=(Component)Get<object>(counter,"SelectedTarget");
             for(int i=0;i<8&&Get<int>(counter,"ElapsedFrames")<2;i++) Call(director,"StepCapture",1d/fps);
-            float expected=enemy.transform.position.x+(mirrored?-.85f:.85f);
+            float expected=enemy.transform.position.x+(mirrored?-3/32f:3/32f);
             Assert.That(state.transform.position.x,Is.EqualTo(expected).Within(.015f));
-            Assert.That(state.transform.position.y,Is.EqualTo(1.55f).Within(.02f));
+            Assert.That(state.transform.position.y,Is.EqualTo(enemy.transform.position.y+1.35f).Within(.02f));
             Vector3 arrival=state.transform.position;
             for(int i=0;i<fps&&!Get<bool>(presentation,"IsCharged");i++)
             {
@@ -479,13 +568,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for(int i=0;i<16;i++) Step();
             Vector3 airborne=enemy.transform.position;Quaternion rotation=enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation;
             double real=Get<double>(director,"RealElapsed");
-            Assert.That(airborne.y-origin.y,Is.GreaterThan(.8f));Assert.That(rotation,Is.Not.EqualTo(Quaternion.identity));
+            Assert.That(airborne.y-origin.y,Is.InRange(.1f,.2f));Assert.That(rotation,Is.Not.EqualTo(Quaternion.identity));
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});for(int i=0;i<60;i++) Step();
             Assert.That(enemy.transform.position,Is.EqualTo(airborne));Assert.That(enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation,Is.EqualTo(rotation));
             Assert.That(Get<double>(director,"RealElapsed"),Is.EqualTo(real));Assert.That(Get<bool>(director,"Completed"),Is.False,"Pause must not end the take between landing and recovery start.");
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
             for(int i=0;i<180&&!Get<bool>(director,"Completed");i++) Step();
-            Assert.That((enemy.transform.position.x-origin.x)*(mirrored?1:-1),Is.EqualTo(2.25f).Within(.02f));
+            Assert.That((enemy.transform.position.x-origin.x)*(mirrored?1:-1),Is.EqualTo(1.4f).Within(.02f));
             Assert.That(Get<int>(enemy,"HitCount"),Is.EqualTo(1));
             Call(director,"ResetTake",4);Assert.That(Get<bool>(driver,"IsLaunched"),Is.False);
             Assert.That(enemy.transform.position,Is.EqualTo(origin));Assert.That(enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation,Is.EqualTo(Quaternion.identity));
@@ -724,7 +813,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
             finally { Object.DestroyImmediate(wall); }
         }
         private static Component Find(string name)=>(Component)Object.FindFirstObjectByType(Type.GetType(name+", Assembly-CSharp",true));
-        private static T Get<T>(object target,string name)=>(T)target.GetType().GetProperty(name,Flags).GetValue(target);
+        private static T Get<T>(object target,string name)
+        {
+            var property=target.GetType().GetProperty(name,Flags);
+            return (T)(property!=null?property.GetValue(target):target.GetType().GetField(name,Flags).GetValue(target));
+        }
         private static void Set(object target,string name,object value)=>target.GetType().GetProperty(name,Flags).SetValue(target,value);
         private static object Call(object target,string name,params object[] values)
         { return target.GetType().GetMethods(Flags).Single(m=>m.Name==name&&m.GetParameters().Length==values.Length).Invoke(target,values); }

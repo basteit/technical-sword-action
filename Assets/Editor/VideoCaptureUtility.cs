@@ -103,7 +103,7 @@ public static class VideoCaptureUtility
             }
             Check(director.Completed,"Capture did not complete.");
             var art=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(CombatVideoArtBuilder.LibraryPath);
-            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,playerArtworkIsRough=defenseCancel||(stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough),takeKind=defenseCancel?"defense-cancel":"sequential",events=director.Marks.ToArray()},true));
+            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,playerArtworkIsRough=defenseCancel||(stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough),takeKind=defenseCancel?"defense-cancel":"sequential",counterAction=director.Player.GetComponent<PlayerParryCounter2D>().IsOverheadHeelDrop?"OverheadHeelDrop":"AirRoundhouse",provisionalActions=art.motions.Where(m=>m.provisional).Select(m=>m.name).ToArray(),events=director.Marks.ToArray()},true));
             return folder;
         }
         finally
@@ -112,5 +112,5 @@ public static class VideoCaptureUtility
             director.ResetTake(stages);clock.ManualAdvanceOnly=previous;
         }
     }
-    [Serializable] private sealed class CaptureReport { public int frameCount,fps;public double duration;public bool playerArtworkIsRough;public string takeKind;public CombatVideoDirector.Mark[] events; }
+    [Serializable] private sealed class CaptureReport { public int frameCount,fps;public double duration;public bool playerArtworkIsRough;public string takeKind,counterAction;public string[] provisionalActions;public CombatVideoDirector.Mark[] events; }
 }

@@ -13,7 +13,7 @@ public static class CombatVideoArtBuilder
     public const string EnemyControllerPath=Folder+"/CombatVideoEnemy.controller";
     public const string LibraryPath="Assets/Settings/CombatVideoArt.asset";
     [Serializable] private sealed class Manifest { public ActionData[] actions; }
-    [Serializable] private sealed class ActionData { public string name;public int hitFrame,branchFrame,totalFrames,chargeFrame,releaseFrame,landingFrame,recoveryFrame;public FrameData[] frames; }
+    [Serializable] private sealed class ActionData { public string name;public int hitFrame,branchFrame,totalFrames,chargeFrame,releaseFrame,landingFrame,recoveryFrame,canvasWidth,canvasHeight,pivotX,pivotY;public bool provisional;public FrameData[] frames; }
     [Serializable] private sealed class FrameData { public int frames,start; }
     [Serializable] private sealed class EyeManifest { public EyeFrame[] frames; }
     [Serializable] private sealed class EyeFrame { public string file;public int pixels; }
@@ -26,6 +26,20 @@ public static class CombatVideoArtBuilder
         bool hasShowcase=File.Exists(showcaseFolder+"/timing-manifest.json");
         if(hasShowcase)
             manifest.actions=manifest.actions.Concat(JsonUtility.FromJson<Manifest>(File.ReadAllText(showcaseFolder+"/timing-manifest.json")).actions).ToArray();
+        const string heelFolder="Assets/Art/Player/VideoHeelDrop";
+        bool hasHeel=File.Exists(heelFolder+"/timing-manifest.json");
+        if(hasHeel)
+        {
+            var heel=JsonUtility.FromJson<Manifest>(File.ReadAllText(heelFolder+"/timing-manifest.json"));
+            for(int i=0;i<manifest.actions.Length;i++) manifest.actions[i]=heel.actions.FirstOrDefault(a=>a.name==manifest.actions[i].name)??manifest.actions[i];
+        }
+        const string submittedFolder="Assets/Art/Player/VideoSubmitted";
+        bool hasSubmitted=File.Exists(submittedFolder+"/timing-manifest.json");
+        if(hasSubmitted)
+        {
+            var submitted=JsonUtility.FromJson<Manifest>(File.ReadAllText(submittedFolder+"/timing-manifest.json"));
+            for(int i=0;i<manifest.actions.Length;i++) manifest.actions[i]=submitted.actions.FirstOrDefault(a=>a.name==manifest.actions[i].name)??manifest.actions[i];
+        }
         const string cleanFolder="Assets/Art/Player/VideoClean";
         bool hasClean=File.Exists(cleanFolder+"/timing-manifest.json");
         if(hasClean)
@@ -36,17 +50,21 @@ public static class CombatVideoArtBuilder
         var motions=new List<VideoArtLibrary.Motion>();
         var paths=SelectCleanFrames("Assets/Art/Player/VideoRough").Concat(Directory.GetFiles("Assets/Art/Player/VideoRough","*Reference_??.png")).Concat(Directory.GetFiles("Assets/Art/Video","*.png"));
         if(hasShowcase) paths=paths.Concat(SelectCleanFrames(showcaseFolder));
+        if(hasHeel) paths=paths.Concat(SelectCleanFrames(heelFolder));
+        if(hasSubmitted) paths=paths.Concat(SelectCleanFrames(submittedFolder));
         if(hasClean) paths=paths.Concat(SelectCleanFrames(cleanFolder));
         var groups=paths.Select(p=>p.Replace('\\','/')).Where(p=>System.Text.RegularExpressions.Regex.IsMatch(p,@"_\d\d\.png$")).GroupBy(p=>Path.GetFileNameWithoutExtension(p)[..^3]);
-        var frames=groups.SelectMany(g=>g.Any(p=>p.StartsWith(cleanFolder))?g.Where(p=>p.StartsWith(cleanFolder)):g).ToArray();
+        var frames=groups.SelectMany(g=>g.Any(p=>p.StartsWith(cleanFolder+"/"))?g.Where(p=>p.StartsWith(cleanFolder+"/")):
+            g.Any(p=>p.StartsWith(submittedFolder+"/"))?g.Where(p=>p.StartsWith(submittedFolder+"/")):
+            g.Any(p=>p.StartsWith(heelFolder+"/"))?g.Where(p=>p.StartsWith(heelFolder+"/")):g).ToArray();
         var eyeCounts=new Dictionary<string,int>();
-        foreach(string folder in new[]{"Assets/Art/Player/VideoRough",showcaseFolder,cleanFolder})
+        foreach(string folder in new[]{"Assets/Art/Player/VideoRough",showcaseFolder,heelFolder,submittedFolder,cleanFolder})
         {
             string file=folder+"/eye-mask-manifest.json";if(!File.Exists(file)) continue;
             foreach(var frame in JsonUtility.FromJson<EyeManifest>(File.ReadAllText(file)).frames)
                 eyeCounts[folder+"/EyeMasks/"+frame.file+".png"]=frame.pixels;
         }
-        foreach(string path in frames.Concat(eyeCounts.Keys))
+        foreach(string path in frames.Concat(eyeCounts.Keys.Where(p=>frames.Contains(p.Replace("/EyeMasks/","/")))))
         {
             var importer=(TextureImporter)AssetImporter.GetAtPath(path);
             importer.textureType=TextureImporterType.Sprite;importer.spriteImportMode=SpriteImportMode.Single;
@@ -54,7 +72,12 @@ public static class CombatVideoArtBuilder
             importer.mipmapEnabled=false;importer.alphaIsTransparency=true;
             var textureSettings=new TextureImporterSettings();importer.ReadTextureSettings(textureSettings);
             textureSettings.spriteAlignment=(int)SpriteAlignment.Custom;
-            textureSettings.spritePivot=path.Contains("/Player/")||Path.GetFileName(path).StartsWith("Enemy_")?new Vector2(.5f,38f/64):new Vector2(.5f,.5f);
+            string motionName=Path.GetFileNameWithoutExtension(path)[..^3];
+            var action=manifest.actions.FirstOrDefault(a=>a.name==motionName);
+            textureSettings.spritePivot=action!=null&&action.canvasWidth>0?
+                new Vector2(action.pivotX/(float)action.canvasWidth,action.pivotY/(float)action.canvasHeight):
+                motionName=="Fx_HeelLightning"?new Vector2(.5f,64f/192):
+                path.Contains("/Player/")||Path.GetFileName(path).StartsWith("Enemy_")?new Vector2(.5f,38f/64):new Vector2(.5f,.5f);
             importer.SetTextureSettings(textureSettings);
             importer.SaveAndReimport();
         }
@@ -64,12 +87,13 @@ public static class CombatVideoArtBuilder
             var action=manifest.actions.FirstOrDefault(a=>a.name==name);
             if(action!=null) durations=action.frames.Select(f=>f.frames).ToArray();
             else if(name=="Fx_Kick") durations=new[]{1,1,2,3,3,3,3,3};
+            else if(name=="Fx_HeelLightning") durations=new[]{1,1,2,2,3,3,4,4};
             else if(name=="Fx_Parry") durations=new[]{2,1,1,1,1,2,2,2};
             else if(name=="Fx_Slash") durations=new[]{1,1,1,1,2,2,2,2};
             else durations=Enumerable.Repeat(name=="IdleReference"?6:name=="WalkReference"?5:name=="Enemy_Idle"?8:name=="Enemy_Windup"?5:name=="Fx_Vanish"?3:4,group.Count()).ToArray();
             var ordered=group.OrderBy(p=>p).ToArray();
             var eyes=ordered.Select(p=>Path.GetDirectoryName(p).Replace('\\','/')+"/EyeMasks/"+Path.GetFileName(p)).Select(p=>eyeCounts.TryGetValue(p,out int count)&&count>0?AssetDatabase.LoadAssetAtPath<Sprite>(p):null).ToArray();
-            motions.Add(new VideoArtLibrary.Motion {name=name,frames=ordered.Select(p=>AssetDatabase.LoadAssetAtPath<Sprite>(p)).ToArray(),eyeFrames=eyes,durations=durations,hitFrame=action?.hitFrame??0,branchFrame=action?.branchFrame??0,chargeFrame=action?.chargeFrame??0,releaseFrame=action?.releaseFrame??0,landingFrame=action?.landingFrame??0,recoveryFrame=action?.recoveryFrame??0});
+            motions.Add(new VideoArtLibrary.Motion {name=name,provisional=action?.provisional??false,frames=ordered.Select(p=>AssetDatabase.LoadAssetAtPath<Sprite>(p)).ToArray(),eyeFrames=eyes,durations=durations,hitFrame=action?.hitFrame??0,branchFrame=action?.branchFrame??0,chargeFrame=action?.chargeFrame??0,releaseFrame=action?.releaseFrame??0,landingFrame=action?.landingFrame??0,recoveryFrame=action?.recoveryFrame??0});
         }
         string backgroundPath="Assets/Art/Video/CaptureTrainingGrid.png";
         var bg=(TextureImporter)AssetImporter.GetAtPath(backgroundPath);bg.textureType=TextureImporterType.Sprite;bg.spritePixelsPerUnit=32;bg.filterMode=FilterMode.Point;bg.textureCompression=TextureImporterCompression.Uncompressed;bg.mipmapEnabled=false;bg.SaveAndReimport();

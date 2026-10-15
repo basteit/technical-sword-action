@@ -107,6 +107,8 @@ public static class CombatVideoSceneBuilder
         Set(counter,"chargeReleaseFrame",kick.releaseFrame>0?kick.releaseFrame:24);Set(counter,"landingFrame",kick.landingFrame>0?kick.landingFrame:36);Set(counter,"maxApproach",1.2f);
         Set(counter,"landingRollDistance",0f);
         Set(counter,"blinkApproach",true);Set(counter,"blinkTravelFrames",2);
+        Set(counter,"overheadHeelDrop",true);
+        Set(counter,"heelTargetHeadOffsetX",7/32f);
         actor.AddComponent<PlayerStateMachine>();actor.AddComponent<PlayerVisualRecovery2D>();Set(actor.AddComponent<VideoPlayerAnimationDriver>(),"library",library);
         return actor;
     }
@@ -128,7 +130,7 @@ public static class CombatVideoSceneBuilder
         Set(animation,"hitbackObstacles",1<<LayerMask.NameToLayer("Ground"));
         obj.SetActive(true); return damageable;
     }
-    private static void ConfigureAttack(PlayerAttack2D attack,VideoArtLibrary library)
+    internal static void ConfigureAttack(PlayerAttack2D attack,VideoArtLibrary library)
     {
         var data=new SerializedObject(attack);var steps=data.FindProperty("attackSteps");
         var motions=new[]{"VerticalSlash","HorizontalSlash","RapidSheathe","IaiSlash"}.Select(library.Find).ToArray();

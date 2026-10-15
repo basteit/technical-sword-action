@@ -18,6 +18,7 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     private PlayerActionState lastAction = (PlayerActionState)(-1);
     private long parryStartTick;
     public bool IsRecovering=>recovery!=null&&recovery.IsPlaying;
+    public VideoArtLibrary Art=>library;
     public int CombatTickOrder => 310;
     private void OnEnable()
     {

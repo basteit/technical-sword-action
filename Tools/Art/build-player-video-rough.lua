@@ -43,7 +43,7 @@ local function limb(im,a,b,d,w,color)
   line(im,a,b,w+2,C.outline);line(im,b,d,w+2,C.outline)
   line(im,a,b,w,color);line(im,b,d,w,color)
 end
-local function head(im,hx,hy,angle,view,face)
+local function head(im,hx,hy,angle,view,face,eyeWidth)
   local co=math.cos(angle*math.pi/180);local si=math.sin(angle*math.pi/180)
   local function point(x,y) return {hx+face*x*co-y*si,hy+face*x*si+y*co} end
   local function shape(points,c) local t={};for _,p in ipairs(points) do t[#t+1]=point(p[1],p[2]) end;poly(im,t,c) end
@@ -59,7 +59,7 @@ local function head(im,hx,hy,angle,view,face)
     -- Large pale fringe and two cheek locks identify the original hairstyle.
     shape({{-7,-3},{-3,-8},{3,-8},{7,-4},{9,0},{8,4},{6,3},{4,-2},{1,1},{-1,-2},{-4,2},{-4,7},{-7,4}},C.hair)
     stroke({-5,-3},{-2,-6},1,C.shade)
-    if side then stroke({6,2},{6,4},1,C.eye) end
+    if side then stroke({6,2},{6,4},eyeWidth or 1,C.eye) end
   else
     shape({{-5,-5},{0,-8},{5,-5},{7,1},{5,8},{-2,9},{-6,4}},C.hair)
     stroke({-3,-4},{-4,5},1,C.shade)
@@ -91,7 +91,7 @@ local function pose(im,weapon,p)
   limb(im,{neck[1]+shoulder,neck[2]+1},elbow,hand,3,C.hair)
   disk(im,hand[1],hand[2],1.5,C.skin)
   local lh=p.lhand or {x-7,36};limb(im,{neck[1]-shoulder,neck[2]+1},p.lelbow or {neck[1]-7,neck[2]+6},lh,3,C.hair);disk(im,lh[1],lh[2],1,C.skin)
-  head(im,p.hx or x,hy,p.angle or 0,p.headView or (back and 'back' or p.view or 'three'),face)
+  head(im,p.hx or x,hy,p.angle or 0,p.headView or (back and 'back' or p.view or 'three'),face,p.eyeWidth)
   -- Sheath belongs to the body; blade motion is independently editable.
   line(im,{hip[1]-5,hip[2]-7},{hip[1]-15,hip[2]+11},2,C.outline)
   if p.tip then
@@ -255,6 +255,31 @@ for i=1,8 do local a=(i-1)*math.pi/4;local stride=math.sin(a)*8
 end
 actions[#actions+1]=move
 local showcaseOnly=app.params['showcase-only']=='true'
+local heelOnly=app.params['heel-only']=='true'
+if heelOnly then
+  -- Compatibility Action name retained for existing clips; this is now a raised-leg
+  -- heel drop, without the former full body rotation. The first 18 ticks are hidden.
+  local heel=actions[6]
+  local raised={hx=20,hy=26,neck={24,34},hip={32,31},angle=12,view='side',hand={24,42},elbow={19,36},lhand={31,40},tail={7,38},hem={27,43},left={{28,43},{20,46}},right={{41,19},{43,7}}}
+  heel.poses={}
+  for i=1,11 do
+    local p={};for k,v in pairs(raised) do p[k]=v end
+    -- Small opposing head/hip changes show tension in the slow, with one clear leg.
+    p.hx=20+(i>=9 and 1 or 0);p.hy=26+(i>=8 and 1 or 0)
+    p.right={{41+(i>=9 and 1 or 0),19},{43+(i>=9 and 1 or 0),7}}
+    heel.poses[i]=p
+  end
+  heel.poses[12]={hx=20,hy=25,neck={24,33},hip={32,31},angle=8,view='side',hand={23,42},elbow={18,35},lhand={30,41},tail={6,38},hem={25,44},left={{27,43},{19,47}},right={{45,18},{54,7}},arc={{43,5},{52,5},{58,9}}}
+  heel.poses[13]={hx=20,hy=23,neck={25,31},hip={32,31},angle=3,view='side',hand={22,41},elbow={18,34},lhand={31,40},tail={5,36},hem={24,43},left={{26,43},{18,47}},right={{46,24},{59,18}},arc={{46,4},{58,11},{62,22}}}
+  heel.poses[14]={hx=21,hy=21,neck={26,29},hip={33,31},angle=-3,view='side',hand={22,40},elbow={18,33},lhand={32,39},tail={5,32},hem={22,43},left={{25,43},{17,48}},right={{46,30},{57,32}},arc={{58,11},{62,23},{59,36}}}
+  heel.poses[15]={hx=21,hy=19,neck={26,28},hip={33,31},angle=-6,view='side',hand={23,38},elbow={19,31},lhand={33,37},tail={5,28},hem={21,42},left={{25,43},{17,49}},right={{44,34},{49,43}},arc={{61,24},{57,37},{48,46}}}
+  heel.poses[16]={hx=22,hy=17,neck={27,27},hip={33,31},angle=-8,view='side',hand={24,36},elbow={20,29},lhand={33,36},tail={6,23},hem={21,42},left={{24,43},{17,49}},right={{43,37},{42,48}},arc={{56,34},{48,46},{42,50}}}
+  heel.poses[17]={hx=26,hy=23,neck={29,32},hip={32,37},angle=5,view='side',hand={37,39},elbow={33,32},lhand={26,40},tail={8,20},hem={21,46},left={{23,47},{19,54}},right={{43,46},{44,56}}}
+  heel.poses[18]={hx=34,hy=31,neck={31,39},hip={29,44},angle=15,view='side',hand={47,52},elbow={42,43},lhand={25,47},tail={11,22},hem={19,46},left={{21,49},{15,56}},right={{43,47},{48,56}}}
+  heel.poses[19]=recoveries[6].poses[1]
+  for _,p in ipairs(heel.poses) do p.eyeWidth=2 end
+  actions={heel,recoveries[6]}
+end
 if showcaseOnly then
   local dash={name='Dash',frames={2,3,3,4},hit=0,poses={
     {hx=39,hy=31,neck={34,39},hip={30,46},angle=18,view='side',hand={43,48},elbow={43,40},lhand={27,46},tail={13,24},hem={16,43},left={{21,50},{15,56}},right={{43,48},{48,56}}},
@@ -292,7 +317,7 @@ local function frame(duration)
   index=index+1;if index>1 then s:newEmptyFrame(index) end
   s.frames[index].duration=duration
 end
-for _,r in ipairs(showcaseOnly and {} or {{sprite=idle,name='IdleReference'},{sprite=walk,name='WalkReference'}}) do
+for _,r in ipairs((showcaseOnly or heelOnly) and {} or {{sprite=idle,name='IdleReference'},{sprite=walk,name='WalkReference'}}) do
   local first=index+1;local sheet=Image(#r.sprite.frames*64,64,ColorMode.RGB)
   for i,f in ipairs(r.sprite.frames) do
     frame(f.duration);local im=Image(r.sprite.spec);im:drawSprite(r.sprite,i)
@@ -346,9 +371,9 @@ end
 -- Aseprite extends a tag when a new frame is appended at its end. Restore all
 -- intended ranges only after creating the entire document.
 for _,b in ipairs(tagBounds) do b.tag.fromFrame=b.first;b.tag.toFrame=b.last end
-local file=out .. (showcaseOnly and '/Player_mobility_rough.aseprite' or '/Player_actions_rough.aseprite');s:saveAs(file);s:close()
+local file=out .. (heelOnly and '/Player_heel_drop_rough.aseprite' or showcaseOnly and '/Player_mobility_rough.aseprite' or '/Player_actions_rough.aseprite');s:saveAs(file);s:close()
 local reopen=app.open(file)
-assert(#reopen.layers==8 and #reopen.tags==(showcaseOnly and 2 or 18) and #reopen.frames==index)
+assert(#reopen.layers==8 and #reopen.tags==((showcaseOnly or heelOnly) and 2 or 18) and #reopen.frames==index)
 for _,b in ipairs(tagBounds) do
   local found=false
   for _,tag in ipairs(reopen.tags) do if tag.name==b.name then

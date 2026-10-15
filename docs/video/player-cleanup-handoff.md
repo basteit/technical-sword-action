@@ -1,5 +1,7 @@
 # 主人公アクション — 清書受け渡し
 
+**2026-10-16更新：** 1段目は `VideoSubmitted/20261016/Player_attack_1.aseprite` を仮受領。128pxの余白を含め32PPU/接地を維持し、9×70ms→Unity38F、命中17F/次段34Fへ接続した。後ろ髪/復帰は今回の動画では待たない。反撃の清書元は別ファイル `VideoHeelDrop/Player_heel_drop_rough.aseprite` に切り替え、全身回転から頭上のかかと落としへ変更。以下の旧ラフの一覧より[最新の素材/タイミング](attack1-submission-and-heel-drop.md)を優先する。
+
 編集元: `Assets/Art/Player/VideoRough/Player_actions_rough.aseprite`。
 原素材の待機・歩きは変更していない。Asepriteで作成し、保存後の再読込で8レイヤー・119コマ・18タグと全タグの開始/終了コマを検証した。2026-10-13の全身を縦回転させる振り下ろし蹴り、斬撃のつなぎと踏ん張り、足場を保つ軽い弾きを反映した版を使う。白いトレーニング空間、単色床、影を残す瞬間接近、地上復帰と全入力キャンセルは維持する。
 

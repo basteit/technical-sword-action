@@ -1,5 +1,7 @@
 # 1段目「縦斬り」の作画ガイド（2026-10-13）
 
+**2026-10-16 仮提出を受領：** 今回は `Player_attack_1.aseprite` の9コマ×70msをそのまま使い、128×128/32PPU/Pivot(32,38)、命中17F/次段34Fへ合わせた。後ろ髪と復帰は今回の動画の前提にしない。[受領版のコマ表と動画接続](attack1-submission-and-heel-drop.md)を正とし、以下の8コマ/10F/22Fは旧ラフを説明する履歴として残す。
+
 編集元は `Assets/Art/Player/VideoRough/Player_actions_rough.aseprite`。`VerticalSlash` と `Recovery_VerticalSlash` を選ぶ。最初の14コマは元idle/walkの非表示参照。別名 `Player_actions_clean.aseprite` に保存し、CleanUpレイヤーへ描く。原素材とラフのファイルは保持する。
 
 ![全コマ](rough-previews/first-slash-all-frames.png)

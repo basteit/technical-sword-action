@@ -1,4 +1,4 @@
-param([string]$FfmpegPath)
+param([string]$FfmpegPath,[ValidatePattern('^[a-z0-9-]*$')][string]$Revision='')
 $ErrorActionPreference = 'Stop'
 $videoProjectRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 Push-Location $videoProjectRoot
@@ -23,6 +23,7 @@ try {
         }
         $videoTier = if ($videoMetadata.playerArtworkIsRough) { 'rough' } else { 'final' }
         $videoName = $videoVariant -replace 'stage-', "stage-$videoTier-"
+        if ($Revision) { $videoName="$videoVariant-$Revision" }
         $videoOutput = "docs/video/previews/combat-$videoName.mp4"
         & $FfmpegPath -hide_banner -loglevel error -framerate 60 -i (Join-Path $videoCaptureDir 'frame-%04d.png') -frames:v $videoMetadata.frameCount -c:v libx264 -crf 16 -preset slow -pix_fmt yuv420p -an -movflags +faststart -y $videoOutput
         if ($LASTEXITCODE -ne 0) { throw "Encoding failed: $videoVariant" }
