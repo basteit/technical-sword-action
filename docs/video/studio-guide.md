@@ -105,7 +105,7 @@ FFmpegが必要。PATH上の実行ファイル、または既存のローカル�
 
 ## 元の待機・歩きの確認動画
 
-[6秒の確認動画・通常ゲーム相当の距離](previews/studio-idle-walk-game-scale.mp4)は、`Assets/Art/Player/Player_idle.aseprite` と `Player_walk.aseprite` をAseprite本体から毎回読み出し、スタジオのCameraで撮影したもの。敵・ギミック・HUDを隠し、通常のSampleScene／BasicActionValidationと同じカメラサイズ5・固定カメラで左右の歩きを確認できる。[以前のアップ版](previews/studio-idle-walk-original.mp4)も比較用に保持する。
+[標準速度の6秒確認動画](previews/studio-idle-walk-standard.mp4)は、`Assets/Art/Player/Player_idle.aseprite` と `Player_walk.aseprite` をAseprite本体から毎回読み出し、スタジオのCameraで撮影したもの。敵・ギミック・HUDを隠し、通常のSampleScene／BasicActionValidationと同じカメラサイズ5・固定カメラで左右の歩きを確認できる。[採用前の通常画角版](previews/studio-idle-walk-game-scale.mp4)と[以前のアップ版](previews/studio-idle-walk-original.mp4)も比較用に保持する。
 
 | 実時間 | 動き |
 |---|---|
@@ -115,7 +115,9 @@ FFmpegが必要。PATH上の実行ファイル、または既存のローカル�
 | 3.4–5.0秒 | 左へ歩く |
 | 5.0–6.0秒 | 左向きの待機 |
 
-待機は6コマ×100ms、歩きは8コマ×80msの元のタイミングを使う。60fpsへ時刻でサンプリングするため、歩きの各コマは4または5フレーム表示となる。歩行速度は確認用の3unit/s（以前のアップ版は2unit/s）。通常ゲームの画角に合わせ、今回は1080pで1ドット3.375pxとなるPoint描画を使う。黒い接地ガイド専用の `Layer 1` だけを書き出し時に非表示にし、キャラクター・元ファイル・ゲーム本編の素材設定は変更しない。未知の絵がガイドレイヤーに追加された場合は、非表示処理を拒否する。
+2026-10-16に、下記の比較の**1.5倍版を標準の歩行速度として採用**。`PlayerMotor2D.StandardMoveSpeed` は **4.4019unit/s**、現行床の摩擦込みで実測約 **4.2057unit/s**。コンポーネントの初期値と、SampleScene／BasicActionValidation／CombatVideo／CombatVideoDefenseCancel／CombatVideoStudioのプレイヤー設定を一致させる。今後の引数なしの撮影もこの標準値を使う。
+
+待機は6コマ×100ms、歩きは8コマ×80msの元のタイミングを使い、速度採用に伴うモーションの再生速度変更は行わない。60fpsへ時刻でサンプリングするため、歩きの各コマは4または5フレーム表示となる。通常ゲームの画角に合わせ、1080pで1ドット3.375pxとなるPoint描画を使う。黒い接地ガイド専用の `Layer 1` だけを書き出し時に非表示にし、元のAsepriteは変更しない。未知の絵がガイドレイヤーに追加された場合は、非表示処理を拒否する。
 
 再収録する場合はスタジオをPlayにし、プロジェクト直下のPowerShellで順に実行する。Asepriteの既定パスはユーザー指定のSteam版。異なる環境では `VideoStudioReferenceCapture.cs` のパスを変更する。
 
@@ -124,15 +126,15 @@ uloop execute-dynamic-code --code 'return VideoStudioReferenceCapture.Capture();
 ./Tools/Video/encode-idle-walk.ps1
 ```
 
-360枚すべてを戦闘時計で1/60秒ずつ進めて撮影し、描画速度に依存する録画落ちを避ける。連番PNGは `.uloop/outputs/video/studio-idle-walk-game-scale/`、MP4とタイミングJSONは `docs/video/previews/studio-idle-walk-game-scale.*` に出力。撮影後はカメラ・歩行速度・入力・Animator・敵／ギミックの表示を復元してリセットする。通常のF9録画では引き続き現在のゲーム素材を使用する。
+360枚すべてを戦闘時計で1/60秒ずつ進めて撮影し、描画速度に依存する録画落ちを避ける。連番PNGは `.uloop/outputs/video/studio-idle-walk-standard/`、MP4とタイミングJSONは `docs/video/previews/studio-idle-walk-standard.*` に出力。撮影後はカメラ・歩行速度・入力・Animator・敵／ギミックの表示を復元してリセットする。通常のF9録画では引き続き現在のゲーム素材を使用する。
 
-### さらに歩行を速くした比較
+### 採用時の速度比較（上が現在の標準）
 
-[同時再生版](previews/studio-idle-walk-speed-comparison.mp4)は、直前の通常画角版を1.0倍とし、**上が移動1.5倍、下が移動2.0倍**。両方とも同じ開始位置・カメラ中心・サイズ5・6秒の入力を使い、歩き8コマ×80msの再生速度を維持する。上下版は各Camera画像の余白を縦に切り取って並べ、キャラクターの表示倍率を変えない。
+[採用時の同時再生版](previews/studio-idle-walk-speed-comparison.mp4)は、採用前の通常画角版（移動設定3unit/s）を1.0倍とし、**上が移動1.5倍、下が移動2.0倍**。上を標準として採用した。両方とも同じ開始位置・カメラ中心・サイズ5・6秒の入力を使い、歩き8コマ×80msの再生速度を維持する。上下版は各Camera画像の余白を縦に切り取って並べ、キャラクターの表示倍率を変えない。
 
 [1.5倍の全画面版](previews/studio-idle-walk-speed-1p5x.mp4)／[2倍の全画面版](previews/studio-idle-walk-speed-2x.mp4)も保存する。いずれも1920×1080・60fps・無音。地面に接した基準歩行を事前に測り、既存の摩擦による減速を補正して、**実際の移動量**の比率を合わせる。設定値と実測値は各JSONに記録する。
 
-再撮影はスタジオをPlayにして、以下を順に実行する。元の通常画角版とアップ版を上書きしない。
+当時の比較を再撮影するにはスタジオをPlayにして、以下を順に実行する。引数付きAPIは採用前の基準を保持しており、新しい標準へさらに1.5倍／2倍を掛ける処理ではない。標準版・通常画角版・アップ版を上書きしない。
 
 ```powershell
 uloop execute-dynamic-code --code 'return VideoStudioReferenceCapture.Capture(1.5f);'

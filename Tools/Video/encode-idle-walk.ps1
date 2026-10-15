@@ -1,4 +1,4 @@
-param([string]$FfmpegPath, [ValidateSet('game-scale','speed-1p5x','speed-2x')][string]$Take='game-scale')
+param([string]$FfmpegPath, [ValidateSet('standard','game-scale','speed-1p5x','speed-2x')][string]$Take='standard')
 $ErrorActionPreference='Stop'
 $motionVideoRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 Push-Location $motionVideoRoot

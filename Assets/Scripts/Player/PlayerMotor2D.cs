@@ -6,8 +6,10 @@ using TechnicalSwordAction.PlayerState;
 [RequireComponent(typeof(Collider2D))]
 public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
+    // Approved 1.5x walking take (2026-10-16); about 4.2057 unit/s after floor friction.
+    public const float StandardMoveSpeed = 4.4019f;
     [Header("Move")]
-    [SerializeField] private float moveSpeed = 6.5f;
+    [SerializeField] private float moveSpeed = StandardMoveSpeed;
     [SerializeField] private bool flipSpriteByMoveInput = true;
 
     [Header("Jump")]
@@ -58,6 +60,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     private readonly HashSet<Collider2D> ignoredDashColliders = new();
 
     public float MoveInput => moveInput;
+    public float MoveSpeed => moveSpeed;
     public bool DownInput { get; private set; }
     // The floor traversal executor in #49 consumes this sample with the Jump request.
     public bool JumpDownInput => jumpDownInput;

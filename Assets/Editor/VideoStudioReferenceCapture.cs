@@ -44,7 +44,8 @@ public static class VideoStudioReferenceCapture
         public float requestedSpeedMultiplier=1f, baselineMeasuredSpeed, measuredMoveSpeed, actualSpeedMultiplier;
         public Vector2 cameraCenter;
         public string cameraReferenceScene="Assets/Scenes/SampleScene.unity";
-        public bool audio=false, originalArtwork=true, sourceFloorGuideHidden=true;
+        public bool audio=false, originalArtwork=true, sourceFloorGuideHidden=true, standardWalkSpeed;
+        public string speedReference;
         public MotionRecord[] motions;
         public Segment[] segments;
     }
@@ -70,8 +71,10 @@ public static class VideoStudioReferenceCapture
         }
     }
 
-    public static string Capture() => Capture(1f);
-    public static string Capture(float speedMultiplier)
+    public static string Capture() => CaptureTake(1f,true);
+    // Preserve the previous 3 unit/s comparison reference and its existing output names.
+    public static string Capture(float speedMultiplier) => CaptureTake(speedMultiplier,false);
+    private static string CaptureTake(float speedMultiplier,bool standard)
     {
         if(speedMultiplier!=1f && speedMultiplier!=1.5f && speedMultiplier!=2f)
             throw new ArgumentOutOfRangeException(nameof(speedMultiplier),"Use 1, 1.5 or 2 times the current preview speed.");
@@ -80,7 +83,7 @@ public static class VideoStudioReferenceCapture
         if(studio==null || VideoStudioCapture.IsBusy) throw new InvalidOperationException("An idle filming studio is required.");
         string sourceOutput=Path.GetFullPath(".uloop/outputs/idle-walk-reference");
         ExportOriginals(sourceOutput);
-        string takeName=speedMultiplier==1f?"game-scale":speedMultiplier==1.5f?"speed-1p5x":"speed-2x";
+        string takeName=standard?"standard":speedMultiplier==1f?"game-scale":speedMultiplier==1.5f?"speed-1p5x":"speed-2x";
         string output=Path.GetFullPath(".uloop/outputs/video/studio-idle-walk-"+takeName);
         Directory.CreateDirectory(output);
         using var idle=LoadMotion("idle", sourceOutput);
@@ -109,7 +112,8 @@ public static class VideoStudioReferenceCapture
         var image=new Texture2D(Width,Height,TextureFormat.RGB24,false);
         var previousActive=RenderTexture.active;
         int frame=0;
-        float baselineMeasuredSpeed=0, commandedSpeed=WalkSpeed, walkDistance=0, walkSeconds=0;
+        float referenceSpeed=standard?PlayerMotor2D.StandardMoveSpeed:WalkSpeed;
+        float baselineMeasuredSpeed=0, commandedSpeed=referenceSpeed, walkDistance=0, walkSeconds=0;
         try
         {
             clock.ManualAdvanceOnly=true;
@@ -117,7 +121,7 @@ public static class VideoStudioReferenceCapture
             foreach(var pair in hidden) pair.Key.SetActive(false);
             router.enabled=false; driver.enabled=false; recovery.enabled=false;
             unmanagedAnimatorEnabled=animator.enabled;animator.enabled=false;
-            motorSettings.FindProperty("moveSpeed").floatValue=WalkSpeed;
+            motorSettings.FindProperty("moveSpeed").floatValue=referenceSpeed;
             motorSettings.ApplyModifiedPropertiesWithoutUndo();
             body.interpolation=RigidbodyInterpolation2D.None;
             body.position=new Vector2(0,1); player.transform.position=body.position; motor.SetFacing(1);
@@ -130,7 +134,7 @@ public static class VideoStudioReferenceCapture
             { motor.SetMoveInput(Vector2.right);studio.StepStudio(1d/Fps); }
             baselineMeasuredSpeed=Mathf.Abs(body.linearVelocity.x);
             if(baselineMeasuredSpeed<=0) throw new InvalidOperationException("Could not measure baseline walking speed.");
-            commandedSpeed=WalkSpeed+baselineMeasuredSpeed*(speedMultiplier-1f);
+            commandedSpeed=referenceSpeed+baselineMeasuredSpeed*(speedMultiplier-1f);
             motorSettings.FindProperty("moveSpeed").floatValue=commandedSpeed;
             motorSettings.ApplyModifiedPropertiesWithoutUndo();
             motor.ClearSampledInput();body.linearVelocity=Vector2.zero;
@@ -164,6 +168,7 @@ public static class VideoStudioReferenceCapture
                 walkSpeed=commandedSpeed,requestedSpeedMultiplier=speedMultiplier,baselineMeasuredSpeed=baselineMeasuredSpeed,
                 measuredMoveSpeed=walkDistance/walkSeconds,actualSpeedMultiplier=walkDistance/walkSeconds/baselineMeasuredSpeed,
                 cameraCenter=studio.FixedCameraCenter,
+                standardWalkSpeed=standard,speedReference=standard?"approved-2026-10-16":"previous-game-scale",
                 motions=new[]
                 {
                     new MotionRecord{source=SourceFolder+"Player_idle.aseprite",durationsMs=idle.Durations},
