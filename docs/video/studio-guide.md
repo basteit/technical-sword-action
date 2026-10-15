@@ -126,6 +126,20 @@ uloop execute-dynamic-code --code 'return VideoStudioReferenceCapture.Capture();
 
 360枚すべてを戦闘時計で1/60秒ずつ進めて撮影し、描画速度に依存する録画落ちを避ける。連番PNGは `.uloop/outputs/video/studio-idle-walk-game-scale/`、MP4とタイミングJSONは `docs/video/previews/studio-idle-walk-game-scale.*` に出力。撮影後はカメラ・歩行速度・入力・Animator・敵／ギミックの表示を復元してリセットする。通常のF9録画では引き続き現在のゲーム素材を使用する。
 
+### さらに歩行を速くした比較
+
+[同時再生版](previews/studio-idle-walk-speed-comparison.mp4)は、直前の通常画角版を1.0倍とし、**上が移動1.5倍、下が移動2.0倍**。両方とも同じ開始位置・カメラ中心・サイズ5・6秒の入力を使い、歩き8コマ×80msの再生速度を維持する。上下版は各Camera画像の余白を縦に切り取って並べ、キャラクターの表示倍率を変えない。
+
+[1.5倍の全画面版](previews/studio-idle-walk-speed-1p5x.mp4)／[2倍の全画面版](previews/studio-idle-walk-speed-2x.mp4)も保存する。いずれも1920×1080・60fps・無音。地面に接した基準歩行を事前に測り、既存の摩擦による減速を補正して、**実際の移動量**の比率を合わせる。設定値と実測値は各JSONに記録する。
+
+再撮影はスタジオをPlayにして、以下を順に実行する。元の通常画角版とアップ版を上書きしない。
+
+```powershell
+uloop execute-dynamic-code --code 'return VideoStudioReferenceCapture.Capture(1.5f);'
+uloop execute-dynamic-code --code 'return VideoStudioReferenceCapture.Capture(2f);'
+./Tools/Video/encode-idle-walk-comparison.ps1
+```
+
 ## 従来の動画制作との関係
 
 - `Assets/Scenes/CombatVideo.unity`：通常コンボ → 背後パリィ → 空中蹴り。

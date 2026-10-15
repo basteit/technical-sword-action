@@ -41,6 +41,8 @@ public static class VideoStudioReferenceCapture
         public int fps=Fps, width=Width, height=Height, frameCount;
         public double duration;
         public float walkSpeed=WalkSpeed, cameraSize=CaptureCameraSize, finalX;
+        public float requestedSpeedMultiplier=1f, baselineMeasuredSpeed, measuredMoveSpeed, actualSpeedMultiplier;
+        public Vector2 cameraCenter;
         public string cameraReferenceScene="Assets/Scenes/SampleScene.unity";
         public bool audio=false, originalArtwork=true, sourceFloorGuideHidden=true;
         public MotionRecord[] motions;
@@ -68,14 +70,18 @@ public static class VideoStudioReferenceCapture
         }
     }
 
-    public static string Capture()
+    public static string Capture() => Capture(1f);
+    public static string Capture(float speedMultiplier)
     {
+        if(speedMultiplier!=1f && speedMultiplier!=1.5f && speedMultiplier!=2f)
+            throw new ArgumentOutOfRangeException(nameof(speedMultiplier),"Use 1, 1.5 or 2 times the current preview speed.");
         if (!Application.isPlaying) throw new InvalidOperationException("Open CombatVideoStudio and enter PlayMode first.");
         var studio=Object.FindFirstObjectByType<CombatVideoStudio>();
         if(studio==null || VideoStudioCapture.IsBusy) throw new InvalidOperationException("An idle filming studio is required.");
         string sourceOutput=Path.GetFullPath(".uloop/outputs/idle-walk-reference");
         ExportOriginals(sourceOutput);
-        string output=Path.GetFullPath(".uloop/outputs/video/studio-idle-walk-game-scale");
+        string takeName=speedMultiplier==1f?"game-scale":speedMultiplier==1.5f?"speed-1p5x":"speed-2x";
+        string output=Path.GetFullPath(".uloop/outputs/video/studio-idle-walk-"+takeName);
         Directory.CreateDirectory(output);
         using var idle=LoadMotion("idle", sourceOutput);
         using var walk=LoadMotion("walk", sourceOutput);
@@ -103,6 +109,7 @@ public static class VideoStudioReferenceCapture
         var image=new Texture2D(Width,Height,TextureFormat.RGB24,false);
         var previousActive=RenderTexture.active;
         int frame=0;
+        float baselineMeasuredSpeed=0, commandedSpeed=WalkSpeed, walkDistance=0, walkSeconds=0;
         try
         {
             clock.ManualAdvanceOnly=true;
@@ -116,11 +123,24 @@ public static class VideoStudioReferenceCapture
             body.position=new Vector2(0,1); player.transform.position=body.position; motor.SetFacing(1);
             studio.FollowCamera=false; studio.CameraSize=CaptureCameraSize;
             studio.FixedCameraCenter=new Vector2(WalkSpeed*Segments.First(s=>s.direction>0).frameCount/Fps/2,1.05f);
+            // Measure the baseline after contact settles so labels describe actual movement,
+            // including the existing floor friction. All variants keep the same camera.
+            for(int warmup=0;warmup<12;warmup++) studio.StepStudio(1d/Fps);
+            for(int sample=0;sample<8;sample++)
+            { motor.SetMoveInput(Vector2.right);studio.StepStudio(1d/Fps); }
+            baselineMeasuredSpeed=Mathf.Abs(body.linearVelocity.x);
+            if(baselineMeasuredSpeed<=0) throw new InvalidOperationException("Could not measure baseline walking speed.");
+            commandedSpeed=WalkSpeed+baselineMeasuredSpeed*(speedMultiplier-1f);
+            motorSettings.FindProperty("moveSpeed").floatValue=commandedSpeed;
+            motorSettings.ApplyModifiedPropertiesWithoutUndo();
+            motor.ClearSampledInput();body.linearVelocity=Vector2.zero;
+            body.position=new Vector2(0,1);player.transform.position=body.position;motor.SetFacing(1);
             // Settle contact before recording; only the original sprites are sampled below.
             for(int warmup=0;warmup<4;warmup++) studio.StepStudio(1d/Fps);
             foreach(var segment in Segments)
             {
                 var motion=segment.motion=="idle"?idle:walk;
+                float startX=body.position.x;
                 for(int local=0;local<segment.frameCount;local++,frame++)
                 {
                     motor.SetMoveInput(Vector2.right*segment.direction);
@@ -133,12 +153,17 @@ public static class VideoStudioReferenceCapture
                     image.ReadPixels(new Rect(0,0,Width,Height),0,0,false);image.Apply(false);
                     File.WriteAllBytes(Path.Combine(output,$"frame-{frame:D4}.png"),image.EncodeToPNG());
                 }
+                if(segment.direction!=0)
+                { walkDistance+=Mathf.Abs(body.position.x-startX);walkSeconds+=segment.frameCount/(float)Fps; }
             }
             if(Mathf.Abs(body.position.x)>.001f || player.ActionState!=PlayerActionState.Neutral || !motor.IsGrounded)
                 throw new InvalidOperationException("Preview failed to finish grounded at its starting position.");
             var report=new Report
             {
                 scene=studio.gameObject.scene.path, frameCount=frame, duration=frame/(double)Fps, finalX=body.position.x,
+                walkSpeed=commandedSpeed,requestedSpeedMultiplier=speedMultiplier,baselineMeasuredSpeed=baselineMeasuredSpeed,
+                measuredMoveSpeed=walkDistance/walkSeconds,actualSpeedMultiplier=walkDistance/walkSeconds/baselineMeasuredSpeed,
+                cameraCenter=studio.FixedCameraCenter,
                 motions=new[]
                 {
                     new MotionRecord{source=SourceFolder+"Player_idle.aseprite",durationsMs=idle.Durations},
