@@ -1,5 +1,7 @@
 # 撮影と再現
 
+自由操作で敵・足場・アクションを試し、SNS用の静止画／動画を撮る場合は[撮影スタジオの使い方](studio-guide.md)へ。以下は決まったシナリオを全フレーム収録する手順。
+
 作業場所は `C:\Users\hirot\GitHub\technical-sword-action`。Unity 6000.3.9f1、uloop CLI 2.1.3、Aseprite 1.3.18.6で確認した。音声は録画・書き出しに含めない。
 
 ## 素材とScene
@@ -18,7 +20,7 @@ uloop run-tests --test-mode EditMode --filter-type regex --filter-value Technica
 uloop run-tests --test-mode PlayMode --filter-type regex --filter-value TechnicalSwordAction
 ```
 
-Test Runnerは単独実行する。2026-10-13の最新修正版はEditMode 181 / PlayMode 141件 Passed。PlayModeに2段/4段・両方向各10回（計40回）、30/60/120fps相当、Pause、対象消失、壁、無敵、強制中断、死亡、Disable、Scene再読込、解除→命中→着地、瞳/Material、段別の実前進/ヒットバック、VFX追従を含む。4段各段・成功/失敗パリィの無入力復帰、歩き/各行動による復帰キャンセル、入力を消費しないこと、揺れ/FlashのPauseと復帰も確認した。影を残す2Fの接近/表示復帰、途中の障害物、空中吹き飛び/壁/回転のリセット、着地直後のPauseによる撮影終了の防止も含む。同期の6件では30/60/120fps×両方向でスロー開始/解除/命中停止のSprite一致と下向きの衝撃を確認する。未保存の既存Sceneを自動で保存・破棄しない。
+Test Runnerは単独実行する。2026-10-15のスタジオ追加版はEditMode 187 / PlayMode 185件 Passed。PlayModeに2段/4段・両方向各10回（計40回）、30/60/120fps相当、Pause、対象消失、壁、無敵、強制中断、死亡、Disable、Scene再読込、解除→命中→着地、瞳/Material、段別の実前進/ヒットバック、VFX追従を含む。4段各段・成功/失敗パリィの無入力復帰、歩き/各行動による復帰キャンセル、入力を消費しないこと、揺れ/FlashのPauseと復帰も確認した。影を残す2Fの接近/表示復帰、途中の障害物、空中吹き飛び/壁/回転のリセット、着地直後のPauseによる撮影終了の防止も含む。同期の6件では30/60/120fps×両方向でスロー開始/解除/命中停止のSprite一致と下向きの衝撃を確認する。未保存の既存Sceneを自動で保存・破棄しない。
 
 ## 録画
 

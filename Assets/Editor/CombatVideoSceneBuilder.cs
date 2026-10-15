@@ -52,6 +52,31 @@ public static class CombatVideoSceneBuilder
         var camera = cameraObject.GetComponent<Camera>();
         camera.orthographic = true; camera.orthographicSize = 2.109375f;
         camera.backgroundColor = new Color(.98f,.985f,.99f);
+        var actor = CreatePlayer(library, ground, enemy, playerLayer, defenseCancel);
+        var counter = actor.GetComponent<PlayerParryCounter2D>();
+        var render = actor.GetComponent<SpriteRenderer>();
+        var a = Enemy("Enemy_A", new Vector3(1.1f,1,0), enemy, playerLayer, actor.transform,library);
+        var bPosition=new Vector3(defenseCancel?-1.45f:-.85f,1,0);
+        var b = Enemy("Enemy_B", bPosition, enemy, playerLayer, actor.transform,library);
+        var fx=new GameObject("VideoEffects").AddComponent<VideoVfxRenderer>();Set(fx,"library",library);
+        string materialPath="Assets/Settings/VideoPixelGlow.mat";var glow=AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+        if(glow==null) { glow=new Material(Shader.Find("TechnicalSwordAction/VideoPixelGlow"));AssetDatabase.CreateAsset(glow,materialPath); }
+        Set(fx,"glowMaterial",glow);
+        var presentation=new GameObject("VideoPresentation").AddComponent<VideoCombatPresentation>();
+        Set(presentation,"captureCamera",camera);Set(presentation,"counter",counter);Set(presentation,"vfx",fx);
+        Set(presentation,"playerVisual",render);Set(presentation,"library",library);
+        var director = new GameObject("CaptureDirector").AddComponent<CombatVideoDirector>();
+        Set(director,"player", actor.GetComponent<PlayerStateMachine>());
+        Set(director,"frontEnemy",a); Set(director,"rearEnemy",b);
+        Set(director,"presentation",presentation);Set(director,"vfx",fx);
+        Set(director,"defenseCancelTake",defenseCancel);
+        if(defenseCancel) Set(director,"rearStart",bPosition);
+        actor.SetActive(true);
+        EditorSceneManager.SaveScene(scene, scenePath);
+        AssetDatabase.SaveAssets();
+    }
+    internal static GameObject CreatePlayer(VideoArtLibrary library, int ground, int enemy, int playerLayer, bool defenseCancel)
+    {
         var actor = new GameObject("Player");
         actor.SetActive(false); actor.tag = "Player"; actor.layer = playerLayer;
         actor.transform.position = new Vector3(0, 1, 0);
@@ -83,27 +108,9 @@ public static class CombatVideoSceneBuilder
         Set(counter,"landingRollDistance",0f);
         Set(counter,"blinkApproach",true);Set(counter,"blinkTravelFrames",2);
         actor.AddComponent<PlayerStateMachine>();actor.AddComponent<PlayerVisualRecovery2D>();Set(actor.AddComponent<VideoPlayerAnimationDriver>(),"library",library);
-        var a = Enemy("Enemy_A", new Vector3(1.1f,1,0), enemy, playerLayer, actor.transform,library);
-        var bPosition=new Vector3(defenseCancel?-1.45f:-.85f,1,0);
-        var b = Enemy("Enemy_B", bPosition, enemy, playerLayer, actor.transform,library);
-        var fx=new GameObject("VideoEffects").AddComponent<VideoVfxRenderer>();Set(fx,"library",library);
-        string materialPath="Assets/Settings/VideoPixelGlow.mat";var glow=AssetDatabase.LoadAssetAtPath<Material>(materialPath);
-        if(glow==null) { glow=new Material(Shader.Find("TechnicalSwordAction/VideoPixelGlow"));AssetDatabase.CreateAsset(glow,materialPath); }
-        Set(fx,"glowMaterial",glow);
-        var presentation=new GameObject("VideoPresentation").AddComponent<VideoCombatPresentation>();
-        Set(presentation,"captureCamera",camera);Set(presentation,"counter",counter);Set(presentation,"vfx",fx);
-        Set(presentation,"playerVisual",render);Set(presentation,"library",library);
-        var director = new GameObject("CaptureDirector").AddComponent<CombatVideoDirector>();
-        Set(director,"player", actor.GetComponent<PlayerStateMachine>());
-        Set(director,"frontEnemy",a); Set(director,"rearEnemy",b);
-        Set(director,"presentation",presentation);Set(director,"vfx",fx);
-        Set(director,"defenseCancelTake",defenseCancel);
-        if(defenseCancel) Set(director,"rearStart",bPosition);
-        actor.SetActive(true);
-        EditorSceneManager.SaveScene(scene, scenePath);
-        AssetDatabase.SaveAssets();
+        return actor;
     }
-    private static Damageable2D Enemy(string name, Vector3 position, int layer, int playerLayer, Transform target,VideoArtLibrary library)
+    internal static Damageable2D Enemy(string name, Vector3 position, int layer, int playerLayer, Transform target,VideoArtLibrary library)
     {
         var obj = new GameObject(name); obj.SetActive(false); obj.layer = layer; obj.transform.position = position;
         var collider = obj.AddComponent<BoxCollider2D>(); collider.size = new Vector2(.5f,1.6f); collider.isTrigger = true;

@@ -52,6 +52,16 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     public event Action WindupStarted;
     public event Action AttackStarted;
 
+    /// <summary>Explicit training override; normal scenes keep their serialized combat values.</summary>
+    public void ConfigureForTraining(Transform playerTarget, float windup, float interval, int damage, float speed)
+    {
+        target = playerTarget;
+        attackWindupDuration = Mathf.Clamp(windup, .1f, 10f);
+        cooldownDuration = Mathf.Clamp(interval, .1f, 30f);
+        attackDamage = Mathf.Max(0, damage);
+        moveSpeed = Mathf.Clamp(speed, 0, 10f);
+    }
+
     public void ResetForCapture(Transform playerTarget, bool held = true)
     {
         target = playerTarget;

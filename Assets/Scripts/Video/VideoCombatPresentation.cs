@@ -14,6 +14,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField, Range(.5f,1f)] private float chargeRealSeconds=.7f;
     [SerializeField] private float normalSize=2.109375f;
     [SerializeField] private float closeSize=1.6875f;
+    [SerializeField] private bool adaptiveFocusHeight;
     [SerializeField,Range(0,1)] private float slowDimStrength=.965f;
     [SerializeField,Range(0,1)] private float heroLiftStrength=.6f;
     [SerializeField,Min(.001f)] private float dimFadeInSeconds=3/60f;
@@ -81,7 +82,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         RestorePlayerBody();charged=true;ChargeRealElapsed=0;
         focus=(counter.transform.position+counter.SelectedTarget.transform.position)*.5f;
-        focus.y=1.05f;focus.z=restPosition.z;
+        focus.y=adaptiveFocusHeight?counter.transform.position.y-.5f:1.05f;focus.z=restPosition.z;
         CombatTimeController.RequestSlow(counter,chargeScale,chargeRealSeconds);
     }
     private void OnRelease() { charged=false;CombatTimeController.ReleaseSlow(counter); }
@@ -99,6 +100,12 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     private void OnMiss() { charged=false;CombatTimeController.ReleaseSlow(counter); }
     public void Shake(float realSeconds,float strength)
     { ShakeDirectional(realSeconds,strength,new Vector2(1,.35f),3); }
+    public void SetCameraFrame(Vector3 position,float size)
+    {
+        restPosition=position;normalSize=Mathf.Max(.5f,size);closeSize=normalSize*.8f;
+        if(zoom==0&&captureCamera!=null)
+        { captureCamera.transform.position=restPosition;captureCamera.orthographicSize=normalSize; }
+    }
     public void PresentLightParry(int facing)
     {
         // A single beat and return carries the impact, while the hero keeps a stable base.

@@ -224,3 +224,17 @@ PlayModeで接地と画面下端までの床を確認し、2/4段×通常/反転
 - Unity compile/Console Error 0 / Warning 0。PlayMode158/158（2026-10-13 16:38:25 UTC）・EditMode181/181（16:40:19 UTC）Passed。追加17件は2/4段×30/60/120fps×両向き、40回反復、Dash中のPause/Reset、対象消失/Counter Disable/死亡時に自動再接近しないことを確認。既存Sceneの141件と40回反復も通った。最終PlayModeでは新Scene40回の再実行を別途記録。
 - 追加動画は2段で締める版225F/3.75秒、4段で締める版283F/4.716667秒。1080p60/無音、スロー/停止を含む全フレームをデコードした。[推奨4段](video/previews/combat-defense-cancel-4stage-rough-hybrid.mp4) / [比較2段](video/previews/combat-defense-cancel-2stage-rough-hybrid.mp4) / [検証](video/previews/defense-cancel-validation.json)。
 - 元の主人公ラフ、idle/walk、候補3動画は前commit20acf1aとバイト一致で保持。追加は魅力紹介のラフで、#69の当初動画の完成判定を置き換えない。人の清書未受領と正式完成までの残作業は維持。
+
+## 2026-10-15 常設の撮影スタジオ
+
+- SNS投稿や進捗共有のため、通常入力で自由に試せる `Assets/Scenes/CombatVideoStudio.unity` と、Game画面の外に置く「撮影スタジオ」EditorWindowを追加した。Tools → Technical Sword Action → Video → Open Studioから開く。[使い方](video/studio-guide.md)。
+- アクション／コンボ／パリィ／足場／複数敵の5セット、敵の追加/削除・HP・予備動作・間隔・ダメージ・追跡速度・待機/単発/反復/追跡、ブロック/すり抜け床/移動床を配置できる。実際の入力要求による4段コンボ、パリィ/反撃のお試し、左右反転も用意した。
+- 現在位置のリセット登録と別名セット保存、Prefab接続とScene上書き設定の永続化に対応。Play開始時にソースAssetを再適用して編集を失うことを防ぐ。CustomContentはセット切替で保持し、StudioResetAnchorとIStudioResettableで独自ギミックを接続できる。
+- F2でHP/位置/AI/入力/時間/カメラ/VFX/足場/床抜け衝突を戻す。カメラの追従/固定/整数倍率距離、混合/純ドット比較、HP/ゲージ補充、診断表示切替を追加。スタジオ使用中だけバックグラウンド進行を有効にし、退出時に元へ戻す。
+- F8でPNG、F9で1080p60・無音MP4。手動終了と6/10/15/30秒の自動停止、個人設定のFFmpeg/出力先、GPU非同期読戻しと別スレッドのエンコード、失敗と0枚の検出を用意した。録画開始前の停止時間を尺へ含めず、F2中も録画の時計を継続する。低い描画fpsでは重複画像で実時間を保ち、重複枚数をJSONに記録する。
+- 最終コードはcompile Error 0 / Warning 0、EditMode187/187（2026-10-15 08:32:46 UTC）・PlayMode185/185（08:34:06 UTC）Passed。追加はEditMode6/PlayMode27ケース。攻撃/Dash/スロー中/死亡の各10回リセット、移動床30回、元の2撮影Scene各40回も通過。通常Play/パリィ→反撃の最終Console Error 0 / Warning 0。[検証記録](video/previews/studio-validation.json)。
+- D/J/F1/F2/F3/F8/F9のキー入力を確認。入力シミュレーション時に限り、uloop 2.1.3側の補助表示Prefabから10 Error/98 Warningを検出し、スタックを上記記録へ残した。入力自体は機能し、Camera出力に補助表示は入らない。パッケージを改変せず、原因を記録して通常Playで0件を再確認した。
+- [実録画サンプル](video/previews/studio-live-parry-rough.mp4)は6.0秒/360F、1080p60/音声Stream0、描画遅延による重複42F。全フレームデコードと向き/動作の目視確認済み。F9キーからの開始→F2→F9終了も7.533333秒/452F・重複67Fで全デコード成功。[足場セット](video/previews/studio-platform-stage.png) / [パネル](video/previews/studio-panel-capture.png)。
+- 元Scene2本・既存候補5本・主人公Asepriteは変更なし。人の清書は未受領。常設スタジオの整備と、元の#69の清書統合/最終調整/最終動画完成は区別し、未達IssueはOpenを維持する。
+
+スタジオの自由操作では本来のDash速度18unit/sを使用する。追加の固定撮影シナリオの6unit/sとは用途を分け、歩行より速く移動することをテストした。入力テストでは、パネルのフォーカスと実デバイスの押下状態から仮想入力を隔離し、設定/デバイスをTearDownで復元する。Scene再読込後の敵追加で名前が重複する問題も修正し、PrefabのHPと位置が正しい個体へ復元されることを確認した。

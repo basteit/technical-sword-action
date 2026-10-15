@@ -24,6 +24,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     public float LastLaunchHeight {get;private set;}
     public string MotionName=>motion;
     public int CombatTickOrder=>320;
+    public void BindPlayer(Transform target) => player=target;
     private void OnEnable()
     {
         health=GetComponent<Damageable2D>();ai=GetComponent<EnemyMeleeChaser2D>();visual=GetComponentInChildren<SpriteRenderer>();
