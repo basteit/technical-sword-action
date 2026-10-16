@@ -27,10 +27,13 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
     private int observedParryCount;
     private float parrySuccessTimer;
     private PlayerVisualRecovery2D recovery;
+    private PlayerAttack2D attack;
+    private TechnicalSwordAction.PlayerState.PlayerActionState lastExtendedAction;
 
     private void Awake()
     {
         ResolveReferences();
+        attack = GetComponent<PlayerAttack2D>();
         recovery=GetComponent<PlayerVisualRecovery2D>();
         if(recovery==null) recovery=gameObject.AddComponent<PlayerVisualRecovery2D>();
     }
@@ -53,6 +56,26 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
         {
             return;
         }
+
+        if (stateMachine.LifeState == TechnicalSwordAction.PlayerState.PlayerLifeState.Dead)
+        {
+            int death = Animator.StringToHash("PlayerPrototype_Death");
+            if (!animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerPrototype_Death")) animator.Play(death, 0, 0);
+            lastDrivenState = (PlayerState)(-1);
+            return;
+        }
+        var extended = stateMachine.ActionState;
+        if (extended == TechnicalSwordAction.PlayerState.PlayerActionState.Heal ||
+            extended == TechnicalSwordAction.PlayerState.PlayerActionState.ParryCounter)
+        {
+            if (lastExtendedAction != extended)
+                animator.Play(extended == TechnicalSwordAction.PlayerState.PlayerActionState.Heal ? "PlayerPrototype_Heal" : "PlayerPrototype_ParryCounter", 0, 0);
+            lastExtendedAction = extended;
+            lastDrivenState = (PlayerState)(-1);
+            return;
+        }
+        lastExtendedAction = extended;
+        if (attack != null && attack.IsRecovering) return;
 
         if (TryPlayNewParrySuccess())
         {
