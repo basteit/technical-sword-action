@@ -15,6 +15,11 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     [SerializeField] private int maxHp = 5;
     [SerializeField] private string individualId;
     [SerializeField] private EnemyCombatRank combatRank;
+    [SerializeField] private EnemyCombatDefinition combatDefinition;
+    [SerializeField] private bool overrideMaxHp;
+    [SerializeField, Min(1)] private int instanceMaxHp = 30;
+    [SerializeField] private bool overrideCounterMultiplier;
+    [SerializeField, Min(.01f)] private float instanceCounterMultiplier = 3f;
     [SerializeField, Min(0f)] private float deathDisplayDuration;
     [SerializeField, Min(0f)] private float lightHitStunDuration;
     [SerializeField] private bool blockContactPushFromPlayer = true;
@@ -57,8 +62,16 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     private bool participatingInCombat = true;
     public bool ParticipatingInCombat => IsAlive && participatingInCombat;
     public EnemyCombatRank CombatRank => combatRank;
-    public float CounterMultiplier => combatRank == EnemyCombatRank.Elite ? 2f :
-        combatRank == EnemyCombatRank.MidBoss || combatRank == EnemyCombatRank.Boss ? 1.5f : 3f;
+    public EnemyCombatDefinition Definition => combatDefinition;
+    public int ConfiguredMaxHp => overrideMaxHp ? Mathf.Max(1, instanceMaxHp) : combatDefinition != null ? combatDefinition.maxHp : maxHp;
+    public float CounterMultiplier => overrideCounterMultiplier ? Mathf.Max(.01f, instanceCounterMultiplier) :
+        combatDefinition != null ? combatDefinition.CounterMultiplier : EnemyCombatDefinition.DefaultCounterMultiplier(combatRank);
+    public string LastHitReaction { get; private set; } = "None";
+    private float lightResistanceTimer;
+    private CombatFeedback2D feedbackOwner;
+    private bool HasExternalFeedback => feedbackOwner != null && feedbackOwner.IsReady;
+    public void SetFeedbackOwner(CombatFeedback2D owner) => feedbackOwner = owner;
+    public void ReleaseFeedbackOwner(CombatFeedback2D owner) { if (feedbackOwner == owner) feedbackOwner = null; }
     public int LastDamageTaken { get; private set; }
     public event Action<Damageable2D> LeftCombat;
     public void SetCombatParticipation(bool participating)
@@ -68,10 +81,26 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     }
     public void ConfigureCombat(EnemyCombatRank rank, int hp)
     {
+        combatDefinition = null;
         combatRank = rank;
         maxHp = Mathf.Max(1, hp);
         currentHp = maxHp;
         participatingInCombat = true;
+    }
+    public void ConfigureDefinition(EnemyCombatDefinition definition)
+    {
+        if (definition == null) return;
+        combatDefinition = definition;
+        combatRank = definition.rank;
+        maxHp = ConfiguredMaxHp;
+        currentHp = maxHp;
+        participatingInCombat = true;
+    }
+    public void ConfigureInstanceOverrides(int hp, float multiplier)
+    {
+        overrideMaxHp = hp > 0; instanceMaxHp = Mathf.Max(1, hp);
+        overrideCounterMultiplier = multiplier > 0; instanceCounterMultiplier = Mathf.Max(.01f, multiplier);
+        maxHp = ConfiguredMaxHp; currentHp = maxHp;
     }
 
     public string IndividualId => string.IsNullOrEmpty(individualId) ? GetInstanceID().ToString() : individualId;
@@ -106,6 +135,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         stunTimer = 0f;
         breakResistTimer = 0f;
         currentBreak = 0f;
+        lightResistanceTimer = 0;
         stunHolds.Clear();
         knockbackVelocity = Vector2.zero;
         if (spriteRenderer != null)
@@ -121,6 +151,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
             ApplyPresetValues();
         }
 
+        if (combatDefinition != null) ConfigureDefinition(combatDefinition);
         currentHp = maxHp;
         bodyColliders = GetComponentsInChildren<Collider2D>(true);
         initialColliderStates = new bool[bodyColliders.Length];
@@ -152,6 +183,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     public void CombatTickTimers()
     {
+        lightResistanceTimer = CombatTimeController.AdvanceTimer(lightResistanceTimer);
         stunHoldOwners.Clear();stunHoldOwners.AddRange(stunHolds.Keys);
         foreach(object owner in stunHoldOwners)
         { float value=CombatTimeController.AdvanceTimer(stunHolds[owner]);if(value<=0) stunHolds.Remove(owner);else stunHolds[owner]=value; }
@@ -208,6 +240,11 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     public bool TryTakeHit(int damage, Vector2 direction)
     {
+        return TryTakeCombatHit(damage, direction, EnemyHitStrength.Light);
+    }
+
+    public bool TryTakeCombatHit(int damage, Vector2 direction, EnemyHitStrength strength)
+    {
         if (damage <= 0 || !isActiveAndEnabled || currentHp <= 0 ||
             (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick))
         {
@@ -217,24 +254,40 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         LastDamageTaken = Mathf.Min(currentHp, damage);
         currentHp = Mathf.Max(0, currentHp - damage);
         HitCount++;
-        AddBreak(damage * hitBreakMultiplier);
-        stunTimer = Mathf.Max(stunTimer, lightHitStunDuration);
+        if (combatDefinition == null)
+        {
+            AddBreak(damage * hitBreakMultiplier);
+            stunTimer = Mathf.Max(stunTimer, lightHitStunDuration);
+        }
+        else
+        {
+            bool armored = TryGetComponent<EnemyMeleeChaser2D>(out var melee) && melee.ResistsHitStun;
+            int frames = strength == EnemyHitStrength.Strong ? combatDefinition.strongHitStunFrames : combatDefinition.lightHitStunFrames;
+            bool resistsLight = strength == EnemyHitStrength.Light && lightResistanceTimer > 0;
+            if (!armored && !resistsLight && frames > 0)
+            {
+                stunTimer = Mathf.Max(stunTimer, frames / 60f);
+                lightResistanceTimer = (frames + combatDefinition.lightStunResistanceFrames) / 60f;
+                LastHitReaction = strength + "Stun";
+            }
+            else LastHitReaction = armored ? "AttackArmor" : resistsLight ? "LightResistance" : "NoStun";
+        }
 
         Vector2 dir = direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.right;
-        knockbackVelocity = dir * knockbackPower;
+        knockbackVelocity = dir * (combatDefinition != null ? combatDefinition.hitKnockback : knockbackPower);
 
-        if (audioSource != null && hitClip != null)
+        if (!HasExternalFeedback && audioSource != null && hitClip != null)
         {
             audioSource.PlayOneShot(hitClip, 0.9f);
         }
 
-        if (spriteRenderer != null)
+        if (!HasExternalFeedback && spriteRenderer != null)
         {
             spriteRenderer.color = hitFlashColor;
             flashTimer = hitFlashDuration;
         }
 
-        CombatCameraFeedback2D.PlayHitShake();
+        if (!HasExternalFeedback) CombatCameraFeedback2D.PlayHitShake();
         HitReceived?.Invoke(this, LastDamageTaken, dir);
 
         if (currentHp <= 0)
@@ -258,13 +311,13 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
         if (result == ParryResult.Just)
         {
-            stunTimer = justParryStunDuration;
-            AddBreak(parryJustBreakGain);
+            stunTimer = combatDefinition != null ? combatDefinition.justParryStunFrames / 60f : justParryStunDuration;
+            if (combatDefinition == null) AddBreak(parryJustBreakGain);
         }
         else if (result == ParryResult.Normal)
         {
-            stunTimer = normalParryStunDuration;
-            AddBreak(parryNormalBreakGain);
+            stunTimer = combatDefinition != null ? combatDefinition.normalParryStunFrames / 60f : normalParryStunDuration;
+            if (combatDefinition == null) AddBreak(parryNormalBreakGain);
         }
         if (result != ParryResult.None) Parried?.Invoke(this, result);
     }
@@ -286,6 +339,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         participatingInCombat = true;
         LastDamageTaken = 0;
         flashTimer = stunTimer = deathTimer = currentBreak = breakResistTimer = 0f;
+        lightResistanceTimer = 0; LastHitReaction = "None";
         stunHolds.Clear();
         HitCount = DeathCount = 0;
         knockbackVelocity = Vector2.zero;

@@ -246,18 +246,18 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IContextDamageReceiver2D, I
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(direction * finalKnockback, ForceMode2D.Impulse);
 
-        if (audioSource != null && hitClip != null)
+        if (!CombatFeedback2D.IsManaging(gameObject) && audioSource != null && hitClip != null)
         {
             audioSource.PlayOneShot(hitClip, 1f);
         }
 
-        if (spriteRenderer != null)
+        if (!CombatFeedback2D.IsManaging(gameObject) && spriteRenderer != null)
         {
             spriteRenderer.color = hitFlashColor;
             flashTimer = hitFlashDuration;
         }
 
-        CombatCameraFeedback2D.PlayHitShake();
+        if (!CombatFeedback2D.IsManaging(gameObject)) CombatCameraFeedback2D.PlayHitShake();
 
         if (invincibleTimer > 0f)
         {
@@ -275,6 +275,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IContextDamageReceiver2D, I
 
     private void ApplyParryEffects(ParryResult result)
     {
+        if (CombatFeedback2D.IsManaging(gameObject)) return;
         float stop = result == ParryResult.Just ? justParryHitStop : normalParryHitStop;
         if (stop > 0f)
         {

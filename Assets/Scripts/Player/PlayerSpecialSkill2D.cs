@@ -157,7 +157,7 @@ public class PlayerSpecialSkill2D : MonoBehaviour, ICombatTickListener, ICombatT
                     dir = transform.right;
                 }
 
-                if (damageable.TryTakeHit(skillDamage, dir))
+                if (damageable.TryTakeCombatHit(skillDamage, dir, EnemyHitStrength.Strong))
                 {
                     HitConfirmed?.Invoke(damageable, damageable.LastDamageTaken);
                     hitSomething = true;

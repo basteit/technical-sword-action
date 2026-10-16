@@ -383,7 +383,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
                 knockbackDir = transform.right;
             }
 
-            if (!damageable.TryTakeHit(data.damage, knockbackDir)) continue;
+            if (!damageable.TryTakeCombatHit(data.damage, knockbackDir, step == 4 ? EnemyHitStrength.Strong : EnemyHitStrength.Light)) continue;
             HitConfirmed?.Invoke(damageable, step, hitPoint.position);
             hitSomething = true;
             hitTargetCount++;
@@ -401,8 +401,11 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
             configuredGaugeAwarded += gain;
         }
 
-        PlayClip(hitConfirmClip, 1f);
-        if (lightHitstopFrames > 0) CombatTimeController.RequestHitstop(this, lightHitstopFrames * CombatTimeController.StepSeconds);
+        if (!CombatFeedback2D.IsManaging(gameObject))
+        {
+            PlayClip(hitConfirmClip, 1f);
+            if (lightHitstopFrames > 0) CombatTimeController.RequestHitstop(this, lightHitstopFrames * CombatTimeController.StepSeconds);
+        }
     }
 
     public void OnAttackRecovery(int step)

@@ -54,6 +54,7 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     [SerializeField, Min(0f)] private float maxParryHeightDifference = 1.25f;
     public Damageable2D LastParriedEnemy { get; private set; }
     public event System.Action<Damageable2D, ParryResult> Succeeded;
+    public event System.Action Failed;
 
     public bool IsParryActive => parryActive;
     public bool IsFailLocked => failLockTimer > 0f;
@@ -153,7 +154,8 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
             if (!parryResolved)
             {
                 ApplyFailLock();
-                PlayClip(parryMissClip, 0.8f);
+                if (!CombatFeedback2D.IsManaging(gameObject)) PlayClip(parryMissClip, 0.8f);
+                Failed?.Invoke();
                 stateMachine?.ChangeActionPhase(
                     PlayerActionState.Parry,
                     PlayerActionState.ParryFail,
@@ -237,11 +239,11 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         if (result == ParryResult.Just)
         {
             justSuccessCount++;
-            PlayClip(justParryClip, 1f);
+            if (!CombatFeedback2D.IsManaging(gameObject)) PlayClip(justParryClip, 1f);
         }
         else
         {
-            PlayClip(normalParryClip, 0.95f);
+            if (!CombatFeedback2D.IsManaging(gameObject)) PlayClip(normalParryClip, 0.95f);
         }
 
         successCount++;

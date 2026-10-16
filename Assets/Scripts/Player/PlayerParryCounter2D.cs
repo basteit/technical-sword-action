@@ -257,7 +257,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
             foreach (Collider2D c in contacts)
                 if (c.GetComponentInParent<Damageable2D>() == SelectedTarget) { contactsTarget = true; break; }
             bool clearPath=SelectedTarget!=null&&Physics2D.Linecast(transform.position,SelectedTarget.transform.position,obstacleLayers).collider==null;
-            if (SelectedTarget != null && SelectedTarget.IsAlive && contactsTarget && clearPath && SelectedTarget.TryTakeHit(selectedDamage, Vector2.right * facing))
+            if (SelectedTarget != null && SelectedTarget.IsAlive && contactsTarget && clearPath && SelectedTarget.TryTakeCombatHit(selectedDamage, Vector2.right * facing, EnemyHitStrength.Strong))
             {
                 confirmedHit=true;HitCount++;
                 if (definition != null && !airborneKick) GetComponent<PlayerSpecialGauge>()?.AddOnAttackHit(definition.gaugeGain);

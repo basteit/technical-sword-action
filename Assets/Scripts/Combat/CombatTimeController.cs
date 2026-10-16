@@ -43,6 +43,7 @@ public sealed class CombatTimeController : MonoBehaviour
     private bool ownsTime;
     public bool ManualAdvanceOnly { get; set; }
     public static event Action<long> BeforeCombatTick;
+    public static event Action SessionReset;
 
     public static bool IsPaused => instance != null && instance.clock.IsPaused;
     public static bool IsHitStopped => instance != null && instance.clock.IsHitStopped;
@@ -74,6 +75,7 @@ public sealed class CombatTimeController : MonoBehaviour
         PauseChanged = null;
         DefeatSlowRequested = null;
         BeforeCombatTick = null;
+        SessionReset = null;
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -192,6 +194,7 @@ public sealed class CombatTimeController : MonoBehaviour
         if (instance == null) return;
         bool wasPaused = IsPaused;
         instance.clock.ResetStops(!IsExecutingTick);
+        SessionReset?.Invoke();
         instance.ApplyTimeScale();
         if (wasPaused) PauseChanged?.Invoke(false);
     }
