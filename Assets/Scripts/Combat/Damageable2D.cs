@@ -99,7 +99,8 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     public void ConfigureInstanceOverrides(int hp, float multiplier)
     {
         overrideMaxHp = hp > 0; instanceMaxHp = Mathf.Max(1, hp);
-        overrideCounterMultiplier = multiplier > 0; instanceCounterMultiplier = Mathf.Max(.01f, multiplier);
+        overrideCounterMultiplier = float.IsFinite(multiplier) && multiplier > 0;
+        instanceCounterMultiplier = overrideCounterMultiplier ? Mathf.Max(.01f, multiplier) : 3f;
         maxHp = ConfiguredMaxHp; currentHp = maxHp;
     }
 

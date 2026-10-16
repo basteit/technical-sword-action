@@ -16,6 +16,7 @@ public sealed class EnemyAttackCoordinator2D : MonoBehaviour
     {
         if (!isActiveAndEnabled || enemy == null) return false;
         if (attackers.Contains(enemy)) return true;
+        if (enemy.PlayerIsInCounterResponse) return false;
         if (attackers.Count >= MaximumAttackers || CombatTimeController.TickCount < nextStartTick) return false;
         attackers.Add(enemy);
         nextStartTick = CombatTimeController.TickCount + Mathf.Max(0, minimumStartGapFrames);

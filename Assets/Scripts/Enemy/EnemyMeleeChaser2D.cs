@@ -56,6 +56,10 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     private bool configuredParryable = true;
     private int configuredActiveFrames = 1;
     public string AttackId => currentAttack != null ? currentAttack.attackId : "legacy-melee";
+    public bool PlayerIsInCounterResponse => target != null && target.TryGetComponent<PlayerStateMachine>(out var player) &&
+        (player.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.ParrySuccess ||
+         player.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.ParryCounter ||
+         player.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.OpportunityStrike);
     public bool ResistsHitStun => currentAttack != null && currentAttack.resistHitStunWhileAttacking &&
         (currentState == State.AttackWindup || currentState == State.Active);
     public string AttackRoleReason { get; private set; } = "None";

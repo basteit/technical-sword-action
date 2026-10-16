@@ -23,16 +23,17 @@ public sealed class EnemyCombatCue2D : MonoBehaviour, ICombatTickListener
         bool winding = enemy.IsWindingUp;
         bool active = enemy.ActiveRemainingFrames > 0;
         bool stunned = health.IsStunned;
+        bool lowSweep = enemy.AttackKind == "Unparryable";
         float direction = enemy.Facing.x < 0 ? -1 : 1;
         if (silhouette != null)
         {
-            silhouette.localScale = Vector3.Scale(silhouetteScale, winding ? new Vector3(1.2f, .8f, 1) : Vector3.one);
+            silhouette.localScale = Vector3.Scale(silhouetteScale, winding ? new Vector3(lowSweep ? 1.35f : 1.2f, lowSweep ? .65f : .8f, 1) : Vector3.one);
             silhouette.localRotation = Quaternion.Euler(0, 0, stunned ? -direction * 25 : winding ? direction * 12 : 0);
         }
         if (weapon != null)
         {
-            weapon.localPosition = new Vector3(direction * (active ? .85f : .45f), winding ? .55f : .1f);
-            weapon.localRotation = Quaternion.Euler(0, 0, direction * (winding ? 65 : active ? -10 : 90));
+            weapon.localPosition = new Vector3(direction * (active ? .85f : .45f), lowSweep ? -.45f : winding ? .55f : .1f);
+            weapon.localRotation = Quaternion.Euler(0, 0, direction * (lowSweep ? winding ? -35 : 0 : winding ? 65 : active ? -10 : 90));
         }
         if (cue != null)
         {

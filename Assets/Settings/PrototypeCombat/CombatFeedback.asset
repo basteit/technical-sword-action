@@ -1,0 +1,103 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd09f94f0748b5942a6b937a888af140, type: 3}
+  m_Name: CombatFeedback
+  m_EditorClassIdentifier: Assembly-CSharp::CombatFeedbackProfile
+  entries:
+  - kind: 0
+    hitstopFrames: 3
+    shakePixels: 3
+    shakeSeconds: 0.08
+    lifetimeFrames: 8
+    glyphSize: 0.18
+    flashFrames: 3
+    tint: {r: 1, g: 0.9, b: 0.55, a: 1}
+    clip: {fileID: 8300000, guid: 50cfbacf7f8677246ad28c29b2e66f84, type: 3}
+    volume: 0.5
+    pitch: 1.15
+  - kind: 1
+    hitstopFrames: 5
+    shakePixels: 4
+    shakeSeconds: 0.12
+    lifetimeFrames: 12
+    glyphSize: 0.34
+    flashFrames: 3
+    tint: {r: 1, g: 0.75, b: 0.3, a: 1}
+    clip: {fileID: 8300000, guid: 784c45d7be21ee94fb504fdcd4e3a387, type: 3}
+    volume: 0.5
+    pitch: 0.9
+  - kind: 2
+    hitstopFrames: 5
+    shakePixels: 4
+    shakeSeconds: 0.12
+    lifetimeFrames: 14
+    glyphSize: 0.42
+    flashFrames: 3
+    tint: {r: 0.5, g: 1, b: 1, a: 1}
+    clip: {fileID: 8300000, guid: e3f191bbeba52c04c9ae8396c4ec259f, type: 3}
+    volume: 0.5
+    pitch: 0.8
+  - kind: 3
+    hitstopFrames: 3
+    shakePixels: 4
+    shakeSeconds: 0.12
+    lifetimeFrames: 10
+    glyphSize: 0.28
+    flashFrames: 3
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    clip: {fileID: 8300000, guid: 50cfbacf7f8677246ad28c29b2e66f84, type: 3}
+    volume: 0.5
+    pitch: 1.3
+  - kind: 4
+    hitstopFrames: 7
+    shakePixels: 6
+    shakeSeconds: 0.16
+    lifetimeFrames: 14
+    glyphSize: 0.4
+    flashFrames: 3
+    tint: {r: 0.5, g: 0.8, b: 1, a: 1}
+    clip: {fileID: 8300000, guid: e3f191bbeba52c04c9ae8396c4ec259f, type: 3}
+    volume: 0.5
+    pitch: 1.3
+  - kind: 5
+    hitstopFrames: 3
+    shakePixels: 3
+    shakeSeconds: 0.08
+    lifetimeFrames: 12
+    glyphSize: 0.3
+    flashFrames: 3
+    tint: {r: 1, g: 0.45, b: 0.4, a: 1}
+    clip: {fileID: 8300000, guid: 1095409cfd91d8a48b9893b051a1eda1, type: 3}
+    volume: 0.5
+    pitch: 0.85
+  - kind: 6
+    hitstopFrames: 0
+    shakePixels: 0
+    shakeSeconds: 0
+    lifetimeFrames: 18
+    glyphSize: 0.45
+    flashFrames: 3
+    tint: {r: 0.7, g: 0.75, b: 0.8, a: 1}
+    clip: {fileID: 0}
+    volume: 0.5
+    pitch: 1
+  - kind: 7
+    hitstopFrames: 0
+    shakePixels: 0
+    shakeSeconds: 0
+    lifetimeFrames: 8
+    glyphSize: 0.15
+    flashFrames: 3
+    tint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    clip: {fileID: 8300000, guid: 1095409cfd91d8a48b9893b051a1eda1, type: 3}
+    volume: 0.5
+    pitch: 0.65

@@ -95,8 +95,10 @@ public class PlayerDebugOverlay : MonoBehaviour
             for (int i = 0; i < Mathf.Min(8, enemies.Length); i++)
             {
                 var enemy = enemies[i]; var health = enemy.GetComponent<Damageable2D>();
-                text.AppendLine($"{health.IndividualId}: {enemy.CurrentStateName}, {health.CurrentHp}/{health.MaxHp} HP / {enemy.AttackKind}\n  Windup {enemy.WindupRemainingFrames}F / Active {enemy.ActiveRemainingFrames}F / Attack ID {enemy.AttackSequence}");
+                text.AppendLine($"{health.IndividualId}: {enemy.CurrentStateName}, {health.CurrentHp}/{health.MaxHp} HP / {enemy.AttackKind}\n  Windup {enemy.WindupRemainingFrames}F / Active {enemy.ActiveRemainingFrames}F / Attack {enemy.AttackId} #{enemy.AttackSequence}\n  Role {enemy.AttackRoleReason} / Counter x{health.CounterMultiplier:0.00} / Reaction {health.LastHitReaction} / Armor {enemy.ResistsHitStun}");
             }
+            var feedback = GetComponent<CombatFeedback2D>();
+            if (feedback != null) text.AppendLine($"Feedback {feedback.LastKind} @{feedback.LastEmissionTick} / emissions {feedback.EmissionCount} / active {feedback.ActiveEffectCount} / flash {feedback.ActiveFlashCount}");
         }
         return text.ToString();
     }

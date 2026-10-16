@@ -6,12 +6,18 @@ public sealed class PrototypeCombatArena : MonoBehaviour
 {
     [SerializeField] private PlayerStateMachine player;
     [SerializeField] private EnemyMeleeChaser2D[] enemies;
+    [SerializeField] private EnemyMeleeChaser2D strongEnemy;
+    [SerializeField] private EnemyAttackCoordinator2D coordinator;
+    [SerializeField] private CombatFeedback2D feedback;
+    private Vector3 strongPosition;
+    private InputActionMap controls;
     private Vector3 playerPosition;
     private Vector3[] enemyPositions;
     private int[] enemyHp;
     private InputAction reset;
     private void Awake()
     {
+        if (strongEnemy != null) strongPosition = strongEnemy.transform.position;
         playerPosition = player.transform.position;
         enemyPositions = new Vector3[enemies.Length]; enemyHp = new int[enemies.Length];
         for (int i = 0; i < enemies.Length; i++)
@@ -22,12 +28,28 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     }
     private void OnEnable()
     {
-        reset = new InputAction("ResetPrototype", InputActionType.Button, "<Keyboard>/f2");
-        reset.Enable();
+        controls = new InputActionMap("PrototypeValidation");
+        for (int i = 2; i <= 9; i++) controls.AddAction("F" + i, InputActionType.Button, "<Keyboard>/f" + i);
+        controls.Enable(); reset = controls.FindAction("F2");
     }
-    private void Update() { if (reset.WasPressedThisFrame()) ResetArena(false); }
+    private void Update()
+    {
+        if (reset.WasPressedThisFrame()) ResetArena(false);
+        if (controls.FindAction("F3").WasPressedThisFrame()) ResetArena(true);
+        if (controls.FindAction("F4").WasPressedThisFrame()) ResetStrongEncounter(false);
+        if (controls.FindAction("F5").WasPressedThisFrame()) ResetStrongEncounter(true);
+        if (feedback == null || feedback.Settings == null) return;
+        var settings = feedback.Settings;
+        if (controls.FindAction("F6").WasPressedThisFrame()) settings.shake = Cycle(settings.shake);
+        if (controls.FindAction("F7").WasPressedThisFrame()) settings.flash = Cycle(settings.flash);
+        if (controls.FindAction("F8").WasPressedThisFrame()) settings.vfx = Cycle(settings.vfx);
+        if (controls.FindAction("F9").WasPressedThisFrame()) settings.masterVolume = settings.masterVolume > 0 ? 0 : 1;
+    }
+    private static float Cycle(float value) => value >= .99f ? 0 : value < .49f ? .5f : 1;
     public void ResetArena(bool twoTargets)
     {
+        coordinator?.ResetEncounter(); feedback?.ResetPresentation();
+        if (strongEnemy != null) strongEnemy.gameObject.SetActive(false);
         player.ResetToSafeState("PrototypeArenaReset", true);
         var body = player.GetComponent<Rigidbody2D>();
         player.transform.position = playerPosition; body.position = playerPosition; body.linearVelocity = Vector2.zero;
@@ -37,7 +59,9 @@ public sealed class PrototypeCombatArena : MonoBehaviour
         player.GetComponent<PlayerCombatTelemetry>()?.ResetMeasurements();
         for (int i = 0; i < enemies.Length; i++)
         {
-            enemies[i].GetComponent<Damageable2D>().ResetForCapture(enemyPositions[i], enemyHp[i]);
+            var health = enemies[i].GetComponent<Damageable2D>();
+            int hp = health.Definition != null ? health.ConfiguredMaxHp : enemyHp[i];
+            health.ResetForCapture(enemyPositions[i], hp);
             enemies[i].ResetForCapture(player.transform, false);
             enemies[i].gameObject.SetActive(i == 0 || twoTargets);
         }
@@ -45,14 +69,34 @@ public sealed class PrototypeCombatArena : MonoBehaviour
         Physics2D.SyncTransforms();
         player.GetComponent<PlayerInteractor2D>()?.RefreshAfterTeleport();
     }
+    public void ResetStrongEncounter(bool includeNormal)
+    {
+        ResetArena(false);
+        if (strongEnemy == null) return;
+        if (enemies.Length > 0) enemies[0].gameObject.SetActive(includeNormal);
+        var health = strongEnemy.GetComponent<Damageable2D>();
+        int hp = health.Definition != null ? health.ConfiguredMaxHp : strongEnemy.Definition.maxHp;
+        health.ResetForCapture(strongPosition, hp);
+        strongEnemy.ResetForCapture(player.transform, false);
+        coordinator?.ResetEncounter(); Physics2D.SyncTransforms();
+    }
     private void OnGUI()
     {
-        GUILayout.BeginArea(new Rect(Screen.width - 280, 12, 268, 130), GUI.skin.box);
-        GUILayout.Label("Prototype #30 / #42 / #43 / #44 / #49");
-        if (GUILayout.Button("Reset: 1 enemy (F2)")) ResetArena(false);
-        if (GUILayout.Button("Reset: 2 enemies / stock test")) ResetArena(true);
+        GUILayout.BeginArea(new Rect(Screen.width - 310, 12, 298, 260), GUI.skin.box);
+        GUILayout.Label("Prototype combat acceptance");
+        GUILayout.Label("F2: Normal / F3: Two normal enemies");
+        GUILayout.Label("F4: Strong / F5: Normal + Strong");
+        if (coordinator != null) GUILayout.Label($"Attack roles: {coordinator.ActiveAttackers}/{coordinator.MaximumAttackers}");
+        if (feedback != null && feedback.Settings != null)
+        {
+            var s = feedback.Settings;
+            GUILayout.Label($"F6 Shake {s.shake:P0} / F7 Flash {s.flash:P0}");
+            GUILayout.Label($"F8 VFX {s.vfx:P0} / F9 Sound {s.masterVolume:P0}");
+            GUILayout.Label("0% keeps essential hit/telegraph shapes");
+            GUILayout.Label($"Feedback: {feedback.LastKind} @{feedback.LastEmissionTick}");
+        }
         GUILayout.Label("B: Interact in range / Dash otherwise");
         GUILayout.EndArea();
     }
-    private void OnDisable() { reset?.Dispose(); reset = null; }
+    private void OnDisable() { controls?.Dispose(); controls = null; reset = null; }
 }

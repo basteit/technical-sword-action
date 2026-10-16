@@ -22,7 +22,7 @@ public sealed class CombatFeedbackProfile : ScriptableObject
         [Range(.5f, 2)] public float pitch = 1;
     }
     public Entry[] entries = new Entry[0];
-    public Entry Find(CombatFeedbackKind kind) => Array.Find(entries, x => x != null && x.kind == kind);
+    public Entry Find(CombatFeedbackKind kind) => entries == null ? null : Array.Find(entries, x => x != null && x.kind == kind);
     public bool IsValid
     {
         get
@@ -30,7 +30,9 @@ public sealed class CombatFeedbackProfile : ScriptableObject
             foreach (CombatFeedbackKind kind in Enum.GetValues(typeof(CombatFeedbackKind)))
             {
                 var entry = Find(kind);
-                if (entry == null || entry.hitstopFrames < 0 || entry.lifetimeFrames <= 0 || entry.glyphSize <= 0) return false;
+                if (entry == null || entry.hitstopFrames < 0 || entry.lifetimeFrames <= 0 ||
+                    !float.IsFinite(entry.glyphSize) || entry.glyphSize <= 0 ||
+                    !float.IsFinite(entry.shakePixels) || entry.shakePixels < 0 || entry.flashFrames < 0) return false;
                 int count = 0;
                 foreach (var value in entries) if (value != null && value.kind == kind) count++;
                 if (count != 1) return false;

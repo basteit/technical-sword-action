@@ -22,10 +22,23 @@ public static class PrototypeCombatValidator
         var counter = AssetDatabase.LoadAssetAtPath<ParryCounterDefinition>(folder + "ParryCounter.asset");
         var parry = AssetDatabase.LoadAssetAtPath<ParryTimingDefinition>(folder + "ParryTiming.asset");
         var enemy = AssetDatabase.LoadAssetAtPath<EnemyCombatDefinition>(folder + "NormalMelee.asset");
+        var strong = AssetDatabase.LoadAssetAtPath<EnemyCombatDefinition>(folder + "StrongMelee.asset");
+        var feedback = AssetDatabase.LoadAssetAtPath<CombatFeedbackProfile>(folder + "CombatFeedback.asset");
+        var feedbackSettings = AssetDatabase.LoadAssetAtPath<CombatFeedbackSettings>(folder + "FeedbackSettings.asset");
         if (attack == null || !attack.IsValid) errors.Add("Invalid/missing four-step attack data or clip.");
         if (counter == null || !counter.IsValid) errors.Add("Invalid/missing counter data.");
         if (parry == null || !parry.IsValid) errors.Add("Invalid/missing parry timing.");
         if (enemy == null || !enemy.IsValid) errors.Add("Invalid/missing enemy combat data.");
+        if (strong == null || !strong.IsValid || strong.attacks == null || strong.attacks.Length < 2)
+            errors.Add("Invalid/missing strong enemy definition or its two readable attacks.");
+        else
+        {
+            if (counter != null && strong.maxHp <= Mathf.FloorToInt(counter.baseDamage * strong.CounterMultiplier + .5f))
+                errors.Add("Initial strong enemy must survive a full-health baseline counter; change the tuning explicitly.");
+            if (!Array.Exists(strong.attacks, a => a.parryable) || !Array.Exists(strong.attacks, a => !a.parryable))
+                errors.Add("Strong enemy requires both parryable and unparryable attacks.");
+        }
+        if (feedback == null || !feedback.IsValid || feedbackSettings == null) errors.Add("Missing/invalid feedback profile or settings.");
         if (attack != null && attack.IsValid)
             foreach (var step in attack.steps)
             {
@@ -43,12 +56,16 @@ public static class PrototypeCombatValidator
         try
         {
             int players = 0;
+            int feedbackOwners = 0, coordinators = 0, strongEnemies = 0;
             foreach (var root in scene.GetRootGameObjects())
                 foreach (var transform in root.GetComponentsInChildren<Transform>(true))
                 {
                     if (GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(transform.gameObject) != 0)
                         errors.Add(transform.name + ": missing script.");
                     if (transform.GetComponent<PlayerStateMachine>() != null) players++;
+                    if (transform.GetComponent<CombatFeedback2D>() != null) feedbackOwners++;
+                    if (transform.GetComponent<EnemyAttackCoordinator2D>() != null) coordinators++;
+                    if (transform.GetComponent<EnemyMeleeChaser2D>() is { Definition: var definition } && definition == strong) strongEnemies++;
                     foreach (var component in transform.GetComponents<Component>())
                     {
                         if (component == null) continue;
@@ -61,6 +78,8 @@ public static class PrototypeCombatValidator
                     }
                 }
             if (players != 1) errors.Add("Validation scene must contain exactly one player.");
+            if (feedbackOwners != 1 || coordinators != 1 || strongEnemies != 1)
+                errors.Add("Validation scene needs one feedback owner, one attack coordinator and one strong enemy.");
         }
         finally
         {
