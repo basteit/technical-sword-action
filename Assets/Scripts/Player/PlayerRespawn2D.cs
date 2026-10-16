@@ -38,7 +38,7 @@ public sealed class PlayerRespawn2D : MonoBehaviour, ICombatTickListener, IComba
         if (body != null) { body.position = transform.position; body.linearVelocity = Vector2.zero; }
         health?.ResetHealth();
         GetComponent<PlayerHeal2D>()?.Refill();
-        GetComponent<PlayerSpecialGauge>()?.ResetGauge();
+        GetComponent<PlayerSpecialGauge>()?.RetainAfterDeath();
         state.ClearBufferedGameplayInput();
         deadFrames = 0;
         Physics2D.SyncTransforms();

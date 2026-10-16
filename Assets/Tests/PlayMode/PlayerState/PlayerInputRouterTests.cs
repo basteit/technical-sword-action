@@ -136,7 +136,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [Test]
-        public void BRemainsInteractOnlyAndNeverTriggersDash()
+        public void BResolvesInteractWithTargetAndDashWithoutTargetTenTimes()
         {
             int startCount = Get<int>(counter, "Count");
             int sharedBefore = Get<int>(router, "SharedPressCount");
@@ -147,12 +147,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<int>(counter, "Count"), Is.EqualTo(startCount + i + 1));
                 Assert.That(Get<bool>(motor, "IsDashing"), Is.False);
                 Release(); Reset(); Exclude(); Pad(GamepadButton.East); Resolve();
-                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.None));
+                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Dash));
                 Assert.That(Get<int>(counter, "Count"), Is.EqualTo(startCount + i + 1));
-                Assert.That(Get<bool>(motor, "IsDashing"), Is.False);
+                Assert.That(Get<bool>(motor, "IsDashing"), Is.True);
                 Release();
             }
-            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(sharedBefore));
+            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(sharedBefore + 20));
         }
 
         [Test]
@@ -197,7 +197,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Keys(Key.E, Key.LeftShift); Resolve();
             int before = Get<int>(router, "SharedPressCount");
             Pad(GamepadButton.East);
-            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(before));
+            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(before + 1));
             Assert.That(Get<int>(counter, "Count"), Is.EqualTo(1));
         }
 
@@ -352,7 +352,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Call(interactor, "OnTriggerExit2D", target.GetComponent<Collider2D>());
                 Call(interactor, "SelectCurrentInteractable");
                 Pad(GamepadButton.East); Resolve();
-                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.None), "Outside boundary");
+                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Dash), "Outside boundary");
                 Release();
             }
             GameObject other = new GameObject("CloserCounter");

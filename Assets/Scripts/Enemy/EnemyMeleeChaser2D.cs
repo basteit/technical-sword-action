@@ -10,11 +10,13 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
         Idle,
         Approach,
         AttackWindup,
+        Active,
         Recovery,
         Cooldown
     }
 
     [Header("Target")]
+    [SerializeField] private EnemyCombatDefinition combatDefinition;
     [SerializeField] private Transform target;
     [SerializeField] private float detectRange = 10f;
     [SerializeField] private float loseTargetRange = 14f;
@@ -44,6 +46,14 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     private long attackSequence;
     private bool captureHeld;
     private readonly HashSet<int> hitReceivers = new();
+    private readonly RaycastHit2D[] movementHits = new RaycastHit2D[8];
+    private Collider2D ownCollider;
+    private int activeRemaining;
+    public EnemyCombatDefinition Definition => combatDefinition;
+    public string AttackKind => combatDefinition == null || combatDefinition.parryable ? "Parryable" : "Unparryable";
+    public int WindupRemainingFrames => Mathf.CeilToInt(WindupRemaining * 60f - .0001f);
+    public int ActiveRemainingFrames => currentState == State.Active ? activeRemaining : 0;
+    public Vector2 Facing => facing;
     public string CurrentStateName => damageable != null && !damageable.IsAlive ? "Dead" :
         damageable != null && damageable.IsStunned ? "Stunned" : currentState.ToString();
     public bool IsWindingUp => currentState == State.AttackWindup;
@@ -112,6 +122,21 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     private void Awake()
     {
         damageable = GetComponent<Damageable2D>();
+        ownCollider = GetComponent<Collider2D>();
+        if (combatDefinition != null)
+        {
+            if (!combatDefinition.IsValid) Debug.LogError("Invalid enemy combat definition", this);
+            attackWindupDuration = combatDefinition.windupFrames / 60f;
+            recoveryDuration = combatDefinition.recoveryFrames / 60f;
+            cooldownDuration = combatDefinition.cooldownFrames / 60f;
+            attackDamage = combatDefinition.damage;
+            attackKnockback = combatDefinition.knockback;
+            attackRange = combatDefinition.attackRange;
+            preferredMaxDistance = attackRange;
+            preferredMinDistance = attackRange * .65f;
+            moveSpeed = combatDefinition.moveSpeed;
+            attackTargetLayers = combatDefinition.targetLayers;
+        }
         if (disableContactDamageSources)
         {
             DisablePassiveDamageSources();
@@ -120,6 +145,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
 
     private void Start()
     {
+        if (combatDefinition != null) damageable.ConfigureCombat(combatDefinition.rank, combatDefinition.maxHp);
         TryFindPlayerTarget();
     }
 
@@ -136,6 +162,10 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
 
         if (damageable != null && damageable.IsStunned)
         {
+            // Never resume an interrupted windup/active hit after stun ends.
+            currentState = State.Recovery;
+            stateTimer = recoveryDuration;
+            activeRemaining = 0;
             return;
         }
 
@@ -144,11 +174,13 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
 
         if (distance > loseTargetRange)
         {
+            damageable.SetCombatParticipation(false);
             currentState = State.Idle;
             return;
         }
+        damageable.SetCombatParticipation(true);
 
-        if (toTarget.sqrMagnitude > 0.0001f)
+        if (currentState != State.AttackWindup && currentState != State.Active && toTarget.sqrMagnitude > 0.0001f)
         {
             facing = toTarget.normalized;
         }
@@ -167,6 +199,9 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
             case State.AttackWindup:
                 advanceStateTimer = true;
                 UpdateAttackWindup(distance);
+                break;
+            case State.Active:
+                pendingMeleeHit = true;
                 break;
             case State.Recovery:
             case State.Cooldown:
@@ -187,6 +222,12 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
 
     public void CombatTickTimers()
     {
+        if (currentState == State.Active && --activeRemaining <= 0)
+        {
+            currentState = State.Recovery;
+            stateTimer = recoveryDuration;
+            advanceStateTimer = false;
+        }
         if (advanceStateTimer)
         {
             stateTimer = CombatTimeController.AdvanceTimer(stateTimer);
@@ -195,7 +236,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
 
     private void UpdateApproach(float distance, Vector2 toTarget)
     {
-        if (distance >= preferredMinDistance && distance <= attackRange && IsTargetInFront())
+        if (distance >= preferredMinDistance && distance <= attackRange && IsTargetInFront() && CanBeginVisibleAttack())
         {
             StartWindup();
             return;
@@ -204,14 +245,14 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
         if (distance < preferredMinDistance)
         {
             Vector2 retreat = -toTarget.normalized * (moveSpeed * CombatTimeController.StepSeconds);
-            transform.position += (Vector3)retreat;
+            MoveSafely(retreat);
             return;
         }
 
         if (distance > preferredMaxDistance)
         {
             Vector2 advance = toTarget.normalized * (moveSpeed * CombatTimeController.StepSeconds);
-            transform.position += (Vector3)advance;
+            MoveSafely(advance);
         }
     }
 
@@ -220,6 +261,15 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
         if (!attackApplied && CombatTimeController.AdvanceTimer(stateTimer) <= 0f)
         {
             attackApplied = true;
+            if (combatDefinition != null)
+            {
+                currentState = State.Active;
+                activeRemaining = combatDefinition.activeFrames;
+                pendingMeleeHit = true;
+                advanceStateTimer = false;
+                AttackStarted?.Invoke();
+                return;
+            }
             if (distance <= attackRange * 1.1f)
             {
                 pendingMeleeHit = true;
@@ -252,8 +302,10 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
 
     private void TryApplyMeleeHit()
     {
-        AttackStarted?.Invoke();
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRange);
+        if (combatDefinition == null) AttackStarted?.Invoke();
+        Collider2D[] hits = combatDefinition == null
+            ? Physics2D.OverlapCircleAll(transform.position, attackRange)
+            : Physics2D.OverlapBoxAll((Vector2)transform.position + new Vector2(facing.x < 0 ? -combatDefinition.hitOffset.x : combatDefinition.hitOffset.x, combatDefinition.hitOffset.y), combatDefinition.hitSize, 0, attackTargetLayers);
         for (int i = 0; i < hits.Length; i++)
         {
             Collider2D other = hits[i];
@@ -263,13 +315,14 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
             }
 
             IDamageReceiver2D receiver = other.GetComponentInParent<IDamageReceiver2D>();
+            if (combatDefinition != null && Physics2D.Linecast(transform.position, other.bounds.center, combatDefinition.obstacleLayers).collider != null) continue;
             if (receiver == null || !hitReceivers.Add(((Component)receiver).GetInstanceID()))
             {
                 continue;
             }
 
             if (receiver is IContextDamageReceiver2D contextual)
-                contextual.TryReceiveContextHit(attackDamage, transform.position, attackKnockback, new CombatHitContext2D(damageable, attackSequence));
+                contextual.TryReceiveContextHit(attackDamage, transform.position, attackKnockback, new CombatHitContext2D(damageable, attackSequence, combatDefinition == null || combatDefinition.parryable));
             else receiver.TryReceiveHit(attackDamage, transform.position, attackKnockback);
         }
     }
@@ -278,6 +331,36 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     {
         Vector2 toTarget = ((Vector2)target.position - (Vector2)transform.position).normalized;
         return Vector2.Dot(facing, toTarget) > 0.1f;
+    }
+
+    private bool CanBeginVisibleAttack()
+    {
+        if (combatDefinition == null) return true;
+        if (Physics2D.Linecast(transform.position, target.position, combatDefinition.obstacleLayers).collider != null) return false;
+        if (combatDefinition.allowOffscreenStart) return true;
+        Camera camera = Camera.main;
+        if (camera == null) return false;
+        Vector3 viewport = camera.WorldToViewportPoint(transform.position);
+        return viewport.z > 0 && viewport.x >= .04f && viewport.x <= .96f && viewport.y >= 0 && viewport.y <= 1;
+    }
+
+    private void MoveSafely(Vector2 displacement)
+    {
+        if (combatDefinition != null)
+        {
+            displacement.y = 0;
+            if (ownCollider != null && displacement.sqrMagnitude > .000001f)
+            {
+                var filter = new ContactFilter2D { useLayerMask = true, layerMask = combatDefinition.obstacleLayers, useTriggers = false };
+                int count = ownCollider.Cast(displacement.normalized, filter, movementHits, displacement.magnitude);
+                float distance = displacement.magnitude;
+                for (int i = 0; i < count; i++)
+                    if (Vector2.Dot(displacement.normalized, movementHits[i].normal) < -.001f)
+                        distance = Mathf.Min(distance, Mathf.Max(0, movementHits[i].distance - .01f));
+                displacement = displacement.normalized * distance;
+            }
+        }
+        transform.position += (Vector3)displacement;
     }
 
     private void TryFindPlayerTarget()

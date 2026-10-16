@@ -51,6 +51,12 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IContextDamageReceiver2D, I
     private int blockedByDash;
     private readonly Dictionary<int, long> lastAttackBySource = new();
     private PlayerParryCounter2D counter;
+    public float InvincibleRemaining => Mathf.Max(0, invincibleTimer);
+    public string LastDamageCause { get; private set; } = "None";
+    public string LastDamageSourceId { get; private set; } = "None";
+    public long LastDamageAttackId { get; private set; }
+    public long LastDamageTick { get; private set; }
+    public event System.Action<int, string, long> DamageReceived;
 
     public bool IsInvincible => invincibleTimer > 0f;
     public bool IsHitLocked => hitLockTimer > 0f;
@@ -179,9 +185,9 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IContextDamageReceiver2D, I
         {
             LastParryResult = parryResult;
             blockedByParry++;
-            ApplyParryEffects(parryResult);
+            if (parry.LastResolvedAsPrimary) ApplyParryEffects(parryResult);
 
-            if (specialGauge != null)
+            if (specialGauge != null && parry.LastResolvedAsPrimary)
             {
                 specialGauge.AddOnParry(parryResult);
             }
@@ -195,13 +201,19 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IContextDamageReceiver2D, I
             return false;
         }
 
-        if (motor != null && motor.IsDashing)
+        if (motor != null && motor.IsDashInvincible)
         {
             blockedByDash++;
             return false;
         }
 
+        int actualDamage = Mathf.Min(currentHp, damage);
+        LastDamageSourceId = context.Source != null ? context.Source.IndividualId : "UnknownSource";
+        LastDamageAttackId = context.AttackId;
+        LastDamageTick = CombatTimeController.TickCount;
+        LastDamageCause = context.Parryable ? "UnprotectedHit" : "UnparryableHit";
         currentHp = Mathf.Max(0, currentHp - damage);
+        DamageReceived?.Invoke(actualDamage, LastDamageSourceId, context.AttackId);
         totalHitsTaken++;
         invincibleTimer = Mathf.Max(0f, invincibleDuration);
         hitLockTimer = Mathf.Max(0f, hitStopMoveDuration);

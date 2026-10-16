@@ -87,6 +87,9 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
     public PlayerActionRequest PendingRequests => pendingRequests;
     public PlayerActionRequest LastSharedInputResolution { get; private set; }
     public int LastSharedInputTargetInstanceId { get; private set; }
+    public string LastSharedInputReason { get; private set; } = "NotPressed";
+    public long LastDecisionTick { get; private set; }
+    public PlayerActionDecision LastDecision { get; private set; }
     public int CombatTickOrder => 100;
     public bool CanCollectGameplayInput => isActiveAndEnabled &&
         CombatTimeController.AcceptsGameplayInput &&
@@ -276,6 +279,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         pendingSharedRequest = PlayerActionResolver.ResolveSharedDashInteract(pendingSharedTarget != null);
         LastSharedInputResolution = pendingSharedRequest;
         LastSharedInputTargetInstanceId = pendingSharedTarget is MonoBehaviour target ? target.GetInstanceID() : 0;
+        LastSharedInputReason = pendingSharedTarget != null ? "TargetInRange" : "NoTarget";
         return RequestAction(pendingSharedRequest);
     }
 
@@ -331,7 +335,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
             return;
         }
 
-        TransitionTo(PlayerActionState.Neutral, reason, true);
+        TransitionTo(PlayerActionState.Neutral, reason, !(expectedAction == PlayerActionState.Attack && attack != null && attack.IsRecovering));
     }
 
     public void CompleteParryAction(string reason)
@@ -562,6 +566,8 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         PlayerAttackCancelWindow cancelWindows = attack != null
             ? attack.OpenCancelWindows
             : PlayerAttackCancelWindow.None;
+        if (ActionState == PlayerActionState.ParryCounter && GetComponent<PlayerParryCounter2D>() is { CanDefenseCancel: true })
+            cancelWindows |= PlayerAttackCancelWindow.Defense;
         PlayerActionDecision decision = PlayerActionResolver.Resolve(
             ActionState,
             requests,
@@ -621,6 +627,8 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         {
             if (actionHandlers.TryGetValue(PlayerActionState.ParryCounter, out IPlayerActionStateHandler counter) && counter.CanStartAction)
                 legal |= PlayerActionRequest.Attack;
+            else if (ActionState == PlayerActionState.Neutral && actionHandlers.TryGetValue(PlayerActionState.OpportunityStrike, out IPlayerActionStateHandler opportunity) && opportunity.CanStartAction)
+                legal |= PlayerActionRequest.Attack;
             else if (attack != null && attack.CanStartAttackFromStateMachine) legal |= PlayerActionRequest.Attack;
         }
         else if (attack != null && attack.CanStartAttackFromStateMachine) legal |= PlayerActionRequest.Attack;
@@ -657,6 +665,17 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
             TransitionTo(PlayerActionState.Attack, "AcceptedAttackWithoutCounterTarget", true);
             return true;
         }
+
+        if (request == PlayerActionRequest.Attack && ActionState == PlayerActionState.Neutral &&
+            actionHandlers.TryGetValue(PlayerActionState.OpportunityStrike, out IPlayerActionStateHandler opportunity) && opportunity.CanStartAction)
+        {
+            if (!opportunity.TryStartAction()) return false;
+            TransitionTo(PlayerActionState.OpportunityStrike, "AcceptedOpportunity", true);
+            return true;
+        }
+
+        if (request == PlayerActionRequest.Attack && ActionState == PlayerActionState.Attack && attack != null)
+            return attack.TryAdvanceConfiguredCombo();
 
         switch (request)
         {
@@ -709,6 +728,8 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
 
     private void RecordDecision(PlayerActionDecision decision)
     {
+        LastDecision = decision;
+        LastDecisionTick = CombatTimeController.TickCount;
         LastAcceptedRequest = decision.SelectedRequest;
         LastAcceptedPriority = PlayerActionResolver.GetPriority(decision.SelectedRequest);
 

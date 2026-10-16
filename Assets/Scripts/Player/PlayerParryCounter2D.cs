@@ -6,6 +6,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHandler, ICombatTickListener, ICombatTimerListener
 {
+    [SerializeField] private ParryCounterDefinition definition;
     [SerializeField, Min(1)] private int hitFrame = 6;
     [SerializeField, Min(1)] private int endFrame = 24;
     [SerializeField, Min(1)] private int damage = 3;
@@ -41,6 +42,17 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     private int facing;
     private readonly List<Damageable2D> stocks = new();
     private readonly RaycastHit2D[] movementHits = new RaycastHit2D[8];
+    private bool queuedCounter;
+    private int selectedDamage;
+    public string LastStockReason { get; private set; } = "None";
+    public string LastSelectionReason { get; private set; } = "NoStock";
+    public int ConsumedCount { get; private set; }
+    public bool HasQueuedCounter => queuedCounter;
+    public float SelectedMultiplier { get; private set; } = 1f;
+    public int SelectedDamage => selectedDamage;
+    public bool CanDefenseCancel => active && !airborneKick && definition != null && elapsed >= definition.cancelStartFrame;
+    public ParryCounterDefinition Definition => definition;
+    public IReadOnlyList<Damageable2D> Stocks => stocks;
     public Damageable2D SelectedTarget { get; private set; }
     public int StockCount { get { PruneStocks(); return stocks.Count; } }
     public bool IsActive => active;
@@ -78,25 +90,70 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     {
         state = GetComponent<PlayerStateMachine>(); motor = GetComponent<PlayerMotor2D>();
         body = GetComponent<Rigidbody2D>(); bodyCollider = GetComponent<Collider2D>();
+        if (definition != null && !airborneKick)
+        {
+            hitFrame = definition.hitFrame; endFrame = definition.endFrame; damage = definition.baseDamage;
+            maxApproach = definition.approachDistance; obstacleLayers = definition.obstacleLayers;
+        }
         state?.RegisterActionHandler(this); CombatTimeController.Register(this);
     }
     public void RegisterParriedEnemy(Damageable2D enemy)
     {
         PruneStocks();
-        if (enemy != null && enemy.IsAlive && !stocks.Contains(enemy)) stocks.Add(enemy);
+        if (enemy != null && enemy.ParticipatingInCombat && !stocks.Contains(enemy))
+        {
+            stocks.Add(enemy);
+            enemy.LeftCombat += RemoveStock;
+            enemy.Died += OnStockTargetDied;
+            enemy.ResetPerformed += RemoveStock;
+            LastStockReason = "Registered:" + enemy.IndividualId;
+        }
     }
-    public void ClearStocks() => stocks.Clear();
-    private void PruneStocks() => stocks.RemoveAll(enemy => enemy == null || !enemy.IsAlive);
+    public void ClearStocks()
+    {
+        for (int i = stocks.Count - 1; i >= 0; i--) RemoveStock(stocks[i]);
+        queuedCounter = false;
+        LastStockReason = "AllCleared";
+    }
+    private void OnStockTargetDied(Damageable2D enemy, Vector2 direction) => RemoveStock(enemy);
+    private void RemoveStock(Damageable2D enemy)
+    {
+        stocks.Remove(enemy);
+        if (enemy == null) return;
+        enemy.LeftCombat -= RemoveStock; enemy.Died -= OnStockTargetDied; enemy.ResetPerformed -= RemoveStock;
+        LastStockReason = "Removed:" + enemy.IndividualId;
+    }
+    private void PruneStocks()
+    {
+        for (int i = stocks.Count - 1; i >= 0; i--)
+            if (stocks[i] == null || !stocks[i].ParticipatingInCombat) RemoveStock(stocks[i]);
+    }
+    public string EligibilityReason(Damageable2D enemy)
+    {
+        if (enemy == null || !enemy.ParticipatingInCombat) return "TargetLost";
+        Vector2 delta = enemy.transform.position - transform.position;
+        if (delta.magnitude > 1.9f) return "OutOfRange";
+        if (Mathf.Abs(delta.y) > 1.25f) return "Height";
+        int direction = motor != null ? motor.FacingSign : 1;
+        if (delta.sqrMagnitude > .0001f && Vector2.Dot(delta.normalized, Vector2.right * direction) < .5f) return "Behind";
+        if (Physics2D.Linecast(transform.position, enemy.transform.position, obstacleLayers).collider != null) return "Obstructed";
+        return "Eligible";
+    }
+    public bool ReserveNextCounter()
+    {
+        if (!active || airborneKick || definition == null || endFrame - elapsed > definition.chainBufferFrames)
+            return false;
+        queuedCounter = true;
+        return true;
+    }
     private Damageable2D FindEligible()
     {
         PruneStocks();
-        int direction = motor != null ? motor.FacingSign : 1;
+        LastSelectionReason = stocks.Count == 0 ? "NoStock" : "NoEligibleTarget";
         foreach (var enemy in stocks)
         {
-            Vector2 delta = enemy.transform.position - transform.position;
-            if (delta.magnitude > 1.9f || Mathf.Abs(delta.y) > 1.25f ||
-                (delta.sqrMagnitude > .0001f && Vector2.Dot(delta.normalized, Vector2.right * direction) < .5f)) continue;
-            if (Physics2D.Linecast(transform.position, enemy.transform.position, obstacleLayers).collider != null) continue;
+            if (EligibilityReason(enemy) != "Eligible") continue;
+            LastSelectionReason = "Selected:" + enemy.IndividualId;
             return enemy;
         }
         return null;
@@ -104,7 +161,11 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public bool TryStartAction()
     {
         if (!CanStartAction) return false;
-        SelectedTarget = FindEligible(); stocks.Remove(SelectedTarget);
+        SelectedTarget = FindEligible(); RemoveStock(SelectedTarget);
+        ConsumedCount++; LastStockReason = "Consumed:" + SelectedTarget.IndividualId;
+        SelectedMultiplier = definition != null && !airborneKick ? SelectedTarget.CounterMultiplier : 1f;
+        selectedDamage = Mathf.Max(1, Mathf.FloorToInt(damage * SelectedMultiplier + .5f));
+        queuedCounter = false;
         active = true; elapsed = 0; hitApplied = charged = confirmedHit = chargeReleased = landed = false; StartCount++;
         origin = body != null ? body.position : (Vector2)transform.position;
         facing = motor != null ? motor.FacingSign : 1;
@@ -118,8 +179,25 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     {
         PruneStocks();
         if (!active) return;
-        if (!hitApplied && (SelectedTarget == null || !SelectedTarget.IsAlive)) { Finish("TargetLost"); return; }
-        if (!airborneKick || body == null) return;
+        if (!hitApplied && (SelectedTarget == null || !SelectedTarget.ParticipatingInCombat)) { Finish("TargetLost"); return; }
+        if (body == null) return;
+        if (!airborneKick)
+        {
+            if (definition != null)
+            {
+                float fraction = Mathf.Clamp01((elapsed + 1f) / Mathf.Max(1, definition.approachFrames));
+                Vector2 groundDesired = new Vector2(origin.x + facing * approach * fraction, body.position.y);
+                Vector2 groundDelta = groundDesired - body.position;
+                var filter = new ContactFilter2D { useLayerMask = true, layerMask = obstacleLayers, useTriggers = false };
+                int count = bodyCollider != null && groundDelta.sqrMagnitude > .000001f ? bodyCollider.Cast(groundDelta.normalized, filter, movementHits, groundDelta.magnitude) : 0;
+                float distance = groundDelta.magnitude;
+                for (int i = 0; i < count; i++)
+                    if (Vector2.Dot(groundDelta.normalized, movementHits[i].normal) < -.001f)
+                        distance = Mathf.Min(distance, Mathf.Max(0, movementHits[i].distance - .005f));
+                body.linearVelocity = new Vector2(groundDelta.normalized.x * distance / CombatTimeController.StepSeconds, body.linearVelocity.y);
+            }
+            return;
+        }
         float frame=elapsed+1f;
         float travelFrames=blinkApproach?Mathf.Max(1,blinkTravelFrames):hitFrame;
         float rise=Mathf.Clamp01(frame/(blinkApproach?travelFrames:Mathf.Max(1,chargeFrame-2)));
@@ -173,11 +251,18 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
             Vector2 offset=airborneKick?(overheadHeelDrop?heelContactOffset:airborneContactOffset):new Vector2(.85f,-.25f);
             Vector2 foot = (Vector2)transform.position + new Vector2(facing*offset.x,offset.y);
             bool contactsTarget = false;
-            foreach (Collider2D c in Physics2D.OverlapCircleAll(foot, radius))
+            Collider2D[] contacts = definition != null && !airborneKick
+                ? Physics2D.OverlapBoxAll((Vector2)transform.position + Vector2.right * facing, definition.hitSize, 0)
+                : Physics2D.OverlapCircleAll(foot, radius);
+            foreach (Collider2D c in contacts)
                 if (c.GetComponentInParent<Damageable2D>() == SelectedTarget) { contactsTarget = true; break; }
             bool clearPath=SelectedTarget!=null&&Physics2D.Linecast(transform.position,SelectedTarget.transform.position,obstacleLayers).collider==null;
-            if (SelectedTarget != null && SelectedTarget.IsAlive && contactsTarget && clearPath && SelectedTarget.TryTakeHit(damage, Vector2.right * facing))
-            { confirmedHit=true;HitCount++; HitConfirmed?.Invoke(SelectedTarget, foot); }
+            if (SelectedTarget != null && SelectedTarget.IsAlive && contactsTarget && clearPath && SelectedTarget.TryTakeHit(selectedDamage, Vector2.right * facing))
+            {
+                confirmedHit=true;HitCount++;
+                if (definition != null && !airborneKick) GetComponent<PlayerSpecialGauge>()?.AddOnAttackHit(definition.gaugeGain);
+                HitConfirmed?.Invoke(SelectedTarget, foot);
+            }
             else { CombatTimeController.ReleaseSlow(this);HitMissed?.Invoke(); }
         }
         if(airborneKick&&!landed&&elapsed>=landingFrame) { landed=true;Landed?.Invoke(); }
@@ -185,15 +270,21 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     }
     private void Finish(string reason)
     {
+        bool chain = reason == "Complete" && queuedCounter;
         LastEndReason = reason;
         CancelAction(); state?.CompleteAction(ActionState, "ParryCounter" + reason);
+        if (chain && FindEligible() != null) state?.RequestAction(PlayerActionRequest.Attack);
     }
     public void CancelAction()
     {
         bool wasActive = active; bool didHit = confirmedHit;
-        active = false; elapsed = 0; hitApplied = charged = confirmedHit = chargeReleased = landed = false;
+        active = false; elapsed = 0; queuedCounter = false; hitApplied = charged = confirmedHit = chargeReleased = landed = false;
         if (wasActive && body != null) { body.gravityScale = savedGravity; body.linearVelocity = Vector2.zero; }
-        if(SelectedTarget!=null) SelectedTarget.ReleaseStun(this);
+        if(SelectedTarget!=null)
+        {
+            SelectedTarget.ReleaseStun(this);
+            if (wasActive && !didHit && SelectedTarget.IsAlive && definition != null && !airborneKick) SelectedTarget.ExtendStun(12f / 60f);
+        }
         SelectedTarget = null; CombatTimeController.ReleaseOwner(this);
         if (wasActive) Finished?.Invoke(didHit);
     }

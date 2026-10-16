@@ -14,6 +14,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     [SerializeField] private int maxHp = 5;
     [SerializeField] private string individualId;
+    [SerializeField] private EnemyCombatRank combatRank;
     [SerializeField, Min(0f)] private float deathDisplayDuration;
     [SerializeField, Min(0f)] private float lightHitStunDuration;
     [SerializeField] private bool blockContactPushFromPlayer = true;
@@ -53,6 +54,25 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     private bool[] initialColliderStates;
     private readonly Dictionary<object,float> stunHolds=new();
     private readonly List<object> stunHoldOwners=new();
+    private bool participatingInCombat = true;
+    public bool ParticipatingInCombat => IsAlive && participatingInCombat;
+    public EnemyCombatRank CombatRank => combatRank;
+    public float CounterMultiplier => combatRank == EnemyCombatRank.Elite ? 2f :
+        combatRank == EnemyCombatRank.MidBoss || combatRank == EnemyCombatRank.Boss ? 1.5f : 3f;
+    public int LastDamageTaken { get; private set; }
+    public event Action<Damageable2D> LeftCombat;
+    public void SetCombatParticipation(bool participating)
+    {
+        if (participatingInCombat && !participating) LeftCombat?.Invoke(this);
+        participatingInCombat = participating;
+    }
+    public void ConfigureCombat(EnemyCombatRank rank, int hp)
+    {
+        combatRank = rank;
+        maxHp = Mathf.Max(1, hp);
+        currentHp = maxHp;
+        participatingInCombat = true;
+    }
 
     public string IndividualId => string.IsNullOrEmpty(individualId) ? GetInstanceID().ToString() : individualId;
     public bool IsAlive => isActiveAndEnabled && currentHp > 0;
@@ -79,6 +99,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     private void OnDisable()
     {
+        SetCombatParticipation(false);
         CombatTimeController.Unregister(this);
         CombatTimeController.ReleaseOwner(this);
         flashTimer = 0f;
@@ -193,6 +214,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
             return false;
         }
 
+        LastDamageTaken = Mathf.Min(currentHp, damage);
         currentHp = Mathf.Max(0, currentHp - damage);
         HitCount++;
         AddBreak(damage * hitBreakMultiplier);
@@ -213,7 +235,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         }
 
         CombatCameraFeedback2D.PlayHitShake();
-        HitReceived?.Invoke(this, damage, dir);
+        HitReceived?.Invoke(this, LastDamageTaken, dir);
 
         if (currentHp <= 0)
         {
@@ -261,6 +283,8 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         transform.position = position;
         maxHp = Mathf.Max(1, hp);
         currentHp = maxHp;
+        participatingInCombat = true;
+        LastDamageTaken = 0;
         flashTimer = stunTimer = deathTimer = currentBreak = breakResistTimer = 0f;
         stunHolds.Clear();
         HitCount = DeathCount = 0;
