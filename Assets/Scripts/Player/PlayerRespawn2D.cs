@@ -42,6 +42,7 @@ public sealed class PlayerRespawn2D : MonoBehaviour, ICombatTickListener, IComba
         state.ClearBufferedGameplayInput();
         deadFrames = 0;
         Physics2D.SyncTransforms();
+        GetComponent<PlayerInteractor2D>()?.RefreshAfterTeleport();
     }
     private void OnDisable() { CombatTimeController.Unregister(this); deadFrames = 0; }
 }

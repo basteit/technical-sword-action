@@ -374,6 +374,24 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         private PlayerActionRequest Accepted => Get<PlayerActionRequest>(state, "LastAcceptedRequest");
+        [Test]
+        public void TeleportRefreshDropsOldContextAndRebuildsCurrentOverlapBeforePhysicsCallbacks()
+        {
+            target.transform.position = new Vector3(.4f, 0);
+            Include();
+            Assert.That(Get<object>(interactor, "CurrentInteractable"), Is.Not.Null);
+            player.transform.position = new Vector3(10, 0);
+            Call(interactor, "RefreshAfterTeleport");
+            Assert.That(Get<object>(interactor, "CurrentInteractable"), Is.Null);
+            Pad(GamepadButton.East); Resolve();
+            Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Dash));
+            Release(); Reset();
+            Call(interactor, "RefreshAfterTeleport");
+            Assert.That(Get<object>(interactor, "CurrentInteractable"), Is.SameAs(counter));
+            Pad(GamepadButton.East); Resolve();
+            Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Interact));
+        }
+
         private void RestrictDevices() { actions = Get<InputActionAsset>(router, "Actions"); actions.devices = new InputDevice[] { keyboard, mouse, pad }; }
         private void Reset()
         {
