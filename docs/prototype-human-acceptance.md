@@ -64,7 +64,7 @@
 
 - [ ] デバッグ3グループの入力採否、Bの解決理由、攻撃フェーズ、受付、ストック順、HP、敵の攻撃種／役割／耐性、被弾元、DPSが実際の挙動と一致する。表示の可読性と計測リセットを確認する。
 - [ ] SampleScene、BasicActionValidation、CombatVideo、VideoStudioで変更前にできた操作と撮影が維持される。今回の共通Feedbackが動画専用の時間・カメラ・VFXへ二重適用されない。
-- [ ] 同じ版のWindows Development Buildで両入力の基本操作と通常／強ザコ戦を確認し、P0/P1・Console Error・Missing Referenceが0件であることを記録する。1〜3分動画、設定値、既知問題、テスト結果を同じSHAへ結び付ける。
+- [ ] 検証専用のWindows Build ProfileにPrototypeCombatValidation Sceneを指定し、Development Buildで両入力の基本操作と通常／強ザコ戦を確認する。製品用のScene Listは不用意に上書きしない。P0/P1・Console Error・Missing Referenceが0件であることを記録し、1〜3分動画、設定値、既知問題、テスト結果を同じSHAへ結び付ける。
 
 ## 6. GitHub運用の受入（#38）
 
