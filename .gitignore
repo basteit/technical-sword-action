@@ -81,6 +81,9 @@ crashlytics-build.properties
 /_codex_tmp/
 /.codex-tmp/
 /.uloop/outputs/
+/.uloop/launch-restart-guard.json
+__pycache__/
+*.py[cod]
 
 # Local scratch work, generated previews, and document exports
 /tmp/

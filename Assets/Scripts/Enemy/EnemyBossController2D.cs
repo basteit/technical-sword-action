@@ -228,7 +228,9 @@ public class EnemyBossController2D : MonoBehaviour, ICombatTickListener, ICombat
                 continue;
             }
 
-            receiver.TryReceiveHit(damage, transform.position, meleeKnockback);
+            if(receiver is IContextDamageReceiver2D contextual)
+                contextual.TryReceiveContextHit(damage,transform.position,meleeKnockback,new CombatHitContext2D(damageable,CombatTimeController.TickCount));
+            else receiver.TryReceiveHit(damage, transform.position, meleeKnockback);
         }
     }
 
@@ -286,7 +288,9 @@ public class EnemyBossController2D : MonoBehaviour, ICombatTickListener, ICombat
                 continue;
             }
 
-            receiver.TryReceiveHit(ScaleDamage(chargeDamage), transform.position, chargeKnockback);
+            if(receiver is IContextDamageReceiver2D contextual)
+                contextual.TryReceiveContextHit(ScaleDamage(chargeDamage),transform.position,chargeKnockback,new CombatHitContext2D(damageable,CombatTimeController.TickCount));
+            else receiver.TryReceiveHit(ScaleDamage(chargeDamage), transform.position, chargeKnockback);
         }
     }
 

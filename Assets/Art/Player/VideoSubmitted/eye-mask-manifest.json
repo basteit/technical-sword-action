@@ -1,0 +1,132 @@
+{
+  "frames": [
+    {
+      "file": "VerticalSlash_01",
+      "pixels": 9
+    },
+    {
+      "file": "VerticalSlash_02",
+      "pixels": 9
+    },
+    {
+      "file": "VerticalSlash_03",
+      "pixels": 6
+    },
+    {
+      "file": "VerticalSlash_04",
+      "pixels": 9
+    },
+    {
+      "file": "VerticalSlash_05",
+      "pixels": 9
+    },
+    {
+      "file": "VerticalSlash_06",
+      "pixels": 9
+    },
+    {
+      "file": "VerticalSlash_07",
+      "pixels": 9
+    },
+    {
+      "file": "VerticalSlash_08",
+      "pixels": 9
+    },
+    {
+      "file": "VerticalSlash_09",
+      "pixels": 9
+    },
+    {
+      "file": "HorizontalSlash_01",
+      "pixels": 9
+    },
+    {
+      "file": "HorizontalSlash_02",
+      "pixels": 9
+    },
+    {
+      "file": "HorizontalSlash_03",
+      "pixels": 9
+    },
+    {
+      "file": "HorizontalSlash_04",
+      "pixels": 6
+    },
+    {
+      "file": "HorizontalSlash_05",
+      "pixels": 6
+    },
+    {
+      "file": "HorizontalSlash_06",
+      "pixels": 6
+    },
+    {
+      "file": "HorizontalSlash_07",
+      "pixels": 6
+    },
+    {
+      "file": "HorizontalSlash_08",
+      "pixels": 6
+    },
+    {
+      "file": "ParryReady_01",
+      "pixels": 9
+    },
+    {
+      "file": "ParryReady_02",
+      "pixels": 9
+    },
+    {
+      "file": "ParryReady_03",
+      "pixels": 9
+    },
+    {
+      "file": "ParryReady_04",
+      "pixels": 9
+    },
+    {
+      "file": "ParryReady_05",
+      "pixels": 9
+    },
+    {
+      "file": "ParryReady_06",
+      "pixels": 9
+    },
+    {
+      "file": "ParryReady_07",
+      "pixels": 9
+    },
+    {
+      "file": "ParryReady_08",
+      "pixels": 9
+    },
+    {
+      "file": "ParrySuccessLight_01",
+      "pixels": 9
+    },
+    {
+      "file": "ParrySuccessLight_02",
+      "pixels": 9
+    },
+    {
+      "file": "ParrySuccessLight_03",
+      "pixels": 0
+    },
+    {
+      "file": "ParrySuccessLight_04",
+      "pixels": 7
+    },
+    {
+      "file": "ParrySuccessLight_05",
+      "pixels": 7
+    },
+    {
+      "file": "ParrySuccessLight_06",
+      "pixels": 7
+    },
+    {
+      "file": "ParrySuccessLight_07",
+      "pixels": 7
+    }
+  ]
+}

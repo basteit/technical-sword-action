@@ -1,0 +1,598 @@
+fileFormatVersion: 2
+guid: 32feb842df1bc2b4596fc5b2f1e902e5
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3510778781174152873
+    second: Fx_HeelLightning_02_0
+  - first:
+      213: -1671095352869405629
+    second: Fx_HeelLightning_02_1
+  - first:
+      213: -1518219608432974092
+    second: Fx_HeelLightning_02_2
+  - first:
+      213: 1576213560779465917
+    second: Fx_HeelLightning_02_3
+  - first:
+      213: -2713620866015007259
+    second: Fx_HeelLightning_02_4
+  - first:
+      213: 8445267075917356482
+    second: Fx_HeelLightning_02_5
+  - first:
+      213: 6147240729721368107
+    second: Fx_HeelLightning_02_6
+  - first:
+      213: -5495695490918428523
+    second: Fx_HeelLightning_02_7
+  - first:
+      213: -1207209707386116401
+    second: Fx_HeelLightning_02_8
+  - first:
+      213: 2816701383369521826
+    second: Fx_HeelLightning_02_9
+  - first:
+      213: 7187436677152128357
+    second: Fx_HeelLightning_02_10
+  - first:
+      213: -7488032234019128798
+    second: Fx_HeelLightning_02_11
+  - first:
+      213: 2406943950813610495
+    second: Fx_HeelLightning_02_12
+  - first:
+      213: -4530285142556953322
+    second: Fx_HeelLightning_02_13
+  - first:
+      213: 7366861611553962533
+    second: Fx_HeelLightning_02_14
+  - first:
+      213: -6472888340081401140
+    second: Fx_HeelLightning_02_15
+  - first:
+      213: 555954005713793539
+    second: Fx_HeelLightning_02_16
+  - first:
+      213: -1472550232548217012
+    second: Fx_HeelLightning_02_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 9
+  spritePivot: {x: 0.5, y: 0.33333334}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_0
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 44
+        width: 63
+        height: 148
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 751c227ac45374fc0800000000000000
+      internalID: -3510778781174152873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_1
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 97
+        width: 33
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 34cb96261a31fc8e0800000000000000
+      internalID: -1671095352869405629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_2
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 68
+        width: 12
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f6e15c5f433eeae0800000000000000
+      internalID: -1518219608432974092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_3
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 49
+        width: 12
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db4e964e1e5dfd510800000000000000
+      internalID: 1576213560779465917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_4
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 39
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ed66122338475ad0800000000000000
+      internalID: -2713620866015007259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_5
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 37
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2cd1b5d19ad933570800000000000000
+      internalID: 8445267075917356482
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_6
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 37
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b2eeadbcfd26f4550800000000000000
+      internalID: 6147240729721368107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_7
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 40
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5905716811e5bb3b0800000000000000
+      internalID: -5495695490918428523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_8
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 33
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc6e8ddca212f3fe0800000000000000
+      internalID: -1207209707386116401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_9
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 36
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2aa77121cfee61720800000000000000
+      internalID: 2816701383369521826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_10
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 33
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56d3443c397eeb360800000000000000
+      internalID: 7187436677152128357
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_11
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 30
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22a7d904b5a251890800000000000000
+      internalID: -7488032234019128798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_12
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 26
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff1458e45ce276120800000000000000
+      internalID: 2406943950813610495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_13
+      rect:
+        serializedVersion: 2
+        x: 30
+        y: 30
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 615b9a25aa13121c0800000000000000
+      internalID: -4530285142556953322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_14
+      rect:
+        serializedVersion: 2
+        x: 43
+        y: 30
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52ab22aba995c3660800000000000000
+      internalID: 7366861611553962533
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_15
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 25
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc22eaa795eab26a0800000000000000
+      internalID: -6472888340081401140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_16
+      rect:
+        serializedVersion: 2
+        x: 87
+        y: 26
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 302b60ef83527b700800000000000000
+      internalID: 555954005713793539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_HeelLightning_02_17
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 9
+        width: 87
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4f6b0b8d53709be0800000000000000
+      internalID: -1472550232548217012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Fx_HeelLightning_02_0: -3510778781174152873
+      Fx_HeelLightning_02_1: -1671095352869405629
+      Fx_HeelLightning_02_10: 7187436677152128357
+      Fx_HeelLightning_02_11: -7488032234019128798
+      Fx_HeelLightning_02_12: 2406943950813610495
+      Fx_HeelLightning_02_13: -4530285142556953322
+      Fx_HeelLightning_02_14: 7366861611553962533
+      Fx_HeelLightning_02_15: -6472888340081401140
+      Fx_HeelLightning_02_16: 555954005713793539
+      Fx_HeelLightning_02_17: -1472550232548217012
+      Fx_HeelLightning_02_2: -1518219608432974092
+      Fx_HeelLightning_02_3: 1576213560779465917
+      Fx_HeelLightning_02_4: -2713620866015007259
+      Fx_HeelLightning_02_5: 8445267075917356482
+      Fx_HeelLightning_02_6: 6147240729721368107
+      Fx_HeelLightning_02_7: -5495695490918428523
+      Fx_HeelLightning_02_8: -1207209707386116401
+      Fx_HeelLightning_02_9: 2816701383369521826
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

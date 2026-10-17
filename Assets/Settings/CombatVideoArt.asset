@@ -1,0 +1,1026 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8a386e9db55ce644be22fb14a08c14a, type: 3}
+  m_Name: CombatVideoArt
+  m_EditorClassIdentifier: Assembly-CSharp::VideoArtLibrary
+  playerArtworkIsRough: 1
+  fourStageArtworkIsRough: 1
+  background: {fileID: -2414837325451676550, guid: 8af4ceaa040a21d4094f51706068b96e, type: 3}
+  motions:
+  - name: AirRoundhouse
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 784546f9100de8344a1ba9dbb0c7c2da, type: 3}
+    - {fileID: 21300000, guid: 1d1ebf3025eca224a82da65b39cf3039, type: 3}
+    - {fileID: 21300000, guid: 20f08ee8d1a167249a15cfa28351bc9a, type: 3}
+    - {fileID: 21300000, guid: 15ef0f6954d505c41be73041976ef3dd, type: 3}
+    - {fileID: 21300000, guid: 745d99f03d9b8a64280b7dc78c2f78a3, type: 3}
+    - {fileID: 21300000, guid: b468133d020badc41a7a66482c84c889, type: 3}
+    - {fileID: 21300000, guid: 34eefc2491e5fe34a9042e1b08e36ee7, type: 3}
+    - {fileID: 21300000, guid: dd8d065924879cb439da9804df1c09f8, type: 3}
+    - {fileID: 21300000, guid: eeb9e35e11f1bf24898eecd2e485e30a, type: 3}
+    - {fileID: 21300000, guid: 8950d4f5fed78bb4f9e0a5e8a6ee94b5, type: 3}
+    - {fileID: 21300000, guid: 2a447b544c26aa0419d8e7b39dca73c7, type: 3}
+    - {fileID: 21300000, guid: 3f1dbb83cf535314f80ceb183232bdd1, type: 3}
+    - {fileID: 21300000, guid: ca9b9dd15c8f076489952c8ca98ec198, type: 3}
+    - {fileID: 21300000, guid: e51a78057b134fd47bdcc6f1e57fd8a1, type: 3}
+    - {fileID: 21300000, guid: 38b65e3447bf91b4dab74dce5f6b1064, type: 3}
+    - {fileID: 21300000, guid: f55a9bedc2f745d4b9a05de0f41f7807, type: 3}
+    - {fileID: 21300000, guid: a9decdfec4c005841b3139a0b278809b, type: 3}
+    - {fileID: 21300000, guid: 94eac8b05b15e974e849dec92a9a64fc, type: 3}
+    - {fileID: 21300000, guid: 0ca551998d99bc2418c8ff911fd4d0ca, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 596be5617112464409d03ed53e301473, type: 3}
+    - {fileID: 21300000, guid: d32f24f8fa31d3a49bc94577a2981935, type: 3}
+    - {fileID: 21300000, guid: 89ecdc8447559034390bd13eb8f5c865, type: 3}
+    - {fileID: 21300000, guid: 2b48fa872a576394cae997d23a75bb2f, type: 3}
+    - {fileID: 21300000, guid: 366479dbb5f26774698495f6757da46f, type: 3}
+    - {fileID: 21300000, guid: 95f818c0b75ad1643ae5b895b7e09c6b, type: 3}
+    - {fileID: 21300000, guid: f4d31e5c1730a2148b11a534ac234b03, type: 3}
+    - {fileID: 21300000, guid: 28062ff7aeebe974aa22e47f425b7f0d, type: 3}
+    - {fileID: 21300000, guid: b8ad4b21e9f0d6f468bb7605e7fdfd48, type: 3}
+    - {fileID: 21300000, guid: 30646c87eba443c409d812c47da9c4e2, type: 3}
+    - {fileID: 21300000, guid: d076f9e43accf264f96b6e9ccaef7073, type: 3}
+    - {fileID: 21300000, guid: dbbac4b2f7fabbd40a6054bc96fb28fd, type: 3}
+    - {fileID: 21300000, guid: 16c0e17464b3d844c964142e18f23778, type: 3}
+    - {fileID: 21300000, guid: a7bcb98efd948a441bd22e78c38f0496, type: 3}
+    - {fileID: 21300000, guid: 6c72650f26eab4540b2c8bb02878d63d, type: 3}
+    - {fileID: 21300000, guid: 719f538fe5104534d9a70266beaa973d, type: 3}
+    - {fileID: 21300000, guid: 29a6e156c146d524880437b51004ead0, type: 3}
+    - {fileID: 21300000, guid: f3301cdff8bd8d24e8327038c25c54a7, type: 3}
+    - {fileID: 21300000, guid: 55c8d37dfe42e1f4a92fa46fb8eec340, type: 3}
+    durations: 04000000040000000400000004000000020000000100000001000000010000000100000001000000010000000100000001000000010000000100000002000000020000000200000002000000
+    hitFrame: 28
+    branchFrame: 36
+    chargeFrame: 18
+    releaseFrame: 24
+    landingFrame: 36
+    recoveryFrame: 36
+  - name: HorizontalSlash
+    provisional: 1
+    includesSlashTrail: 1
+    hasTrailHitbox: 1
+    hitboxMin: {x: 0, y: -1.0625}
+    hitboxMax: {x: 2.65625, y: 0.15625}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: db1caef6a891aeb428b44b1f299713e9, type: 3}
+    - {fileID: 21300000, guid: d0531b92298ebee4aaac0ee046f7401e, type: 3}
+    - {fileID: 21300000, guid: 9230743de77622d43a26b70b464bbd04, type: 3}
+    - {fileID: 21300000, guid: 380ec3ac1eb0a684a942f0af946d0632, type: 3}
+    - {fileID: 21300000, guid: 2ec413ab077018b4b8f5599b53c18518, type: 3}
+    - {fileID: 21300000, guid: 0a130a4e91d5f9f4eb7d58c14b70c0b8, type: 3}
+    - {fileID: 21300000, guid: c3453418c6970484bacc55f5bb80ba97, type: 3}
+    - {fileID: 21300000, guid: 45f067a8e702f0d4890b26f12dd46c09, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 90d7b6a3f9b673b4c9b477fc4ab467f6, type: 3}
+    - {fileID: 21300000, guid: ed6077236475ce4458cfffc2986e64bd, type: 3}
+    - {fileID: 21300000, guid: 69f05546a745a2c4dafab0813de287b9, type: 3}
+    - {fileID: 21300000, guid: 2a7a630a14bab1d4d88adc9c226f0adb, type: 3}
+    - {fileID: 21300000, guid: 438cd04208653874ca31e9825185bf4d, type: 3}
+    - {fileID: 21300000, guid: 92e8851ee6bd7a34f97ec893ad2c95aa, type: 3}
+    - {fileID: 21300000, guid: 0f19cbb4cff7cf14681c95ae51908dcc, type: 3}
+    - {fileID: 21300000, guid: f06f0ef63f20d6a4b9162ff276e700d3, type: 3}
+    durations: 0400000004000000050000000400000004000000040000000400000005000000
+    hitFrame: 13
+    branchFrame: 29
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 29
+  - name: IaiSlash
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: c82a9c5e9e09e1d4db58b7d8e4b977ae, type: 3}
+    - {fileID: 21300000, guid: 64a8a5160b72a804f98067cea5335821, type: 3}
+    - {fileID: 21300000, guid: c6f7f22c8514f1d4280a1fa43564ed97, type: 3}
+    - {fileID: 21300000, guid: 0ad4f9d95cac6c14093538e584a4db8b, type: 3}
+    - {fileID: 21300000, guid: 7dd9b5dfdf2c8c840be1c5a73aae57f9, type: 3}
+    - {fileID: 21300000, guid: 035000fe8e72d2a4ba91be399ed60254, type: 3}
+    - {fileID: 21300000, guid: d61e46e6e98b6af418cc703f9bf5134f, type: 3}
+    - {fileID: 21300000, guid: f0f70e0edd01689438bb7773b95caf7f, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: c909c91fbfebd84478e5574fbe72a518, type: 3}
+    - {fileID: 21300000, guid: 6ec3cfc2258595a40b78d5e25360364d, type: 3}
+    - {fileID: 21300000, guid: 54d3ff4d721bca341a1a0771e8e9657a, type: 3}
+    - {fileID: 21300000, guid: 135e6a0d7934e1c4ab6f4df7b9541f4d, type: 3}
+    - {fileID: 0}
+    - {fileID: 21300000, guid: cb9c7a148d8202345a0ee4dc684f4cad, type: 3}
+    - {fileID: 21300000, guid: 7f6d04c2bba3cc54e933041c1c603705, type: 3}
+    - {fileID: 21300000, guid: 0d0266f69306cd74d8555076697b6b31, type: 3}
+    durations: 0400000003000000020000000200000003000000040000000600000006000000
+    hitFrame: 7
+    branchFrame: 22
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 22
+  - name: IdleRough
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 02133f89baa50744ea0409b20b6dfeb8, type: 3}
+    - {fileID: 21300000, guid: 94ebc8e6624aec7468c427e9e0e940c0, type: 3}
+    - {fileID: 21300000, guid: 105468861075cf848b5f98992d4ee30c, type: 3}
+    - {fileID: 21300000, guid: 5a8d25126710bc74a8df700f40f02eb2, type: 3}
+    - {fileID: 21300000, guid: a762e9dcfe0acdf4da12651e48825b97, type: 3}
+    - {fileID: 21300000, guid: 094f3ad66e2c1884da5efddfa6c43aa2, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: c53b910643c216b41a148fb292c4b52c, type: 3}
+    - {fileID: 21300000, guid: 5cd9528c27d805f4eb7359e3807da757, type: 3}
+    - {fileID: 21300000, guid: 98b975264f7f38442893a2beac36850e, type: 3}
+    - {fileID: 21300000, guid: fa71e1f5f465adc43953f23066241859, type: 3}
+    - {fileID: 21300000, guid: 46c7fab062cbe3342b9d33ce800ad629, type: 3}
+    - {fileID: 21300000, guid: 6db90c31be468ec42aafdfb24e6be8f4, type: 3}
+    durations: 060000000600000006000000060000000600000006000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: ParryDeflect
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 85d458a6d8aff564686a02f6c441acfb, type: 3}
+    - {fileID: 21300000, guid: a582b941e4f5ef54aa2cd3164df303b9, type: 3}
+    - {fileID: 21300000, guid: 84dd78ec9829c2e4981ed595f8fba893, type: 3}
+    - {fileID: 21300000, guid: e7e5b133aef5a7d47a2c1e1c4147b201, type: 3}
+    - {fileID: 21300000, guid: 8ed544bf610b88642aaf1b6b191c9752, type: 3}
+    - {fileID: 21300000, guid: f5c3d1f2da39f2140bbeacf484cb6686, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: c78436c9565ede646830e5e04b912a5d, type: 3}
+    - {fileID: 21300000, guid: 26af05c511806404ba0a34822c6f8f3b, type: 3}
+    - {fileID: 0}
+    - {fileID: 21300000, guid: 93e7abbb022cb394e8146fc57da8c244, type: 3}
+    - {fileID: 0}
+    - {fileID: 21300000, guid: 9ba467103917e644081cab87c3c0fadc, type: 3}
+    durations: 030000000300000002000000020000000400000005000000
+    hitFrame: 6
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: RapidSheathe
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 5d151480a57d6454a9a3388b1d554d09, type: 3}
+    - {fileID: 21300000, guid: 028bc19c7046b2040be915a39123308f, type: 3}
+    - {fileID: 21300000, guid: fddf55fe5046d8143bc6dbecc6761399, type: 3}
+    - {fileID: 21300000, guid: 9f9e0ed05f7a90e4b80c26af2c037dfa, type: 3}
+    - {fileID: 21300000, guid: 51f5ab2aeb4da734599d17a81e070ac2, type: 3}
+    - {fileID: 21300000, guid: 843ad940bd332f642a80f01776ed243b, type: 3}
+    - {fileID: 21300000, guid: f24c7585bb5b13347a8bb110eda23bcc, type: 3}
+    - {fileID: 21300000, guid: 3e376144b321c93498a3e413e2d7e043, type: 3}
+    - {fileID: 21300000, guid: ebef34403a5cb3a43ae23d1621e610dc, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 2694149d33b75b54585895f967a82782, type: 3}
+    - {fileID: 21300000, guid: 0df71c0652e4df9468fa7146e28a5b78, type: 3}
+    - {fileID: 21300000, guid: aaa70c5f5a43c684c8c9ec632c06ff99, type: 3}
+    - {fileID: 21300000, guid: aa41ef74fafcc7a4ea664ae501319f71, type: 3}
+    - {fileID: 21300000, guid: b97ed78a9cd4a5644b8ef311e583927f, type: 3}
+    - {fileID: 21300000, guid: ddad076b4a1b56c46b83fb539f7169c9, type: 3}
+    - {fileID: 21300000, guid: fb821cb034b2b784aaa63708c2385cf2, type: 3}
+    - {fileID: 21300000, guid: f903174cdf210654080d91a44b8b5a31, type: 3}
+    - {fileID: 21300000, guid: dc866b8d0f656bd45bef63ca10f3097d, type: 3}
+    durations: 03000000030000000300000002000000020000000200000005000000060000000c000000
+    hitFrame: 11
+    branchFrame: 32
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 32
+  - name: Recovery_AirRoundhouse
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 892a72cf0d5e19845a6e77c88cb07260, type: 3}
+    - {fileID: 21300000, guid: 69fbf0d0f1c9ebd4cbb32154d0a677b1, type: 3}
+    - {fileID: 21300000, guid: db1768448a3f56047aad5c05b38f76ef, type: 3}
+    - {fileID: 21300000, guid: 2da9914c3e971134ea4645a8dd62c8cb, type: 3}
+    - {fileID: 21300000, guid: 4e7cc13bce8b6cb4294a11475ed65b13, type: 3}
+    - {fileID: 21300000, guid: fc02f70ed98b6c04aad33e9184b8064e, type: 3}
+    - {fileID: 21300000, guid: 2267debe7c991a24a9c663f3006c148c, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: e214e8e19e373c14a93105cca4588b4b, type: 3}
+    - {fileID: 21300000, guid: 1be53f90142eb79439090c1986efdb28, type: 3}
+    - {fileID: 21300000, guid: db688abfabf635c448b44599a5539000, type: 3}
+    - {fileID: 21300000, guid: 9d279fc802890564fafa1e87a8aca8ec, type: 3}
+    - {fileID: 21300000, guid: 7d96c220b6db89f448165ac1f05309cd, type: 3}
+    - {fileID: 21300000, guid: 82f192e7eec680a48833900129f9ae35, type: 3}
+    - {fileID: 21300000, guid: 475ff22a54f3c9c4f92ff68e658405eb, type: 3}
+    durations: 05000000050000000500000005000000050000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_HorizontalSlash
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 6503bdc207432eb4f847dc96b46f8e08, type: 3}
+    - {fileID: 21300000, guid: 38d2f6878bcf72740b4352a506542324, type: 3}
+    - {fileID: 21300000, guid: 2dd1c5f026e4f274ab4292ac8fa04621, type: 3}
+    - {fileID: 21300000, guid: 777cd6c54fcf35043abb9437e9c36a06, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: f03c716aa01f94e4cbe20a4f9d78d9c2, type: 3}
+    - {fileID: 21300000, guid: 9bb39604090a0234ea730e1591cba465, type: 3}
+    - {fileID: 21300000, guid: 8d825fdfd0516aa41bcd895930163902, type: 3}
+    - {fileID: 21300000, guid: 7c31ecf44500fe44a87aec4640cac711, type: 3}
+    durations: 04000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_IaiSlash
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: ed91ebec86cc4c4499a4943ae635bf57, type: 3}
+    - {fileID: 21300000, guid: 46b45606b7bd9a44bb72356ce795114a, type: 3}
+    - {fileID: 21300000, guid: 7d1828845508d8e40a544a91ea02d5fe, type: 3}
+    - {fileID: 21300000, guid: 80b19947f65b38a468baf64112e5c419, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 959ddbfc6ad44684985ca5c2d9d0d977, type: 3}
+    - {fileID: 21300000, guid: 8b6ed36bdd41ad747a60c16089430bb7, type: 3}
+    - {fileID: 21300000, guid: 2fff04f982cae6544aac6485c16daa27, type: 3}
+    - {fileID: 21300000, guid: d306fd57062054742a1c7f3f5c6749b2, type: 3}
+    durations: 04000000050000000500000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_Landing
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 38ef6e0880ea52745ae27883bd0f007e, type: 3}
+    - {fileID: 21300000, guid: aad64718130d4bb49802bd44b62656fd, type: 3}
+    - {fileID: 21300000, guid: 31baa7bed19a838499fc63f3af5f5b52, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 6f06c51186c25b246958001df1fb9744, type: 3}
+    - {fileID: 21300000, guid: ef0db661d291f8d45806bd254a914d4d, type: 3}
+    - {fileID: 21300000, guid: e4f700922fa33d545a29965208871a65, type: 3}
+    durations: 030000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_Move
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 3edc667e9f1bcf74fa44adb4141fbc1b, type: 3}
+    - {fileID: 21300000, guid: bebebc4a25e5afb4987d5e73954cc5ea, type: 3}
+    - {fileID: 21300000, guid: 58b503e8ca064dd46a3ab7a48d7bf470, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 5cd14380c0f74894cb6f75e436fad912, type: 3}
+    - {fileID: 21300000, guid: ede642ab136a8a84d872555c7bd219be, type: 3}
+    - {fileID: 21300000, guid: 89b0052d188245a4695de114983d4e00, type: 3}
+    durations: 030000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_ParryDeflect
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 92c5ea07f24abbb4486b2d357641a264, type: 3}
+    - {fileID: 21300000, guid: 136eb231e10694e48abb094534897664, type: 3}
+    - {fileID: 21300000, guid: 3c920910074529b44b8311a98d3e7404, type: 3}
+    - {fileID: 21300000, guid: 26a5d7254f0192145b6ac32c42fe42bf, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 4bb6daa3a89fabc4297e7d5ed9a71511, type: 3}
+    - {fileID: 21300000, guid: df90ed115d1bff349924971de266ca8d, type: 3}
+    - {fileID: 21300000, guid: ef43030de0df7464e9f8ed2e958cf33e, type: 3}
+    - {fileID: 21300000, guid: 8ed560dd506f66244b89769ad58f18c7, type: 3}
+    durations: 03000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_RapidSheathe
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: dbb0e760899d9bf4eb02e809329b8ea3, type: 3}
+    - {fileID: 21300000, guid: 48b9db39e55a0644c9a2faff5a57ad23, type: 3}
+    - {fileID: 21300000, guid: 87615ce01f969ee4b8a77963df6f417f, type: 3}
+    - {fileID: 21300000, guid: b4b74ea750a21cb4495d207027bd2a4b, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: d487a248e74565f49b7ba32d72f57f73, type: 3}
+    - {fileID: 21300000, guid: 95d1612a7b2e4934098abf9cef478ba6, type: 3}
+    - {fileID: 21300000, guid: d952f06181402f44bb257fa8fc522008, type: 3}
+    - {fileID: 21300000, guid: 2ff88052644387943951e391734bb14e, type: 3}
+    durations: 04000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_VerticalSlash
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: e823c34174ac21246a831e3bf6f6e5aa, type: 3}
+    - {fileID: 21300000, guid: 3088facbf79cfec41bec7b2c49acbf30, type: 3}
+    - {fileID: 21300000, guid: 59e64ef68f97b9a47b542558675cd78d, type: 3}
+    - {fileID: 21300000, guid: 09f0ecfcae39a0842b2c16d7f9fd30eb, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 4f317aabe6d8a7a4b9e083d46bc6c124, type: 3}
+    - {fileID: 21300000, guid: 045dc9139c83c8f42914a95353ab6637, type: 3}
+    - {fileID: 21300000, guid: 9b8f6de188632be4b8909c1afeb4971f, type: 3}
+    - {fileID: 21300000, guid: bf33ad303690d8b4aa6696502e3cd5ff, type: 3}
+    durations: 04000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: VerticalSlash
+    provisional: 1
+    includesSlashTrail: 1
+    hasTrailHitbox: 1
+    hitboxMin: {x: 0.5625, y: -1.1875}
+    hitboxMax: {x: 2.3125, y: 1.65625}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 53a7092c3e3e1964b83c72e0407aa4a8, type: 3}
+    - {fileID: 21300000, guid: bc52b7d04eec8a8488f9f1bb8bac8d4e, type: 3}
+    - {fileID: 21300000, guid: 53d20dcdab24b77489c86cccb9221d0b, type: 3}
+    - {fileID: 21300000, guid: 4f563a957d298a44991368778abcc458, type: 3}
+    - {fileID: 21300000, guid: 0d9740a402b8fd044ad39076650555d7, type: 3}
+    - {fileID: 21300000, guid: 34462499d9267ae47a6b79f01423de32, type: 3}
+    - {fileID: 21300000, guid: 49993aa869571a0409b7f248942c0767, type: 3}
+    - {fileID: 21300000, guid: e6529e5d81d13e04f9c18f8d431bf7c2, type: 3}
+    - {fileID: 21300000, guid: 76a3e984d26120849b213615c89d3798, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: b68d3085a36aacf4a8148ef5c7fe90f4, type: 3}
+    - {fileID: 21300000, guid: 266e8ce2c04b340449f2c758e6a2d78b, type: 3}
+    - {fileID: 21300000, guid: 34a154521caa45f49a7148e11578f862, type: 3}
+    - {fileID: 21300000, guid: b8e0fc87df0dedb4c93634b65e943c25, type: 3}
+    - {fileID: 21300000, guid: 5e62f796b06a7dd47a2f73436528778c, type: 3}
+    - {fileID: 21300000, guid: b3b5d30bccef5de4caaf876e8f5f6d13, type: 3}
+    - {fileID: 21300000, guid: b11a336a97593eb40b7f828995764569, type: 3}
+    - {fileID: 21300000, guid: 2acd30bc98376084e96ca2ad048e7256, type: 3}
+    - {fileID: 21300000, guid: 06eeaf8c7b9859b4bac54291a73b8a73, type: 3}
+    durations: 040000000400000005000000040000000400000004000000040000000500000004000000
+    hitFrame: 17
+    branchFrame: 29
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 34
+  - name: WalkRough
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 79eed05e528b5734f9e8a588bcf61a29, type: 3}
+    - {fileID: 21300000, guid: 86f30078863ad6f408c8cb478e8b6500, type: 3}
+    - {fileID: 21300000, guid: 5128f9f9f62ab564f8667e3dabac5af2, type: 3}
+    - {fileID: 21300000, guid: 41578004912e46e48b2ba0a9e2ad41b9, type: 3}
+    - {fileID: 21300000, guid: 0297760a6c677aa4faa11d8bc09c6c94, type: 3}
+    - {fileID: 21300000, guid: 38d9d510a38551c4baac670e203bcbb7, type: 3}
+    - {fileID: 21300000, guid: 9eea9dfefdf0b334c8a3d52cef6f4d64, type: 3}
+    - {fileID: 21300000, guid: 8878c20a58e722a4fbe095e2e948ce05, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 66a3d4f4848f06a488b062a25aaf962d, type: 3}
+    - {fileID: 21300000, guid: f031fb4383a3a1748b508ba6ba395f5a, type: 3}
+    - {fileID: 21300000, guid: 80468e10513205745b108b7c9a5f8838, type: 3}
+    - {fileID: 21300000, guid: b0f1497486ad07e4294295e401762627, type: 3}
+    - {fileID: 21300000, guid: 109ef77f090cae2469c6f1e50551492d, type: 3}
+    - {fileID: 21300000, guid: c15309dc6c2ab1c438b4108dc9724a05, type: 3}
+    - {fileID: 21300000, guid: 2b0729ec1e8b6224da801d8ce7fb30f9, type: 3}
+    - {fileID: 21300000, guid: 6d3e9b85189305b40a51b45d0f0c5902, type: 3}
+    durations: 0500000005000000050000000500000005000000050000000500000005000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: IdleReference
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 51ffc896482d10f46804e09d6370ee66, type: 3}
+    - {fileID: 21300000, guid: 05fe7974e397406498fcada29b9233c2, type: 3}
+    - {fileID: 21300000, guid: d6611cfce19edbd439bbfa8822473373, type: 3}
+    - {fileID: 21300000, guid: 99108cc9f1b467449a44b757b7b53bcf, type: 3}
+    - {fileID: 21300000, guid: e0c2bcd9977ed704f86f31f589a81b4b, type: 3}
+    - {fileID: 21300000, guid: e67f9a4837b1b524b95afb60e0074c0e, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 1fd624e696b2752449c49a0ae8c4ac23, type: 3}
+    - {fileID: 21300000, guid: 30cc51c7e67861a498dcac4cd3bd31aa, type: 3}
+    - {fileID: 21300000, guid: 98474db76f7a0cc46ba181192f94426e, type: 3}
+    - {fileID: 21300000, guid: 1d47d6b8e0ccfd649bcbc364d429e0b4, type: 3}
+    - {fileID: 21300000, guid: 5b983c945629fff4a927681cace74eac, type: 3}
+    - {fileID: 21300000, guid: 3a0348e11db5190448e0e028f75aad09, type: 3}
+    durations: 060000000600000006000000060000000600000006000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: WalkReference
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 1c977fa69aea60f4bbeef92674923cdb, type: 3}
+    - {fileID: 21300000, guid: 5c16d9e5ad81f6a438e36a788268721c, type: 3}
+    - {fileID: 21300000, guid: c44987b512ac1144a98fe520e159ed87, type: 3}
+    - {fileID: 21300000, guid: 23544e5fed4514d4da913b5cd9071a38, type: 3}
+    - {fileID: 21300000, guid: a67f33c5d356d5b41b5a50c811595acd, type: 3}
+    - {fileID: 21300000, guid: 8862b2785dece8445ae9b7d0eaed7930, type: 3}
+    - {fileID: 21300000, guid: daf5fa25c836055439590f9b7cf70a45, type: 3}
+    - {fileID: 21300000, guid: 3d7ed1f70a2c25346b3119406d35a4a9, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: e4b643cee3ee59a488f0f4bacebffadd, type: 3}
+    - {fileID: 21300000, guid: 1e4596585ca5a9747acd0816b686f270, type: 3}
+    - {fileID: 21300000, guid: ccf9e954e6e40c34bb07c854ef4549d2, type: 3}
+    - {fileID: 21300000, guid: 890b29dc2b566024e962a1f20653954b, type: 3}
+    - {fileID: 21300000, guid: 102eabb6179a11a4ebc26aa0e2e28633, type: 3}
+    - {fileID: 21300000, guid: ea2c911718a89f1499b60a6195f3c75b, type: 3}
+    - {fileID: 21300000, guid: 11a1cd7c7b8f1f44d8b110458aae6387, type: 3}
+    - {fileID: 21300000, guid: c59b54891df813d41a855a2f717ccde0, type: 3}
+    durations: 0500000005000000050000000500000005000000050000000500000005000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Enemy_Attack
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 6b08e786994c3b141ad3ca7f7600e322, type: 3}
+    - {fileID: 21300000, guid: d886bcc42d3335145add268bf6d28ed0, type: 3}
+    - {fileID: 21300000, guid: 5f16d9f7f1479ea43bb39924a5ab02f6, type: 3}
+    - {fileID: 21300000, guid: ee782c627ed0bdb44aeea1c7b2e70fda, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 04000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Enemy_Death
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 90ebbdf5fe1d7c94f9ef241f9f658f22, type: 3}
+    - {fileID: 21300000, guid: bd417b60e3716884ab6cdd72dc467e01, type: 3}
+    - {fileID: 21300000, guid: 52a23284e1c9e9048a72bb319840e54d, type: 3}
+    - {fileID: 21300000, guid: 21e2575a786ada74b8d54326336ccffc, type: 3}
+    - {fileID: 21300000, guid: d53c8379904363c4f95a09494a4d2b54, type: 3}
+    - {fileID: 21300000, guid: b3ad1b8bd631cc64b9c44f0e78611c23, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 040000000400000004000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Enemy_Hit
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 7a9697a8fb6e3bd449a3b45cb3596e8c, type: 3}
+    - {fileID: 21300000, guid: 78aa88b1db176d24cb7da999b681126c, type: 3}
+    - {fileID: 21300000, guid: ed343cedd86eaf14db1c802a4a52709a, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Enemy_Idle
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 579ffc7e3a2f3d74282c75a594a0ce0f, type: 3}
+    - {fileID: 21300000, guid: 4213a48cb5289a84b8363a68668fee51, type: 3}
+    - {fileID: 21300000, guid: 7c1c3d75664d8b7409a0868c97fa56eb, type: 3}
+    - {fileID: 21300000, guid: d2b49b9168304db4ba5a605f3542ad4c, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 08000000080000000800000008000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Enemy_Move
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 9c95abd1f914b354298a5b8bf58ceb42, type: 3}
+    - {fileID: 21300000, guid: 5055e662c9d9b9c4e986ffeffdf89eeb, type: 3}
+    - {fileID: 21300000, guid: 28e43d8ff8d4c924ba0426c06d42254f, type: 3}
+    - {fileID: 21300000, guid: 5f0d674d26b126f4faabebf1f15c4ef8, type: 3}
+    - {fileID: 21300000, guid: c13cba788357b3341b9f2405d33b74a2, type: 3}
+    - {fileID: 21300000, guid: babb89cbc443e2841867def95ac927af, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 040000000400000004000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Enemy_Parried
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: d02bd6199eb634e4bad5aecc8a7cf0e5, type: 3}
+    - {fileID: 21300000, guid: 3be7ac1a4dae508499aaff9eea5e1ceb, type: 3}
+    - {fileID: 21300000, guid: b56fdb68784831343864dc0c9b69244e, type: 3}
+    - {fileID: 21300000, guid: ed4c2b8a42ab36643bcba7bfdd9749ac, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 04000000040000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Enemy_Windup
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 0c821fa265daa5243b18cfeb6c3f3e9f, type: 3}
+    - {fileID: 21300000, guid: d15e7492113cc7844ad7f9d2042f589b, type: 3}
+    - {fileID: 21300000, guid: 1aa58e550f9dbb84a88a753eeb3592b0, type: 3}
+    - {fileID: 21300000, guid: 542fec1a4d3e160488dd23be06e320ac, type: 3}
+    - {fileID: 21300000, guid: 8ad4e188fa6cd594dac428917c7898ce, type: 3}
+    - {fileID: 21300000, guid: 0341e86641715344a94bb33eb32fa27a, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 050000000500000005000000050000000500000005000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Fx_HeelLightning
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: cf5c4528093bbd747845f2f47155d0f7, type: 3}
+    - {fileID: 21300000, guid: 32feb842df1bc2b4596fc5b2f1e902e5, type: 3}
+    - {fileID: 21300000, guid: 3ace816c630ac934f9a9b6fb7092570b, type: 3}
+    - {fileID: 21300000, guid: 52ba7df05822385489fcc4e205e6def7, type: 3}
+    - {fileID: 21300000, guid: d99ebdeb263b75d4aa02b434c7c9d807, type: 3}
+    - {fileID: 21300000, guid: bf50eb34dd6d1a4468690112c3fb3422, type: 3}
+    - {fileID: 21300000, guid: b4b4c2d808e70be468e6b5b05deb68cb, type: 3}
+    - {fileID: 21300000, guid: 09e01843dc9522e4f89b61aad4226b68, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 0100000001000000020000000200000003000000030000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Fx_Kick
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 1865dfe8d376a4a42b2640169074cccd, type: 3}
+    - {fileID: 21300000, guid: 61d4a528320e75843b1d5194d7c6913c, type: 3}
+    - {fileID: 21300000, guid: 605f9272e17b38a48b4c0e3f24490863, type: 3}
+    - {fileID: 21300000, guid: 225fd214bd4974b4e87f21d4e5caef42, type: 3}
+    - {fileID: 21300000, guid: 7accb1cbef730ff44aa3ec01221a47cc, type: 3}
+    - {fileID: 21300000, guid: e79577e8b62d7844cb89c717960856a5, type: 3}
+    - {fileID: 21300000, guid: 5097b54522d9bbf4a8aaabd8c1c2f45e, type: 3}
+    - {fileID: 21300000, guid: a204055fed3b0b743b47d38b552824ae, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 0100000001000000020000000300000003000000030000000300000003000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Fx_Parry
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 37f00514be220a445ba7fd5f491f3583, type: 3}
+    - {fileID: 21300000, guid: 675d877e0d41d98459c8e587eaa473c1, type: 3}
+    - {fileID: 21300000, guid: 3b2e919bdd1391f4aa13d380b13159c0, type: 3}
+    - {fileID: 21300000, guid: dd12bbb276e7e0e4997942bd7dbaf0b6, type: 3}
+    - {fileID: 21300000, guid: cef02f0ad5320e644954b30697122686, type: 3}
+    - {fileID: 21300000, guid: 32beae71cadd7bd4d8cce70c8a20dead, type: 3}
+    - {fileID: 21300000, guid: 2beb56ca9d99a464a996b5e257c19721, type: 3}
+    - {fileID: 21300000, guid: 440bd40e882b60544bf5406fe0985df3, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 0200000001000000010000000100000001000000020000000200000002000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Fx_Slash
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 7954b446d00a43c4698226af5477fbb5, type: 3}
+    - {fileID: 21300000, guid: 4850919e599bfa3429011e4ddbc1caae, type: 3}
+    - {fileID: 21300000, guid: dc622d4c0aa55224ab7f8a89af735273, type: 3}
+    - {fileID: 21300000, guid: 5279d26a224aed441a6b2102db4f76e9, type: 3}
+    - {fileID: 21300000, guid: f0a8a4bf97a27c045abc3580fee471f0, type: 3}
+    - {fileID: 21300000, guid: 5375cc5372140f54e8546aa4bc8a7d90, type: 3}
+    - {fileID: 21300000, guid: b1c2b61b6e21ed246896dc3f4da311c4, type: 3}
+    - {fileID: 21300000, guid: e7beaa061f5d4484e9183a9fbf1e0f22, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 0100000001000000010000000100000002000000020000000200000002000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Fx_Vanish
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 73fb458ea97584e4f8f3157b0d7f55fd, type: 3}
+    - {fileID: 21300000, guid: 03512b1d7e4130e43bace090612b70b9, type: 3}
+    - {fileID: 21300000, guid: 57be9856b8f89854a914c24323135139, type: 3}
+    - {fileID: 21300000, guid: 445203fa44d84314193d91de0192b5b0, type: 3}
+    - {fileID: 21300000, guid: 14cf6dd3917027a43a66bd4252bf81d8, type: 3}
+    - {fileID: 21300000, guid: 5f7aafe4b66f7d947b2e5fca60fdaec3, type: 3}
+    - {fileID: 21300000, guid: 345fc1dc6fa2d8c4d9e96a483c8ddadf, type: 3}
+    - {fileID: 21300000, guid: dc2710e64d06ddd42bf444213970e45b, type: 3}
+    eyeFrames:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    durations: 0300000003000000030000000300000003000000030000000300000003000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Dash
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 301983a741ffbb54ca9ec9ec26e8d442, type: 3}
+    - {fileID: 21300000, guid: c38c5eedfffa5774db1de2e481ed08f7, type: 3}
+    - {fileID: 21300000, guid: 6664663025e7f134186074ec3b8b7be6, type: 3}
+    - {fileID: 21300000, guid: 089d01c9ec3c54b4f85dda1acf92093f, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 4c08092fa4ebece4189b3dfd3139e875, type: 3}
+    - {fileID: 21300000, guid: 80fb095c978389146bd767f37cb1bbb7, type: 3}
+    - {fileID: 21300000, guid: d8d60a4ff61c2e94dabc5650f50d5281, type: 3}
+    - {fileID: 21300000, guid: 09f4418f8c07b9c4693c96705166d38e, type: 3}
+    durations: 02000000030000000300000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: Recovery_Dash
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: fde539e416c174b4685a743ce6c8c217, type: 3}
+    - {fileID: 21300000, guid: fca7db49a79282a489f5f66ec1133c36, type: 3}
+    - {fileID: 21300000, guid: 344a7e8ec83accf4596dfc29b405e5ea, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 14c742f8b25252d499aadf3b57e247cd, type: 3}
+    - {fileID: 21300000, guid: 1b15af8cc199711408ec27eca1cd3d89, type: 3}
+    - {fileID: 21300000, guid: 35b270af9dc2fb5449218909576901c9, type: 3}
+    durations: 030000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: ParryReady
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 73830e90c00aa1648bdd3a063b6f8ee4, type: 3}
+    - {fileID: 21300000, guid: 0f290c831778f0d43834f4b3bbd91c54, type: 3}
+    - {fileID: 21300000, guid: 35de4834efc1381418bd7f464df91940, type: 3}
+    - {fileID: 21300000, guid: 003c2e2569ec1c947abae7634e2cc933, type: 3}
+    - {fileID: 21300000, guid: 87d5f5cb3cbdfab4eb4b747c73df4c3a, type: 3}
+    - {fileID: 21300000, guid: 7808dce85c425d149878450171b538f3, type: 3}
+    - {fileID: 21300000, guid: 1066b4021a14c2d4c90deadd56913544, type: 3}
+    - {fileID: 21300000, guid: 92dde6b3e6bcc5f4a83c2000e7556742, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 6429e488e5ad06443b4354db8c746936, type: 3}
+    - {fileID: 21300000, guid: 85c5910c352f79342ac42e9b621c2d82, type: 3}
+    - {fileID: 21300000, guid: 924a6ba66a852184795e888f4695f9c4, type: 3}
+    - {fileID: 21300000, guid: 44069c937aee8754d81256d6858a4ad7, type: 3}
+    - {fileID: 21300000, guid: cc56f6138077d734183ad056c40dce7d, type: 3}
+    - {fileID: 21300000, guid: 631d2e812483bc744bd8cd8e399726e6, type: 3}
+    - {fileID: 21300000, guid: bb07546c8868ae04295423a94e9c265a, type: 3}
+    - {fileID: 21300000, guid: 361c740ee1ff29348be175e50bc10f5b, type: 3}
+    durations: 0200000002000000060000000600000006000000060000000600000006000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: ParrySuccessLight
+    provisional: 1
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 1
+    parryContactOffset: {x: 0.375, y: -0.375}
+    frames:
+    - {fileID: 21300000, guid: ef97ab5844ca9614c92a760075ce3819, type: 3}
+    - {fileID: 21300000, guid: 510892de17b573141aff56f091655dd0, type: 3}
+    - {fileID: 21300000, guid: 1e988b5e1f4e8f24babc07aa67ea253b, type: 3}
+    - {fileID: 21300000, guid: 676fdba497e5c6a43aa13dac2f159a93, type: 3}
+    - {fileID: 21300000, guid: 47d17ab7c723a164f81da7fc05bca6b4, type: 3}
+    - {fileID: 21300000, guid: 9e85f259dc852844f8211be86bf1696e, type: 3}
+    - {fileID: 21300000, guid: 0d48b122c78de584e89db0c1b400b0b0, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 6fda7ee906842a842863096733d5a461, type: 3}
+    - {fileID: 21300000, guid: 4e14af6a7d281ac43b9586bed768ed62, type: 3}
+    - {fileID: 0}
+    - {fileID: 21300000, guid: 66ea4d28c15c4764c80ef92e236bb091, type: 3}
+    - {fileID: 21300000, guid: 4f600651004bc7741b87c925845b37ef, type: 3}
+    - {fileID: 21300000, guid: c5dd8e85b12ed5b45aedf69d02a77a9f, type: 3}
+    - {fileID: 21300000, guid: 36e353a0a0ad242438037a5785d60774, type: 3}
+    durations: 02000000010000000100000002000000010000000100000002000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
