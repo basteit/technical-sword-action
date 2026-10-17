@@ -19,6 +19,9 @@ MonoBehaviour:
   - name: AirRoundhouse
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 784546f9100de8344a1ba9dbb0c7c2da, type: 3}
     - {fileID: 21300000, guid: 1d1ebf3025eca224a82da65b39cf3039, type: 3}
@@ -69,6 +72,9 @@ MonoBehaviour:
   - name: HorizontalSlash
     provisional: 1
     includesSlashTrail: 1
+    hasTrailHitbox: 1
+    hitboxMin: {x: 0, y: -1.0625}
+    hitboxMax: {x: 2.65625, y: 0.15625}
     frames:
     - {fileID: 21300000, guid: db1caef6a891aeb428b44b1f299713e9, type: 3}
     - {fileID: 21300000, guid: d0531b92298ebee4aaac0ee046f7401e, type: 3}
@@ -97,6 +103,9 @@ MonoBehaviour:
   - name: IaiSlash
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: c82a9c5e9e09e1d4db58b7d8e4b977ae, type: 3}
     - {fileID: 21300000, guid: 64a8a5160b72a804f98067cea5335821, type: 3}
@@ -125,6 +134,9 @@ MonoBehaviour:
   - name: IdleRough
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 02133f89baa50744ea0409b20b6dfeb8, type: 3}
     - {fileID: 21300000, guid: 94ebc8e6624aec7468c427e9e0e940c0, type: 3}
@@ -149,6 +161,9 @@ MonoBehaviour:
   - name: ParryDeflect
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 85d458a6d8aff564686a02f6c441acfb, type: 3}
     - {fileID: 21300000, guid: a582b941e4f5ef54aa2cd3164df303b9, type: 3}
@@ -173,6 +188,9 @@ MonoBehaviour:
   - name: RapidSheathe
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 5d151480a57d6454a9a3388b1d554d09, type: 3}
     - {fileID: 21300000, guid: 028bc19c7046b2040be915a39123308f, type: 3}
@@ -203,6 +221,9 @@ MonoBehaviour:
   - name: Recovery_AirRoundhouse
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 892a72cf0d5e19845a6e77c88cb07260, type: 3}
     - {fileID: 21300000, guid: 69fbf0d0f1c9ebd4cbb32154d0a677b1, type: 3}
@@ -229,6 +250,9 @@ MonoBehaviour:
   - name: Recovery_HorizontalSlash
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 6503bdc207432eb4f847dc96b46f8e08, type: 3}
     - {fileID: 21300000, guid: 38d2f6878bcf72740b4352a506542324, type: 3}
@@ -249,6 +273,9 @@ MonoBehaviour:
   - name: Recovery_IaiSlash
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: ed91ebec86cc4c4499a4943ae635bf57, type: 3}
     - {fileID: 21300000, guid: 46b45606b7bd9a44bb72356ce795114a, type: 3}
@@ -269,6 +296,9 @@ MonoBehaviour:
   - name: Recovery_Landing
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 38ef6e0880ea52745ae27883bd0f007e, type: 3}
     - {fileID: 21300000, guid: aad64718130d4bb49802bd44b62656fd, type: 3}
@@ -287,6 +317,9 @@ MonoBehaviour:
   - name: Recovery_Move
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 3edc667e9f1bcf74fa44adb4141fbc1b, type: 3}
     - {fileID: 21300000, guid: bebebc4a25e5afb4987d5e73954cc5ea, type: 3}
@@ -305,6 +338,9 @@ MonoBehaviour:
   - name: Recovery_ParryDeflect
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 92c5ea07f24abbb4486b2d357641a264, type: 3}
     - {fileID: 21300000, guid: 136eb231e10694e48abb094534897664, type: 3}
@@ -325,6 +361,9 @@ MonoBehaviour:
   - name: Recovery_RapidSheathe
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: dbb0e760899d9bf4eb02e809329b8ea3, type: 3}
     - {fileID: 21300000, guid: 48b9db39e55a0644c9a2faff5a57ad23, type: 3}
@@ -345,6 +384,9 @@ MonoBehaviour:
   - name: Recovery_VerticalSlash
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: e823c34174ac21246a831e3bf6f6e5aa, type: 3}
     - {fileID: 21300000, guid: 3088facbf79cfec41bec7b2c49acbf30, type: 3}
@@ -365,6 +407,9 @@ MonoBehaviour:
   - name: VerticalSlash
     provisional: 1
     includesSlashTrail: 1
+    hasTrailHitbox: 1
+    hitboxMin: {x: 0.5625, y: -1.1875}
+    hitboxMax: {x: 2.3125, y: 1.65625}
     frames:
     - {fileID: 21300000, guid: 53a7092c3e3e1964b83c72e0407aa4a8, type: 3}
     - {fileID: 21300000, guid: bc52b7d04eec8a8488f9f1bb8bac8d4e, type: 3}
@@ -395,6 +440,9 @@ MonoBehaviour:
   - name: WalkRough
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 79eed05e528b5734f9e8a588bcf61a29, type: 3}
     - {fileID: 21300000, guid: 86f30078863ad6f408c8cb478e8b6500, type: 3}
@@ -423,6 +471,9 @@ MonoBehaviour:
   - name: IdleReference
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 51ffc896482d10f46804e09d6370ee66, type: 3}
     - {fileID: 21300000, guid: 05fe7974e397406498fcada29b9233c2, type: 3}
@@ -447,6 +498,9 @@ MonoBehaviour:
   - name: WalkReference
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 1c977fa69aea60f4bbeef92674923cdb, type: 3}
     - {fileID: 21300000, guid: 5c16d9e5ad81f6a438e36a788268721c, type: 3}
@@ -475,6 +529,9 @@ MonoBehaviour:
   - name: Enemy_Attack
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 6b08e786994c3b141ad3ca7f7600e322, type: 3}
     - {fileID: 21300000, guid: d886bcc42d3335145add268bf6d28ed0, type: 3}
@@ -495,6 +552,9 @@ MonoBehaviour:
   - name: Enemy_Death
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 90ebbdf5fe1d7c94f9ef241f9f658f22, type: 3}
     - {fileID: 21300000, guid: bd417b60e3716884ab6cdd72dc467e01, type: 3}
@@ -519,6 +579,9 @@ MonoBehaviour:
   - name: Enemy_Hit
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 7a9697a8fb6e3bd449a3b45cb3596e8c, type: 3}
     - {fileID: 21300000, guid: 78aa88b1db176d24cb7da999b681126c, type: 3}
@@ -537,6 +600,9 @@ MonoBehaviour:
   - name: Enemy_Idle
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 579ffc7e3a2f3d74282c75a594a0ce0f, type: 3}
     - {fileID: 21300000, guid: 4213a48cb5289a84b8363a68668fee51, type: 3}
@@ -557,6 +623,9 @@ MonoBehaviour:
   - name: Enemy_Move
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 9c95abd1f914b354298a5b8bf58ceb42, type: 3}
     - {fileID: 21300000, guid: 5055e662c9d9b9c4e986ffeffdf89eeb, type: 3}
@@ -581,6 +650,9 @@ MonoBehaviour:
   - name: Enemy_Parried
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: d02bd6199eb634e4bad5aecc8a7cf0e5, type: 3}
     - {fileID: 21300000, guid: 3be7ac1a4dae508499aaff9eea5e1ceb, type: 3}
@@ -601,6 +673,9 @@ MonoBehaviour:
   - name: Enemy_Windup
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 0c821fa265daa5243b18cfeb6c3f3e9f, type: 3}
     - {fileID: 21300000, guid: d15e7492113cc7844ad7f9d2042f589b, type: 3}
@@ -625,6 +700,9 @@ MonoBehaviour:
   - name: Fx_HeelLightning
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: cf5c4528093bbd747845f2f47155d0f7, type: 3}
     - {fileID: 21300000, guid: 32feb842df1bc2b4596fc5b2f1e902e5, type: 3}
@@ -653,6 +731,9 @@ MonoBehaviour:
   - name: Fx_Kick
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 1865dfe8d376a4a42b2640169074cccd, type: 3}
     - {fileID: 21300000, guid: 61d4a528320e75843b1d5194d7c6913c, type: 3}
@@ -681,6 +762,9 @@ MonoBehaviour:
   - name: Fx_Parry
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 37f00514be220a445ba7fd5f491f3583, type: 3}
     - {fileID: 21300000, guid: 675d877e0d41d98459c8e587eaa473c1, type: 3}
@@ -709,6 +793,9 @@ MonoBehaviour:
   - name: Fx_Slash
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 7954b446d00a43c4698226af5477fbb5, type: 3}
     - {fileID: 21300000, guid: 4850919e599bfa3429011e4ddbc1caae, type: 3}
@@ -737,6 +824,9 @@ MonoBehaviour:
   - name: Fx_Vanish
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 73fb458ea97584e4f8f3157b0d7f55fd, type: 3}
     - {fileID: 21300000, guid: 03512b1d7e4130e43bace090612b70b9, type: 3}
@@ -765,6 +855,9 @@ MonoBehaviour:
   - name: Dash
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: 301983a741ffbb54ca9ec9ec26e8d442, type: 3}
     - {fileID: 21300000, guid: c38c5eedfffa5774db1de2e481ed08f7, type: 3}
@@ -785,6 +878,9 @@ MonoBehaviour:
   - name: Recovery_Dash
     provisional: 0
     includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
     frames:
     - {fileID: 21300000, guid: fde539e416c174b4685a743ce6c8c217, type: 3}
     - {fileID: 21300000, guid: fca7db49a79282a489f5f66ec1133c36, type: 3}
@@ -794,6 +890,37 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 1b15af8cc199711408ec27eca1cd3d89, type: 3}
     - {fileID: 21300000, guid: 35b270af9dc2fb5449218909576901c9, type: 3}
     durations: 030000000400000004000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+  - name: ParryReady
+    provisional: 0
+    includesSlashTrail: 0
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 73830e90c00aa1648bdd3a063b6f8ee4, type: 3}
+    - {fileID: 21300000, guid: 0f290c831778f0d43834f4b3bbd91c54, type: 3}
+    - {fileID: 21300000, guid: 35de4834efc1381418bd7f464df91940, type: 3}
+    - {fileID: 21300000, guid: 003c2e2569ec1c947abae7634e2cc933, type: 3}
+    - {fileID: 21300000, guid: 87d5f5cb3cbdfab4eb4b747c73df4c3a, type: 3}
+    - {fileID: 21300000, guid: 7808dce85c425d149878450171b538f3, type: 3}
+    - {fileID: 21300000, guid: 1066b4021a14c2d4c90deadd56913544, type: 3}
+    - {fileID: 21300000, guid: 92dde6b3e6bcc5f4a83c2000e7556742, type: 3}
+    eyeFrames:
+    - {fileID: 21300000, guid: 6429e488e5ad06443b4354db8c746936, type: 3}
+    - {fileID: 21300000, guid: 85c5910c352f79342ac42e9b621c2d82, type: 3}
+    - {fileID: 21300000, guid: 924a6ba66a852184795e888f4695f9c4, type: 3}
+    - {fileID: 21300000, guid: 44069c937aee8754d81256d6858a4ad7, type: 3}
+    - {fileID: 21300000, guid: cc56f6138077d734183ad056c40dce7d, type: 3}
+    - {fileID: 21300000, guid: 631d2e812483bc744bd8cd8e399726e6, type: 3}
+    - {fileID: 21300000, guid: bb07546c8868ae04295423a94e9c265a, type: 3}
+    - {fileID: 21300000, guid: 361c740ee1ff29348be175e50bc10f5b, type: 3}
+    durations: 0200000002000000060000000600000006000000060000000600000006000000
     hitFrame: 0
     branchFrame: 0
     chargeFrame: 0

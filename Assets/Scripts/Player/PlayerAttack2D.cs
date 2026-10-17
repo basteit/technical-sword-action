@@ -28,6 +28,9 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     {
         public int damage;
         public float radius;
+        public bool useBoxHitbox;
+        public Vector2 hitboxOffset;
+        public Vector2 hitboxSize;
         public float gaugeGain;
         public float fallbackDuration;
         [Tooltip("Signed displacement in world units during this ground attack step. Positive moves toward facing direction; negative moves backward.")]
@@ -367,7 +370,11 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         bool hitSomething = false;
         int hitTargetCount = 0;
         float radius = data.radius > 0f ? data.radius : attackRadius;
-        Collider2D[] hits = Physics2D.OverlapCircleAll(hitPoint.position, radius, targetLayers);
+        bool useBox=definition==null&&data.useBoxHitbox;
+        Vector2 boxCenter=(Vector2)transform.position+new Vector2(data.hitboxOffset.x*attackFacingSign,data.hitboxOffset.y);
+        Collider2D[] hits = useBox
+            ? Physics2D.OverlapBoxAll(boxCenter,data.hitboxSize,0,targetLayers)
+            : Physics2D.OverlapCircleAll(hitPoint.position, radius, targetLayers);
 
         for (int i = 0; i < hits.Length; i++)
         {
@@ -661,6 +668,14 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
         AttackStepData data = GetStepData(Mathf.Max(1, comboStep));
         float radius = data.radius > 0f ? data.radius : attackRadius;
+
+        if(definition==null&&data.useBoxHitbox)
+        {
+            int facing=isAttacking?attackFacingSign:motor!=null?motor.FacingSign:1;
+            Vector2 center=(Vector2)transform.position+new Vector2(data.hitboxOffset.x*facing,data.hitboxOffset.y);
+            if(isAttacking) { Gizmos.color=activeFillColor;Gizmos.DrawCube(center,data.hitboxSize); }
+            Gizmos.color=isAttacking?activeHitboxColor:idleHitboxColor;Gizmos.DrawWireCube(center,data.hitboxSize);return;
+        }
 
         if (isAttacking)
         {

@@ -8,6 +8,16 @@ local number=action=='VerticalSlash' and 1 or 2
 local count=number==1 and 9 or 8
 local contact=number==1 and 5 or 4
 assert(s.width==128 and s.height==128 and #s.frames==count,'Unexpected submitted attack revision')
+local effect=nil;for _,layer in ipairs(s.layers) do if layer.name=='Effect' then effect=layer end end
+local cel=assert(effect and effect:cel(contact),'Missing contact trail')
+local minX,minY,maxX,maxY=9999,9999,-1,-1
+for p in cel.image:pixels() do if app.pixelColor.rgbaA(p())>0 then
+  local x,y=p.x+cel.position.x,p.y+cel.position.y
+  minX=math.min(minX,x);minY=math.min(minY,y);maxX=math.max(maxX,x+1);maxY=math.max(maxY,y+1)
+end end
+assert(maxX>32 and maxY>minY,'Empty contact trail')
+local boxMin=json.encode{x=math.max(0,(minX-32)/32),y=(s.height-maxY-38)/32}
+local boxMax=json.encode{x=(maxX-32)/32,y=(s.height-minY-38)/32}
 local guide=s.layers[1]
 assert(guide.name=='Layer 1','Inspect the submission before changing guide visibility')
 for _,cel in ipairs(guide.cels) do for p in cel.image:pixels() do
@@ -49,6 +59,6 @@ assert(#reopen.frames==count and reopen.tags[1].name==action and not reopen.laye
 for _,f in ipairs(reopen.frames) do assert(math.floor(f.duration*1000+.5)==70) end
 reopen:close()
 local f=assert(io.open(out..'/timing-manifest.json','w'))
-f:write(string.format('{"actions":[{"name":%q,"provisional":true,"includesSlashTrail":true,"canvasWidth":128,"canvasHeight":128,"pivotX":32,"pivotY":38,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"recoveryFrame":%d,"frames":[%s]}]}',action,count,start,hitFrame,branchFrame,recoveryFrame,table.concat(frames,',')));f:close()
+f:write(string.format('{"actions":[{"name":%q,"provisional":true,"includesSlashTrail":true,"hasTrailHitbox":true,"hitboxMin":%s,"hitboxMax":%s,"canvasWidth":128,"canvasHeight":128,"pivotX":32,"pivotY":38,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"recoveryFrame":%d,"frames":[%s]}]}',action,boxMin,boxMax,count,start,hitFrame,branchFrame,recoveryFrame,table.concat(frames,',')));f:close()
 local e=assert(io.open(out..'/eye-mask-manifest.json','w'));e:write('{"frames":['..table.concat(eyes,',')..']}');e:close()
 local r=assert(io.open(out..'/submission-validation.json','w'));r:write(string.format('{"sourceUnmodified":true,"reviewCopyReopened":true,"guideHidden":true,"hairVisibilityPreserved":true,"nativeDurationMs":%d,"gameTicks":%d,"contactFrame":%d,"contactTick":%d,"frames":[%s]}',nativeMs,start,contact,hitFrame,table.concat(native,',')));r:close()

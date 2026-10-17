@@ -42,7 +42,9 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     public bool DefenseCancelTake { get=>defenseCancelTake; set=>defenseCancelTake=value; }
     public bool AttackWasCancelledForParry { get; private set; }
     public bool ReturnDashObserved=>returnDashObserved;
-    public bool UsesSpacingApproaches=>useSpacingApproaches;
+    // Preserve the optional four-stage comparison's travel while the selected
+    // two-stage take uses the supplied sword artwork without an approach.
+    public bool UsesSpacingApproaches=>useSpacingApproaches||!defenseCancelTake&&comboStages==4;
     public int CombatTickOrder=>-200;
     private void Awake()
     {
@@ -152,7 +154,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         if(!attackSent && tick-startTick>=18)
         {
             var motor=player.GetComponent<PlayerMotor2D>();
-            if(useSpacingApproaches&&Mathf.Abs(frontEnemy.transform.position.x-player.transform.position.x)>1.35f)
+            if(UsesSpacingApproaches&&Mathf.Abs(frontEnemy.transform.position.x-player.transform.position.x)>1.35f)
             {
                 if(!openingApproachStarted) { openingApproachStarted=true;MarkEvent("OpeningApproach",frontEnemy); }
                 motor.SetMoveInput(Vector2.right*(frontEnemy.transform.position.x>player.transform.position.x?1:-1));
@@ -176,13 +178,17 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         var ai=rearEnemy.GetComponent<EnemyMeleeChaser2D>();
         if(rearStarted && tick==rearWindupTick)
         {
-            if(useSpacingApproaches) { ai.ResetForCapture(player.transform,false);MarkEvent("RearApproach",rearEnemy); }
+            if(UsesSpacingApproaches) { ai.ResetForCapture(player.transform,false);MarkEvent("RearApproach",rearEnemy); }
             else { ai.BeginCaptureAttack();MarkEvent("RearWindup",rearEnemy);rearWindupMarked=true; }
         }
-        if(useSpacingApproaches&&rearStarted&&ai.IsWindingUp&&!rearWindupMarked)
+        if(UsesSpacingApproaches&&rearStarted&&ai.IsWindingUp&&!rearWindupMarked)
         { rearWindupMarked=true;MarkEvent("RearWindup",rearEnemy); }
-        if(ai.IsWindingUp && ai.WindupRemaining<=5*CombatTimeController.StepSeconds && !parrySent)
-        { parrySent=true;player.RequestAction(PlayerActionRequest.Parry); }
+        int readyLead=player.GetComponent<VideoPlayerAnimationDriver>().Art.Find("ParryReady")!=null?9:5;
+        if(ai.IsWindingUp && ai.WindupRemaining<=readyLead*CombatTimeController.StepSeconds && !parrySent)
+        {
+            parrySent=player.RequestAction(PlayerActionRequest.Parry);
+            if(parrySent) MarkEvent("ParryReady",rearEnemy);
+        }
         if(successTick>0 && tick-successTick>=10 && !counterSent)
         { counterSent=true;player.RequestAction(PlayerActionRequest.Attack); }
     }

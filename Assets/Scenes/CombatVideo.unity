@@ -221,7 +221,7 @@ MonoBehaviour:
   moveSpeed: 4
   preferredMinDistance: 1.05
   preferredMaxDistance: 1.35
-  attackRange: 1.35
+  attackRange: 1.9
   attackWindupDuration: 0.5
   recoveryDuration: 0.45
   cooldownDuration: 0.55
@@ -664,9 +664,12 @@ MonoBehaviour:
   attackSteps:
   - damage: 1
     radius: 0.6
+    useBoxHitbox: 1
+    hitboxOffset: {x: 1.15625, y: 0.234375}
+    hitboxSize: {x: 2.3125, y: 2.84375}
     gaugeGain: 2
     fallbackDuration: 0.6333333
-    groundMotionDistance: 0.12
+    groundMotionDistance: 0
     groundMotionDuration: 0.28333333
     useGroundMotionCurve: 1
     groundMotionCurve:
@@ -676,15 +679,15 @@ MonoBehaviour:
         time: 0
         value: 0
         inSlope: 0
-        outSlope: 0.42352942
+        outSlope: 0
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
         time: 0.28333333
-        value: 0.12
-        inSlope: 0.42352942
+        value: 0
+        inSlope: 0
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
@@ -695,9 +698,12 @@ MonoBehaviour:
       m_RotationOrder: 4
   - damage: 1
     radius: 0.6
+    useBoxHitbox: 1
+    hitboxOffset: {x: 1.328125, y: -0.453125}
+    hitboxSize: {x: 2.65625, y: 1.21875}
     gaugeGain: 2
     fallbackDuration: 0.56666666
-    groundMotionDistance: 0.2
+    groundMotionDistance: 0
     groundMotionDuration: 0.21666667
     useGroundMotionCurve: 1
     groundMotionCurve:
@@ -707,15 +713,15 @@ MonoBehaviour:
         time: 0
         value: 0
         inSlope: 0
-        outSlope: 0.9230769
+        outSlope: 0
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
         time: 0.21666667
-        value: 0.2
-        inSlope: 0.9230769
+        value: 0
+        inSlope: 0
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
@@ -726,6 +732,9 @@ MonoBehaviour:
       m_RotationOrder: 4
   - damage: 2
     radius: 0.6
+    useBoxHitbox: 0
+    hitboxOffset: {x: 0, y: 0}
+    hitboxSize: {x: 0, y: 0}
     gaugeGain: 2
     fallbackDuration: 0.6333333
     groundMotionDistance: 0.28
@@ -757,6 +766,9 @@ MonoBehaviour:
       m_RotationOrder: 4
   - damage: 3
     radius: 0.6
+    useBoxHitbox: 0
+    hitboxOffset: {x: 0, y: 0}
+    hitboxSize: {x: 0, y: 0}
     gaugeGain: 5
     fallbackDuration: 0.5
     groundMotionDistance: 0.4
@@ -1245,7 +1257,7 @@ MonoBehaviour:
   rearEnemy: {fileID: 132085609}
   comboStages: 2
   defenseCancelTake: 0
-  useSpacingApproaches: 1
+  useSpacingApproaches: 0
   presentation: {fileID: 2043710621}
   vfx: {fileID: 2028738715}
   playerStart: {x: 0, y: 1, z: 0}

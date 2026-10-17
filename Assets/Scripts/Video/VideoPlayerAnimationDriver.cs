@@ -96,6 +96,12 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
         // Counter timers run after Animator.Update. Sample the same integer frame
         // after its events, so slow entry and hitstop never hold the previous pose.
         if(visual==null||library==null) return;
+        if(state.ActionState==PlayerActionState.Parry)
+        {
+            var ready=library.Find("ParryReady");
+            if(ready!=null) visual.sprite=ready.At(parry.ElapsedFrames);
+            return;
+        }
         if(state.ActionState==PlayerActionState.ParrySuccess)
         {
             var motion=library.FindParrySuccess(parry.LastReactionWeight,out int startFrame);

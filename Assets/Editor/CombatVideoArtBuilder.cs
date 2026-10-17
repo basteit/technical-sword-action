@@ -13,7 +13,7 @@ public static class CombatVideoArtBuilder
     public const string EnemyControllerPath=Folder+"/CombatVideoEnemy.controller";
     public const string LibraryPath="Assets/Settings/CombatVideoArt.asset";
     [Serializable] private sealed class Manifest { public ActionData[] actions; }
-    [Serializable] private sealed class ActionData { public string name;public int hitFrame,branchFrame,totalFrames,chargeFrame,releaseFrame,landingFrame,recoveryFrame,canvasWidth,canvasHeight,pivotX,pivotY;public bool provisional,includesSlashTrail;public FrameData[] frames; }
+    [Serializable] private sealed class ActionData { public string name;public int hitFrame,branchFrame,totalFrames,chargeFrame,releaseFrame,landingFrame,recoveryFrame,canvasWidth,canvasHeight,pivotX,pivotY;public bool provisional,includesSlashTrail,hasTrailHitbox;public Vector2 hitboxMin,hitboxMax;public FrameData[] frames; }
     [Serializable] private sealed class FrameData { public int frames,start; }
     [Serializable] private sealed class EyeManifest { public EyeFrame[] frames; }
     [Serializable] private sealed class EyeFrame { public string file;public int pixels; }
@@ -39,6 +39,7 @@ public static class CombatVideoArtBuilder
         {
             var submitted=JsonUtility.FromJson<Manifest>(File.ReadAllText(submittedFolder+"/timing-manifest.json"));
             for(int i=0;i<manifest.actions.Length;i++) manifest.actions[i]=submitted.actions.FirstOrDefault(a=>a.name==manifest.actions[i].name)??manifest.actions[i];
+            manifest.actions=manifest.actions.Concat(submitted.actions.Where(a=>!manifest.actions.Any(old=>old.name==a.name))).ToArray();
         }
         const string cleanFolder="Assets/Art/Player/VideoClean";
         bool hasClean=File.Exists(cleanFolder+"/timing-manifest.json");
@@ -95,7 +96,7 @@ public static class CombatVideoArtBuilder
             else durations=Enumerable.Repeat(name=="IdleReference"?6:name=="WalkReference"?5:name=="Enemy_Idle"?8:name=="Enemy_Windup"?5:name=="Fx_Vanish"?3:4,group.Count()).ToArray();
             var ordered=group.OrderBy(p=>p).ToArray();
             var eyes=ordered.Select(p=>Path.GetDirectoryName(p).Replace('\\','/')+"/EyeMasks/"+Path.GetFileName(p)).Select(p=>eyeCounts.TryGetValue(p,out int count)&&count>0?AssetDatabase.LoadAssetAtPath<Sprite>(p):null).ToArray();
-            motions.Add(new VideoArtLibrary.Motion {name=name,provisional=action?.provisional??false,includesSlashTrail=action?.includesSlashTrail??false,frames=ordered.Select(p=>AssetDatabase.LoadAssetAtPath<Sprite>(p)).ToArray(),eyeFrames=eyes,durations=durations,hitFrame=action?.hitFrame??0,branchFrame=action?.branchFrame??0,chargeFrame=action?.chargeFrame??0,releaseFrame=action?.releaseFrame??0,landingFrame=action?.landingFrame??0,recoveryFrame=action?.recoveryFrame??0});
+            motions.Add(new VideoArtLibrary.Motion {name=name,provisional=action?.provisional??false,includesSlashTrail=action?.includesSlashTrail??false,hasTrailHitbox=action?.hasTrailHitbox??false,hitboxMin=action?.hitboxMin??Vector2.zero,hitboxMax=action?.hitboxMax??Vector2.zero,frames=ordered.Select(p=>AssetDatabase.LoadAssetAtPath<Sprite>(p)).ToArray(),eyeFrames=eyes,durations=durations,hitFrame=action?.hitFrame??0,branchFrame=action?.branchFrame??0,chargeFrame=action?.chargeFrame??0,releaseFrame=action?.releaseFrame??0,landingFrame=action?.landingFrame??0,recoveryFrame=action?.recoveryFrame??0});
         }
         string backgroundPath="Assets/Art/Video/CaptureTrainingGrid.png";
         var bg=(TextureImporter)AssetImporter.GetAtPath(backgroundPath);bg.textureType=TextureImporterType.Sprite;bg.spritePixelsPerUnit=32;bg.filterMode=FilterMode.Point;bg.textureCompression=TextureImporterCompression.Uncompressed;bg.mipmapEnabled=false;bg.SaveAndReimport();

@@ -69,7 +69,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
             Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
-            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.4d,4.9d));
+            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.0d,4.3d));
             Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.63f,.71f));
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
@@ -548,7 +548,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             finally { Object.DestroyImmediate(wall); }
         }
         [TestCase(false)] [TestCase(true)]
-        public void StrongerSwordStagesAdvanceAndHitbackMoreInBothDirections(bool mirrored)
+        public void SubmittedSlashesStayPutWhileLaterStagesAndEnemyHitbacksGrow(bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
             var enemy=(Component)Get<object>(director,"FrontEnemy");var rear=(Component)Get<object>(director,"RearEnemy");
@@ -565,7 +565,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 {
                     Assert.That(Get<float>(driver,"LastHitbackDistance"),Is.GreaterThan(lastDistance));
                     float advance=(state.transform.position.x-lastHitX)*(mirrored?-1:1);
-                    Assert.That(advance,Is.GreaterThan(lastAdvance),"Stronger stage did not advance farther.");
+                    if(now<=2)Assert.That(advance,Is.EqualTo(0).Within(.002f),"Submitted slash moved the root.");
+                    else Assert.That(advance,Is.GreaterThan(lastAdvance),"Later rough stage did not advance farther.");
                     lastAdvance=advance;lastHitX=state.transform.position.x;
                     lastDistance=Get<float>(driver,"LastHitbackDistance");hits=now;
                 }
@@ -837,6 +838,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(2,false,30)] [TestCase(2,true,60)] [TestCase(4,false,60)] [TestCase(4,true,120)]
         public void SpacedTakeApproachesBothTargetsAndReturnsDirectlyToIdleAfterLanding(int stages,bool mirror,int fps)
         {
+            UseApproachesForComparison();
             Set(director,"MirrorLayout",mirror);Call(director,"StartTake",stages,true);
             var front=(Component)Get<object>(director,"FrontEnemy");var rear=(Component)Get<object>(director,"RearEnemy");
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
@@ -864,6 +866,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [Test] public void OpeningFootworkResetsWithoutResidualInput()
         {
+            UseApproachesForComparison();
             Call(director,"StartTake",2,true);
             var motor=state.GetComponent(Type.GetType("PlayerMotor2D, Assembly-CSharp",true));
             for(int i=0;i<24&&!Marks().Any(m=>(string)m.GetType().GetField("kind").GetValue(m)=="OpeningApproach");i++)Step();
@@ -875,6 +878,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [UnityTest] public IEnumerator OpeningFootworkFreezesOnPauseAndRetriesItsSuppressedAttackAfterResume()
         {
+            UseApproachesForComparison();
             Call(director,"StartTake",2,true);
             var motor=state.GetComponent(Type.GetType("PlayerMotor2D, Assembly-CSharp",true));
             for(int i=0;i<24&&!Marks().Any(m=>(string)m.GetType().GetField("kind").GetValue(m)=="OpeningApproach");i++)Step();
@@ -889,6 +893,59 @@ namespace TechnicalSwordAction.PlayerState.Tests
             yield return null;
             for(int i=0;i<360&&!Get<bool>(director,"Completed");i++)Step();
             Assert.That(Get<bool>(director,"Completed"),Is.True);Assert.That(Get<float>(motor,"MoveInput"),Is.Zero);
+        }
+        [TestCase(1,-1,false)] [TestCase(1,1,false)] [TestCase(2,-1,false)] [TestCase(2,1,false)]
+        [TestCase(1,-1,true)] [TestCase(1,1,true)] [TestCase(2,-1,true)] [TestCase(2,1,true)]
+        public void SubmittedTrailReachesItsVisibleEdgeWithoutRootTravelOrBackwardDamage(int stage,int direction,bool outside)
+        {
+            Call(director,"ResetTake",2);
+            var front=(Component)Get<object>(director,"FrontEnemy");var rear=(Component)Get<object>(director,"RearEnemy");
+            var motor=state.GetComponent(Type.GetType("PlayerMotor2D, Assembly-CSharp",true));Call(motor,"SetFacing",direction);
+            float reach=stage==1?2.3125f:2.65625f;
+            float half=front.GetComponent<BoxCollider2D>().size.x/2;
+            front.transform.position=new Vector3(direction*(reach+half+(outside?.04f:-.04f)),1,0);
+            rear.transform.position=new Vector3(-direction*1.1f,1,0);Physics2D.SyncTransforms();
+            Call(state,"RequestAction",PlayerActionRequest.Attack);Step();
+            var attack=state.GetComponent(Type.GetType("PlayerAttack2D, Assembly-CSharp",true));
+            if(stage==2)Call(attack,"StartAttackStep",2);
+            for(int i=0;i<90&&Get<bool>(attack,"IsAttacking");i++)
+            { Step();Assert.That(state.transform.position.x,Is.EqualTo(0).Within(.002f)); }
+            Assert.That(Get<int>(front,"HitCount"),Is.EqualTo(outside?0:1));
+            Assert.That(Get<int>(rear,"HitCount"),Is.Zero);
+        }
+        [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
+        [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
+        public void SelectedTwoStageTakeStaysOnTheSpotUntilItsCounter(int fps,bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            Assert.That(Get<bool>(director,"UsesSpacingApproaches"),Is.False);
+            for(int i=0;i<fps*6&&!Get<bool>(director,"Completed");i++)
+            {
+                Call(director,"StepCapture",1d/fps);
+                if(!Marks().Any(m=>(string)m.GetType().GetField("kind").GetValue(m)=="CounterStart"))
+                    Assert.That(state.transform.position.x,Is.EqualTo(0).Within(.002f));
+            }
+            Assert.That(Get<bool>(director,"Completed"),Is.True);
+            Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
+            Assert.That(Marks().Any(m=>((string)m.GetType().GetField("kind").GetValue(m)).Contains("Approach")),Is.False);
+        }
+        [TestCase(-1)] [TestCase(1)]
+        public void SubmittedParryReadyReachesItsHeldPoseBeforeContactWithoutChangingAcceptance(int direction)
+        {
+            Call(director,"ResetTake",2);Call(state.GetComponent(Type.GetType("PlayerMotor2D, Assembly-CSharp",true)),"SetFacing",direction);
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            var ready=Call(Get<object>(driver,"Art"),"Find","ParryReady");
+            Assert.That(Get<int[]>(ready,"durations"),Is.EqualTo(new[]{2,2,6,6,6,6,6,6}));
+            Assert.That(Get<Sprite[]>(ready,"frames").Length,Is.EqualTo(8));
+            var parry=state.GetComponent(Type.GetType("PlayerParry2D, Assembly-CSharp",true));
+            Assert.That(Get<int>(parry,"AcceptanceEndFrame"),Is.EqualTo(12));
+            Call(state,"RequestAction",PlayerActionRequest.Parry);
+            for(int i=0;i<4;i++)Step();
+            var sprite=state.GetComponent<SpriteRenderer>().sprite;
+            Assert.That(sprite.name,Is.EqualTo("ParryReady_03"));
+            Assert.That(sprite.rect.size,Is.EqualTo(new Vector2(64,64)));
+            Assert.That(sprite.pivot,Is.EqualTo(new Vector2(32,38)));
+            Assert.That(Get<bool>(parry,"IsParryActive"),Is.True);
         }
         [TestCase(1,"VerticalSlash")] [TestCase(2,"HorizontalSlash")]
         [TestCase(3,"RapidSheathe")] [TestCase(4,"IaiSlash")]
@@ -1039,6 +1096,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 }
             }
             finally { Object.DestroyImmediate(wall); }
+        }
+        private void UseApproachesForComparison()
+        {
+            director.GetType().GetField("useSpacingApproaches",Flags).SetValue(director,true);
+            var rear=(Component)Get<object>(director,"RearEnemy");
+            var ai=rear.GetComponent(Type.GetType("EnemyMeleeChaser2D, Assembly-CSharp",true));
+            ai.GetType().GetField("attackRange",Flags).SetValue(ai,1.35f);
         }
         private static Component Find(string name)=>(Component)Object.FindFirstObjectByType(Type.GetType(name+", Assembly-CSharp",true));
         private static T Get<T>(object target,string name)

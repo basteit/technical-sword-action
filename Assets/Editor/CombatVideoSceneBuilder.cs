@@ -105,7 +105,7 @@ public static class CombatVideoSceneBuilder
         Set(attack, "hitPoint", hit.transform); Set(attack, "targetLayers", 1 << enemy);
         Set(attack, "showHitboxAlways", false);
         Set(attack,"directStatePrefix","PlayerVideo_Attack_");Set(attack,"lightHitstopFrames",2);
-        ConfigureAttack(attack,library);
+        ConfigureAttack(attack,library,!defenseCancel);
         actor.AddComponent<PlayerParry2D>(); actor.AddComponent<PlayerSpecialGauge>();
         var health=actor.AddComponent<PlayerDamageReceiver2D>();Set(health,"normalParryHitStop",2/60f);Set(health,"justParryHitStop",3/60f);
         var counter=actor.AddComponent<PlayerParryCounter2D>();var kick=library.Find("AirRoundhouse");Set(counter,"airborneKick",true);Set(counter,"hitFrame",kick.hitFrame);Set(counter,"chargeFrame",kick.chargeFrame);Set(counter,"endFrame",kick.recoveryFrame>0?kick.recoveryFrame:kick.TotalFrames);Set(counter,"radius",.5f);Set(counter,"obstacleLayers",1 << ground);
@@ -136,28 +136,41 @@ public static class CombatVideoSceneBuilder
         Set(animation,"hitbackObstacles",1<<LayerMask.NameToLayer("Ground"));
         obj.SetActive(true); return damageable;
     }
-    internal static void ConfigureAttack(PlayerAttack2D attack,VideoArtLibrary library)
+    internal static void ConfigureAttack(PlayerAttack2D attack,VideoArtLibrary library,bool stationarySubmitted=true)
     {
         var data=new SerializedObject(attack);var steps=data.FindProperty("attackSteps");
         var motions=new[]{"VerticalSlash","HorizontalSlash","RapidSheathe","IaiSlash"}.Select(library.Find).ToArray();
         int[] totals=motions.Select(m=>m.TotalFrames).ToArray(),hits=motions.Select(m=>m.hitFrame).ToArray();float[] distance={.12f,.2f,.28f,.4f};
         for(int i=0;i<4;i++)
         {
+            // Supplied sword trails define reach; these two poses stay on the spot.
+            bool trail=motions[i].hasTrailHitbox;
+            float travel=trail&&stationarySubmitted?0:distance[i];
             var step=steps.GetArrayElementAtIndex(i);step.FindPropertyRelative("fallbackDuration").floatValue=totals[i]/60f;
-            step.FindPropertyRelative("groundMotionDistance").floatValue=distance[i];step.FindPropertyRelative("groundMotionDuration").floatValue=hits[i]/60f;
+            step.FindPropertyRelative("groundMotionDistance").floatValue=travel;step.FindPropertyRelative("groundMotionDuration").floatValue=hits[i]/60f;
             step.FindPropertyRelative("radius").floatValue=.6f;step.FindPropertyRelative("useGroundMotionCurve").boolValue=true;
-            step.FindPropertyRelative("groundMotionCurve").animationCurveValue=AnimationCurve.Linear(0,0,hits[i]/60f,distance[i]);
+            step.FindPropertyRelative("groundMotionCurve").animationCurveValue=AnimationCurve.Linear(0,0,hits[i]/60f,travel);
+            step.FindPropertyRelative("useBoxHitbox").boolValue=trail;
+            if(trail)
+            {
+                Vector2 min=motions[i].hitboxMin;min.x=0; // Include the sword between the grip and the outer trail.
+                Vector2 max=motions[i].hitboxMax;
+                step.FindPropertyRelative("hitboxOffset").vector2Value=(min+max)/2;
+                step.FindPropertyRelative("hitboxSize").vector2Value=max-min;
+            }
         }
         data.ApplyModifiedPropertiesWithoutUndo();
     }
     internal static void ConfigureSequentialLayout(CombatVideoDirector director)
     {
         Set(director,"frontStart",SequentialFrontStart);Set(director,"rearStart",SequentialRearStart);
-        Set(director,"useSpacingApproaches",true);
+        Set(director,"useSpacingApproaches",false);
         director.FrontEnemy.transform.position=SequentialFrontStart;
         director.RearEnemy.transform.position=SequentialRearStart;
         var rearAi=director.RearEnemy.GetComponent<EnemyMeleeChaser2D>();
-        Set(rearAi,"moveSpeed",4f);Set(rearAi,"attackRange",1.35f);Set(rearAi,"preferredMaxDistance",1.35f);
+        // The selected two-stage take keeps this AI held until its scripted
+        // windup. The retained four-stage comparison may still release pursuit.
+        Set(rearAi,"moveSpeed",4f);Set(rearAi,"attackRange",1.9f);Set(rearAi,"preferredMaxDistance",1.35f);
     }
     internal static void Set(Object target, string name, Object value)
     { var s = new SerializedObject(target); s.FindProperty(name).objectReferenceValue = value; s.ApplyModifiedPropertiesWithoutUndo(); }
