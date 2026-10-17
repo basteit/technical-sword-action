@@ -249,3 +249,7 @@ PlayModeで接地と画面下端までの床を確認し、2/4段×通常/反転
 [今回のMP4](video/previews/combat-2stage-hybrid-submitted-attacks-1-2.mp4) は4.233333秒/254F、1080p60・音声なし。全フレームのデコード、2段のみの入力と撃破、背後パリィと同一個体へのかかと落としを確認。Unity compile/収録後Console Error 0 / Warning 0、PlayMode318/318・EditMode186/186。最終撮影Sceneでも2/4段×左右×各10回の40回リセットを通過。
 
 [素材・タイミング・再現手順・未達](video/attack2-submission.md) / [検証JSON](video/previews/attack2-submission-validation.json) / [通し画像](video/previews/submitted-attacks-1-2-contact.png)。既存の未コミット変更と原素材・過去動画を保持。未保存PrototypeCombatValidationはユーザー承認後に保存し、収録後に元Sceneへ戻した。パリィ・かかと落としなどの人の素材と全体の最終受入は未完了のため、#69の完成とは扱わない。
+
+### 同日：1→2段目の派生を5F早める
+
+次段予約時だけ終盤を34F→29Fへ切り上げ、単発の復帰開始34Fと命中17F、提出原画の表示時間を維持。新しい通しは249F / 4.15秒・1080p60・無音。PlayMode324/324・EditMode186/186、最終Scene40回リセット、全249Fデコードを通過した。従来版を残し、チャットで直接再生できるプレビューを用意。[最新動画・変更内容・再現・未達](video/attack-combo-early-branch.md)。
