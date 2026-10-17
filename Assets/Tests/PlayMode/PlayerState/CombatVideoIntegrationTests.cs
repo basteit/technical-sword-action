@@ -47,7 +47,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
             Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
-            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.2d,4.3d));
+            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.10d,4.20d));
             Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.63f,.71f));
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
@@ -257,6 +257,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int[]>(action,"durations"),Is.EqualTo(count==9?new[]{4,4,5,4,4,4,4,5,4}:new[]{4,4,5,4,4,4,4,5}));
             Assert.That(Get<int>(action,"hitFrame"),Is.EqualTo(hit));
             Assert.That(Get<int>(action,"TotalFrames"),Is.EqualTo(total));
+            Assert.That(Get<int>(action,"branchFrame"),Is.EqualTo(29));
+            Assert.That(Get<int>(action,"recoveryFrame"),Is.EqualTo(name=="VerticalSlash"?34:29));
             foreach(var sprite in frames)
             {
                 Assert.That(sprite.rect.size,Is.EqualTo(new Vector2(128,128)));
@@ -264,6 +266,44 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(sprite.pixelsPerUnit,Is.EqualTo(32));
             }
             Assert.That(Get<bool>(art,"playerArtworkIsRough"),Is.True,"Submitted attacks do not finish the remaining artwork.");
+        }
+        [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
+        [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
+        public void FirstSlashCutsItsTailOnlyForAReservedFollowup(int fps,bool queueNext)
+        {
+            Call(director,"StartTake",2,true);Set(director,"Running",false);
+            var attack=state.GetComponent(Type.GetType("PlayerAttack2D, Assembly-CSharp",true));
+            var started=attack.GetType().GetEvent("StepStarted");
+            long first=-1,second=-1;bool reserved=false,heldTail=false;
+            long Tick()=>(long)clockType.GetProperty("TickCount").GetValue(null);
+            Action<int> onStep=step=>{if(step==1)first=Tick();if(step==2)second=Tick();};
+            started.AddEventHandler(attack,onStep);
+            try
+            {
+                Call(attack,"RequestAttack");
+                for(int frame=0;frame<fps*2;frame++)
+                {
+                    if(queueNext&&!reserved&&Get<bool>(attack,"IsComboWindowOpen"))
+                    { Call(attack,"RequestAttack");reserved=true; }
+                    Call(director,"StepCapture",1d/fps);
+                    if(first<0)continue;
+                    if(!queueNext&&Tick()-first>=30&&Get<int>(attack,"ComboStep")==1)heldTail=true;
+                    if(second>=0||!Get<bool>(attack,"IsAttacking"))break;
+                }
+                Assert.That(first,Is.GreaterThanOrEqualTo(0));
+                if(queueNext)
+                {
+                    Assert.That(reserved,Is.True);Assert.That(second-first,Is.InRange(28L,30L));
+                    Assert.That(Get<string>(attack,"LastEndReason"),Is.EqualTo("ComboBranch->Next"));
+                }
+                else
+                {
+                    Assert.That(second,Is.EqualTo(-1));Assert.That(heldTail,Is.True,"Single slash must keep its authored follow-through past the early combo branch.");
+                    Assert.That(Tick()-first,Is.InRange(33L,35L));
+                    Assert.That(Get<string>(attack,"LastEndReason"),Is.EqualTo("Recovery"));
+                }
+            }
+            finally { started.RemoveEventHandler(attack,onStep); }
         }
         [TestCase(false)] [TestCase(true)]
         public void SubmittedTwoStageTakeKillsOnSecondHitWithoutLaterStagesOrDuplicateSlashTrails(bool mirror)

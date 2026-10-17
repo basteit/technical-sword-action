@@ -408,6 +408,14 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         }
     }
 
+    // A queued follow-up may interrupt only the authored tail of this step.
+    // Without a reservation, keep playing until the normal recovery event.
+    public void OnComboBranch(int step)
+    {
+        if (definition != null || !queuedNextAttack || !CanProcessAnimationEvent(step)) return;
+        CompleteAttackStep(step, "ComboBranch");
+    }
+
     public void OnAttackRecovery(int step)
     {
         if (definition != null) return;

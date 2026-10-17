@@ -387,7 +387,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 06eeaf8c7b9859b4bac54291a73b8a73, type: 3}
     durations: 040000000400000005000000040000000400000004000000040000000500000004000000
     hitFrame: 17
-    branchFrame: 34
+    branchFrame: 29
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0

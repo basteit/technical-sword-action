@@ -121,10 +121,12 @@ public static class CombatVideoArtBuilder
             var clip=Clip("Attack_"+stage,library.Find(action.name),false);
             var events=new List<AnimationEvent>();
             void Event(int frame,string name,int parameter=0)=>events.Add(new AnimationEvent{time=frame/60f,functionName=name,intParameter=parameter});
+            int recoveryFrame=action.recoveryFrame>0?action.recoveryFrame:action.branchFrame;
             Event(action.hitFrame,"OnAttackHit",stage);
             if(stage<4) { Event(action.hitFrame+4,"OnComboWindowOpen",stage);Event(action.branchFrame-1,"OnComboWindowClose",stage); }
-            Event(action.hitFrame+4,"OnDefenseCancelWindowOpen");Event(action.branchFrame-2,"OnLateCancelWindowOpen");
-            Event(action.branchFrame,"OnAttackRecovery",stage);Event(action.totalFrames,"OnAttackEnd",stage);
+            if(stage<4&&action.branchFrame<recoveryFrame) Event(action.branchFrame,"OnComboBranch",stage);
+            Event(action.hitFrame+4,"OnDefenseCancelWindowOpen");Event(recoveryFrame-2,"OnLateCancelWindowOpen");
+            Event(recoveryFrame,"OnAttackRecovery",stage);Event(action.totalFrames,"OnAttackEnd",stage);
             AnimationUtility.SetAnimationEvents(clip,events.OrderBy(e=>e.time).ToArray());EditorUtility.SetDirty(clip);
             machine.AddState("PlayerVideo_Attack_"+stage).motion=clip;stage++;
         }

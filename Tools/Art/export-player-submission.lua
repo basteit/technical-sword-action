@@ -36,6 +36,9 @@ for i,f in ipairs(s.frames) do
   native[#native+1]=string.format('{"frame":%d,"durationMs":%d,"startTick":%d,"ticks":%d}',i,math.floor(f.duration*1000+.5),start,nextFrame-start)
   start=nextFrame
 end
+-- Keep native cel/recovery timing; only a reserved first-to-second branch is earlier.
+local recoveryFrame=branchFrame
+if action=='VerticalSlash' then branchFrame=29 end
 sheet:saveAs(out..'/'..action..'.png')
 local t=s:newTag(1,count);t.name=action
 -- The editable review copy gains only a tag and hidden construction guide.
@@ -46,6 +49,6 @@ assert(#reopen.frames==count and reopen.tags[1].name==action and not reopen.laye
 for _,f in ipairs(reopen.frames) do assert(math.floor(f.duration*1000+.5)==70) end
 reopen:close()
 local f=assert(io.open(out..'/timing-manifest.json','w'))
-f:write(string.format('{"actions":[{"name":%q,"provisional":true,"includesSlashTrail":true,"canvasWidth":128,"canvasHeight":128,"pivotX":32,"pivotY":38,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"recoveryFrame":%d,"frames":[%s]}]}',action,count,start,hitFrame,branchFrame,branchFrame,table.concat(frames,',')));f:close()
+f:write(string.format('{"actions":[{"name":%q,"provisional":true,"includesSlashTrail":true,"canvasWidth":128,"canvasHeight":128,"pivotX":32,"pivotY":38,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"recoveryFrame":%d,"frames":[%s]}]}',action,count,start,hitFrame,branchFrame,recoveryFrame,table.concat(frames,',')));f:close()
 local e=assert(io.open(out..'/eye-mask-manifest.json','w'));e:write('{"frames":['..table.concat(eyes,',')..']}');e:close()
 local r=assert(io.open(out..'/submission-validation.json','w'));r:write(string.format('{"sourceUnmodified":true,"reviewCopyReopened":true,"guideHidden":true,"hairVisibilityPreserved":true,"nativeDurationMs":%d,"gameTicks":%d,"contactFrame":%d,"contactTick":%d,"frames":[%s]}',nativeMs,start,contact,hitFrame,table.concat(native,',')));r:close()
