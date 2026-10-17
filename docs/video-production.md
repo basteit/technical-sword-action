@@ -240,3 +240,12 @@ PlayModeで接地と画面下端までの床を確認し、2/4段×通常/反転
 - 元Scene2本・既存候補5本・主人公Asepriteは変更なし。人の清書は未受領。常設スタジオの整備と、元の#69の清書統合/最終調整/最終動画完成は区別し、未達IssueはOpenを維持する。
 
 スタジオの自由操作では本来のDash速度18unit/sを使用する。追加の固定撮影シナリオの6unit/sとは用途を分け、歩行より速く移動することをテストした。入力テストでは、パネルのフォーカスと実デバイスの押下状態から仮想入力を隔離し、設定/デバイスをTearDownで復元する。Scene再読込後の敵追加で名前が重複する問題も修正し、PrefabのHPと位置が正しい個体へ復元されることを確認した。
+
+
+## 2026-10-17 提出2段目を接続・2段撃破で収録
+
+最新指示に従い、Player_attack_2.aseprite（128×128、8×70ms）を提出1段目へ接続。命中13F・全体34F、Pivot(32,38)/32PPUを維持し、原本は日付付きで保存した。描き込みSlashを1/2段目とも採用し、汎用軌跡の二重表示を抑止。今回の録画では敵AをHP2にし、1段目で生存→2段目の命中tickで撃破する。既存の本編4段・任意4段撮影は保持した。
+
+[今回のMP4](video/previews/combat-2stage-hybrid-submitted-attacks-1-2.mp4) は4.233333秒/254F、1080p60・音声なし。全フレームのデコード、2段のみの入力と撃破、背後パリィと同一個体へのかかと落としを確認。Unity compile/収録後Console Error 0 / Warning 0、PlayMode318/318・EditMode186/186。最終撮影Sceneでも2/4段×左右×各10回の40回リセットを通過。
+
+[素材・タイミング・再現手順・未達](video/attack2-submission.md) / [検証JSON](video/previews/attack2-submission-validation.json) / [通し画像](video/previews/submitted-attacks-1-2-contact.png)。既存の未コミット変更と原素材・過去動画を保持。未保存PrototypeCombatValidationはユーザー承認後に保存し、収録後に元Sceneへ戻した。パリィ・かかと落としなどの人の素材と全体の最終受入は未完了のため、#69の完成とは扱わない。
