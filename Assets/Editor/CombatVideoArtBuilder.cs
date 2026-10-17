@@ -46,6 +46,8 @@ public static class CombatVideoArtBuilder
         {
             var final=JsonUtility.FromJson<Manifest>(File.ReadAllText(cleanFolder+"/timing-manifest.json"));
             for(int i=0;i<manifest.actions.Length;i++) manifest.actions[i]=final.actions.FirstOrDefault(a=>a.name==manifest.actions[i].name)??manifest.actions[i];
+            // Split parry tags are additions rather than replacements of ParryDeflect.
+            manifest.actions=manifest.actions.Concat(final.actions.Where(a=>!manifest.actions.Any(old=>old.name==a.name))).ToArray();
         }
         var motions=new List<VideoArtLibrary.Motion>();
         var paths=SelectCleanFrames("Assets/Art/Player/VideoRough").Concat(Directory.GetFiles("Assets/Art/Player/VideoRough","*Reference_??.png")).Concat(Directory.GetFiles("Assets/Art/Video","*.png"));
@@ -101,7 +103,9 @@ public static class CombatVideoArtBuilder
         if(library==null) { library=ScriptableObject.CreateInstance<VideoArtLibrary>();AssetDatabase.CreateAsset(library,LibraryPath); }
         library.motions=motions.ToArray();library.background=AssetDatabase.LoadAssetAtPath<Sprite>(backgroundPath);EditorUtility.SetDirty(library);
         bool CleanExists(string name)=>frames.Any(p=>p.StartsWith(cleanFolder)&&Path.GetFileNameWithoutExtension(p).StartsWith(name+"_"));
-        library.playerArtworkIsRough=!new[]{"VerticalSlash","HorizontalSlash","ParryDeflect","AirRoundhouse","Recovery_VerticalSlash","Recovery_HorizontalSlash","Recovery_ParryDeflect","Recovery_AirRoundhouse"}.All(CleanExists);
+        bool cleanParry=CleanExists("ParryReady")&&CleanExists("ParrySuccessLight")&&CleanExists("Recovery_ParrySuccessLight")||
+            CleanExists("ParryDeflect")&&CleanExists("Recovery_ParryDeflect");
+        library.playerArtworkIsRough=!cleanParry||!new[]{"VerticalSlash","HorizontalSlash","AirRoundhouse","Recovery_VerticalSlash","Recovery_HorizontalSlash","Recovery_AirRoundhouse"}.All(CleanExists);
         library.fourStageArtworkIsRough=library.playerArtworkIsRough||!new[]{"RapidSheathe","IaiSlash","Recovery_RapidSheathe","Recovery_IaiSlash"}.All(CleanExists);
         var controller=AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
         if(controller==null) controller=AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
@@ -125,13 +129,20 @@ public static class CombatVideoArtBuilder
             machine.AddState("PlayerVideo_Attack_"+stage).motion=clip;stage++;
         }
         var parry=library.Find("ParryDeflect");
-        machine.AddState("PlayerVideo_Parry").motion=Clip("Parry",new VideoArtLibrary.Motion{name="Ready",frames=new[]{parry.frames[0]},durations=new[]{12}},false);
-        machine.AddState("PlayerVideo_ParrySuccess").motion=Clip("ParrySuccess",new VideoArtLibrary.Motion{name="Deflect",frames=parry.frames.Skip(2).ToArray(),durations=parry.durations.Skip(2).ToArray()},false);
+        var parryReady=library.Find("ParryReady")??new VideoArtLibrary.Motion{name="Ready",frames=new[]{parry.frames[0]},durations=new[]{12}};
+        machine.AddState("PlayerVideo_Parry").motion=Clip("Parry",parryReady,false);
+        var lightParry=library.Find("ParrySuccessLight")??new VideoArtLibrary.Motion{name="Deflect",frames=parry.frames.Skip(2).ToArray(),durations=parry.durations.Skip(2).ToArray()};
+        machine.AddState("PlayerVideo_ParrySuccess").motion=Clip("ParrySuccess",lightParry,false);
+        foreach(string reaction in new[]{"ParrySuccessLight","ParrySuccessHeavy"})
+        {
+            var motion=library.Find(reaction);
+            if(motion!=null) machine.AddState("PlayerVideo_"+reaction).motion=Clip(reaction,motion,false);
+        }
         machine.AddState("PlayerVideo_Counter").motion=Clip("Counter",library.Find("AirRoundhouse"),false);
         machine.AddState("PlayerVideo_Move").motion=Clip("Move",moveMotion,true);
         var dash=library.Find("Dash");
         if(dash!=null) machine.AddState("PlayerVideo_Dash").motion=Clip("Dash",dash,false);
-        machine.AddState("PlayerVideo_ParryFail").motion=Clip("ParryFail",new VideoArtLibrary.Motion{name="Miss",frames=new[]{parry.frames[0]},durations=new[]{18}},false);
+        machine.AddState("PlayerVideo_ParryFail").motion=Clip("ParryFail",new VideoArtLibrary.Motion{name="Miss",frames=new[]{parryReady.frames[^1]},durations=new[]{18}},false);
         var kick=library.Find("AirRoundhouse");
         machine.AddState("PlayerVideo_Jump").motion=Clip("Jump",new VideoArtLibrary.Motion{name="Jump",frames=new[]{kick.frames[1]},durations=new[]{8}},false);
         machine.AddState("PlayerVideo_Fall").motion=Clip("Fall",new VideoArtLibrary.Motion{name="Fall",frames=new[]{kick.frames[^1]},durations=new[]{8}},false);

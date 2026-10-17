@@ -1,5 +1,7 @@
 # 主人公アクション — 清書受け渡し
 
+**2026-10-17更新：** パリィは入力時の待機 `ParryReady`、接触成功時の `ParrySuccessLight` / `ParrySuccessHeavy` に分離する。今回は軽を作画し、重は後日。軽・重は敵攻撃の属性で決まり、通常／ジャストの入力精度や反撃の種類とは独立する。旧 `ParryDeflect` の6コマ一体型より、[最新のパリィ作画・タイミング・提出ガイド](parry-motion-guide.md)を優先する。分離タグの部分提出、原点を明示した拡張キャンバスの書き出しに対応した。
+
 **2026-10-16更新：** 1段目は `VideoSubmitted/20261016/Player_attack_1.aseprite` を仮受領。128pxの余白を含め32PPU/接地を維持し、9×70ms→Unity38F、命中17F/次段34Fへ接続した。後ろ髪/復帰は今回の動画では待たない。反撃の清書元は別ファイル `VideoHeelDrop/Player_heel_drop_rough.aseprite` に切り替え、全身回転から頭上のかかと落としへ変更。以下の旧ラフの一覧より[最新の素材/タイミング](attack1-submission-and-heel-drop.md)を優先する。
 
 編集元: `Assets/Art/Player/VideoRough/Player_actions_rough.aseprite`。
