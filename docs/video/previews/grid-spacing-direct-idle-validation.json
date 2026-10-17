@@ -575,5 +575,33 @@
     "Human parry-ready/light-success and heel-drop artwork",
     "Final readability and quality acceptance after artwork integration",
     "Final full validation and export before closing #69"
-  ]
+  ],
+  "repositoryArtifactsAudit": {
+    "branch": "issue/33-52-38-combat-polish",
+    "base": "",
+    "staged": true,
+    "changedFiles": 7,
+    "attributes": [
+      "Assets/Scenes/PrototypeCombatValidation.unity: merge: unityyamlmerge",
+      "Assets/Art/test.aseprite: merge: unset"
+    ],
+    "problems": [],
+    "success": true
+  },
+  "repositoryFinalHistoryAudit": {
+    "branch": "issue/33-52-38-combat-polish",
+    "base": "c1a0263",
+    "staged": false,
+    "changedFiles": 18,
+    "attributes": [
+      "Assets/Scenes/PrototypeCombatValidation.unity: merge: unityyamlmerge",
+      "Assets/Art/test.aseprite: merge: unset"
+    ],
+    "problems": [
+      "Commit convention: docs: record spaced direct-idle capture and validation",
+      "Commit convention: feat: widen capture spacing and return attacks directly to idle"
+    ],
+    "success": false,
+    "resolution": "Published history retained. Two nonconforming commit subjects are recorded in Draft PR #78; use compliant scoped subjects with Issue references when integrating by squash."
+  }
 }
