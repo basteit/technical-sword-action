@@ -1,4 +1,5 @@
-param([string]$FfmpegPath,[ValidatePattern('^[a-z0-9-]*$')][string]$Revision='')
+param([string]$FfmpegPath,[ValidatePattern('^[a-z0-9-]*$')][string]$Revision='',
+    [ValidateSet('2stage-hybrid','4stage-hybrid','4stage-pixel')][string[]]$Variants=@('2stage-hybrid','4stage-hybrid','4stage-pixel'))
 $ErrorActionPreference = 'Stop'
 $videoProjectRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 Push-Location $videoProjectRoot
@@ -13,7 +14,7 @@ try {
     }
     if (-not $FfmpegPath) { throw 'Provide -FfmpegPath or install FFmpeg; see docs/video/capture-guide.md.' }
     New-Item -ItemType Directory -Force -Path 'docs/video/previews' | Out-Null
-    foreach ($videoVariant in @('2stage-hybrid','4stage-hybrid','4stage-pixel')) {
+    foreach ($videoVariant in $Variants) {
         $videoCaptureDir = Join-Path '.uloop/outputs/video' $videoVariant
         $videoEventFile = Join-Path $videoCaptureDir 'events.json'
         $videoMetadata = Get-Content -Raw -LiteralPath $videoEventFile | ConvertFrom-Json

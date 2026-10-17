@@ -153,6 +153,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Damageable2D
   maxHp: 5
   individualId: Enemy_A
+  combatRank: 0
+  combatDefinition: {fileID: 0}
+  overrideMaxHp: 0
+  instanceMaxHp: 30
+  overrideCounterMultiplier: 0
+  instanceCounterMultiplier: 3
   deathDisplayDuration: 0.65
   lightHitStunDuration: 0.1
   blockContactPushFromPlayer: 1
@@ -207,6 +213,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5093e44b7999daf45bc8c374d177c8d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMeleeChaser2D
+  combatDefinition: {fileID: 0}
+  attackCoordinator: {fileID: 0}
   target: {fileID: 467345028}
   detectRange: 10
   loseTargetRange: 14
@@ -521,6 +529,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd9e535e0ec1ab94d89d33552b1358e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerParryCounter2D
+  definition: {fileID: 0}
   hitFrame: 28
   endFrame: 36
   damage: 3
@@ -665,6 +674,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2af2b00e86e497940a8c41487d969b38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerParry2D
+  timing: {fileID: 0}
   parryWindowDuration: 0.2
   justParryDuration: 0.07
   parryCooldown: 0.22
@@ -690,6 +700,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b7f70074825f4b4594143adf5ae6ad8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack2D
+  definition: {fileID: 0}
   inputBufferDuration: 0.1
   fallbackGraceDuration: 0.12
   animator: {fileID: 0}
@@ -737,9 +748,9 @@ MonoBehaviour:
   - damage: 1
     radius: 0.6
     gaugeGain: 2
-    fallbackDuration: 0.43333334
+    fallbackDuration: 0.56666666
     groundMotionDistance: 0.2
-    groundMotionDuration: 0.15
+    groundMotionDuration: 0.21666667
     useGroundMotionCurve: 1
     groundMotionCurve:
       serializedVersion: 2
@@ -748,15 +759,15 @@ MonoBehaviour:
         time: 0
         value: 0
         inSlope: 0
-        outSlope: 1.3333333
+        outSlope: 0.9230769
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.15
+        time: 0.21666667
         value: 0.2
-        inSlope: 1.3333333
+        inSlope: 0.9230769
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
@@ -863,9 +874,12 @@ MonoBehaviour:
     m_Bits: 8
   jumpReleaseMultiplier: 0.5
   floorDropFrames: 18
+  coyoteFrames: 6
   dashSpeed: 6
   dashDuration: 0.18
   dashCooldown: 0.8
+  dashMoveFrames: 0
+  preserveAirDashVertical: 0
   ignoreCollisionLayersWhileDashing:
     serializedVersion: 2
     m_Bits: 0
@@ -1271,6 +1285,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Damageable2D
   maxHp: 5
   individualId: Enemy_B
+  combatRank: 0
+  combatDefinition: {fileID: 0}
+  overrideMaxHp: 0
+  instanceMaxHp: 30
+  overrideCounterMultiplier: 0
+  instanceCounterMultiplier: 3
   deathDisplayDuration: 0.65
   lightHitStunDuration: 0.1
   blockContactPushFromPlayer: 1
@@ -1325,6 +1345,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5093e44b7999daf45bc8c374d177c8d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMeleeChaser2D
+  combatDefinition: {fileID: 0}
+  attackCoordinator: {fileID: 0}
   target: {fileID: 467345028}
   detectRange: 10
   loseTargetRange: 14

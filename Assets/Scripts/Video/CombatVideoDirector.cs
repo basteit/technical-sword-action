@@ -64,7 +64,8 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         int direction=player.GetComponent<PlayerMotor2D>().FacingSign;
         target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyHitback(new[]{.10f,.18f,.30f,.58f}[step-1],6+step,Vector2.right*direction);
         MarkEvent((defenseCancelTake&&!returnAttackSent?"OpeningSlash":"Slash")+step,target);
-        if(step!=1||!player.GetComponent<VideoPlayerAnimationDriver>().Art.Find("VerticalSlash").provisional)
+        var motion=player.GetComponent<VideoPlayerAnimationDriver>().Art.Find(new[]{"VerticalSlash","HorizontalSlash","RapidSheathe","IaiSlash"}[step-1]);
+        if(!motion.includesSlashTrail)
             vfx.Emit("Slash",point,new[]{.65f,.8f,1f,1.25f}[step-1],direction);
         var directionVector=step==1?new Vector2(direction*.2f,-1):new Vector2(direction,step==3?-.3f:.15f);
         presentation.ShakeDirectional(new[]{.09f,.10f,.11f,.14f}[step-1],new[]{.04f,.055f,.075f,.11f}[step-1],directionVector,2.5f);

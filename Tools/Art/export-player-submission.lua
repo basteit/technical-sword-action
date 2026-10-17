@@ -2,16 +2,24 @@
 -- This submission has a padded 128px canvas; its 64px reference cell is bottom-left.
 local s=assert(app.open(assert(app.params['input'])))
 local out=assert(app.params['out'])
-assert(s.width==128 and s.height==128 and #s.frames==9,'Unexpected attack-1 submission revision')
+local action=app.params['action'] or 'VerticalSlash'
+assert(action=='VerticalSlash' or action=='HorizontalSlash','Unsupported submitted action')
+local number=action=='VerticalSlash' and 1 or 2
+local count=number==1 and 9 or 8
+local contact=number==1 and 5 or 4
+assert(s.width==128 and s.height==128 and #s.frames==count,'Unexpected submitted attack revision')
 local guide=s.layers[1]
 assert(guide.name=='Layer 1','Inspect the submission before changing guide visibility')
 for _,cel in ipairs(guide.cels) do for p in cel.image:pixels() do
   local c=p();assert(app.pixelColor.rgbaA(c)==0 or c==app.pixelColor.rgba(0,0,0,255),'Guide contains artwork; inspect before export')
 end end
 guide.isVisible=false
-local action='VerticalSlash';local frames={};local eyes={};local native={};local cumulative=0;local start=0
+local frames={};local eyes={};local native={};local cumulative=0;local start=0;local hitFrame=0;local branchFrame=0;local nativeMs=0
 local sheet=Image(128*#s.frames,128,ColorMode.RGB)
 for i,f in ipairs(s.frames) do
+  if i==contact then hitFrame=start end
+  if i==count then branchFrame=start end
+  nativeMs=nativeMs+math.floor(f.duration*1000+.5)
   local im=Image(s.spec);im:drawSprite(s,i)
   local name=action..'_'..string.format('%02d',i)
   im:saveAs(out..'/'..name..'.png');sheet:drawImage(im,Point((i-1)*128,0))
@@ -29,14 +37,15 @@ for i,f in ipairs(s.frames) do
   start=nextFrame
 end
 sheet:saveAs(out..'/'..action..'.png')
-local t=s:newTag(1,9);t.name=action
+local t=s:newTag(1,count);t.name=action
 -- The editable review copy gains only a tag and hidden construction guide.
-s:saveAs(out..'/Player_attack_1_preview.aseprite');s:close()
-local reopen=assert(app.open(out..'/Player_attack_1_preview.aseprite'))
-assert(#reopen.frames==9 and reopen.tags[1].name==action and not reopen.layers[1].isVisible)
+local review=out..'/Player_attack_'..number..'_preview.aseprite'
+s:saveAs(review);s:close()
+local reopen=assert(app.open(review))
+assert(#reopen.frames==count and reopen.tags[1].name==action and not reopen.layers[1].isVisible)
 for _,f in ipairs(reopen.frames) do assert(math.floor(f.duration*1000+.5)==70) end
 reopen:close()
 local f=assert(io.open(out..'/timing-manifest.json','w'))
-f:write('{"actions":[{"name":"VerticalSlash","provisional":true,"canvasWidth":128,"canvasHeight":128,"pivotX":32,"pivotY":38,"count":9,"totalFrames":38,"hitFrame":17,"branchFrame":34,"recoveryFrame":34,"frames":['..table.concat(frames,',')..']}]}');f:close()
+f:write(string.format('{"actions":[{"name":%q,"provisional":true,"includesSlashTrail":true,"canvasWidth":128,"canvasHeight":128,"pivotX":32,"pivotY":38,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"recoveryFrame":%d,"frames":[%s]}]}',action,count,start,hitFrame,branchFrame,branchFrame,table.concat(frames,',')));f:close()
 local e=assert(io.open(out..'/eye-mask-manifest.json','w'));e:write('{"frames":['..table.concat(eyes,',')..']}');e:close()
-local r=assert(io.open(out..'/submission-validation.json','w'));r:write('{"sourceUnmodified":true,"reviewCopyReopened":true,"guideHidden":true,"hairVisibilityPreserved":true,"nativeDurationMs":630,"gameTicks":38,"contactFrame":5,"contactTick":17,"frames":['..table.concat(native,',')..']}');r:close()
+local r=assert(io.open(out..'/submission-validation.json','w'));r:write(string.format('{"sourceUnmodified":true,"reviewCopyReopened":true,"guideHidden":true,"hairVisibilityPreserved":true,"nativeDurationMs":%d,"gameTicks":%d,"contactFrame":%d,"contactTick":%d,"frames":[%s]}',nativeMs,start,contact,hitFrame,table.concat(native,',')));r:close()

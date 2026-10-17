@@ -47,7 +47,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
             Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
-            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.07d,4.15d));
+            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.2d,4.3d));
             Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.63f,.71f));
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
@@ -245,22 +245,50 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for(int i=0;i<10;i++) Step();
             Assert.That(renderer.sprite.name,Does.StartWith("Enemy_Death_"));
         }
-        [Test] public void SubmittedAttackPreservesItsPixelScaleAndCumulativeNativeTiming()
+        [TestCase("VerticalSlash",9,17,38)] [TestCase("HorizontalSlash",8,13,34)]
+        public void SubmittedAttackPreservesItsPixelScaleAndCumulativeNativeTiming(string name,int count,int hit,int total)
         {
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
-            var art=Get<object>(driver,"Art");var action=Call(art,"Find","VerticalSlash");
+            var art=Get<object>(driver,"Art");var action=Call(art,"Find",name);
             var frames=Get<Sprite[]>(action,"frames");
-            Assert.That(frames.Length,Is.EqualTo(9));
+            Assert.That(frames.Length,Is.EqualTo(count));
             Assert.That(Get<bool>(action,"provisional"),Is.True);
-            Assert.That(Get<int[]>(action,"durations"),Is.EqualTo(new[]{4,4,5,4,4,4,4,5,4}));
-            Assert.That(Get<int>(action,"hitFrame"),Is.EqualTo(17));
+            Assert.That(Get<bool>(action,"includesSlashTrail"),Is.True);
+            Assert.That(Get<int[]>(action,"durations"),Is.EqualTo(count==9?new[]{4,4,5,4,4,4,4,5,4}:new[]{4,4,5,4,4,4,4,5}));
+            Assert.That(Get<int>(action,"hitFrame"),Is.EqualTo(hit));
+            Assert.That(Get<int>(action,"TotalFrames"),Is.EqualTo(total));
             foreach(var sprite in frames)
             {
                 Assert.That(sprite.rect.size,Is.EqualTo(new Vector2(128,128)));
                 Assert.That(sprite.pivot,Is.EqualTo(new Vector2(32,38)));
                 Assert.That(sprite.pixelsPerUnit,Is.EqualTo(32));
             }
-            Assert.That(Get<bool>(art,"playerArtworkIsRough"),Is.True,"One provisional action does not finish the remaining artwork.");
+            Assert.That(Get<bool>(art,"playerArtworkIsRough"),Is.True,"Submitted attacks do not finish the remaining artwork.");
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void SubmittedTwoStageTakeKillsOnSecondHitWithoutLaterStagesOrDuplicateSlashTrails(bool mirror)
+        {
+            Set(director,"MirrorLayout",mirror);Call(director,"StartTake",2,true);
+            var front=(Component)Get<object>(director,"FrontEnemy");
+            var attack=state.GetComponent(Type.GetType("PlayerAttack2D, Assembly-CSharp",true));
+            var vfx=Find("VideoVfxRenderer");int previousHits=0,maxStage=0;
+            Assert.That(Get<int>(front,"CurrentHp"),Is.EqualTo(2));
+            for(int i=0;i<360&&!Get<bool>(director,"Completed");i++)
+            {
+                Step();maxStage=Mathf.Max(maxStage,Get<int>(attack,"ComboStep"));
+                int hits=Get<int>(front,"HitCount");if(hits==previousHits)continue;
+                Assert.That(hits,Is.EqualTo(previousHits+1));
+                Assert.That(Get<bool>(front,"IsAlive"),Is.EqualTo(hits==1));
+                Assert.That(vfx.GetComponentsInChildren<SpriteRenderer>().Any(r=>r.enabled&&r.sprite!=null&&r.sprite.name.StartsWith("Fx_Slash")),Is.False,"Authored trails must not be doubled by generic slash VFX.");
+                previousHits=hits;
+            }
+            Assert.That(Get<bool>(director,"Completed"),Is.True);Assert.That(maxStage,Is.EqualTo(2));
+            Assert.That(previousHits,Is.EqualTo(2));Assert.That(Get<int>(front,"DeathCount"),Is.EqualTo(1));
+            var marks=Marks();
+            Assert.That(marks.Any(m=>new[]{"Slash3","Slash4"}.Contains((string)m.GetType().GetField("kind").GetValue(m))),Is.False);
+            var hit=marks.Single(m=>(string)m.GetType().GetField("kind").GetValue(m)=="Slash2");
+            var death=marks.Single(m=>(string)m.GetType().GetField("kind").GetValue(m)=="Death"&&(string)m.GetType().GetField("target").GetValue(m)==Get<string>(front,"IndividualId"));
+            Assert.That((long)death.GetType().GetField("tick").GetValue(death),Is.EqualTo((long)hit.GetType().GetField("tick").GetValue(hit)));
         }
         [Test] public void KickInvulnerabilityRejectsAnotherAttackerAndEndsOnReset()
         {

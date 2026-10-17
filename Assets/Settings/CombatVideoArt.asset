@@ -18,6 +18,7 @@ MonoBehaviour:
   motions:
   - name: AirRoundhouse
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 784546f9100de8344a1ba9dbb0c7c2da, type: 3}
     - {fileID: 21300000, guid: 1d1ebf3025eca224a82da65b39cf3039, type: 3}
@@ -66,34 +67,36 @@ MonoBehaviour:
     landingFrame: 36
     recoveryFrame: 36
   - name: HorizontalSlash
-    provisional: 0
+    provisional: 1
+    includesSlashTrail: 1
     frames:
-    - {fileID: 21300000, guid: bd63ead4d5c4b644dbdb30d01e11a545, type: 3}
-    - {fileID: 21300000, guid: e0d201e51beab8f40867c0f119b42e55, type: 3}
-    - {fileID: 21300000, guid: fd7af8020f363d44e9f72bb97ef6782c, type: 3}
-    - {fileID: 21300000, guid: ac356a7ffbb1a6c4fa7df207fb9fe9db, type: 3}
-    - {fileID: 21300000, guid: 1f1c3f6bcf3577948a977751f6288791, type: 3}
-    - {fileID: 21300000, guid: 13625a9e5cba45f4eb8d900bf6132667, type: 3}
-    - {fileID: 21300000, guid: cc6f7b76aab28624d980a8497634a162, type: 3}
-    - {fileID: 21300000, guid: d7af699f0d9e08f4293d2b7dd85ca51a, type: 3}
+    - {fileID: 21300000, guid: db1caef6a891aeb428b44b1f299713e9, type: 3}
+    - {fileID: 21300000, guid: d0531b92298ebee4aaac0ee046f7401e, type: 3}
+    - {fileID: 21300000, guid: 9230743de77622d43a26b70b464bbd04, type: 3}
+    - {fileID: 21300000, guid: 380ec3ac1eb0a684a942f0af946d0632, type: 3}
+    - {fileID: 21300000, guid: 2ec413ab077018b4b8f5599b53c18518, type: 3}
+    - {fileID: 21300000, guid: 0a130a4e91d5f9f4eb7d58c14b70c0b8, type: 3}
+    - {fileID: 21300000, guid: c3453418c6970484bacc55f5bb80ba97, type: 3}
+    - {fileID: 21300000, guid: 45f067a8e702f0d4890b26f12dd46c09, type: 3}
     eyeFrames:
-    - {fileID: 21300000, guid: 80ec5de57be12004aa299e4bc0bc9a2d, type: 3}
-    - {fileID: 21300000, guid: e9e467cdfabb25a4ea2a4a3bc2f7f2da, type: 3}
-    - {fileID: 21300000, guid: 7dcc6c724b100314d90f3a29f105b643, type: 3}
-    - {fileID: 21300000, guid: 4dc0dba29ccdcd14dba0ec1155ca5e37, type: 3}
-    - {fileID: 21300000, guid: 0d05c5de95cfd56449ac869c40411140, type: 3}
-    - {fileID: 21300000, guid: f8b194552682496469472c8e3ddbdc83, type: 3}
-    - {fileID: 21300000, guid: 4aa74454e75f426439be1524e393af20, type: 3}
-    - {fileID: 21300000, guid: 28297ca6e8e00be469115fbee92b9eea, type: 3}
-    durations: 0300000003000000030000000200000002000000030000000400000006000000
-    hitFrame: 9
-    branchFrame: 20
+    - {fileID: 21300000, guid: 90d7b6a3f9b673b4c9b477fc4ab467f6, type: 3}
+    - {fileID: 21300000, guid: ed6077236475ce4458cfffc2986e64bd, type: 3}
+    - {fileID: 21300000, guid: 69f05546a745a2c4dafab0813de287b9, type: 3}
+    - {fileID: 21300000, guid: 2a7a630a14bab1d4d88adc9c226f0adb, type: 3}
+    - {fileID: 21300000, guid: 438cd04208653874ca31e9825185bf4d, type: 3}
+    - {fileID: 21300000, guid: 92e8851ee6bd7a34f97ec893ad2c95aa, type: 3}
+    - {fileID: 21300000, guid: 0f19cbb4cff7cf14681c95ae51908dcc, type: 3}
+    - {fileID: 21300000, guid: f06f0ef63f20d6a4b9162ff276e700d3, type: 3}
+    durations: 0400000004000000050000000400000004000000040000000400000005000000
+    hitFrame: 13
+    branchFrame: 29
     chargeFrame: 0
     releaseFrame: 0
     landingFrame: 0
-    recoveryFrame: 20
+    recoveryFrame: 29
   - name: IaiSlash
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: c82a9c5e9e09e1d4db58b7d8e4b977ae, type: 3}
     - {fileID: 21300000, guid: 64a8a5160b72a804f98067cea5335821, type: 3}
@@ -121,6 +124,7 @@ MonoBehaviour:
     recoveryFrame: 22
   - name: IdleRough
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 02133f89baa50744ea0409b20b6dfeb8, type: 3}
     - {fileID: 21300000, guid: 94ebc8e6624aec7468c427e9e0e940c0, type: 3}
@@ -144,6 +148,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: ParryDeflect
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 85d458a6d8aff564686a02f6c441acfb, type: 3}
     - {fileID: 21300000, guid: a582b941e4f5ef54aa2cd3164df303b9, type: 3}
@@ -167,6 +172,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: RapidSheathe
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 5d151480a57d6454a9a3388b1d554d09, type: 3}
     - {fileID: 21300000, guid: 028bc19c7046b2040be915a39123308f, type: 3}
@@ -196,6 +202,7 @@ MonoBehaviour:
     recoveryFrame: 32
   - name: Recovery_AirRoundhouse
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 892a72cf0d5e19845a6e77c88cb07260, type: 3}
     - {fileID: 21300000, guid: 69fbf0d0f1c9ebd4cbb32154d0a677b1, type: 3}
@@ -221,6 +228,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Recovery_HorizontalSlash
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 6503bdc207432eb4f847dc96b46f8e08, type: 3}
     - {fileID: 21300000, guid: 38d2f6878bcf72740b4352a506542324, type: 3}
@@ -240,6 +248,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Recovery_IaiSlash
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: ed91ebec86cc4c4499a4943ae635bf57, type: 3}
     - {fileID: 21300000, guid: 46b45606b7bd9a44bb72356ce795114a, type: 3}
@@ -259,6 +268,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Recovery_Landing
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 38ef6e0880ea52745ae27883bd0f007e, type: 3}
     - {fileID: 21300000, guid: aad64718130d4bb49802bd44b62656fd, type: 3}
@@ -276,6 +286,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Recovery_Move
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 3edc667e9f1bcf74fa44adb4141fbc1b, type: 3}
     - {fileID: 21300000, guid: bebebc4a25e5afb4987d5e73954cc5ea, type: 3}
@@ -293,6 +304,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Recovery_ParryDeflect
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 92c5ea07f24abbb4486b2d357641a264, type: 3}
     - {fileID: 21300000, guid: 136eb231e10694e48abb094534897664, type: 3}
@@ -312,6 +324,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Recovery_RapidSheathe
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: dbb0e760899d9bf4eb02e809329b8ea3, type: 3}
     - {fileID: 21300000, guid: 48b9db39e55a0644c9a2faff5a57ad23, type: 3}
@@ -331,6 +344,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Recovery_VerticalSlash
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: e823c34174ac21246a831e3bf6f6e5aa, type: 3}
     - {fileID: 21300000, guid: 3088facbf79cfec41bec7b2c49acbf30, type: 3}
@@ -350,6 +364,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: VerticalSlash
     provisional: 1
+    includesSlashTrail: 1
     frames:
     - {fileID: 21300000, guid: 53a7092c3e3e1964b83c72e0407aa4a8, type: 3}
     - {fileID: 21300000, guid: bc52b7d04eec8a8488f9f1bb8bac8d4e, type: 3}
@@ -379,6 +394,7 @@ MonoBehaviour:
     recoveryFrame: 34
   - name: WalkRough
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 79eed05e528b5734f9e8a588bcf61a29, type: 3}
     - {fileID: 21300000, guid: 86f30078863ad6f408c8cb478e8b6500, type: 3}
@@ -406,6 +422,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: IdleReference
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 51ffc896482d10f46804e09d6370ee66, type: 3}
     - {fileID: 21300000, guid: 05fe7974e397406498fcada29b9233c2, type: 3}
@@ -429,6 +446,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: WalkReference
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 1c977fa69aea60f4bbeef92674923cdb, type: 3}
     - {fileID: 21300000, guid: 5c16d9e5ad81f6a438e36a788268721c, type: 3}
@@ -456,6 +474,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Enemy_Attack
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 6b08e786994c3b141ad3ca7f7600e322, type: 3}
     - {fileID: 21300000, guid: d886bcc42d3335145add268bf6d28ed0, type: 3}
@@ -475,6 +494,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Enemy_Death
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 90ebbdf5fe1d7c94f9ef241f9f658f22, type: 3}
     - {fileID: 21300000, guid: bd417b60e3716884ab6cdd72dc467e01, type: 3}
@@ -498,6 +518,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Enemy_Hit
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 7a9697a8fb6e3bd449a3b45cb3596e8c, type: 3}
     - {fileID: 21300000, guid: 78aa88b1db176d24cb7da999b681126c, type: 3}
@@ -515,6 +536,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Enemy_Idle
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 579ffc7e3a2f3d74282c75a594a0ce0f, type: 3}
     - {fileID: 21300000, guid: 4213a48cb5289a84b8363a68668fee51, type: 3}
@@ -534,6 +556,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Enemy_Move
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 9c95abd1f914b354298a5b8bf58ceb42, type: 3}
     - {fileID: 21300000, guid: 5055e662c9d9b9c4e986ffeffdf89eeb, type: 3}
@@ -557,6 +580,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Enemy_Parried
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: d02bd6199eb634e4bad5aecc8a7cf0e5, type: 3}
     - {fileID: 21300000, guid: 3be7ac1a4dae508499aaff9eea5e1ceb, type: 3}
@@ -576,6 +600,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Enemy_Windup
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 0c821fa265daa5243b18cfeb6c3f3e9f, type: 3}
     - {fileID: 21300000, guid: d15e7492113cc7844ad7f9d2042f589b, type: 3}
@@ -599,6 +624,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Fx_HeelLightning
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: cf5c4528093bbd747845f2f47155d0f7, type: 3}
     - {fileID: 21300000, guid: 32feb842df1bc2b4596fc5b2f1e902e5, type: 3}
@@ -626,6 +652,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Fx_Kick
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 1865dfe8d376a4a42b2640169074cccd, type: 3}
     - {fileID: 21300000, guid: 61d4a528320e75843b1d5194d7c6913c, type: 3}
@@ -653,6 +680,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Fx_Parry
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 37f00514be220a445ba7fd5f491f3583, type: 3}
     - {fileID: 21300000, guid: 675d877e0d41d98459c8e587eaa473c1, type: 3}
@@ -680,6 +708,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Fx_Slash
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 7954b446d00a43c4698226af5477fbb5, type: 3}
     - {fileID: 21300000, guid: 4850919e599bfa3429011e4ddbc1caae, type: 3}
@@ -707,6 +736,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Fx_Vanish
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 73fb458ea97584e4f8f3157b0d7f55fd, type: 3}
     - {fileID: 21300000, guid: 03512b1d7e4130e43bace090612b70b9, type: 3}
@@ -734,6 +764,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Dash
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: 301983a741ffbb54ca9ec9ec26e8d442, type: 3}
     - {fileID: 21300000, guid: c38c5eedfffa5774db1de2e481ed08f7, type: 3}
@@ -753,6 +784,7 @@ MonoBehaviour:
     recoveryFrame: 0
   - name: Recovery_Dash
     provisional: 0
+    includesSlashTrail: 0
     frames:
     - {fileID: 21300000, guid: fde539e416c174b4685a743ce6c8c217, type: 3}
     - {fileID: 21300000, guid: fca7db49a79282a489f5f66ec1133c36, type: 3}

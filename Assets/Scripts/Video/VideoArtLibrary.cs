@@ -8,6 +8,7 @@ public sealed class VideoArtLibrary : ScriptableObject
     {
         public string name;
         public bool provisional;
+        public bool includesSlashTrail;
         public Sprite[] frames;
         public Sprite[] eyeFrames;
         public int[] durations;
