@@ -29,12 +29,13 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     private void OnEnable()
     {
         controls = new InputActionMap("PrototypeValidation");
-        for (int i = 2; i <= 9; i++) controls.AddAction("F" + i, InputActionType.Button, "<Keyboard>/f" + i);
+        for (int i = 1; i <= 9; i++) controls.AddAction("F" + i, InputActionType.Button, "<Keyboard>/f" + i);
         controls.Enable(); reset = controls.FindAction("F2");
     }
     private void Update()
     {
-        if (reset.WasPressedThisFrame()) ResetArena(false);
+        if (reset.WasPressedThisFrame()) ResetActionsOnly();
+        if (controls.FindAction("F1").WasPressedThisFrame()) ResetArena(false);
         if (controls.FindAction("F3").WasPressedThisFrame()) ResetArena(true);
         if (controls.FindAction("F4").WasPressedThisFrame()) ResetStrongEncounter(false);
         if (controls.FindAction("F5").WasPressedThisFrame()) ResetStrongEncounter(true);
@@ -46,7 +47,9 @@ public sealed class PrototypeCombatArena : MonoBehaviour
         if (controls.FindAction("F9").WasPressedThisFrame()) settings.masterVolume = settings.masterVolume > 0 ? 0 : 1;
     }
     private static float Cycle(float value) => value >= .99f ? 0 : value < .49f ? .5f : 1;
-    public void ResetArena(bool twoTargets)
+    public void ResetActionsOnly() => ResetCore(0);
+    public void ResetArena(bool twoTargets) => ResetCore(twoTargets ? 2 : 1);
+    private void ResetCore(int normalCount)
     {
         coordinator?.ResetEncounter(); feedback?.ResetPresentation();
         if (strongEnemy != null) strongEnemy.gameObject.SetActive(false);
@@ -63,7 +66,7 @@ public sealed class PrototypeCombatArena : MonoBehaviour
             int hp = health.Definition != null ? health.ConfiguredMaxHp : enemyHp[i];
             health.ResetForCapture(enemyPositions[i], hp);
             enemies[i].ResetForCapture(player.transform, false);
-            enemies[i].gameObject.SetActive(i == 0 || twoTargets);
+            enemies[i].gameObject.SetActive(i < normalCount);
         }
         player.ClearBufferedGameplayInput();
         Physics2D.SyncTransforms();
@@ -71,9 +74,8 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     }
     public void ResetStrongEncounter(bool includeNormal)
     {
-        ResetArena(false);
+        ResetCore(includeNormal ? 1 : 0);
         if (strongEnemy == null) return;
-        if (enemies.Length > 0) enemies[0].gameObject.SetActive(includeNormal);
         var health = strongEnemy.GetComponent<Damageable2D>();
         int hp = health.Definition != null ? health.ConfiguredMaxHp : strongEnemy.Definition.maxHp;
         health.ResetForCapture(strongPosition, hp);
@@ -83,8 +85,9 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     private void OnGUI()
     {
         GUILayout.BeginArea(new Rect(Screen.width - 310, 12, 298, 260), GUI.skin.box);
-        GUILayout.Label("Prototype combat acceptance");
-        GUILayout.Label("F2: Normal / F3: Two normal enemies");
+        GUILayout.Label("Prototype action / combat acceptance");
+        GUILayout.Label("F2: Reset actions only (no enemies)");
+        GUILayout.Label("Optional F1: One normal / F3: Two");
         GUILayout.Label("F4: Strong / F5: Normal + Strong");
         if (coordinator != null) GUILayout.Label($"Attack roles: {coordinator.ActiveAttackers}/{coordinator.MaximumAttackers}");
         if (feedback != null && feedback.Settings != null)

@@ -57,12 +57,17 @@ public static class PrototypeCombatValidator
         {
             int players = 0;
             int feedbackOwners = 0, coordinators = 0, strongEnemies = 0;
+            Transform actionPlatforms = null, videoGrid = null;
             foreach (var root in scene.GetRootGameObjects())
                 foreach (var transform in root.GetComponentsInChildren<Transform>(true))
                 {
                     if (GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(transform.gameObject) != 0)
                         errors.Add(transform.name + ": missing script.");
                     if (transform.GetComponent<PlayerStateMachine>() != null) players++;
+                    if (transform.name == "ActionPlatforms") actionPlatforms = transform;
+                    if (transform.name == "VideoWhiteGrid") videoGrid = transform;
+                    if (!Application.isPlaying && transform.TryGetComponent<EnemyMeleeChaser2D>(out _) && transform.gameObject.activeInHierarchy)
+                        errors.Add("Initial action practice must not contain active enemies.");
                     if (transform.GetComponent<CombatFeedback2D>() != null) feedbackOwners++;
                     if (transform.GetComponent<EnemyAttackCoordinator2D>() != null) coordinators++;
                     if (transform.GetComponent<EnemyMeleeChaser2D>() is { Definition: var definition } && definition == strong) strongEnemies++;
@@ -80,6 +85,11 @@ public static class PrototypeCombatValidator
             if (players != 1) errors.Add("Validation scene must contain exactly one player.");
             if (feedbackOwners != 1 || coordinators != 1 || strongEnemies != 1)
                 errors.Add("Validation scene needs one feedback owner, one attack coordinator and one strong enemy.");
+            if (videoGrid == null || videoGrid.GetComponentsInChildren<SpriteRenderer>().Length == 0)
+                errors.Add("Validation scene must reuse the existing video white grid.");
+            if (actionPlatforms == null || actionPlatforms.GetComponentsInChildren<BoxCollider2D>().Length != 3 ||
+                actionPlatforms.GetComponentsInChildren<PlatformEffector2D>().Length != 2)
+                errors.Add("Action practice requires one solid step and two one-way platforms.");
         }
         finally
         {

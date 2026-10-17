@@ -123,7 +123,7 @@ public static class PrototypeCombatSceneBuilder
                 var weapon = Box("Weapon", Vector3.zero, new Vector2(1.1f, .12f), Color.white); weapon.transform.SetParent(enemy.transform, false);
                 var cueObject = Box("Tell", new Vector3(0, 1.1f), new Vector2(.2f, .2f), Color.yellow); cueObject.transform.SetParent(enemy.transform, false); cueObject.transform.localPosition = Vector3.up * 1.1f;
                 var cue = enemy.AddComponent<EnemyCombatCue2D>(); Set(cue, "silhouette", silhouette.transform); Set(cue, "weapon", weapon.transform); Set(cue, "cue", cueObject.GetComponent<SpriteRenderer>());
-                if (i == 1) enemy.SetActive(false);
+                enemy.SetActive(false);
             }
             var interact = Box("InteractCounter", new Vector3(-6, .5f), new Vector2(.6f, 1), Color.cyan);
             var trigger = interact.AddComponent<BoxCollider2D>(); trigger.size = new Vector2(2, 2); trigger.isTrigger = true;
@@ -135,6 +135,7 @@ public static class PrototypeCombatSceneBuilder
             for (int i = 0; i < 2; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = enemies[i];
             arenaData.ApplyModifiedPropertiesWithoutUndo();
             player.SetActive(true);
+            PrototypeActionStageInstaller.InstallIntoScene(scene);
             AssetDatabase.SaveAssets();
             EditorSceneManager.SaveScene(scene, ScenePath);
         }
@@ -181,7 +182,7 @@ public static class PrototypeCombatSceneBuilder
         foreach (var root in scene.GetRootGameObjects())
         {
             foreach (var renderer in root.GetComponentsInChildren<SpriteRenderer>(true)) renderer.sharedMaterial = GetUnlitMaterial();
-            foreach (var camera in root.GetComponentsInChildren<Camera>(true)) camera.orthographicSize = 7.5f;
+            foreach (var camera in root.GetComponentsInChildren<Camera>(true)) camera.orthographicSize = PrototypeActionStageInstaller.CameraSize;
         }
         AssetDatabase.SaveAssets();
         EditorSceneManager.SaveScene(scene);
