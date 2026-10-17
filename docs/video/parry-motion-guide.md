@@ -2,6 +2,8 @@
 
 更新: 2026-10-17。ユーザーの最新指示を反映。動画#69は成功（軽）を使用する。重の最終作画・後退変位は今回の素材制作待ちであり、完成扱いにしない。
 
+**同日、待機を受領・接続済み。** `Player_parry_wait.aseprite` 8×100msを原本保持で取り込み、ゲーム用は最初の2枚を各2Fへ合わせ、4Fから構えを保持する。[最新の素材・その場で斬る動画・検証](parry-ready-and-stationary-slashes.md)。以下の待機作画案は受領前のガイド。成功（軽）の人の素材は引き続き未受領。
+
 ## 確定した区分
 
 - 入力で `ParryReady`（待機）を開始。有効な敵攻撃の接触で `ParrySuccessLight` または `ParrySuccessHeavy` へ派生する。待機は成功を先取りした素振りにしない。
@@ -61,8 +63,8 @@
 
 重専用の作画・後退変位・その演出の受入は未完了。今回の接続追加はその完成を意味しない。
 
-## 今回の検証
+## 仕様追加時の検証（受領前）
 
 Unity compile Error 0 / Warning 0、PlayMode 315/315、EditMode 186/186 Passed。攻撃定義／単一攻撃設定 × 軽／重の4設定を各10回、計40回リセットし、毎回同じ対象へ同じ反撃90ダメージを確認した。不可攻撃、通常／ジャストとの独立、同tickの軽重混在、成功姿勢を待機へ上書きしない通常Animator、専用接触Spriteを即表示する撮影Animatorも確認した。既存の動画2/4段・両向きの反復は全PlayModeテストに含む。最終Console Error 0 / Warning 0。
 
-Aseprite本体による旧形式／分離タグ／拡張キャンバス／不正入力の8ケースを通過。画素・瞳・原点・整数F・原本非変更を検査した。再現は `python Tools/Art/validate-player-clean-export.py`。実素材の新しい待機・成功（軽）の受領後には、実機の接触点、反撃・復帰への接続、VFX・構図を再確認する。[検証記録](../validation/parry-reactions-2026-10-17.json)。
+Aseprite本体による旧形式／分離タグ／拡張キャンバス／不正入力の8ケースを通過。画素・瞳・原点・整数F・原本非変更を検査した。再現は `python Tools/Art/validate-player-clean-export.py`。成功（軽）の受領後には、実機の接触点、反撃・復帰への接続、VFX・構図を再確認する。[当時の検証記録](../validation/parry-reactions-2026-10-17.json)。
