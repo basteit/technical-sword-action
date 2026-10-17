@@ -38,6 +38,8 @@ public static class VideoCaptureUtility
                 Check(director.FrontEnemy.HitCount==stages+(defenseCancel?1:0)&&director.FrontEnemy.DeathCount==1,"Front enemy duplicate/missing hit or death.");
                 Check(director.RearEnemy.HitCount==1&&director.RearEnemy.DeathCount==1&&counter.HitCount-before==1,"Counter did not hit exactly once.");
                 Check(director.Marks.Single(m=>m.kind=="Parry").target==director.Marks.Single(m=>m.kind=="Kick").target,"Counter target differs from parried source.");
+                if(state.GetComponent<VideoPlayerAnimationDriver>().SkipAttackRecovery)
+                    Check(!director.Marks.Any(m=>new[]{"VerticalSlash","HorizontalSlash","RapidSheathe","IaiSlash","AirRoundhouse"}.Any(name=>m.kind=="RecoveryStart:PlayerVideo_Recovery_"+name)),"Attack return animation was not skipped.");
                 if(defenseCancel) Check(director.AttackWasCancelledForParry&&director.ReturnDashObserved,"Attack cancel or return dash did not occur.");
                 Check(state.ActionState==PlayerActionState.Neutral&&!counter.IsCounterInvincible,"Player remained locked/invincible.");
                 Check(state.GetComponent<PlayerDamageReceiver2D>().CurrentHp==state.GetComponent<PlayerDamageReceiver2D>().MaxHp,"Unexpected player damage.");
@@ -90,6 +92,7 @@ public static class VideoCaptureUtility
         string folder=Path.GetFullPath($".uloop/outputs/video/{(defenseCancel?"defense-cancel-":"")}{stages}stage-{(hybrid?"hybrid":"pixel")}");Directory.CreateDirectory(folder);
         bool previous=clock.ManualAdvanceOnly;clock.ManualAdvanceOnly=true;
         director.MirrorLayout=false;director.StartTake(stages,hybrid);
+        Vector3 initialFrontPosition=director.FrontEnemy.transform.position,initialRearPosition=director.RearEnemy.transform.position;
         var target=new RenderTexture(1920,1080,24,RenderTextureFormat.ARGB32);target.Create();
         var image=new Texture2D(1920,1080,TextureFormat.RGB24,false);
         var camera=Camera.main;int frame=0;var previousActive=RenderTexture.active;
@@ -105,7 +108,7 @@ public static class VideoCaptureUtility
             }
             Check(director.Completed,"Capture did not complete.");
             var art=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(CombatVideoArtBuilder.LibraryPath);
-            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,playerArtworkIsRough=defenseCancel||(stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough),takeKind=defenseCancel?"defense-cancel":"sequential",counterAction=director.Player.GetComponent<PlayerParryCounter2D>().IsOverheadHeelDrop?"OverheadHeelDrop":"AirRoundhouse",provisionalActions=art.motions.Where(m=>m.provisional).Select(m=>m.name).ToArray(),events=director.Marks.ToArray()},true));
+            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,playerArtworkIsRough=defenseCancel||(stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough),takeKind=defenseCancel?"defense-cancel":"sequential",counterAction=director.Player.GetComponent<PlayerParryCounter2D>().IsOverheadHeelDrop?"OverheadHeelDrop":"AirRoundhouse",provisionalActions=art.motions.Where(m=>m.provisional).Select(m=>m.name).ToArray(),skipAttackRecovery=director.Player.GetComponent<VideoPlayerAnimationDriver>().SkipAttackRecovery,spacingApproaches=director.UsesSpacingApproaches,initialFrontPosition=initialFrontPosition,initialRearPosition=initialRearPosition,events=director.Marks.ToArray()},true));
             return folder;
         }
         finally
@@ -114,5 +117,5 @@ public static class VideoCaptureUtility
             director.ResetTake(stages);clock.ManualAdvanceOnly=previous;
         }
     }
-    [Serializable] private sealed class CaptureReport { public int frameCount,fps;public double duration;public bool playerArtworkIsRough;public string takeKind,counterAction;public string[] provisionalActions;public CombatVideoDirector.Mark[] events; }
+    [Serializable] private sealed class CaptureReport { public int frameCount,fps;public double duration;public bool playerArtworkIsRough,skipAttackRecovery,spacingApproaches;public Vector3 initialFrontPosition,initialRearPosition;public string takeKind,counterAction;public string[] provisionalActions;public CombatVideoDirector.Mark[] events; }
 }

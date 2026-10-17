@@ -603,6 +603,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VideoPlayerAnimationDriver
   library: {fileID: 11400000, guid: 948efd1e09648894f8c35efd70bbd0fb, type: 2}
+  skipAttackRecovery: 1
 --- !u!114 &467345030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1092,6 +1093,7 @@ MonoBehaviour:
   rearEnemy: {fileID: 1216795204}
   comboStages: 2
   defenseCancelTake: 1
+  useSpacingApproaches: 0
   presentation: {fileID: 55966713}
   vfx: {fileID: 1146708413}
   playerStart: {x: 0, y: 1, z: 0}

@@ -4,6 +4,8 @@ using UnityEngine;
 public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     [SerializeField] private VideoArtLibrary library;
+    [SerializeField,Tooltip("Go directly to idle after a sword attack or airborne counter. Keeps the recovery artwork available for later comparison.")]
+    private bool skipAttackRecovery;
     private Animator animator;
     private PlayerStateMachine state;
     private PlayerParry2D parry;
@@ -20,6 +22,7 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     private string parryRecoveryMotion = "ParryDeflect";
     public bool IsRecovering=>recovery!=null&&recovery.IsPlaying;
     public VideoArtLibrary Art=>library;
+    public bool SkipAttackRecovery { get=>skipAttackRecovery;set=>skipAttackRecovery=value; }
     public int CombatTickOrder => 310;
     private void OnEnable()
     {
@@ -61,7 +64,8 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
                 PlayerActionState.ParryFail or PlayerActionState.Parry=>"ParryDeflect",
                 _=>lastMotion==PlayerState.Move?"Move":lastMotion==PlayerState.Fall||lastMotion==PlayerState.Jump?"Landing":""
             };
-            var recover=library!=null?library.Find("Recovery_"+name):null;
+            bool skipReturn=skipAttackRecovery&&(lastAction==PlayerActionState.Attack||lastAction==PlayerActionState.ParryCounter);
+            var recover=!skipReturn&&library!=null?library.Find("Recovery_"+name):null;
             lastAction=action;lastMotion=motion;
             if(recover!=null&&recovery!=null&&recovery.TryPlay("PlayerVideo_Recovery_"+name,recover.TotalFrames))
             { driven="Recovery_"+name;return; }

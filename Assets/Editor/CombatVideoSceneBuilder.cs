@@ -8,8 +8,10 @@ public static class CombatVideoSceneBuilder
 {
     public const string ScenePath = "Assets/Scenes/CombatVideo.unity";
     public const string DefenseCancelScenePath = "Assets/Scenes/CombatVideoDefenseCancel.unity";
-    internal static readonly Vector3 SequentialFrontStart=new Vector3(1.35f,1,0);
-    internal static readonly Vector3 SequentialRearStart=new Vector3(-1.1f,1,0);
+    // TrainingGrid has a 16px pitch at 32 pixels per unit.
+    internal const float BackgroundGridUnit=.5f;
+    internal static readonly Vector3 SequentialFrontStart=new Vector3(1.35f+BackgroundGridUnit,1,0);
+    internal static readonly Vector3 SequentialRearStart=new Vector3(-1.1f-BackgroundGridUnit,1,0);
     [MenuItem("Tools/Technical Sword Action/Video/Build Art and Capture Scene")]
     public static void BuildAll()
     {
@@ -112,7 +114,8 @@ public static class CombatVideoSceneBuilder
         Set(counter,"blinkApproach",true);Set(counter,"blinkTravelFrames",2);
         Set(counter,"overheadHeelDrop",true);
         Set(counter,"heelTargetHeadOffsetX",7/32f);
-        actor.AddComponent<PlayerStateMachine>();actor.AddComponent<PlayerVisualRecovery2D>();Set(actor.AddComponent<VideoPlayerAnimationDriver>(),"library",library);
+        actor.AddComponent<PlayerStateMachine>();actor.AddComponent<PlayerVisualRecovery2D>();
+        var animation=actor.AddComponent<VideoPlayerAnimationDriver>();Set(animation,"library",library);Set(animation,"skipAttackRecovery",true);
         return actor;
     }
     internal static Damageable2D Enemy(string name, Vector3 position, int layer, int playerLayer, Transform target,VideoArtLibrary library)
@@ -150,8 +153,11 @@ public static class CombatVideoSceneBuilder
     internal static void ConfigureSequentialLayout(CombatVideoDirector director)
     {
         Set(director,"frontStart",SequentialFrontStart);Set(director,"rearStart",SequentialRearStart);
+        Set(director,"useSpacingApproaches",true);
         director.FrontEnemy.transform.position=SequentialFrontStart;
         director.RearEnemy.transform.position=SequentialRearStart;
+        var rearAi=director.RearEnemy.GetComponent<EnemyMeleeChaser2D>();
+        Set(rearAi,"moveSpeed",4f);Set(rearAi,"attackRange",1.35f);Set(rearAi,"preferredMaxDistance",1.35f);
     }
     internal static void Set(Object target, string name, Object value)
     { var s = new SerializedObject(target); s.FindProperty(name).objectReferenceValue = value; s.ApplyModifiedPropertiesWithoutUndo(); }

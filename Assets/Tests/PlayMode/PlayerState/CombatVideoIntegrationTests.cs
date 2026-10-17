@@ -35,8 +35,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         public void WiderCaptureLayoutUsesTheSuppliedIdleWithoutChangingItsScaleOrTiming(bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"ResetTake",2);int sign=mirrored?-1:1;
-            Assert.That(((Component)Get<object>(director,"FrontEnemy")).transform.position,Is.EqualTo(new Vector3(1.35f*sign,1,0)));
-            Assert.That(((Component)Get<object>(director,"RearEnemy")).transform.position,Is.EqualTo(new Vector3(-1.1f*sign,1,0)));
+            Assert.That(((Component)Get<object>(director,"FrontEnemy")).transform.position,Is.EqualTo(new Vector3(1.85f*sign,1,0)));
+            Assert.That(((Component)Get<object>(director,"RearEnemy")).transform.position,Is.EqualTo(new Vector3(-1.6f*sign,1,0)));
             var visual=state.GetComponent<SpriteRenderer>();
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
             var idle=Call(Get<object>(driver,"Art"),"Find","IdleReference");
@@ -69,7 +69,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
             Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
-            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.10d,4.20d));
+            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.4d,4.9d));
             Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.63f,.71f));
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
@@ -554,10 +554,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var enemy=(Component)Get<object>(director,"FrontEnemy");var rear=(Component)Get<object>(director,"RearEnemy");
             float originX=enemy.transform.position.x;
             var driver=enemy.GetComponent(Type.GetType("VideoEnemyAnimationDriver, Assembly-CSharp",true));
-            int hits=0;float lastDistance=0,lastAdvance=0,lastHitX=state.transform.position.x;
+            var attack=state.GetComponent(Type.GetType("PlayerAttack2D, Assembly-CSharp",true));
+            int hits=0;float lastDistance=0,lastAdvance=0,lastHitX=state.transform.position.x;bool openingAttackSeen=false;
             for(int i=0;i<360&&!Get<bool>(director,"Completed");i++)
             {
                 Step();int now=Get<int>(enemy,"HitCount");
+                if(!openingAttackSeen&&Get<bool>(attack,"IsAttacking"))
+                { openingAttackSeen=true;lastHitX=state.transform.position.x; }
                 if(now>hits)
                 {
                     Assert.That(Get<float>(driver,"LastHitbackDistance"),Is.GreaterThan(lastDistance));
@@ -653,9 +656,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
             var enemy=(Component)Get<object>(director,"RearEnemy");var driver=enemy.GetComponent(Type.GetType("VideoEnemyAnimationDriver, Assembly-CSharp",true));
-            Vector3 origin=enemy.transform.position;
+            Vector3 resetOrigin=enemy.transform.position;
             for(int i=0;i<330&&!Get<bool>(driver,"IsLaunched");i++) Step();
             Assert.That(Get<bool>(driver,"IsLaunched"),Is.True);Assert.That(Get<int>(enemy,"DeathCount"),Is.EqualTo(1));
+            Vector3 origin=enemy.transform.position;
             for(int i=0;i<16;i++) Step();
             Vector3 airborne=enemy.transform.position;Quaternion rotation=enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation;
             double real=Get<double>(director,"RealElapsed");
@@ -668,7 +672,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That((enemy.transform.position.x-origin.x)*(mirrored?1:-1),Is.EqualTo(1.4f).Within(.02f));
             Assert.That(Get<int>(enemy,"HitCount"),Is.EqualTo(1));
             Call(director,"ResetTake",4);Assert.That(Get<bool>(driver,"IsLaunched"),Is.False);
-            Assert.That(enemy.transform.position,Is.EqualTo(origin));Assert.That(enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation,Is.EqualTo(Quaternion.identity));
+            Assert.That(enemy.transform.position,Is.EqualTo(resetOrigin));Assert.That(enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation,Is.EqualTo(Quaternion.identity));
         }
         [TestCase(-1)] [TestCase(1)]
         public void LaunchedEnemyCannotCrossATallWall(int direction)
@@ -808,9 +812,83 @@ namespace TechnicalSwordAction.PlayerState.Tests
         { return WaitForRecovery("AirRoundhouse"); }
         private Component WaitForRecovery(string motion)
         {
+            // Exercise the retained optional artwork explicitly; the capture default skips attack returns.
+            Set(state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true)),"SkipAttackRecovery",false);
             var recovery=state.GetComponent(Type.GetType("PlayerVisualRecovery2D, Assembly-CSharp",true));
             for(int i=0;i<360&&(!Get<bool>(recovery,"IsPlaying")||Get<string>(recovery,"StateName")!="PlayerVideo_Recovery_"+motion);i++) Step();
             Assert.That(Get<bool>(recovery,"IsPlaying"),Is.True);return recovery;
+        }
+        [TestCase(1)] [TestCase(2)] [TestCase(3)] [TestCase(4)]
+        public void SwordAttacksGoStraightToTheSuppliedIdleWhenReturnsAreSkipped(int stage)
+        {
+            Call(director,"ResetTake",4);
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            Assert.That(Get<bool>(driver,"SkipAttackRecovery"),Is.True);
+            Call(state,"RequestAction",PlayerActionRequest.Attack);Step();
+            var attack=state.GetComponent(Type.GetType("PlayerAttack2D, Assembly-CSharp",true));
+            if(stage>1)Call(attack,"StartAttackStep",stage);
+            for(int i=0;i<90&&Get<bool>(attack,"IsAttacking");i++)Step();
+            Step();
+            Assert.That(Get<PlayerActionState>(state,"ActionState"),Is.EqualTo(PlayerActionState.Neutral));
+            Assert.That(Get<bool>(driver,"IsRecovering"),Is.False);
+            Assert.That(state.GetComponent<SpriteRenderer>().sprite.name,Does.StartWith("IdleReference_"));
+            Assert.That(Get<bool>(state,"BlocksStandardMovement"),Is.False);
+        }
+        [TestCase(2,false,30)] [TestCase(2,true,60)] [TestCase(4,false,60)] [TestCase(4,true,120)]
+        public void SpacedTakeApproachesBothTargetsAndReturnsDirectlyToIdleAfterLanding(int stages,bool mirror,int fps)
+        {
+            Set(director,"MirrorLayout",mirror);Call(director,"StartTake",stages,true);
+            var front=(Component)Get<object>(director,"FrontEnemy");var rear=(Component)Get<object>(director,"RearEnemy");
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            float rearStart=rear.transform.position.x;bool walking=false,landedIdle=false,rearClosed=false;
+            for(int frame=0;frame<fps*6&&!Get<bool>(director,"Completed");frame++)
+            {
+                Call(director,"StepCapture",1d/fps);
+                walking|=state.GetComponent<SpriteRenderer>().sprite.name.StartsWith("WalkReference_");
+                if(Get<bool>(rear,"IsAlive")&&(rear.transform.position.x-rearStart)*(mirror?-1:1)>.5f)rearClosed=true;
+                if(!landedIdle&&Marks().Any(m=>(string)m.GetType().GetField("kind").GetValue(m)=="Landing")&&!Get<bool>(counter,"IsActive"))
+                {
+                    // At 120fps one render advances only half a combat tick. Allow
+                    // one complete combat tick for the animation driver to select idle.
+                    Step();
+                    Assert.That(Get<bool>(driver,"IsRecovering"),Is.False);
+                    Assert.That(state.GetComponent<SpriteRenderer>().sprite.name,Does.StartWith("IdleReference_"));landedIdle=true;
+                }
+            }
+            Assert.That(Get<bool>(director,"Completed"),Is.True);Assert.That(walking&&landedIdle,Is.True);
+            Assert.That(Get<int>(front,"HitCount"),Is.EqualTo(stages));Assert.That(Get<int>(rear,"HitCount"),Is.EqualTo(1));
+            var kinds=Marks().Select(m=>(string)m.GetType().GetField("kind").GetValue(m)).ToArray();
+            Assert.That(kinds,Does.Contain("OpeningApproach").And.Contain("RearApproach"));
+            Assert.That(kinds.Any(k=>new[]{"VerticalSlash","HorizontalSlash","RapidSheathe","IaiSlash","AirRoundhouse"}.Any(n=>k=="RecoveryStart:PlayerVideo_Recovery_"+n)),Is.False);
+            Assert.That(rearClosed,Is.True);
+        }
+        [Test] public void OpeningFootworkResetsWithoutResidualInput()
+        {
+            Call(director,"StartTake",2,true);
+            var motor=state.GetComponent(Type.GetType("PlayerMotor2D, Assembly-CSharp",true));
+            for(int i=0;i<24&&!Marks().Any(m=>(string)m.GetType().GetField("kind").GetValue(m)=="OpeningApproach");i++)Step();
+            Assert.That(Mathf.Abs(Get<float>(motor,"MoveInput")),Is.EqualTo(1));
+            Call(director,"ResetTake",2);Assert.That(Get<float>(motor,"MoveInput"),Is.Zero);
+            Assert.That(state.transform.position.x,Is.EqualTo(0));Call(director,"StartTake",2,true);
+            for(int i=0;i<360&&!Get<bool>(director,"Completed");i++)Step();
+            Assert.That(Get<bool>(director,"Completed"),Is.True);Assert.That(Get<float>(motor,"MoveInput"),Is.Zero);
+        }
+        [UnityTest] public IEnumerator OpeningFootworkFreezesOnPauseAndRetriesItsSuppressedAttackAfterResume()
+        {
+            Call(director,"StartTake",2,true);
+            var motor=state.GetComponent(Type.GetType("PlayerMotor2D, Assembly-CSharp",true));
+            for(int i=0;i<24&&!Marks().Any(m=>(string)m.GetType().GetField("kind").GetValue(m)=="OpeningApproach");i++)Step();
+            Vector3 position=state.transform.position;double time=Get<double>(director,"RealElapsed");
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});for(int i=0;i<30;i++)Step();
+            Assert.That(state.transform.position,Is.EqualTo(position));Assert.That(Get<double>(director,"RealElapsed"),Is.EqualTo(time));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
+            // Deterministic captures may advance several combat ticks in this render.
+            // Resume must suppress that render's attack without consuming the request.
+            for(int i=0;i<12;i++)Step();
+            Assert.That(Get<PlayerActionState>(state,"ActionState"),Is.EqualTo(PlayerActionState.Neutral));
+            yield return null;
+            for(int i=0;i<360&&!Get<bool>(director,"Completed");i++)Step();
+            Assert.That(Get<bool>(director,"Completed"),Is.True);Assert.That(Get<float>(motor,"MoveInput"),Is.Zero);
         }
         [TestCase(1,"VerticalSlash")] [TestCase(2,"HorizontalSlash")]
         [TestCase(3,"RapidSheathe")] [TestCase(4,"IaiSlash")]

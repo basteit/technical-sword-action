@@ -114,7 +114,7 @@ public static class CombatVideoArtBuilder
         var machine=controller.layers[0].stateMachine;foreach(var state in machine.states) machine.RemoveState(state.state);
         // Idle has already been supplied; unfinished actions must not select a rough substitute for it.
         var idleMotion=library.Find("IdleReference")??library.Find("IdleRough");
-        var moveMotion=library.playerArtworkIsRough?library.Find("WalkRough")??library.Find("WalkReference"):library.Find("WalkReference");
+        var moveMotion=library.Find("WalkReference")??library.Find("WalkRough");
         var idle=Clip("Idle",idleMotion,true);var idleState=machine.AddState("PlayerVideo_Idle");idleState.motion=idle;machine.defaultState=idleState;
         int stage=1;
         foreach(var action in manifest.actions.Take(4))

@@ -218,10 +218,10 @@ MonoBehaviour:
   target: {fileID: 324319916}
   detectRange: 10
   loseTargetRange: 14
-  moveSpeed: 0
+  moveSpeed: 4
   preferredMinDistance: 1.05
-  preferredMaxDistance: 1.7
-  attackRange: 1.9
+  preferredMaxDistance: 1.35
+  attackRange: 1.35
   attackWindupDuration: 0.5
   recoveryDuration: 0.45
   cooldownDuration: 0.55
@@ -286,7 +286,7 @@ Transform:
   m_GameObject: {fileID: 132085608}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.1, y: 1, z: 0}
+  m_LocalPosition: {x: -1.6, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -550,6 +550,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VideoPlayerAnimationDriver
   library: {fileID: 11400000, guid: 948efd1e09648894f8c35efd70bbd0fb, type: 2}
+  skipAttackRecovery: 1
 --- !u!114 &324319918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1203,7 +1204,7 @@ Transform:
   m_GameObject: {fileID: 550565034}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.35, y: 1, z: 0}
+  m_LocalPosition: {x: 1.85, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1244,11 +1245,12 @@ MonoBehaviour:
   rearEnemy: {fileID: 132085609}
   comboStages: 2
   defenseCancelTake: 0
+  useSpacingApproaches: 1
   presentation: {fileID: 2043710621}
   vfx: {fileID: 2028738715}
   playerStart: {x: 0, y: 1, z: 0}
-  frontStart: {x: 1.35, y: 1, z: 0}
-  rearStart: {x: -1.1, y: 1, z: 0}
+  frontStart: {x: 1.85, y: 1, z: 0}
+  rearStart: {x: -1.6, y: 1, z: 0}
 --- !u!4 &691203146
 Transform:
   m_ObjectHideFlags: 0
