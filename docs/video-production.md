@@ -1,5 +1,7 @@
 # 動画制作 #69 — 作業・受入記録
 
+2026-10-18最新：`Player_parry_light.aseprite` を仮受領し、待機→成功（軽）→頭上のかかと落としを接続。2段撃破・その場の斬撃・攻撃後の直接Idleを維持する。[最新の素材・動画・検証、Unity/作画のエフェクト分担、反撃の配色案](video/parry-light-submission-and-effects.md)。新しい反撃の移行用/追撃用の人の素材と全体の最終受入は未完了。以下の旧版の清書未受領や回し蹴りの記述は当時の記録であり、最新リンクを優先する。
+
 作業場所は `C:\Users\hirot\GitHub\technical-sword-action` 固定。着手時ブランチは `codex/49-basic-actions`、HEADは `83eed84`。既存の攻撃移動・Animator・Scene・要件・素材等の未コミット変更を保持し、`codex/69-combat-video` へ引き継ぐ。着手差分は `.uloop/outputs/video-production-baseline/preexisting.patch` に保存した。
 
 親と #70–#76 の本文・追記、および #33/#39/#40/#41/#43/#44/#47/#48/#50 を確認。古い本文の「素材未追加」は最新指示で更新され、参照は `Assets/Art/Player/Player_idle.aseprite` と `Player_walk.aseprite`。
