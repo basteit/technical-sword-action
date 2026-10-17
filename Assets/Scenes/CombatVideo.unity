@@ -286,7 +286,7 @@ Transform:
   m_GameObject: {fileID: 132085608}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.85, y: 1, z: 0}
+  m_LocalPosition: {x: -1.1, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1203,7 +1203,7 @@ Transform:
   m_GameObject: {fileID: 550565034}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.1, y: 1, z: 0}
+  m_LocalPosition: {x: 1.35, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1247,8 +1247,8 @@ MonoBehaviour:
   presentation: {fileID: 2043710621}
   vfx: {fileID: 2028738715}
   playerStart: {x: 0, y: 1, z: 0}
-  frontStart: {x: 1.1, y: 1, z: 0}
-  rearStart: {x: -0.85, y: 1, z: 0}
+  frontStart: {x: 1.35, y: 1, z: 0}
+  rearStart: {x: -1.1, y: 1, z: 0}
 --- !u!4 &691203146
 Transform:
   m_ObjectHideFlags: 0

@@ -8,6 +8,8 @@ public static class CombatVideoSceneBuilder
 {
     public const string ScenePath = "Assets/Scenes/CombatVideo.unity";
     public const string DefenseCancelScenePath = "Assets/Scenes/CombatVideoDefenseCancel.unity";
+    internal static readonly Vector3 SequentialFrontStart=new Vector3(1.35f,1,0);
+    internal static readonly Vector3 SequentialRearStart=new Vector3(-1.1f,1,0);
     [MenuItem("Tools/Technical Sword Action/Video/Build Art and Capture Scene")]
     public static void BuildAll()
     {
@@ -55,8 +57,8 @@ public static class CombatVideoSceneBuilder
         var actor = CreatePlayer(library, ground, enemy, playerLayer, defenseCancel);
         var counter = actor.GetComponent<PlayerParryCounter2D>();
         var render = actor.GetComponent<SpriteRenderer>();
-        var a = Enemy("Enemy_A", new Vector3(1.1f,1,0), enemy, playerLayer, actor.transform,library);
-        var bPosition=new Vector3(defenseCancel?-1.45f:-.85f,1,0);
+        var a = Enemy("Enemy_A", defenseCancel?new Vector3(1.1f,1,0):SequentialFrontStart, enemy, playerLayer, actor.transform,library);
+        var bPosition=defenseCancel?new Vector3(-1.45f,1,0):SequentialRearStart;
         var b = Enemy("Enemy_B", bPosition, enemy, playerLayer, actor.transform,library);
         var fx=new GameObject("VideoEffects").AddComponent<VideoVfxRenderer>();Set(fx,"library",library);
         string materialPath="Assets/Settings/VideoPixelGlow.mat";var glow=AssetDatabase.LoadAssetAtPath<Material>(materialPath);
@@ -71,6 +73,7 @@ public static class CombatVideoSceneBuilder
         Set(director,"presentation",presentation);Set(director,"vfx",fx);
         Set(director,"defenseCancelTake",defenseCancel);
         if(defenseCancel) Set(director,"rearStart",bPosition);
+        else ConfigureSequentialLayout(director);
         actor.SetActive(true);
         EditorSceneManager.SaveScene(scene, scenePath);
         AssetDatabase.SaveAssets();
@@ -143,6 +146,12 @@ public static class CombatVideoSceneBuilder
             step.FindPropertyRelative("groundMotionCurve").animationCurveValue=AnimationCurve.Linear(0,0,hits[i]/60f,distance[i]);
         }
         data.ApplyModifiedPropertiesWithoutUndo();
+    }
+    internal static void ConfigureSequentialLayout(CombatVideoDirector director)
+    {
+        Set(director,"frontStart",SequentialFrontStart);Set(director,"rearStart",SequentialRearStart);
+        director.FrontEnemy.transform.position=SequentialFrontStart;
+        director.RearEnemy.transform.position=SequentialRearStart;
     }
     internal static void Set(Object target, string name, Object value)
     { var s = new SerializedObject(target); s.FindProperty(name).objectReferenceValue = value; s.ApplyModifiedPropertiesWithoutUndo(); }

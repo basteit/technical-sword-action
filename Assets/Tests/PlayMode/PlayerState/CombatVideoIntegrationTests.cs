@@ -31,6 +31,28 @@ namespace TechnicalSwordAction.PlayerState.Tests
             health=state.GetComponent(Type.GetType("PlayerDamageReceiver2D, Assembly-CSharp",true));
             presentation=Find("VideoCombatPresentation");
         }
+        [TestCase(false)] [TestCase(true)]
+        public void WiderCaptureLayoutUsesTheSuppliedIdleWithoutChangingItsScaleOrTiming(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"ResetTake",2);int sign=mirrored?-1:1;
+            Assert.That(((Component)Get<object>(director,"FrontEnemy")).transform.position,Is.EqualTo(new Vector3(1.35f*sign,1,0)));
+            Assert.That(((Component)Get<object>(director,"RearEnemy")).transform.position,Is.EqualTo(new Vector3(-1.1f*sign,1,0)));
+            var visual=state.GetComponent<SpriteRenderer>();
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            var idle=Call(Get<object>(driver,"Art"),"Find","IdleReference");
+            Assert.That(Get<int[]>(idle,"durations"),Is.EqualTo(new[]{6,6,6,6,6,6}));
+            Assert.That(Get<Sprite[]>(idle,"frames").Length,Is.EqualTo(6));
+            var seen=new System.Collections.Generic.HashSet<string>();
+            for(int i=0;i<36;i++)
+            {
+                Step();Assert.That(visual.sprite.name,Does.StartWith("IdleReference_"));seen.Add(visual.sprite.name);
+                Assert.That(visual.sprite.rect.size,Is.EqualTo(new Vector2(64,64)));
+                Assert.That(visual.sprite.pivot,Is.EqualTo(new Vector2(32,38)));
+                Assert.That(visual.sprite.pixelsPerUnit,Is.EqualTo(32));
+            }
+            Assert.That(seen.Count,Is.EqualTo(6));
+            Assert.That(state.transform.position.x,Is.EqualTo(0).Within(.001f));
+        }
         [UnityTearDown] public IEnumerator Teardown()
         { Call(director,"ResetTake",2);Set(clock,"ManualAdvanceOnly",false);yield return null; }
         [Test] public void TwoAndFourStagesAndBothDirectionsResetTenTimesEach()
@@ -530,6 +552,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
             var enemy=(Component)Get<object>(director,"FrontEnemy");var rear=(Component)Get<object>(director,"RearEnemy");
+            float originX=enemy.transform.position.x;
             var driver=enemy.GetComponent(Type.GetType("VideoEnemyAnimationDriver, Assembly-CSharp",true));
             int hits=0;float lastDistance=0,lastAdvance=0,lastHitX=state.transform.position.x;
             for(int i=0;i<360&&!Get<bool>(director,"Completed");i++)
@@ -545,7 +568,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 }
             }
             Assert.That(hits,Is.EqualTo(4));Assert.That(Get<int>(rear,"HitCount"),Is.EqualTo(1));
-            Assert.That((enemy.transform.position.x-1.1f*(mirrored?-1:1))*(mirrored?-1:1),Is.InRange(1.14f,1.18f));
+            Assert.That((enemy.transform.position.x-originX)*(mirrored?-1:1),Is.InRange(1.14f,1.18f));
         }
         [TestCase(2,false,60)] [TestCase(4,true,60)] [TestCase(4,false,30)] [TestCase(4,true,120)]
         public void BlinkReachesActualTargetInTwoTicksAndRevealsOnlyAtCharge(int stages,bool mirrored,int fps)
@@ -915,7 +938,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Call(director,"ResetTake",2);var a=(Component)Get<object>(director,"FrontEnemy");Call(counter,"RegisterParriedEnemy",a);
             if(afterStart) { Call(state,"RequestAction",PlayerActionRequest.Attack);Step();Assert.That(Get<bool>(counter,"IsActive"),Is.True); }
-            var wall=new GameObject("VideoCounterWall");wall.layer=LayerMask.NameToLayer("Ground");wall.transform.position=new Vector3(.55f,1.2f,0);
+            // After the first blink tick, put the obstacle ahead of the current body.
+            // A fixed world x can end up behind it when the capture layout is widened.
+            var wall=new GameObject("VideoCounterWall");wall.layer=LayerMask.NameToLayer("Ground");
+            wall.transform.position=new Vector3((state.transform.position.x+a.transform.position.x)*.5f,1.2f,0);
             wall.AddComponent<BoxCollider2D>().size=new Vector2(.1f,3.4f);Physics2D.SyncTransforms();
             try
             {

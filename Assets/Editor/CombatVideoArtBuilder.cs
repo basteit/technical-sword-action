@@ -112,7 +112,8 @@ public static class CombatVideoArtBuilder
         foreach(var parameter in controller.parameters) controller.RemoveParameter(parameter);
         controller.AddParameter("ComboStep",AnimatorControllerParameterType.Int);controller.AddParameter("AttackTrigger",AnimatorControllerParameterType.Trigger);
         var machine=controller.layers[0].stateMachine;foreach(var state in machine.states) machine.RemoveState(state.state);
-        var idleMotion=library.playerArtworkIsRough?library.Find("IdleRough")??library.Find("IdleReference"):library.Find("IdleReference");
+        // Idle has already been supplied; unfinished actions must not select a rough substitute for it.
+        var idleMotion=library.Find("IdleReference")??library.Find("IdleRough");
         var moveMotion=library.playerArtworkIsRough?library.Find("WalkRough")??library.Find("WalkReference"):library.Find("WalkReference");
         var idle=Clip("Idle",idleMotion,true);var idleState=machine.AddState("PlayerVideo_Idle");idleState.motion=idle;machine.defaultState=idleState;
         int stage=1;

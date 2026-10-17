@@ -71,7 +71,9 @@ public static class VideoCaptureUtility
                     Check(enemy.GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0).shortNameHash==Animator.StringToHash("EnemyVideo_Idle"),"Enemy Animator not reset.");
                 }
                 Check(state.GetComponent<Rigidbody2D>().gravityScale==3,"Gravity not restored.");
-                Check(state.transform.position==new Vector3(0,1,0)&&Mathf.Approximately(director.FrontEnemy.transform.position.x,mirrored?-1.1f:1.1f)&&Mathf.Approximately(director.RearEnemy.transform.position.x,mirrored?(defenseCancel?1.45f:.85f):(defenseCancel?-1.45f:-.85f)),"Actor positions not reset.");
+                float frontX=defenseCancel?1.1f:CombatVideoSceneBuilder.SequentialFrontStart.x;
+                float rearX=defenseCancel?-1.45f:CombatVideoSceneBuilder.SequentialRearStart.x;
+                Check(state.transform.position==new Vector3(0,1,0)&&Mathf.Approximately(director.FrontEnemy.transform.position.x,frontX*(mirrored?-1:1))&&Mathf.Approximately(director.RearEnemy.transform.position.x,rearX*(mirrored?-1:1)),"Actor positions not reset.");
             }
             return JsonUtility.ToJson(new ValidationReport{runsPassed=records.Count,runs=records.ToArray()},true);
         }

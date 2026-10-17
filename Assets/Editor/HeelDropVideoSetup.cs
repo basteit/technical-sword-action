@@ -32,6 +32,8 @@ public static class HeelDropVideoSetup
             data.FindProperty("heelTargetHeadOffsetX").floatValue=7/32f;
             data.ApplyModifiedPropertiesWithoutUndo();
             CombatVideoSceneBuilder.ConfigureAttack(player.GetComponent<PlayerAttack2D>(),library);
+            if(path==CombatVideoSceneBuilder.ScenePath)
+                CombatVideoSceneBuilder.ConfigureSequentialLayout(UnityEngine.Object.FindFirstObjectByType<CombatVideoDirector>());
             EditorSceneManager.MarkSceneDirty(scene);EditorSceneManager.SaveScene(scene);
         }
         EditorSceneManager.OpenScene(previous);AssetDatabase.SaveAssets();
