@@ -22,6 +22,15 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     private string parryRecoveryMotion = "ParryDeflect";
     public bool IsRecovering=>recovery!=null&&recovery.IsPlaying;
     public VideoArtLibrary Art=>library;
+    public Vector2 ParryContactPoint
+    {
+        get
+        {
+            var motion=library!=null?library.FindParrySuccess(parry.LastReactionWeight,out _):null;
+            Vector2 offset=motion!=null&&motion.hasParryContact?motion.parryContactOffset:new Vector2(19/32f,8/32f);
+            return (Vector2)transform.position+new Vector2(motor.FacingSign*offset.x,offset.y);
+        }
+    }
     public bool SkipAttackRecovery { get=>skipAttackRecovery;set=>skipAttackRecovery=value; }
     public int CombatTickOrder => 310;
     private void OnEnable()

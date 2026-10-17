@@ -11,6 +11,8 @@ public sealed class VideoArtLibrary : ScriptableObject
         public bool includesSlashTrail;
         public bool hasTrailHitbox;
         public Vector2 hitboxMin,hitboxMax;
+        public bool hasParryContact;
+        public Vector2 parryContactOffset;
         public Sprite[] frames;
         public Sprite[] eyeFrames;
         public int[] durations;

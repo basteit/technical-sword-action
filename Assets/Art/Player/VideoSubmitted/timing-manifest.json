@@ -162,6 +162,53 @@
       "pivotX": 32,
       "pivotY": 38,
       "totalFrames": 40
+    },
+    {
+      "branchFrame": 0,
+      "canvasHeight": 64,
+      "canvasWidth": 64,
+      "count": 7,
+      "frames": [
+        {
+          "frames": 2,
+          "start": 0
+        },
+        {
+          "frames": 1,
+          "start": 2
+        },
+        {
+          "frames": 1,
+          "start": 3
+        },
+        {
+          "frames": 2,
+          "start": 4
+        },
+        {
+          "frames": 1,
+          "start": 6
+        },
+        {
+          "frames": 1,
+          "start": 7
+        },
+        {
+          "frames": 2,
+          "start": 8
+        }
+      ],
+      "hasParryContact": true,
+      "hitFrame": 0,
+      "name": "ParrySuccessLight",
+      "parryContactOffset": {
+        "x": 0.375,
+        "y": -0.375
+      },
+      "pivotX": 32,
+      "pivotY": 38,
+      "provisional": true,
+      "totalFrames": 10
     }
   ]
 }

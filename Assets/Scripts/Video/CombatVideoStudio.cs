@@ -295,7 +295,7 @@ public sealed class CombatVideoStudio : MonoBehaviour, ICombatTickListener
     private void OnParry(Damageable2D target,ParryResult result)
     {
         if (parryPreview != null && parryPreview.Health==target) parriedTick=CombatTimeController.TickCount;
-        vfx.Emit("Parry",(Vector2)player.transform.position+new Vector2(motor.FacingSign*19/32f,8/32f),1.1f,motor.FacingSign);
+        vfx.Emit("Parry",player.GetComponent<VideoPlayerAnimationDriver>().ParryContactPoint,.85f,motor.FacingSign);
         presentation.PresentLightParry(motor.FacingSign); LastEvent="パリィ: "+target.IndividualId+" / "+result;
     }
     private void OnKick(Damageable2D target,Vector2 point)

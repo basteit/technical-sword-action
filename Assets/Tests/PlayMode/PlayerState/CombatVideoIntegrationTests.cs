@@ -132,11 +132,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for(int i=0;i<fps*5&&Get<int>(parry,"SuccessCount")==0;i++) Call(director,"StepCapture",1d/fps);
             Assert.That(Get<int>(parry,"SuccessCount"),Is.EqualTo(1));
             var visual=state.GetComponent<SpriteRenderer>();
-            Assert.That(visual.sprite.name,Is.EqualTo("ParryDeflect_03"));
+            Assert.That(visual.sprite.name,Is.EqualTo("ParrySuccessLight_01"));
             var effect=Find("VideoVfxRenderer").GetComponentsInChildren<SpriteRenderer>()
                 .First(r=>r.sprite!=null&&r.sprite.name=="Fx_Parry_01");
             int facing=mirrored?1:-1;
-            Vector3 contact=state.transform.position+new Vector3(facing*19/32f,8/32f,0);
+            Vector3 contact=state.transform.position+new Vector3(facing*12/32f,-12/32f,0);
             Assert.That(Vector3.Distance(effect.transform.position,contact),Is.LessThan(.001f));
             var flash=GameObject.Find("VideoImpactFlash").GetComponent<SpriteRenderer>();
             Assert.That(flash.color.r+flash.color.g+flash.color.b,Is.Zero);
@@ -144,7 +144,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var position=Camera.main.transform.position;float alpha=Get<float>(presentation,"FlashAlpha");
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
             for(int i=0;i<fps;i++) Call(director,"StepCapture",1d/fps);
-            Assert.That(visual.sprite.name,Is.EqualTo("ParryDeflect_03"));
+            Assert.That(visual.sprite.name,Is.EqualTo("ParrySuccessLight_01"));
             Assert.That(Camera.main.transform.position,Is.EqualTo(position));
             Assert.That(Get<float>(presentation,"FlashAlpha"),Is.EqualTo(alpha));
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
@@ -748,7 +748,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var clips=new System.Collections.Generic.List<AnimationClip>();
             var layers=controller.layers;
             var motionType=oldLibrary.GetType().GetNestedType("Motion");
-            var original=(Array)oldLibrary.GetType().GetField("motions").GetValue(oldLibrary);
+            var original=((Array)oldLibrary.GetType().GetField("motions").GetValue(oldLibrary)).Cast<object>()
+                .Where(m=>!new[]{"ParrySuccessLight","ParrySuccessHeavy"}.Contains((string)motionType.GetField("name").GetValue(m))).ToArray();
             var motions=Array.CreateInstance(motionType,original.Length+2);Array.Copy(original,motions,original.Length);
             var legacy=oldLibrary.GetType().GetMethod("Find").Invoke(oldLibrary,new object[]{"ParryDeflect"});
             var frames=(Sprite[])motionType.GetField("frames").GetValue(legacy);
@@ -946,6 +947,31 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(sprite.rect.size,Is.EqualTo(new Vector2(64,64)));
             Assert.That(sprite.pivot,Is.EqualTo(new Vector2(32,38)));
             Assert.That(Get<bool>(parry,"IsParryActive"),Is.True);
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void SubmittedLightParryShowsItsSwingAndSettleBeforeTheSameSourceCounter(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            var light=Call(Get<object>(driver,"Art"),"Find","ParrySuccessLight");
+            Assert.That(Get<int[]>(light,"durations"),Is.EqualTo(new[]{2,1,1,2,1,1,2}));
+            var sprites=Get<Sprite[]>(light,"frames");Assert.That(sprites.Length,Is.EqualTo(7));
+            Assert.That(sprites.All(s=>s.pivot==new Vector2(32,38)&&s.rect.size==new Vector2(64,64)&&s.pixelsPerUnit==32),Is.True);
+            Assert.That(Get<bool>(light,"hasParryContact"),Is.True);
+            Assert.That(Get<Vector2>(light,"parryContactOffset"),Is.EqualTo(new Vector2(12/32f,-12/32f)));
+            var seen=new System.Collections.Generic.HashSet<string>();
+            for(int i=0;i<300&&!Get<bool>(counter,"IsActive");i++)
+            {
+                Step();
+                if(Get<PlayerActionState>(state,"ActionState")==PlayerActionState.ParrySuccess)
+                {
+                    seen.Add(state.GetComponent<SpriteRenderer>().sprite.name);
+                    Assert.That(state.transform.position.x,Is.EqualTo(0).Within(.002f),"The light reaction keeps its planted root before blinking.");
+                }
+            }
+            Assert.That(seen,Is.EquivalentTo(sprites.Select(s=>s.name)),"Do not keep only the first contact cel through the entire success reaction.");
+            Assert.That(Get<bool>(counter,"IsActive"),Is.True);
+            Assert.That(Get<object>(counter,"SelectedTarget"),Is.SameAs(Get<object>(director,"RearEnemy")));
         }
         [TestCase(1,"VerticalSlash")] [TestCase(2,"HorizontalSlash")]
         [TestCase(3,"RapidSheathe")] [TestCase(4,"IaiSlash")]
