@@ -17,6 +17,7 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     private PlayerState lastMotion=PlayerState.Idle;
     private PlayerActionState lastAction = (PlayerActionState)(-1);
     private long parryStartTick;
+    private string parryRecoveryMotion = "ParryDeflect";
     public bool IsRecovering=>recovery!=null&&recovery.IsPlaying;
     public VideoArtLibrary Art=>library;
     public int CombatTickOrder => 310;
@@ -32,11 +33,14 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     private void OnParried(Damageable2D source, ParryResult result)
     {
         recovery?.Cancel();parryStartTick=CombatTimeController.TickCount;
-        Play("ParrySuccess");lastAction=PlayerActionState.ParrySuccess;
+        string reaction = SuccessClip();
+        Play(reaction);lastAction=PlayerActionState.ParrySuccess;
+        parryRecoveryMotion = library != null && library.Find("Recovery_" + reaction) != null ? reaction : "ParryDeflect";
         // The collision can occur after Animator.Update in this tick.
         // Freeze the actual blade contact immediately when hitstop begins.
-        var motion=library!=null?library.Find("ParryDeflect"):null;
-        if(visual!=null&&motion!=null) visual.sprite=motion.frames[2];
+        int startFrame = 0;
+        var motion=library!=null?library.FindParrySuccess(parry.LastReactionWeight,out startFrame):null;
+        if(visual!=null&&motion!=null) visual.sprite=motion.At(startFrame);
     }
     public void ResetVisual()
     { recovery?.Cancel();lastAction=PlayerActionState.Neutral;lastMotion=PlayerState.Idle;lastStep=1;driven="";animator.Rebind();Play("Idle");animator.Update(0); }
@@ -53,7 +57,8 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
                 PlayerActionState.Attack=>new[]{"VerticalSlash","HorizontalSlash","RapidSheathe","IaiSlash"}[lastStep-1],
                 PlayerActionState.ParryCounter=>"AirRoundhouse",
                 PlayerActionState.Dash=>"Dash",
-                PlayerActionState.ParrySuccess or PlayerActionState.ParryFail or PlayerActionState.Parry=>"ParryDeflect",
+                PlayerActionState.ParrySuccess=>parryRecoveryMotion,
+                PlayerActionState.ParryFail or PlayerActionState.Parry=>"ParryDeflect",
                 _=>lastMotion==PlayerState.Move?"Move":lastMotion==PlayerState.Fall||lastMotion==PlayerState.Jump?"Landing":""
             };
             var recover=library!=null?library.Find("Recovery_"+name):null;
@@ -66,7 +71,7 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
         string clip=action switch
         {
             PlayerActionState.Parry => "Parry",
-            PlayerActionState.ParrySuccess => "ParrySuccess",
+            PlayerActionState.ParrySuccess => SuccessClip(),
             PlayerActionState.ParryFail=>"ParryFail",
             PlayerActionState.ParryCounter => "Counter",
             PlayerActionState.Dash => "Dash",
@@ -76,6 +81,12 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     }
     private void Play(string clip)
     { if(driven==clip) return;animator.Play("PlayerVideo_"+clip,0,0);driven=clip; }
+    private string SuccessClip()
+    {
+        string reaction = parry.LastReactionWeight == ParryReactionWeight.Heavy ? "ParrySuccessHeavy" : "ParrySuccessLight";
+        if (animator.HasState(0, Animator.StringToHash("PlayerVideo_" + reaction))) return reaction;
+        return animator.HasState(0, Animator.StringToHash("PlayerVideo_ParrySuccessLight")) ? "ParrySuccessLight" : "ParrySuccess";
+    }
     public void CombatTickTimers()
     {
         // Counter timers run after Animator.Update. Sample the same integer frame
@@ -83,9 +94,9 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
         if(visual==null||library==null) return;
         if(state.ActionState==PlayerActionState.ParrySuccess)
         {
-            var motion=library.Find("ParryDeflect");
+            var motion=library.FindParrySuccess(parry.LastReactionWeight,out int startFrame);
             if(motion!=null)
-                visual.sprite=motion.At(motion.durations[0]+motion.durations[1]+(int)(CombatTimeController.TickCount-parryStartTick));
+                visual.sprite=motion.At(startFrame+(int)(CombatTimeController.TickCount-parryStartTick));
             return;
         }
         if(counter!=null&&counter.IsActive&&counter.IsAirborneKick)

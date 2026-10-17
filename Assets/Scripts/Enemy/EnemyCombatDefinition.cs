@@ -28,6 +28,8 @@ public sealed class EnemyCombatDefinition : ScriptableObject
     [Min(1)] public int damage = 10;
     [Min(0)] public float knockback = 4.5f;
     public bool parryable = true;
+    [Tooltip("Fallback reaction for the single attack below. Per-attack definitions override this value.")]
+    public ParryReactionWeight parryReaction = ParryReactionWeight.Light;
     public Vector2 hitOffset = new Vector2(.7f, 0);
     public Vector2 hitSize = new Vector2(1.4f, 1.3f);
     [Min(.1f)] public float attackRange = 1.45f;

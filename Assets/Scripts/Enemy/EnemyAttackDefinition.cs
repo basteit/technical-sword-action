@@ -12,6 +12,8 @@ public sealed class EnemyAttackDefinition : ScriptableObject
     [Min(1)] public int damage = 14;
     [Min(0)] public float knockback = 4.5f;
     public bool parryable = true;
+    [Tooltip("Player reaction on a successful parry. Does not change the counterattack or normal/just timing.")]
+    public ParryReactionWeight parryReaction = ParryReactionWeight.Light;
     public bool resistHitStunWhileAttacking;
     [Min(.1f)] public float attackRange = 1.6f;
     public Vector2 hitOffset = new Vector2(.8f, 0);

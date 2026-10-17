@@ -53,6 +53,7 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     public int AcceptanceEndFrame => timing != null ? timing.endFrame : Mathf.RoundToInt(parryWindowDuration * 60);
     [SerializeField, Min(0f)] private float maxParryHeightDifference = 1.25f;
     public Damageable2D LastParriedEnemy { get; private set; }
+    public ParryReactionWeight LastReactionWeight { get; private set; } = ParryReactionWeight.Light;
     public event System.Action<Damageable2D, ParryResult> Succeeded;
     public event System.Action Failed;
 
@@ -183,6 +184,7 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         resolvedTick = -1;
         LastParryResult = ParryResult.None;
         LastParriedEnemy = null;
+        LastReactionWeight = ParryReactionWeight.Light;
         attemptCount++;
         return true;
     }
@@ -194,15 +196,20 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
     public bool TryResolveParry(Vector2 sourcePosition, out ParryResult result)
     {
-        return ResolveParry(sourcePosition, null, true, out result);
+        return ResolveParry(sourcePosition, null, true, ParryReactionWeight.Light, out result);
     }
 
     public bool TryResolveSourceParry(Vector2 contactPosition, Damageable2D source, bool parryable, out ParryResult result)
     {
-        return ResolveParry(contactPosition, source, parryable, out result);
+        return ResolveParry(contactPosition, source, parryable, ParryReactionWeight.Light, out result);
     }
 
-    private bool ResolveParry(Vector2 sourcePosition, Damageable2D source, bool parryable, out ParryResult result)
+    public bool TryResolveContextParry(Vector2 contactPosition, CombatHitContext2D context, out ParryResult result)
+    {
+        return ResolveParry(contactPosition, context.Source, context.Parryable, context.ParryReaction, out result);
+    }
+
+    private bool ResolveParry(Vector2 sourcePosition, Damageable2D source, bool parryable, ParryReactionWeight reaction, out ParryResult result)
     {
         LastResolvedAsPrimary = false;
         bool secondary = !parryActive && parryResolved && CombatTimeController.IsExecutingTick && resolvedTick == CombatTimeController.TickCount;
@@ -231,6 +238,9 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         LastResolvedAsPrimary = true;
         resolvedTick = CombatTimeController.TickCount;
         LastParryResult = result;
+        // Only the primary hit selects the reaction. Secondary same-tick hits
+        // may add counter stock, but never restart the pose or change facing.
+        LastReactionWeight = reaction;
         parryActive = false;
         parryResolved = true;
         parryTimer = 0f;
@@ -282,6 +292,7 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         successLockTimer = 0f;
         LastParryResult = ParryResult.None;
         LastParriedEnemy = null;
+        LastReactionWeight = ParryReactionWeight.Light;
 
         if (clearCooldown)
         {

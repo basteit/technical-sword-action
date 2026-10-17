@@ -181,7 +181,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IContextDamageReceiver2D, I
         if (counter == null) counter = GetComponent<PlayerParryCounter2D>();
         if (counter != null && counter.IsCounterInvincible) { blockedByInvincible++; return false; }
 
-        if (parry != null && parry.TryResolveSourceParry(sourcePosition, context.Source, context.Parryable, out ParryResult parryResult))
+        if (parry != null && parry.TryResolveContextParry(sourcePosition, context, out ParryResult parryResult))
         {
             LastParryResult = parryResult;
             blockedByParry++;

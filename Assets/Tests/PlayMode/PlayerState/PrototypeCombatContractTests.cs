@@ -176,6 +176,143 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(succeeds ? 100 : 90));
         }
 
+        [TestCase("Light", false)] [TestCase("Heavy", false)]
+        [TestCase("Light", true)] [TestCase("Heavy", true)]
+        public void ActualEnemyAttackCarriesReactionAndKeepsTheSameCounterAcrossTenResets(string weight, bool perAttack)
+        {
+            Component melee = ParryEnemy(weight, true, perAttack, out Component enemy);
+            for (int run = 0; run < 10; run++)
+            {
+                Call(state, "ResetToSafeState", "ReactionReset", true);
+                Call(health, "ResetHealth");
+                player.transform.position = new Vector3(100, 1);
+                Call(enemy, "ResetForCapture", player.transform.position + Vector3.right * .9f, 1000);
+                Call(melee, "ResetForCapture", player.transform, true);
+                Physics2D.SyncTransforms();
+                Assert.That(Get<object>(parry, "LastReactionWeight").ToString(), Is.EqualTo("Light"));
+                int previousHits = Get<int>(counter, "HitCount");
+                Start(PlayerActionRequest.Parry);
+                Assert.That((bool)Call(melee, "BeginCaptureAttack"), Is.True);
+                Frames(9);
+                Assert.That(Get<object>(melee, "AttackParryReaction").ToString(), Is.EqualTo(weight));
+                Assert.That(Get<object>(parry, "LastReactionWeight").ToString(), Is.EqualTo(weight));
+                Assert.That(Get<object>(parry, "LastParriedEnemy"), Is.SameAs(enemy));
+                Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(100));
+                Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(1));
+                Start(PlayerActionRequest.Attack);
+                Frames(70);
+                Assert.That(Get<int>(counter, "HitCount"), Is.EqualTo(previousHits + 1));
+                Assert.That(Get<int>(enemy, "CurrentHp"), Is.EqualTo(910));
+                Assert.That(Get<PlayerActionState>(state, "ActionState"), Is.EqualTo(PlayerActionState.Neutral));
+                Assert.That(Get<int>(counter, "StockCount"), Is.Zero);
+                Assert.That(Get<object>(parry, "LastReactionWeight").ToString(), Is.EqualTo("Light"));
+            }
+        }
+
+        [TestCase("Light")] [TestCase("Heavy")]
+        public void UnparryableAttackNeverSelectsItsReactionOrAwardsStock(string weight)
+        {
+            Component melee = ParryEnemy(weight, false, true, out _);
+            Start(PlayerActionRequest.Parry); Call(melee, "BeginCaptureAttack"); Frames(9);
+            Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(86));
+            Assert.That(Get<int>(parry, "SuccessCount"), Is.Zero);
+            Assert.That(Get<object>(parry, "LastReactionWeight").ToString(), Is.EqualTo("Light"));
+            Assert.That(Get<int>(counter, "StockCount"), Is.Zero);
+        }
+
+        [TestCase("Light", 5, "Just")] [TestCase("Heavy", 5, "Just")]
+        [TestCase("Light", 12, "Normal")] [TestCase("Heavy", 12, "Normal")]
+        public void ReactionWeightIsIndependentOfNormalAndJustTiming(string weight, int frame, string result)
+        {
+            Component enemy = Enemy(.9f, 1000);
+            Start(PlayerActionRequest.Parry); Frames(frame);
+            object context = Activator.CreateInstance(TypeOf("CombatHitContext2D"), enemy, 7L, true,
+                Enum.Parse(TypeOf("ParryReactionWeight"), weight));
+            Call(health, "TryReceiveContextHit", 10, (Vector2)enemy.transform.position, 0f, context);
+            Assert.That(Get<object>(parry, "LastReactionWeight").ToString(), Is.EqualTo(weight));
+            Assert.That(Get<object>(parry, "LastParryResult").ToString(), Is.EqualTo(result));
+        }
+
+        [TestCase("Light")] [TestCase("Heavy")]
+        public void SameTickSecondaryHitAddsStockWithoutReplacingThePrimaryReaction(string firstWeight)
+        {
+            var first = ParryEnemy(firstWeight, true, true, out var firstEnemy);
+            var second = ParryEnemy(firstWeight == "Light" ? "Heavy" : "Light", true, true, out var secondEnemy);
+            Start(PlayerActionRequest.Parry);
+            Call(first, "BeginCaptureAttack"); Call(second, "BeginCaptureAttack"); Frames(9);
+            Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(100));
+            Assert.That(Get<int>(health, "BlockedByParry"), Is.EqualTo(2));
+            Assert.That(Get<int>(parry, "SuccessCount"), Is.EqualTo(1));
+            // Same-order listeners use instance IDs, not creation order. Whichever
+            // hit really became primary must keep its own reaction after both hits.
+            var source = (Component)Get<object>(parry, "LastParriedEnemy");
+            Assert.That(source == firstEnemy || source == secondEnemy, Is.True);
+            var primary = source == firstEnemy ? first : second;
+            Assert.That(Get<object>(parry, "LastReactionWeight").ToString(),
+                Is.EqualTo(Get<object>(primary, "AttackParryReaction").ToString()));
+            Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void ExistingAttackDefinitionsAndThreeArgumentContextsDefaultToLight()
+        {
+            foreach (string type in new[] { "EnemyAttackDefinition", "EnemyCombatDefinition" })
+            {
+                var data = Own(ScriptableObject.CreateInstance(TypeOf(type)));
+                Assert.That(data.GetType().GetField("parryReaction").GetValue(data).ToString(), Is.EqualTo("Light"));
+            }
+            object context = Activator.CreateInstance(TypeOf("CombatHitContext2D"), Enemy(.9f, 1000), 1L, true);
+            Assert.That(context.GetType().GetField("ParryReaction").GetValue(context).ToString(), Is.EqualTo("Light"));
+        }
+
+        [TestCase("Light")] [TestCase("Heavy")]
+        public void PrototypeAnimatorKeepsTheDedicatedSuccessInsteadOfReturningToReady(string weight)
+        {
+            var controller = Own(new UnityEditor.Animations.AnimatorController()); controller.AddLayer("Base Layer");
+            var machine = controller.layers[0].stateMachine;
+            var clip = Own(new AnimationClip { name = "ParryReactionTest" });
+            foreach (string name in new[] { "Idle", "Parry", "ParrySuccess", "ParrySuccessLight", "ParrySuccessHeavy" })
+                machine.AddState("PlayerPrototype_" + name).motion = clip;
+            machine.defaultState = machine.states[0].state;
+            var animator = player.AddComponent<Animator>(); animator.runtimeAnimatorController = controller;
+            Add(player, "PlayerAnimationDriver2D");
+            var enemy = Enemy(.9f, 1000); Start(PlayerActionRequest.Parry); Frames(5);
+            object context = Activator.CreateInstance(TypeOf("CombatHitContext2D"), enemy, 8L, true,
+                Enum.Parse(TypeOf("ParryReactionWeight"), weight));
+            Call(health, "TryReceiveContextHit", 10, (Vector2)enemy.transform.position, 0f, context);
+            Frames(5); // Let hitstop expire and sample the first success tick.
+            for (int i = 0; i < 2; i++)
+            {
+                Frames(1); animator.Update(0);
+                Assert.That(animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerPrototype_ParrySuccess" + weight), Is.True);
+            }
+        }
+
+        private Component ParryEnemy(string weight, bool parryable, bool perAttack, out Component enemy)
+        {
+            var data = Own(ScriptableObject.CreateInstance(TypeOf("EnemyCombatDefinition")));
+            Set(data, "maxHp", 1000); Set(data, "hitKnockback", 0f); Set(data, "windupFrames", 8);
+            Set(data, "damage", 14); Set(data, "knockback", 0f); Set(data, "moveSpeed", 0f);
+            Set(data, "targetLayers", (LayerMask)(1 << player.layer)); Set(data, "allowOffscreenStart", true);
+            Set(data, "parryable", parryable);
+            Set(data, "parryReaction", Enum.Parse(TypeOf("ParryReactionWeight"), perAttack ? (weight == "Light" ? "Heavy" : "Light") : weight));
+            if (perAttack)
+            {
+                var definition = Own(ScriptableObject.CreateInstance(TypeOf("EnemyAttackDefinition")));
+                Set(definition, "windupFrames", 8); Set(definition, "damage", 14); Set(definition, "knockback", 0f);
+                Set(definition, "parryable", parryable); Set(definition, "parryReaction", Enum.Parse(TypeOf("ParryReactionWeight"), weight));
+                var attacks = Array.CreateInstance(TypeOf("EnemyAttackDefinition"), 1); attacks.SetValue(definition, 0);
+                Set(data, "attacks", attacks);
+            }
+            var root = Own(new GameObject("ParryReactionEnemy")); root.SetActive(false);
+            root.transform.position = player.transform.position + Vector3.right * .9f;
+            root.AddComponent<BoxCollider2D>().isTrigger = true;
+            enemy = Add(root, "Damageable2D");
+            var melee = Add(root, "EnemyMeleeChaser2D"); Set(melee, "combatDefinition", data); Set(melee, "target", player.transform);
+            root.SetActive(true); Call(melee, "ResetForCapture", player.transform, true); Physics2D.SyncTransforms();
+            return melee;
+        }
+
         [Test]
         public void HealMovesAtConfiguredFractionAndOnlyConsumesAtApplyFrame()
         {

@@ -28,12 +28,14 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
     private float parrySuccessTimer;
     private PlayerVisualRecovery2D recovery;
     private PlayerAttack2D attack;
+    private PlayerParry2D parry;
     private TechnicalSwordAction.PlayerState.PlayerActionState lastExtendedAction;
 
     private void Awake()
     {
         ResolveReferences();
         attack = GetComponent<PlayerAttack2D>();
+        parry = GetComponent<PlayerParry2D>();
         recovery=GetComponent<PlayerVisualRecovery2D>();
         if(recovery==null) recovery=gameObject.AddComponent<PlayerVisualRecovery2D>();
     }
@@ -79,6 +81,14 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
 
         if (TryPlayNewParrySuccess())
         {
+            return;
+        }
+
+        if (extended == TechnicalSwordAction.PlayerState.PlayerActionState.ParrySuccess)
+        {
+            // The legacy state maps both ready and success to Parry. Do not
+            // overwrite a successful deflection with the ready pose next tick.
+            lastDrivenState = PlayerState.Parry;
             return;
         }
 
@@ -135,7 +145,10 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
 
         observedParryCount = parryCount;
         parrySuccessTimer = parrySuccessPoseDuration;
-        animator.Play(ParrySuccessState, 0, 0f);
+        string reaction = parry != null && parry.LastReactionWeight == ParryReactionWeight.Heavy ? "Heavy" : "Light";
+        int success = Animator.StringToHash("PlayerPrototype_ParrySuccess" + reaction);
+        if (!animator.HasState(0, success)) success = Animator.StringToHash("PlayerPrototype_ParrySuccessLight");
+        animator.Play(animator.HasState(0, success) ? success : ParrySuccessState, 0, 0f);
         lastDrivenState = (PlayerState)(-1);
         return true;
     }

@@ -54,6 +54,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     private int nextAttackIndex;
     private Vector2 configuredHitOffset, configuredHitSize;
     private bool configuredParryable = true;
+    private ParryReactionWeight configuredParryReaction = ParryReactionWeight.Light;
     private int configuredActiveFrames = 1;
     public string AttackId => currentAttack != null ? currentAttack.attackId : "legacy-melee";
     public bool PlayerIsInCounterResponse => target != null && target.TryGetComponent<PlayerStateMachine>(out var player) &&
@@ -65,6 +66,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     public string AttackRoleReason { get; private set; } = "None";
     public EnemyCombatDefinition Definition => combatDefinition;
     public string AttackKind => combatDefinition == null || configuredParryable ? "Parryable" : "Unparryable";
+    public ParryReactionWeight AttackParryReaction => configuredParryReaction;
     public int WindupRemainingFrames => Mathf.CeilToInt(WindupRemaining * 60f - .0001f);
     public int ActiveRemainingFrames => currentState == State.Active ? activeRemaining : 0;
     public Vector2 Facing => facing;
@@ -192,6 +194,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
         configuredHitOffset = data != null ? data.hitOffset : combatDefinition.hitOffset;
         configuredHitSize = data != null ? data.hitSize : combatDefinition.hitSize;
         configuredParryable = data != null ? data.parryable : combatDefinition.parryable;
+        configuredParryReaction = data != null ? data.parryReaction : combatDefinition.parryReaction;
     }
 
     private void InterruptAttack(string reason)
@@ -389,7 +392,8 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
             }
 
             if (receiver is IContextDamageReceiver2D contextual)
-                contextual.TryReceiveContextHit(attackDamage, transform.position, attackKnockback, new CombatHitContext2D(damageable, attackSequence, combatDefinition == null || configuredParryable));
+                contextual.TryReceiveContextHit(attackDamage, transform.position, attackKnockback,
+                    new CombatHitContext2D(damageable, attackSequence, combatDefinition == null || configuredParryable, configuredParryReaction));
             else receiver.TryReceiveHit(attackDamage, transform.position, attackKnockback);
         }
     }

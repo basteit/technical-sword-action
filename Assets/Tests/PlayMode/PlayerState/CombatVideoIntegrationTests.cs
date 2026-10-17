@@ -639,6 +639,62 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(Find("VideoVfxRenderer"),"EmissionCount"),Is.Zero);
             Assert.That(Get<PlayerActionState>(state,"ActionState"),Is.EqualTo(PlayerActionState.Neutral));
         }
+
+        [TestCase("Light")] [TestCase("Heavy")]
+        public void DedicatedParryReactionSelectsItsOwnContactSpriteAndAnimatorState(string weight)
+        {
+            Call(director,"ResetTake",2);
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            var animator=state.GetComponent<Animator>();var oldController=animator.runtimeAnimatorController;
+            var oldLibrary=(ScriptableObject)Get<object>(driver,"Art");
+            var library=Object.Instantiate(oldLibrary);
+            var controller=new UnityEditor.Animations.AnimatorController();controller.AddLayer("Base Layer");
+            var clips=new System.Collections.Generic.List<AnimationClip>();
+            var layers=controller.layers;
+            var motionType=oldLibrary.GetType().GetNestedType("Motion");
+            var original=(Array)oldLibrary.GetType().GetField("motions").GetValue(oldLibrary);
+            var motions=Array.CreateInstance(motionType,original.Length+2);Array.Copy(original,motions,original.Length);
+            var legacy=oldLibrary.GetType().GetMethod("Find").Invoke(oldLibrary,new object[]{"ParryDeflect"});
+            var frames=(Sprite[])motionType.GetField("frames").GetValue(legacy);
+            try
+            {
+                for(int i=0;i<2;i++)
+                {
+                    string name="ParrySuccess"+(i==0?"Light":"Heavy");
+                    var motion=Activator.CreateInstance(motionType);
+                    motionType.GetField("name").SetValue(motion,name);
+                    motionType.GetField("frames").SetValue(motion,new[]{frames[i+2]});
+                    motionType.GetField("durations").SetValue(motion,new[]{10});motions.SetValue(motion,original.Length+i);
+                    var clip=new AnimationClip{name=name};clips.Add(clip);
+                    UnityEditor.AnimationUtility.SetObjectReferenceCurve(clip,
+                        new UnityEditor.EditorCurveBinding{path="",type=typeof(SpriteRenderer),propertyName="m_Sprite"},
+                        new[]{new UnityEditor.ObjectReferenceKeyframe{time=0,value=frames[i+2]}});
+                    layers[0].stateMachine.AddState("PlayerVideo_"+name).motion=clip;
+                }
+                var idle=layers[0].stateMachine.AddState("PlayerVideo_Idle");idle.motion=clips[0];layers[0].stateMachine.defaultState=idle;
+                layers[0].stateMachine.AddState("PlayerVideo_Parry").motion=clips[0];
+                library.GetType().GetField("motions").SetValue(library,motions);
+                driver.GetType().GetField("library",Flags).SetValue(driver,library);
+                animator.runtimeAnimatorController=controller;Call(driver,"ResetVisual");
+                var enemy=(Component)Get<object>(director,"RearEnemy");enemy.transform.position=state.transform.position+Vector3.left;
+                Call(state,"RequestAction",PlayerActionRequest.Parry);Step();
+                object context=Activator.CreateInstance(Type.GetType("CombatHitContext2D, Assembly-CSharp",true),enemy,991L,true,
+                    Enum.Parse(Type.GetType("ParryReactionWeight, Assembly-CSharp",true),weight));
+                Call(health,"TryReceiveContextHit",1,(Vector2)enemy.transform.position,0f,context);
+                var expected=frames[weight=="Light"?2:3];
+                Assert.That(state.GetComponent<SpriteRenderer>().sprite,Is.SameAs(expected),"Contact pose must be selected before hitstop.");
+                animator.Update(0);Call(driver,"CombatTick");animator.Update(0);
+                Assert.That(animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerVideo_ParrySuccess"+weight),Is.True);
+                for(int i=0;i<5;i++) Step();
+                Assert.That(state.GetComponent<SpriteRenderer>().sprite,Is.SameAs(expected));
+            }
+            finally
+            {
+                driver.GetType().GetField("library",Flags).SetValue(driver,oldLibrary);
+                animator.runtimeAnimatorController=oldController;Call(driver,"ResetVisual");
+                Object.DestroyImmediate(controller);foreach(var clip in clips)Object.DestroyImmediate(clip);Object.DestroyImmediate(library);
+            }
+        }
         [Test] public void SkippedOldStockIsPreservedAndOverlappingOtherEnemyIsNeverKicked()
         {
             Call(director,"ResetTake",2);

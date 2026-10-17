@@ -25,6 +25,17 @@ public sealed class VideoArtLibrary : ScriptableObject
     public Sprite background;
     public Motion[] motions;
     public Motion Find(string name) => Array.Find(motions,m => m.name == name);
+    public Motion FindParrySuccess(ParryReactionWeight weight, out int startFrame)
+    {
+        startFrame = 0;
+        var motion = Find(weight == ParryReactionWeight.Heavy ? "ParrySuccessHeavy" : "ParrySuccessLight") ?? Find("ParrySuccessLight");
+        if (motion != null) return motion;
+        // Existing rough art combines two ready cels with the success motion.
+        motion = Find("ParryDeflect");
+        if (motion != null)
+            for (int i = 0; i < Math.Min(2, motion.durations.Length); i++) startFrame += motion.durations[i];
+        return motion;
+    }
     public Sprite EyesFor(Sprite source)
     {
         if(source==null||motions==null) return null;
