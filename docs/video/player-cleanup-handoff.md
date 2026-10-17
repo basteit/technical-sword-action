@@ -1,5 +1,7 @@
 # 主人公アクション — 清書受け渡し
 
+**2026-10-17 待機を既存素材へ：** 撮影/Studio共通のIdleに `Player_idle.aseprite` と画素一致する `IdleReference` 6×100msを採用。原本・画像・32PPU/接地を保持。通しでは敵2体をそれぞれ中央から0.25unit離した。[最新の動画・接続記録](reference-idle-and-spacing.md)。
+
 **2026-10-17 接続を追加調整：** 1段目の次段予約時だけ29Fから2段目へ派生する（従来34F）。単発の復帰開始34F・提出9×70ms・命中17Fは維持。[最新の4.15秒動画と確認記録](attack-combo-early-branch.md)。
 
 **2026-10-17 攻撃2段目を受領：** `VideoSubmitted/20261017/Player_attack_2.aseprite` を1段目へ接続した。128px/32PPU/Pivot(32,38)、8×70msを保持し、Unity34F・命中13Fへ同期。今回の録画は2段目で敵Aを撃破し、3・4段目は出さない。既存の4段攻撃は保持する。[最新の2段版動画・接続記録](attack2-submission.md)。
