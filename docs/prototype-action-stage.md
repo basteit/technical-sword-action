@@ -58,7 +58,18 @@
 ### 原因と修正
 
 - 攻撃Clipの `OnAttackHit(int)` イベントが、同じGameObject上の `PlayerCombatTelemetry.OnAttackHit(Damageable2D, int, Vector2)` にも送信され、Unityで許可されない3引数の呼出しとしてエラーになっていた。計測用のC#イベントコールバックを別名へ変更し、購読・購読解除も揃えた。攻撃データ・Clip・命中処理は変更していない。
-- `PlatformEffector2D.surfaceArc = 180` が薄いBoxColliderの横面まで含んでいた。検証Sceneの2枚を160度へ変更し、側面の摩擦・反発を無効にする設定を配置処理と検証へ追加した。Sceneの保存差分はこの2個の角度だけで、白グリッド・位置・通常ブロック・壁・動画Sceneは変更していない。
+- `PlatformEffector2D.surfaceArc = 180` が薄いBoxColliderの横面まで含んでいた。検証Sceneの2枚を160度へ変更し、側面の摩擦・反発を無効にする設定を配置処理と検証へ追加した。今回の修正コミットに含めたScene差分はこの2個の角度だけで、白グリッド・位置・通常ブロック・壁・動画Sceneは変更していない。
 - 前回の足場テストは上下移動が中心で、実Animator付き4段攻撃と足場の左右からの侵入を十分に確認できていなかった。今回は地上／空中・空振り／命中の4ケースと、2枚×左右×移動／Dashの8ケースを追加した。
 
 修正前に同じAnimationEventエラーと横面停止を再現した。修正後の関連PlayModeテストは19 / 19合格。空振りの計測は0、命中は各段1回、4段の合計実ダメージと計測値は60で一致した。上からの着地・下からのジャンプ・床抜けと衝突復帰も維持している。
+
+### 実入力確認と統合検証の範囲
+
+- 修正コミット: `ce57c7fdafa8f9b7a1996313e174f2bb7c4c0b0a`。
+- ULoop経由のJキー入力10回で攻撃開始10回、終了後Neutral、空振りの計測0、敵0体を確認。`OnAttackHit` のAnimationEventエラーは0件だった。
+- 入力注入時、ULoopの入力表示Prefab自身が `InputVisualizationCanvas component not found on prefab` を10件出力した（`OverlayCanvasFactory.cs:61`）。ゲームの攻撃エラーとは別件で、今回パッケージを改変していない。全体テスト前のConsoleクリアでは警告98件も存在したため、この実入力確認について「Console全体のエラー・警告0」とは扱わない。
+- ユーザー許可で未保存の検証Sceneを保存した。並行して動画側が追加していた反撃設定の既定値2フィールドは、その作業の未コミット差分として保持し、今回の修正コミットには混ぜていない。
+- 全体検証を開始しコンパイルはError 0 / Warning 0だったが、参照検証開始時のDomain Reloadで中断した。EditMode / PlayMode全体はこの回では未実行。動画側の新テストと提出素材のLibrary・Clip・Scene適用を揃えてから統合回帰を行う順序とし、当方のUnity操作は終了した。
+- 前回の186 / 361件合格は修正前の版の履歴であり、今回の全体回帰合格に読み替えない。機械可読結果は `docs/validation/prototype-action-fixes-2026-10-18.json`。
+
+再プレイでは、地上・空中の4段攻撃、足場の左右からの移動・Dash、上からの着地と下＋Jumpの床抜けを確認する。15分の操作感と物理ゲームパッドの受入は引き続き未実施。
