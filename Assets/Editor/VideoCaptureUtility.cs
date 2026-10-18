@@ -108,7 +108,8 @@ public static class VideoCaptureUtility
             }
             Check(director.Completed,"Capture did not complete.");
             var art=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(CombatVideoArtBuilder.LibraryPath);
-            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,playerArtworkIsRough=defenseCancel||(stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough),takeKind=defenseCancel?"defense-cancel":"sequential",counterAction=director.Player.GetComponent<PlayerParryCounter2D>().IsOverheadHeelDrop?"OverheadHeelDrop":"AirRoundhouse",provisionalActions=art.motions.Where(m=>m.provisional).Select(m=>m.name).ToArray(),skipAttackRecovery=director.Player.GetComponent<VideoPlayerAnimationDriver>().SkipAttackRecovery,spacingApproaches=director.UsesSpacingApproaches,initialFrontPosition=initialFrontPosition,initialRearPosition=initialRearPosition,events=director.Marks.ToArray()},true));
+            var counter=director.Player.GetComponent<PlayerParryCounter2D>();
+            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,playerArtworkIsRough=defenseCancel||(stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough),takeKind=defenseCancel?"defense-cancel":"sequential",counterAction=counter.AttacksFromBehind?"RearSubmittedKick":counter.IsOverheadHeelDrop?"OverheadHeelDrop":"AirRoundhouse",provisionalActions=art.motions.Where(m=>m.provisional).Select(m=>m.name).ToArray(),skipAttackRecovery=director.Player.GetComponent<VideoPlayerAnimationDriver>().SkipAttackRecovery,spacingApproaches=director.UsesSpacingApproaches,initialFrontPosition=initialFrontPosition,initialRearPosition=initialRearPosition,events=director.Marks.ToArray()},true));
             return folder;
         }
         finally

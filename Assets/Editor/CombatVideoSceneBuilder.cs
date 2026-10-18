@@ -108,15 +108,30 @@ public static class CombatVideoSceneBuilder
         ConfigureAttack(attack,library,!defenseCancel);
         actor.AddComponent<PlayerParry2D>(); actor.AddComponent<PlayerSpecialGauge>();
         var health=actor.AddComponent<PlayerDamageReceiver2D>();Set(health,"normalParryHitStop",2/60f);Set(health,"justParryHitStop",3/60f);
-        var counter=actor.AddComponent<PlayerParryCounter2D>();var kick=library.Find("AirRoundhouse");Set(counter,"airborneKick",true);Set(counter,"hitFrame",kick.hitFrame);Set(counter,"chargeFrame",kick.chargeFrame);Set(counter,"endFrame",kick.recoveryFrame>0?kick.recoveryFrame:kick.TotalFrames);Set(counter,"radius",.5f);Set(counter,"obstacleLayers",1 << ground);
-        Set(counter,"chargeReleaseFrame",kick.releaseFrame>0?kick.releaseFrame:24);Set(counter,"landingFrame",kick.landingFrame>0?kick.landingFrame:36);Set(counter,"maxApproach",1.2f);
-        Set(counter,"landingRollDistance",0f);
-        Set(counter,"blinkApproach",true);Set(counter,"blinkTravelFrames",2);
-        Set(counter,"overheadHeelDrop",true);
-        Set(counter,"heelTargetHeadOffsetX",7/32f);
+        var counter=actor.AddComponent<PlayerParryCounter2D>();
+        ConfigureCounter(counter,library);Set(counter,"obstacleLayers",1 << ground);
         actor.AddComponent<PlayerStateMachine>();actor.AddComponent<PlayerVisualRecovery2D>();
         var animation=actor.AddComponent<VideoPlayerAnimationDriver>();Set(animation,"library",library);Set(animation,"skipAttackRecovery",true);
         return actor;
+    }
+    internal static void ConfigureCounter(PlayerParryCounter2D counter,VideoArtLibrary library)
+    {
+        var submitted=library.Find("CounterKick");var kick=submitted??library.Find("AirRoundhouse");
+        int transfer=submitted!=null?(library.Find("CounterTransfer")?.TotalFrames??0):0;
+        Set(counter,"airborneKick",true);Set(counter,"invincibleDuringKick",true);
+        Set(counter,"hitFrame",transfer+kick.hitFrame);Set(counter,"chargeFrame",transfer+kick.chargeFrame);
+        Set(counter,"endFrame",transfer+(kick.recoveryFrame>0?kick.recoveryFrame:kick.TotalFrames));
+        Set(counter,"chargeReleaseFrame",transfer+(kick.releaseFrame>0?kick.releaseFrame:24));
+        Set(counter,"landingFrame",transfer+(kick.landingFrame>0?kick.landingFrame:36));
+        Set(counter,"radius",.5f);Set(counter,"maxApproach",1.2f);Set(counter,"landingRollDistance",0f);
+        Set(counter,"blinkApproach",true);Set(counter,"blinkTravelFrames",2);
+        Set(counter,"blinkStartFrame",Mathf.Max(0,transfer-2));Set(counter,"behindTarget",submitted!=null);
+        Set(counter,"overheadHeelDrop",submitted==null);
+        Set(counter,"overheadHeight",submitted!=null?4/32f:1.35f);
+        Set(counter,"heelImpactHeight",submitted!=null?2/32f:1.15f);
+        Set(counter,"airborneContactOffset",new Vector2(41/32f,4/32f));
+        Set(counter,"heelContactOffset",new Vector2(10/32f,-22/32f));
+        Set(counter,"heelTargetHeadOffsetX",7/32f);
     }
     internal static Damageable2D Enemy(string name, Vector3 position, int layer, int playerLayer, Transform target,VideoArtLibrary library)
     {
@@ -184,6 +199,8 @@ public static class CombatVideoSceneBuilder
     { var s = new SerializedObject(target); s.FindProperty(name).stringValue = value; s.ApplyModifiedPropertiesWithoutUndo(); }
     internal static void Set(Object target,string name,Vector3 value)
     { var s=new SerializedObject(target);s.FindProperty(name).vector3Value=value;s.ApplyModifiedPropertiesWithoutUndo(); }
+    internal static void Set(Object target,string name,Vector2 value)
+    { var s=new SerializedObject(target);s.FindProperty(name).vector2Value=value;s.ApplyModifiedPropertiesWithoutUndo(); }
     private static void Visual(GameObject obj, Vector2 size, Color color)
     {
         var r = obj.GetComponent<SpriteRenderer>();

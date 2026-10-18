@@ -530,24 +530,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerParryCounter2D
   definition: {fileID: 0}
-  hitFrame: 28
-  endFrame: 36
+  hitFrame: 25
+  endFrame: 38
   damage: 3
   radius: 0.5
   airborneKick: 1
-  airborneContactOffset: {x: 0.6875, y: -0.6875}
+  airborneContactOffset: {x: 1.28125, y: 0.125}
   invincibleDuringKick: 1
   chargeFrame: 18
   chargeReleaseFrame: 24
-  landingFrame: 36
+  landingFrame: 38
   landingRollDistance: 0
   jumpHeight: 0.55
   maxApproach: 1.2
   blinkApproach: 1
   blinkTravelFrames: 2
-  overheadHeelDrop: 1
-  overheadHeight: 1.35
-  heelImpactHeight: 1.15
+  blinkStartFrame: 10
+  behindTarget: 1
+  overheadHeelDrop: 0
+  overheadHeight: 0.125
+  heelImpactHeight: 0.0625
   heelContactOffset: {x: 0.3125, y: -0.6875}
   heelTargetHeadOffsetX: 0.21875
   obstacleLayers:

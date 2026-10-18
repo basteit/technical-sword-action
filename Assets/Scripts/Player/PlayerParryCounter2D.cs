@@ -23,6 +23,8 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     [SerializeField, Min(0f)] private float maxApproach = .6f;
     [SerializeField] private bool blinkApproach;
     [SerializeField, Min(1)] private int blinkTravelFrames = 2;
+    [SerializeField, Min(0)] private int blinkStartFrame;
+    [SerializeField] private bool behindTarget;
     [SerializeField] private bool overheadHeelDrop;
     [SerializeField, Min(0f)] private float overheadHeight = 1.35f;
     [SerializeField, Min(0f)] private float heelImpactHeight = 1.15f;
@@ -60,6 +62,11 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public bool IsAirborneKick => airborneKick;
     public bool UsesBlinkApproach => airborneKick && blinkApproach;
     public bool IsOverheadHeelDrop => airborneKick && overheadHeelDrop;
+    public bool AttacksFromBehind => airborneKick && behindTarget;
+    public bool HasAuthoredTransfer => UsesBlinkApproach && blinkStartFrame > 0;
+    public int BlinkStartFrame => blinkStartFrame;
+    public int BlinkArrivalFrame => blinkStartFrame + Mathf.Max(1, blinkTravelFrames);
+    public int KickFacingSign => facing;
     public Vector2 HoverPosition => hoverPosition;
     public Vector2 ContactPoint => (Vector2)transform.position + new Vector2(facing * (IsOverheadHeelDrop?heelContactOffset.x:airborneContactOffset.x),IsOverheadHeelDrop?heelContactOffset.y:airborneContactOffset.y);
     public int ElapsedFrames => elapsed;
@@ -79,6 +86,8 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         state.LifeState == PlayerLifeState.Alive &&
         (state.ActionState == PlayerActionState.ParrySuccess || state.ActionState == PlayerActionState.Neutral) && FindEligible() != null;
     public event Action Started;
+    public event Action BlinkStarted;
+    public event Action BlinkArrived;
     public event Action ChargeStarted;
     public event Action ChargeReleased;
     public event Action Landed;
@@ -169,7 +178,16 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         active = true; elapsed = 0; hitApplied = charged = confirmedHit = chargeReleased = landed = false; StartCount++;
         origin = body != null ? body.position : (Vector2)transform.position;
         facing = motor != null ? motor.FacingSign : 1;
-        hoverPosition = (Vector2)SelectedTarget.transform.position + new Vector2(facing*(heelTargetHeadOffsetX-heelContactOffset.x),overheadHeight);
+        if (AttacksFromBehind)
+        {
+            // Snapshot the attacker's direction before its stun. Do not make the
+            // target turn around to face the teleport destination.
+            var enemy = SelectedTarget.GetComponent<EnemyMeleeChaser2D>();
+            facing = enemy != null && Mathf.Abs(enemy.Facing.x) > .01f ? (enemy.Facing.x > 0 ? 1 : -1) : -facing;
+        }
+        var contact = IsOverheadHeelDrop ? heelContactOffset : airborneContactOffset;
+        float headX = AttacksFromBehind ? -heelTargetHeadOffsetX : heelTargetHeadOffsetX;
+        hoverPosition = (Vector2)SelectedTarget.transform.position + new Vector2(facing*(headX-contact.x),overheadHeight);
         approach = Mathf.Clamp((SelectedTarget.transform.position.x - origin.x) * facing - .85f, 0, maxApproach);
         if (body != null) { savedGravity = body.gravityScale; if (airborneKick) body.gravityScale = 0; }
         SelectedTarget.AcquireStun(this,Mathf.Max(hitFrame, endFrame) * CombatTimeController.StepSeconds + .1f);
@@ -199,6 +217,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
             return;
         }
         float frame=elapsed+1f;
+        if (UsesBlinkApproach && elapsed == blinkStartFrame) BlinkStarted?.Invoke();
         float travelFrames=blinkApproach?Mathf.Max(1,blinkTravelFrames):hitFrame;
         float rise=Mathf.Clamp01(frame/(blinkApproach?travelFrames:Mathf.Max(1,chargeFrame-2)));
         float fall=Mathf.Clamp01((frame-hitFrame)/Mathf.Max(1,landingFrame-hitFrame));
@@ -206,9 +225,9 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         float x = origin.x + facing * approach * Mathf.Clamp01(frame / travelFrames);
         x+=facing*landingRollDistance*Mathf.Clamp01((frame-landingFrame)/4f);
         Vector2 desired = new Vector2(x, origin.y + height);
-        if(overheadHeelDrop)
+        if(overheadHeelDrop || AttacksFromBehind)
         {
-            float arrive=Mathf.Clamp01(frame/Mathf.Max(1,blinkTravelFrames));
+            float arrive=Mathf.Clamp01((frame-blinkStartFrame)/Mathf.Max(1,blinkTravelFrames));
             desired=Vector2.Lerp(origin,hoverPosition,arrive);
             if(frame>chargeReleaseFrame)
             {
@@ -231,7 +250,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
             for (int i = 0; i < count; i++)
                 if(Vector2.Dot(delta.normalized,movementHits[i].normal)<-.001f)
                     distance = Mathf.Min(distance, Mathf.Max(0f, movementHits[i].distance - .005f));
-            if(overheadHeelDrop&&frame<=blinkTravelFrames&&distance<delta.magnitude-.001f)
+            if((overheadHeelDrop||AttacksFromBehind)&&frame>blinkStartFrame&&frame<=BlinkArrivalFrame&&distance<delta.magnitude-.001f)
             { Finish("ApproachBlocked");return; }
             delta = delta.normalized * distance;
         }
@@ -241,6 +260,11 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     {
         if (!active) return;
         elapsed++;
+        if (UsesBlinkApproach && elapsed == BlinkArrivalFrame)
+        {
+            if (AttacksFromBehind) motor?.SetFacing(facing);
+            BlinkArrived?.Invoke();
+        }
         if (airborneKick && !charged && elapsed >= chargeFrame)
         { charged = true; ChargeStarted?.Invoke(); }
         if(airborneKick&&charged&&!chargeReleased&&elapsed>=chargeReleaseFrame)

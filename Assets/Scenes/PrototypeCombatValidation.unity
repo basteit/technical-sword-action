@@ -8408,6 +8408,8 @@ MonoBehaviour:
   maxApproach: 0.6
   blinkApproach: 0
   blinkTravelFrames: 2
+  blinkStartFrame: 0
+  behindTarget: 0
   overheadHeelDrop: 0
   overheadHeight: 1.35
   heelImpactHeight: 1.15

@@ -85,7 +85,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     }
     private void OnKick(Damageable2D target,Vector2 point)
     {
-        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyLaunch(counter.IsOverheadHeelDrop?1.4f:defenseCancelTake?1.75f:2.25f,counter.IsOverheadHeelDrop?.18f:1.05f,20,Vector2.right*player.GetComponent<PlayerMotor2D>().FacingSign);
+        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyLaunch(counter.AttacksFromBehind?3.2f:counter.IsOverheadHeelDrop?1.4f:defenseCancelTake?1.75f:2.25f,counter.AttacksFromBehind?.65f:counter.IsOverheadHeelDrop?.18f:1.05f,counter.AttacksFromBehind?22:20,Vector2.right*counter.KickFacingSign);
         MarkEvent("Kick",target);
     }
     private void OnCharge()=>MarkEvent("ChargeStart",counter.SelectedTarget);
@@ -222,6 +222,8 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         }
         if(returnDashObserved&&!motor.IsDashing&&!returnAttackSent&&player.ActionState==PlayerActionState.Neutral)
         {
+            if(Mathf.Abs(frontEnemy.transform.position.x-player.transform.position.x)>1.35f)
+            { motor.SetMoveInput(Vector2.right*(frontEnemy.transform.position.x>player.transform.position.x?1:-1));return; }
             motor.SetMoveInput(Vector2.zero);returnAttackSent=true;MarkEvent("ReturnAttack",frontEnemy);attack.RequestAttack();
         }
         if(returnAttackSent&&attack.IsAttacking&&attack.ComboStep<comboStages&&attack.IsComboWindowOpen&&queuedStep!=attack.ComboStep)
@@ -240,7 +242,8 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     {
         if(CombatTimeController.IsPaused) return;
         vfx.AdvanceVisuals(dt);presentation.AdvanceVisuals(dt);
-        if(Running && deathReal>=0 && RealElapsed-deathReal>=.85d && !counter.IsActive && (recovery==null||!recovery.IsPlaying))
+        bool idleVisible=player.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).shortNameHash==Animator.StringToHash("PlayerVideo_Idle");
+        if(Running && deathReal>=0 && RealElapsed-deathReal>=.85d && !counter.IsActive && (recovery==null||!recovery.IsPlaying)&&idleVisible)
         { Running=false;Completed=true;player.GetComponent<PlayerInputRouter>().enabled=true;player.ClearBufferedGameplayInput(); }
     }
     private void OnDisable()

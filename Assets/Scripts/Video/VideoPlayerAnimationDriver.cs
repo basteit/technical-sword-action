@@ -86,7 +86,7 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
             PlayerActionState.Parry => "Parry",
             PlayerActionState.ParrySuccess => SuccessClip(),
             PlayerActionState.ParryFail=>"ParryFail",
-            PlayerActionState.ParryCounter => "Counter",
+            PlayerActionState.ParryCounter => counter.HasAuthoredTransfer && counter.ElapsedFrames < counter.BlinkArrivalFrame ? "CounterTransfer" : "Counter",
             PlayerActionState.Dash => "Dash",
             _=>motion==PlayerState.Move?"Move":motion==PlayerState.Jump?"Jump":motion==PlayerState.Fall?"Fall":"Idle"
         };
@@ -120,8 +120,11 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
         }
         if(counter!=null&&counter.IsActive&&counter.IsAirborneKick)
         {
-            var motion=library.Find("AirRoundhouse");
-            if(motion!=null) visual.sprite=motion.At(counter.ElapsedFrames);
+            var transfer=library.Find("CounterTransfer");
+            bool transferring=counter.HasAuthoredTransfer&&transfer!=null&&counter.ElapsedFrames<counter.BlinkArrivalFrame;
+            var motion=transferring?transfer:library.Find("CounterKick")??library.Find("AirRoundhouse");
+            int localFrame=counter.ElapsedFrames-(counter.HasAuthoredTransfer&&!transferring?counter.BlinkArrivalFrame:0);
+            if(motion!=null) visual.sprite=motion.At(localFrame);
             return;
         }
         if(attack!=null&&attack.IsAttacking)

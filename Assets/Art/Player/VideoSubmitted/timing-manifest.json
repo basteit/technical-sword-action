@@ -209,6 +209,127 @@
       "pivotY": 38,
       "provisional": true,
       "totalFrames": 10
+    },
+    {
+      "canvasHeight": 64,
+      "canvasWidth": 64,
+      "count": 8,
+      "frames": [
+        {
+          "frames": 1,
+          "start": 0
+        },
+        {
+          "frames": 1,
+          "start": 1
+        },
+        {
+          "frames": 2,
+          "start": 2
+        },
+        {
+          "frames": 2,
+          "start": 4
+        },
+        {
+          "frames": 2,
+          "start": 6
+        },
+        {
+          "frames": 1,
+          "start": 8
+        },
+        {
+          "frames": 1,
+          "start": 9
+        },
+        {
+          "frames": 2,
+          "start": 10
+        }
+      ],
+      "name": "CounterTransfer",
+      "pivotX": 32,
+      "pivotY": 38,
+      "provisional": true,
+      "totalFrames": 12
+    },
+    {
+      "canvasHeight": 128,
+      "canvasWidth": 128,
+      "chargeFrame": 6,
+      "count": 15,
+      "frames": [
+        {
+          "frames": 2,
+          "start": 0
+        },
+        {
+          "frames": 2,
+          "start": 2
+        },
+        {
+          "frames": 2,
+          "start": 4
+        },
+        {
+          "frames": 2,
+          "start": 6
+        },
+        {
+          "frames": 1,
+          "start": 8
+        },
+        {
+          "frames": 1,
+          "start": 9
+        },
+        {
+          "frames": 2,
+          "start": 10
+        },
+        {
+          "frames": 1,
+          "start": 12
+        },
+        {
+          "frames": 1,
+          "start": 13
+        },
+        {
+          "frames": 2,
+          "start": 14
+        },
+        {
+          "frames": 2,
+          "start": 16
+        },
+        {
+          "frames": 2,
+          "start": 18
+        },
+        {
+          "frames": 2,
+          "start": 20
+        },
+        {
+          "frames": 2,
+          "start": 22
+        },
+        {
+          "frames": 2,
+          "start": 24
+        }
+      ],
+      "hitFrame": 13,
+      "landingFrame": 26,
+      "name": "CounterKick",
+      "pivotX": 32,
+      "pivotY": 38,
+      "provisional": true,
+      "recoveryFrame": 26,
+      "releaseFrame": 12,
+      "totalFrames": 26
     }
   ]
 }

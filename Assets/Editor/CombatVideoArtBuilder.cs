@@ -142,7 +142,9 @@ public static class CombatVideoArtBuilder
             var motion=library.Find(reaction);
             if(motion!=null) machine.AddState("PlayerVideo_"+reaction).motion=Clip(reaction,motion,false);
         }
-        machine.AddState("PlayerVideo_Counter").motion=Clip("Counter",library.Find("AirRoundhouse"),false);
+        machine.AddState("PlayerVideo_Counter").motion=Clip("Counter",library.Find("CounterKick")??library.Find("AirRoundhouse"),false);
+        var transfer=library.Find("CounterTransfer");
+        if(transfer!=null) machine.AddState("PlayerVideo_CounterTransfer").motion=Clip("CounterTransfer",transfer,false);
         machine.AddState("PlayerVideo_Move").motion=Clip("Move",moveMotion,true);
         var dash=library.Find("Dash");
         if(dash!=null) machine.AddState("PlayerVideo_Dash").motion=Clip("Dash",dash,false);

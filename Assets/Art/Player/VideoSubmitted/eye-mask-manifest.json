@@ -127,6 +127,98 @@
     {
       "file": "ParrySuccessLight_07",
       "pixels": 7
+    },
+    {
+      "file": "CounterTransfer_01",
+      "pixels": 0
+    },
+    {
+      "file": "CounterTransfer_02",
+      "pixels": 0
+    },
+    {
+      "file": "CounterTransfer_03",
+      "pixels": 0
+    },
+    {
+      "file": "CounterTransfer_04",
+      "pixels": 9
+    },
+    {
+      "file": "CounterTransfer_05",
+      "pixels": 12
+    },
+    {
+      "file": "CounterTransfer_06",
+      "pixels": 31
+    },
+    {
+      "file": "CounterTransfer_07",
+      "pixels": 40
+    },
+    {
+      "file": "CounterTransfer_08",
+      "pixels": 48
+    },
+    {
+      "file": "CounterKick_01",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_02",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_03",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_04",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_05",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_06",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_07",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_08",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_09",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_10",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_11",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_12",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_13",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_14",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_15",
+      "pixels": 0
     }
   ]
 }

@@ -24,13 +24,7 @@ public static class HeelDropVideoSetup
         {
             var scene=EditorSceneManager.OpenScene(path);
             var player=UnityEngine.Object.FindFirstObjectByType<PlayerParryCounter2D>();
-            var data=new SerializedObject(player);
-            data.FindProperty("overheadHeelDrop").boolValue=true;
-            data.FindProperty("overheadHeight").floatValue=1.35f;
-            data.FindProperty("heelImpactHeight").floatValue=1.15f;
-            data.FindProperty("heelContactOffset").vector2Value=new Vector2(10f/32f,-22f/32f);
-            data.FindProperty("heelTargetHeadOffsetX").floatValue=7/32f;
-            data.ApplyModifiedPropertiesWithoutUndo();
+            CombatVideoSceneBuilder.ConfigureCounter(player,library);
             CombatVideoSceneBuilder.ConfigureAttack(player.GetComponent<PlayerAttack2D>(),library,path!=CombatVideoSceneBuilder.DefenseCancelScenePath);
             CombatVideoSceneBuilder.Set(player.GetComponent<VideoPlayerAnimationDriver>(),"skipAttackRecovery",true);
             if(path==CombatVideoSceneBuilder.ScenePath)

@@ -70,7 +70,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
             if (motion=="Attack" && elapsed<16) desired="Attack";
             if (motion=="Hit" && elapsed<6) desired="Hit";
             if(desired!=motion) Play(desired);
-            if(player!=null) visual.flipX=player.position.x<transform.position.x;
+            if(player!=null&&!health.IsStunned) visual.flipX=player.position.x<transform.position.x;
         }
         elapsed++;Show();
     }
