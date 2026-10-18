@@ -27,5 +27,8 @@ UnityYAMLMergeの端末設定、Assetと.metaの監査、main保護とSquash mer
 
 ## Art Workflow
 
+受領済みプレイヤー原稿の現在版・履歴・追加更新は
+[`ArtSource/Player/README.md`](ArtSource/Player/README.md)、[素材一覧](ArtSource/Player/INDEX.md)を参照してください。
+
 主人公ドット絵のサイズ、足裏基準、Asepriteタグ、Unityへの追加・差し替え手順は
 [`Assets/Art/Player/Prototype/README.md`](Assets/Art/Player/Prototype/README.md) を参照してください。
