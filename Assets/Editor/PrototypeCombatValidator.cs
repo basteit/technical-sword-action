@@ -17,6 +17,7 @@ public static class PrototypeCombatValidator
     public static string[] Validate()
     {
         var errors = new List<string>();
+        errors.AddRange(PrototypePlayerArtInstaller.Validate());
         const string folder = "Assets/Settings/PrototypeCombat/";
         var attack = AssetDatabase.LoadAssetAtPath<PlayerAttackDefinition>(folder + "FourStepAttack.asset");
         var counter = AssetDatabase.LoadAssetAtPath<ParryCounterDefinition>(folder + "ParryCounter.asset");
@@ -63,7 +64,14 @@ public static class PrototypeCombatValidator
                 {
                     if (GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(transform.gameObject) != 0)
                         errors.Add(transform.name + ": missing script.");
-                    if (transform.GetComponent<PlayerStateMachine>() != null) players++;
+                    if (transform.GetComponent<PlayerStateMachine>() != null)
+                    {
+                        players++;
+                        var art = transform.GetComponent<PrototypePlayerArtPresentation>();
+                        if (art == null || art.Artwork == null || art.ArtSet == null ||
+                            transform.GetComponent<Animator>().runtimeAnimatorController != art.ArtSet.controller)
+                            errors.Add("Prototype player needs its submitted art set, visual renderer and controller connected.");
+                    }
                     if (transform.name == "ActionPlatforms") actionPlatforms = transform;
                     if (transform.name == "VideoWhiteGrid") videoGrid = transform;
                     if (!Application.isPlaying && transform.TryGetComponent<EnemyMeleeChaser2D>(out _) && transform.gameObject.activeInHierarchy)

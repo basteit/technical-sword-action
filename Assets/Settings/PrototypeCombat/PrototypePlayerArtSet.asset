@@ -1,0 +1,169 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c15c5a2a783d0f4a973a390ef1e79f0, type: 3}
+  m_Name: PrototypePlayerArtSet
+  m_EditorClassIdentifier: Assembly-CSharp::PrototypePlayerArtSet
+  controller: {fileID: 22100000, guid: d003cb834f706204287868da53baf14e, type: 2}
+  entries:
+  - action: AirDashSlash
+    source: HorizontalSlash
+    status: 3
+    clip: {fileID: 7400000, guid: aa2b63ca166767440b5ba6970435b084, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: AirRecovery
+    source: Player_jamp_up_sample
+    status: 3
+    clip: {fileID: 7400000, guid: fb1103f9b3baa2f47b8ff679c3ca2688, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Attack_1
+    source: VerticalSlash
+    status: 1
+    clip: {fileID: 7400000, guid: 9d549334dcbba634cb85e8a061a8d2d5, type: 2}
+    contactSprite: {fileID: 21300000, guid: 0d9740a402b8fd044ad39076650555d7, type: 3}
+    visualHitFrame: 15.000008
+  - action: Attack_2
+    source: HorizontalSlash
+    status: 1
+    clip: {fileID: 7400000, guid: 4ea43e0cfb396f74686cbd53d681b52e, type: 2}
+    contactSprite: {fileID: 21300000, guid: 380ec3ac1eb0a684a942f0af946d0632, type: 3}
+    visualHitFrame: 12.000008
+  - action: Attack_3
+    source: RapidSheathe
+    status: 2
+    clip: {fileID: 7400000, guid: 2e3d30c1e0e3cd447aab4a3a189b8958, type: 2}
+    contactSprite: {fileID: 21300000, guid: 51f5ab2aeb4da734599d17a81e070ac2, type: 3}
+    visualHitFrame: 15.000008
+  - action: Attack_4
+    source: IaiSlash
+    status: 2
+    clip: {fileID: 7400000, guid: 01d5d7ff3aa597a41aac2aae85ac1c30, type: 2}
+    contactSprite: {fileID: 21300000, guid: c6f7f22c8514f1d4280a1fa43564ed97, type: 3}
+    visualHitFrame: 38.00001
+  - action: ComboBranch
+    source: HorizontalSlash
+    status: 3
+    clip: {fileID: 7400000, guid: 968c28c9ba254be46a0e95763e28194d, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Dash
+    source: Dash
+    status: 2
+    clip: {fileID: 7400000, guid: a402605c87856984ba3e1e1aa60e9295, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Death
+    source: AirRoundhouse
+    status: 3
+    clip: {fileID: 7400000, guid: 116fde58de279864b9bd474342a66c9b, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: DropThrough
+    source: Player_jamp_up_sample
+    status: 3
+    clip: {fileID: 7400000, guid: ba197e426d48cb44ebc6db6eca09e870, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Fall
+    source: Player_jamp_up_sample
+    status: 3
+    clip: {fileID: 7400000, guid: af2a3daf9fa95d84f804c6c65637b7a3, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Heal
+    source: IdleReference
+    status: 3
+    clip: {fileID: 7400000, guid: 48e010d970dac014289fa2a4a986718f, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Hit
+    source: ParryDeflect
+    status: 3
+    clip: {fileID: 7400000, guid: 8e1e88f89ef24b044b1fc8f5922bf22f, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Idle
+    source: IdleReference
+    status: 0
+    clip: {fileID: 7400000, guid: 95eb3162627532e4fa6968e026da95a4, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Jump
+    source: Player_jamp_start_sample + Player_jamp_up_sample
+    status: 1
+    clip: {fileID: 7400000, guid: 4d7b909a4d4ce3e40a560b6eed3ca83e, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: LandingShock
+    source: AirRoundhouse
+    status: 3
+    clip: {fileID: 7400000, guid: 2d8e5af4e36d8d94daa417f2a8254386, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Move
+    source: WalkReference
+    status: 0
+    clip: {fileID: 7400000, guid: 1268efdb9df50c64cb72c6ed63a2203c, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Parry
+    source: ParryReady
+    status: 0
+    clip: {fileID: 7400000, guid: 0a2646c127d1e18449e301f341ea6e73, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: ParryCounter
+    source: CounterKick
+    status: 1
+    clip: {fileID: 7400000, guid: 9afcdef72634eea4b839ee7d82b2a41a, type: 2}
+    contactSprite: {fileID: 21300000, guid: 3fa3157504dd1f146a5d26503a51f05d, type: 3}
+    visualHitFrame: 17
+  - action: ParryFail
+    source: ParryReady
+    status: 3
+    clip: {fileID: 7400000, guid: cd6f78275efe4164b97d4ac4da29457e, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: ParrySuccess
+    source: ParrySuccessLight
+    status: 1
+    clip: {fileID: 7400000, guid: 752dcff243157714ab1254ef0127764a, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Respawn
+    source: IdleReference
+    status: 3
+    clip: {fileID: 7400000, guid: 8c8cd41652e40cf409c1d0ae238a00c8, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Rest
+    source: IdleReference
+    status: 3
+    clip: {fileID: 7400000, guid: 16b30cc7e6e16e44686dfe4390ee1227, type: 2}
+    contactSprite: {fileID: 0}
+    visualHitFrame: 0
+  - action: Special
+    source: IaiSlash
+    status: 3
+    clip: {fileID: 7400000, guid: 45f8013c41fa6534aafa3bbb57b7a60f, type: 2}
+    contactSprite: {fileID: 21300000, guid: c6f7f22c8514f1d4280a1fa43564ed97, type: 3}
+    visualHitFrame: 15
+  feetPivotSprites:
+  - {fileID: 1468722982401124421, guid: c6c9fb6c899188943a52105f9862e607, type: 3}
+  - {fileID: 5033249882690796087, guid: c6c9fb6c899188943a52105f9862e607, type: 3}
+  - {fileID: -7650389486476378212, guid: c6c9fb6c899188943a52105f9862e607, type: 3}
+  - {fileID: 970126226892156605, guid: c6c9fb6c899188943a52105f9862e607, type: 3}
+  - {fileID: -1815033701688668729, guid: c6c9fb6c899188943a52105f9862e607, type: 3}
+  - {fileID: -8402897093334649978, guid: e113841a56162a14ea8443f4e4726440, type: 3}
+  commonFeetBelowPivot: 1
+  pixelsPerUnit: 32

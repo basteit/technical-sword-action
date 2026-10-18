@@ -29,3 +29,6 @@
 *.prefab whitespace=-blank-at-eol
 *.asset whitespace=-blank-at-eol
 *.meta whitespace=-blank-at-eol
+*.anim whitespace=-blank-at-eol
+*.controller whitespace=-blank-at-eol
+*.overrideController whitespace=-blank-at-eol
