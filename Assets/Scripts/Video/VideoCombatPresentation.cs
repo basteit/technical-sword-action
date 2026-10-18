@@ -99,8 +99,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         charged=false;CombatTimeController.ReleaseSlow(counter);
         CombatTimeController.RequestHitstop(counter,8*CombatTimeController.StepSeconds);
-        ShakeDirectional(.25f,.24f,counter.AttacksFromBehind?new Vector2(counter.KickFacingSign,-.25f):new Vector2(counter.KickFacingSign*.35f,-1),2.75f);
-        flashRemaining=flashDuration=3/60f;flashStrength=.12f;flashTint=Color.white;
+        ShakeDirectional(vfx.ReadableImpacts?.22f:.25f,vfx.ReadableImpacts?.26f:.24f,counter.AttacksFromBehind?new Vector2(counter.KickFacingSign,-.25f):new Vector2(counter.KickFacingSign*.35f,-1),vfx.ReadableImpacts?1.75f:2.75f);
+        flashRemaining=flashDuration=(vfx.ReadableImpacts?2:3)/60f;flashStrength=vfx.ReadableImpacts?.20f:.12f;flashTint=Color.white;
         bool authored=library!=null&&library.Find("CounterKick")?.includesCounterTrail==true;
         vfx.Emit(counter.IsOverheadHeelDrop?"HeelLightning":authored?"ElectricKick":"Kick",foot,counter.IsOverheadHeelDrop?1f:authored?1.15f:1.55f,counter.KickFacingSign);
     }
@@ -119,7 +119,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     public void PresentLightParry(int facing)
     {
         // A single beat and return carries the impact, while the hero keeps a stable base.
-        ShakeDirectional(7/60f,.135f,new Vector2(-facing,-.3f),1.25f);
+        ShakeDirectional((vfx.ReadableImpacts?6:7)/60f,vfx.ReadableImpacts?.145f:.135f,new Vector2(-facing,-.3f),vfx.ReadableImpacts?1f:1.25f);
         flashRemaining=flashDuration=3/60f;flashStrength=.18f;flashTint=Color.black;
     }
     public void ShakeDirectional(float realSeconds,float strength,Vector2 direction,float cycles=3)

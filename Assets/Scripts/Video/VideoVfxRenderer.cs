@@ -8,18 +8,40 @@ public sealed class VideoVfxRenderer : MonoBehaviour
     [SerializeField] private Material glowMaterial;
     [SerializeField] private bool hybridGlow=true;
     [SerializeField,Range(0,1)] private float intensity=.8f;
+    [SerializeField] private bool readableImpacts=true;
+    [SerializeField] private int impactBackdropOrder=-1;
+    private VideoArtLibrary.Motion electricBurst,parryBurst;
+    private readonly List<Sprite> generatedSprites=new();
+    private readonly List<Texture2D> generatedTextures=new();
     private sealed class Effect
-    { public GameObject root;public SpriteRenderer sprite,glow;public VideoArtLibrary.Motion motion;public float age,duration;public bool permitsGlow,fresh,fade;public Transform follow;public Vector2 offset,drift;public Color tint,glowTint; }
+    { public GameObject root;public SpriteRenderer sprite,glow;public VideoArtLibrary.Motion motion;public float age,duration,glowSeconds;public bool permitsGlow,fresh,fade;public Transform follow;public Vector2 offset,drift;public Color tint,glowTint; }
     private readonly List<Effect> pool=new();
+    public bool ReadableImpacts { get=>readableImpacts;set=>readableImpacts=value; }
     public bool HybridGlow { get=>hybridGlow;set=>hybridGlow=value; }
     public int ActiveCount { get { int n=0;foreach(var e in pool) if(e.root.activeSelf) n++;return n; } }
     public int EmissionCount { get; private set; }
     public void Emit(string kind,Vector2 position,float scale=1,int facing=1,float delay=0)
-    { EmitEffect(kind,position,scale,facing,delay); }
+    {
+        var effect=EmitEffect(kind,position,scale,facing,delay);
+        if(effect==null||!readableImpacts) return;
+        if(kind=="ElectricKick")
+        {
+            // The ring and lightning surround the contact behind both actors.
+            effect.sprite.sortingOrder=impactBackdropOrder;effect.glow.sortingOrder=impactBackdropOrder-1;
+            effect.sprite.color=new Color(1,1,1,intensity*.65f);
+            EmitImpactBurst(true,position,scale,facing,delay);
+        }
+        else if(kind=="Parry")
+        {
+            effect.root.transform.localScale*=.75f;
+            EmitImpactBurst(false,position,scale,facing,delay);
+        }
+    }
     private Effect EmitEffect(string kind,Vector2 position,float scale,int facing,float delay)
     {
         var motion=library.Find("Fx_"+kind);if(motion==null) return null;
         Effect effect=Obtain();
+        effect.glowSeconds=readableImpacts&&(kind=="ElectricKick"||kind=="Parry")?2/60f:motion.TotalFrames/60f*.6f;
         effect.motion=motion;effect.age=-delay;effect.duration=motion.TotalFrames/60f;effect.permitsGlow=effect.fresh=true;
         effect.follow=null;effect.drift=Vector2.zero;effect.fade=false;effect.sprite.sortingOrder=30;effect.glow.sortingOrder=29;
         effect.root.transform.position=position;effect.root.transform.localScale=new Vector3(scale*facing,scale,1);
@@ -39,15 +61,75 @@ public sealed class VideoVfxRenderer : MonoBehaviour
     public void EmitEyeTrail(SpriteRenderer player,int facing)
     {
         var eyes=library.EyesFor(player.sprite);if(eyes==null) return;
-        var effect=Obtain();effect.motion=new VideoArtLibrary.Motion{name="EyeTrail",frames=new[]{eyes},durations=new[]{8}};
-        effect.age=0;effect.duration=8/60f;effect.permitsGlow=effect.fresh=effect.fade=true;
+        var effect=Obtain();effect.motion=new VideoArtLibrary.Motion{name="EyeTrail",frames=new[]{eyes},durations=new[]{readableImpacts?6:8}};
+        effect.age=0;effect.duration=(readableImpacts?6:8)/60f;effect.glowSeconds=effect.duration*.6f;effect.permitsGlow=effect.fresh=effect.fade=true;
         effect.follow=null;effect.drift=Vector2.right*(-facing*1.8f);
-        effect.tint=new Color(.75f,.95f,1,.8f);effect.glowTint=new Color(.65f,.9f,1,.4f);
+        effect.tint=new Color(.75f,.95f,1,readableImpacts?.45f:.8f);effect.glowTint=new Color(.65f,.9f,1,readableImpacts?.18f:.4f);
         effect.root.transform.position=player.transform.position;effect.root.transform.localScale=new Vector3(facing,1,1);
         effect.sprite.sprite=effect.glow.sprite=eyes;effect.sprite.color=effect.tint;
         effect.glow.color=effect.glowTint;effect.glow.transform.localScale=Vector3.one;
         effect.sprite.sortingOrder=1020;effect.glow.sortingOrder=1019;
         effect.sprite.enabled=true;effect.glow.enabled=hybridGlow;effect.root.SetActive(true);EmissionCount++;
+    }
+    private void EmitImpactBurst(bool electric,Vector2 position,float scale,int facing,float delay)
+    {
+        var motion=electric?(electricBurst??=CreateImpactBurst(true)):(parryBurst??=CreateImpactBurst(false));
+        var effect=Obtain();effect.motion=motion;effect.age=-delay;effect.duration=motion.TotalFrames/60f;
+        effect.glowSeconds=2/60f;effect.permitsGlow=effect.fresh=true;
+        effect.fade=false;effect.follow=null;effect.drift=Vector2.zero;
+        effect.root.transform.position=position;effect.root.transform.localScale=new Vector3(scale*facing,scale,1);
+        effect.sprite.sortingOrder=electric?impactBackdropOrder:31;effect.glow.sortingOrder=electric?impactBackdropOrder-1:30;
+        effect.sprite.sprite=effect.glow.sprite=motion.frames[0];effect.sprite.color=new Color(1,1,1,intensity);
+        effect.glow.color=electric?new Color(.5f,.85f,1,.16f*intensity):new Color(1,.88f,.6f,.12f*intensity);
+        effect.glow.transform.localScale=Vector3.one;
+        effect.sprite.enabled=delay<=0;effect.glow.enabled=hybridGlow&&delay<=0;effect.root.SetActive(true);EmissionCount++;
+    }
+    private VideoArtLibrary.Motion CreateImpactBurst(bool electric)
+    {
+        int size=electric?128:96,count=electric?6:4;
+        float[] angles=electric?new float[]{-160,-116,-72,-28,14,56,106,150}:new float[]{-70,-28,8,38,72,130,168};
+        var frames=new Sprite[count];
+        for(int frame=0;frame<count;frame++)
+        {
+            var pixels=new Color32[size*size];
+            for(int ray=0;ray<angles.Length;ray++)
+            {
+                float angle=angles[ray]*Mathf.Deg2Rad;var direction=new Vector2(Mathf.Cos(angle),Mathf.Sin(angle));
+                var normal=new Vector2(-direction.y,direction.x);var center=Vector2.one*(size/2);
+                float inner=electric?13+frame*4:3+frame*6;
+                float outer=electric?30+frame*3+(ray*7)%9:18+frame*5+(ray%3)*3;
+                Vector2 a=center+direction*inner,b=center+direction*Mathf.Lerp(inner,outer,.35f)+normal*((ray%2==0?1:-1)*(electric?5:2));
+                Vector2 c=center+direction*Mathf.Lerp(inner,outer,.65f)-normal*(electric?3:1),d=center+direction*outer;
+                Color32 edge=electric?new Color32(66,83,184,220):new Color32(113,83,52,210);
+                Color32 core=electric?new Color32(172,242,255,255):new Color32(255,241,198,255);
+                DrawPixelLine(pixels,size,a,b,edge,3);DrawPixelLine(pixels,size,b,c,edge,3);DrawPixelLine(pixels,size,c,d,edge,3);
+                DrawPixelLine(pixels,size,a,b,core,1);DrawPixelLine(pixels,size,b,c,core,1);DrawPixelLine(pixels,size,c,d,core,1);
+                if(frame<2)DrawPixelLine(pixels,size,b,c,new Color32(244,253,255,255),1);
+            }
+            var texture=new Texture2D(size,size,TextureFormat.RGBA32,false){filterMode=FilterMode.Point,wrapMode=TextureWrapMode.Clamp,hideFlags=HideFlags.DontSave};
+            texture.SetPixels32(pixels);texture.Apply(false,false);generatedTextures.Add(texture);
+            var sprite=Sprite.Create(texture,new Rect(0,0,size,size),Vector2.one*.5f,32,0,SpriteMeshType.FullRect);
+            sprite.name=$"Video_{(electric?"ElectricDischarge":"DeflectSparks")}_{frame+1:00}";sprite.hideFlags=HideFlags.DontSave;
+            generatedSprites.Add(sprite);frames[frame]=sprite;
+        }
+        return new VideoArtLibrary.Motion{name=electric?"ElectricDischarge":"DeflectSparks",frames=frames,durations=electric?new[]{1,1,2,2,3,3}:new[]{1,1,2,3}};
+    }
+    private static void DrawPixelLine(Color32[] pixels,int size,Vector2 from,Vector2 to,Color32 color,int width)
+    {
+        int x=Mathf.RoundToInt(from.x),y=Mathf.RoundToInt(from.y),tx=Mathf.RoundToInt(to.x),ty=Mathf.RoundToInt(to.y);
+        int dx=Mathf.Abs(tx-x),dy=-Mathf.Abs(ty-y),sx=x<tx?1:-1,sy=y<ty?1:-1,error=dx+dy;
+        while(true)
+        {
+            for(int oy=-width/2;oy<=width/2;oy++)for(int ox=-width/2;ox<=width/2;ox++)
+            {int px=x+ox,py=y+oy;if(px>=0&&py>=0&&px<size&&py<size)pixels[py*size+px]=color;}
+            if(x==tx&&y==ty)break;
+            int twice=2*error;if(twice>=dy){error+=dy;x+=sx;}if(twice<=dx){error+=dx;y+=sy;}
+        }
+    }
+    private void OnDestroy()
+    {
+        foreach(var sprite in generatedSprites)if(sprite!=null)Destroy(sprite);
+        foreach(var texture in generatedTextures)if(texture!=null)Destroy(texture);
     }
     private Effect Obtain()
     {
@@ -89,7 +171,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
             if(e.fresh) { e.fresh=false;continue; }
             e.age+=realSeconds;
             if(e.age>=e.duration) { e.root.SetActive(false);continue; }
-            e.sprite.enabled=e.age>=0;e.glow.enabled=e.permitsGlow&&hybridGlow&&e.age>=0&&e.age<e.duration*.6f;
+            e.sprite.enabled=e.age>=0;e.glow.enabled=e.permitsGlow&&hybridGlow&&e.age>=0&&e.age<e.glowSeconds;
             if(e.follow!=null) e.root.transform.position=(Vector2)e.follow.position+e.offset;
             else e.root.transform.position+=(Vector3)(e.drift*realSeconds);
             if(e.fade)

@@ -257,6 +257,92 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(presentation,"ActiveShakeCount"),Is.Zero);
             Assert.That(Get<int>(Find("VideoVfxRenderer"),"ActiveCount"),Is.Zero);
         }
+        [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
+        [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
+        public void ElectricImpactKeepsTheContactClearAndFreezesItsOuterBoltsOnPause(int fps,bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            var enemy=(Component)Get<object>(director,"RearEnemy");var targetVisual=enemy.GetComponentInChildren<SpriteRenderer>();
+            int restOrder=targetVisual.sortingOrder;
+            Vector3 localBefore=default,rootBefore=default;Quaternion rotationBefore=default;
+            for(int i=0;i<fps*6&&Get<int>(enemy,"HitCount")==0;i++)
+            {localBefore=targetVisual.transform.localPosition;rootBefore=enemy.transform.position;rotationBefore=targetVisual.transform.localRotation;Call(director,"StepCapture",1d/fps);}
+            Assert.That(Get<int>(enemy,"HitCount"),Is.EqualTo(1));
+            Assert.That(enemy.transform.position,Is.EqualTo(rootBefore),"Launch starts after the contact tick and its hitstop.");
+            Assert.That(targetVisual.transform.localPosition,Is.EqualTo(localBefore),"Death must not shift the contact body during hitstop.");
+            Assert.That(Quaternion.Angle(targetVisual.transform.localRotation,rotationBefore),Is.LessThan(.001f));
+            Assert.That(targetVisual.sortingOrder,Is.GreaterThan(state.GetComponent<SpriteRenderer>().sortingOrder),"The struck body stays visible over the authored trail during contact.");
+            var vfx=Find("VideoVfxRenderer");var renderers=vfx.GetComponentsInChildren<SpriteRenderer>();
+            var ring=renderers.First(r=>r.sprite!=null&&r.sprite.name=="Fx_ElectricKick_01");
+            var bolts=renderers.First(r=>r.sprite!=null&&r.sprite.name=="Video_ElectricDischarge_01");
+            Assert.That(ring.sortingOrder,Is.LessThan(targetVisual.sortingOrder));
+            Assert.That(bolts.sortingOrder,Is.LessThan(state.GetComponent<SpriteRenderer>().sortingOrder));
+            Assert.That(bolts.sprite.texture.filterMode,Is.EqualTo(FilterMode.Point));
+            var pixels=bolts.sprite.texture.GetPixels32();int size=bolts.sprite.texture.width;
+            for(int y=size/2-8;y<=size/2+8;y++)for(int x=size/2-8;x<=size/2+8;x++)
+                if((x-size/2)*(x-size/2)+(y-size/2)*(y-size/2)<64)Assert.That(pixels[y*size+x].a,Is.Zero,"Keep the impact center clear.");
+            var sprite=bolts.sprite;var position=bolts.transform.position;int active=Get<int>(vfx,"ActiveCount");
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
+            for(int i=0;i<fps;i++)Call(director,"StepCapture",1d/fps);
+            Assert.That(bolts.sprite,Is.SameAs(sprite));Assert.That(bolts.transform.position,Is.EqualTo(position));
+            Assert.That(Get<int>(vfx,"ActiveCount"),Is.EqualTo(active));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
+            for(int i=0;i<Mathf.CeilToInt(fps*.06f);i++)Call(director,"StepCapture",1d/fps);
+            Assert.That(enemy.transform.position,Is.EqualTo(rootBefore));
+            for(int i=0;i<fps*2&&!Get<bool>(director,"Completed");i++)Call(director,"StepCapture",1d/fps);
+            Assert.That(targetVisual.sortingOrder,Is.EqualTo(restOrder));
+            Call(director,"ResetTake",2);
+            Assert.That(Get<int>(vfx,"ActiveCount"),Is.Zero);
+            Assert.That(targetVisual.transform.localRotation,Is.EqualTo(Quaternion.identity));
+            Assert.That(targetVisual.sortingOrder,Is.EqualTo(restOrder));
+        }
+        [TestCase("ElectricKick",false)] [TestCase("ElectricKick",true)]
+        [TestCase("Parry",false)] [TestCase("Parry",true)]
+        public void ImpactSpritesAreReusedAndPurePixelModeNeverEnablesGlow(string kind,bool hybrid)
+        {
+            Call(director,"ResetTake",2);var vfx=Find("VideoVfxRenderer");Set(vfx,"HybridGlow",hybrid);
+            int pooled=0,generated=0;
+            for(int run=0;run<10;run++)
+            {
+                Call(vfx,"Emit",kind,Vector2.zero,1f,1,0f);
+                if(kind=="ElectricKick")
+                    Assert.That(vfx.GetComponentsInChildren<SpriteRenderer>().First(r=>r.sprite!=null&&r.sprite.name=="Fx_ElectricKick_01").sortingOrder,
+                        Is.LessThan(0),"The shared effect also needs to stay behind prototype actors at default sorting order.");
+                if(!hybrid)Assert.That(vfx.GetComponentsInChildren<SpriteRenderer>().Where(r=>r.name=="OptionalGlow").All(r=>!r.enabled),Is.True);
+                if(run==0)
+                {
+                    pooled=((ICollection)Get<object>(vfx,"pool")).Count;
+                    generated=((ICollection)Get<object>(vfx,"generatedSprites")).Count;
+                    Assert.That(generated,Is.GreaterThan(0));
+                }
+                else
+                {
+                    Assert.That(((ICollection)Get<object>(vfx,"pool")).Count,Is.EqualTo(pooled));
+                    Assert.That(((ICollection)Get<object>(vfx,"generatedSprites")).Count,Is.EqualTo(generated));
+                }
+                for(int i=0;i<60;i++)Call(vfx,"AdvanceVisuals",1/60f);
+                Assert.That(Get<int>(vfx,"ActiveCount"),Is.Zero);
+            }
+            Call(vfx,"ResetEffects");Assert.That(Get<int>(vfx,"ActiveCount"),Is.Zero);
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void LightParryRecoilMovesOnlyTheVisualAwayThenResets(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            var enemy=(Component)Get<object>(director,"RearEnemy");var visual=enemy.GetComponentInChildren<SpriteRenderer>();
+            var ai=enemy.GetComponent(Type.GetType("EnemyMeleeChaser2D, Assembly-CSharp",true));
+            var parry=state.GetComponent(Type.GetType("PlayerParry2D, Assembly-CSharp",true));
+            Vector3 rest=visual.transform.localPosition;
+            for(int i=0;i<220&&Get<int>(parry,"SuccessCount")==0;i++)Step();
+            Vector3 root=enemy.transform.position;int away=mirrored?1:-1;
+            Assert.That(visual.transform.localPosition,Is.EqualTo(rest));
+            for(int i=0;i<8;i++)Step();
+            Assert.That((visual.transform.localPosition.x-rest.x)*away,Is.GreaterThan(.03f));
+            Assert.That(enemy.transform.position,Is.EqualTo(root));
+            Assert.That(Quaternion.Angle(visual.transform.localRotation,Quaternion.identity),Is.GreaterThan(2));
+            Call(director,"ResetTake",2);Assert.That(visual.transform.localPosition,Is.EqualTo(rest));
+            Assert.That(visual.transform.localRotation,Is.EqualTo(Quaternion.identity));
+        }
         [TestCase(false)] [TestCase(true)]
         public void SubmittedKickImpactUsesTheDrawnFootInsideTheSelectedTarget(bool mirrored)
         {
