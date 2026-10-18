@@ -166,6 +166,7 @@ public static class CombatVideoArtBuilder
             var state=enemyMachine.AddState("EnemyVideo_"+name);state.motion=clip;if(name=="Idle") enemyMachine.defaultState=state;
         }
         AssetDatabase.SaveAssets();
+        EnemySubmissionSetup.Apply();
     }
     private static string[] SelectCleanFrames(string folder)
     {

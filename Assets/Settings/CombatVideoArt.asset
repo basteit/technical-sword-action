@@ -609,16 +609,15 @@ MonoBehaviour:
     hasParryContact: 0
     parryContactOffset: {x: 0, y: 0}
     frames:
-    - {fileID: 21300000, guid: 6b08e786994c3b141ad3ca7f7600e322, type: 3}
-    - {fileID: 21300000, guid: d886bcc42d3335145add268bf6d28ed0, type: 3}
-    - {fileID: 21300000, guid: 5f16d9f7f1479ea43bb39924a5ab02f6, type: 3}
-    - {fileID: 21300000, guid: ee782c627ed0bdb44aeea1c7b2e70fda, type: 3}
-    eyeFrames:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    durations: 04000000040000000400000004000000
+    - {fileID: 21300000, guid: 9aa4061de160e3e418b10a3e5ceca27e, type: 3}
+    - {fileID: 21300000, guid: f495e587f7befc046a79bfb44156b888, type: 3}
+    - {fileID: 21300000, guid: e8006709d52f0c649b7695f0cb4135dd, type: 3}
+    - {fileID: 21300000, guid: 5d8570cb38d24e54bb364ab229792e40, type: 3}
+    - {fileID: 21300000, guid: b3e4a4cd9de843049a43aa7f5754d418, type: 3}
+    - {fileID: 21300000, guid: b071004e00055af49a24becaff8b8b26, type: 3}
+    - {fileID: 21300000, guid: 8c8705761d1355142bc9dc52b15b078d, type: 3}
+    eyeFrames: []
+    durations: 02000000020000000100000002000000020000000300000004000000
     hitFrame: 0
     branchFrame: 0
     chargeFrame: 0
@@ -636,20 +635,9 @@ MonoBehaviour:
     hasParryContact: 0
     parryContactOffset: {x: 0, y: 0}
     frames:
-    - {fileID: 21300000, guid: 90ebbdf5fe1d7c94f9ef241f9f658f22, type: 3}
-    - {fileID: 21300000, guid: bd417b60e3716884ab6cdd72dc467e01, type: 3}
-    - {fileID: 21300000, guid: 52a23284e1c9e9048a72bb319840e54d, type: 3}
-    - {fileID: 21300000, guid: 21e2575a786ada74b8d54326336ccffc, type: 3}
-    - {fileID: 21300000, guid: d53c8379904363c4f95a09494a4d2b54, type: 3}
-    - {fileID: 21300000, guid: b3ad1b8bd631cc64b9c44f0e78611c23, type: 3}
-    eyeFrames:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    durations: 040000000400000004000000040000000400000004000000
+    - {fileID: 21300000, guid: 2a761bc0109998b44a1bf1b710fcb914, type: 3}
+    eyeFrames: []
+    durations: 27000000
     hitFrame: 0
     branchFrame: 0
     chargeFrame: 0
@@ -667,14 +655,9 @@ MonoBehaviour:
     hasParryContact: 0
     parryContactOffset: {x: 0, y: 0}
     frames:
-    - {fileID: 21300000, guid: 7a9697a8fb6e3bd449a3b45cb3596e8c, type: 3}
-    - {fileID: 21300000, guid: 78aa88b1db176d24cb7da999b681126c, type: 3}
-    - {fileID: 21300000, guid: ed343cedd86eaf14db1c802a4a52709a, type: 3}
-    eyeFrames:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    durations: 040000000400000004000000
+    - {fileID: 21300000, guid: bfc06de8937b9ab4ba8c22ed5b81bbff, type: 3}
+    eyeFrames: []
+    durations: 06000000
     hitFrame: 0
     branchFrame: 0
     chargeFrame: 0
@@ -692,16 +675,18 @@ MonoBehaviour:
     hasParryContact: 0
     parryContactOffset: {x: 0, y: 0}
     frames:
-    - {fileID: 21300000, guid: 579ffc7e3a2f3d74282c75a594a0ce0f, type: 3}
-    - {fileID: 21300000, guid: 4213a48cb5289a84b8363a68668fee51, type: 3}
-    - {fileID: 21300000, guid: 7c1c3d75664d8b7409a0868c97fa56eb, type: 3}
-    - {fileID: 21300000, guid: d2b49b9168304db4ba5a605f3542ad4c, type: 3}
-    eyeFrames:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    durations: 08000000080000000800000008000000
+    - {fileID: 21300000, guid: 4be25dd6ce343654997624ec56b587b0, type: 3}
+    - {fileID: 21300000, guid: 68ea9abf1a5bfe34aa9f059656ed1679, type: 3}
+    - {fileID: 21300000, guid: d7daa5e3ff668f24891fced5c8f5cb21, type: 3}
+    - {fileID: 21300000, guid: b08c5640b79b09e4e99f56407c9757e4, type: 3}
+    - {fileID: 21300000, guid: 3dfec4735bf69b749ae4b1fb7acf7033, type: 3}
+    - {fileID: 21300000, guid: 81a1f34f1f65c0a4d9b7023220225af9, type: 3}
+    - {fileID: 21300000, guid: d7468a1f1595da34eaaa1d9d55a6cbcb, type: 3}
+    - {fileID: 21300000, guid: c734cb034ca8e7d4f85c3a4ce83b35d5, type: 3}
+    - {fileID: 21300000, guid: d485a473c443e0d498f31ec1960d94cd, type: 3}
+    - {fileID: 21300000, guid: 6405e91f5c63bee4bb3ad28487dd4149, type: 3}
+    eyeFrames: []
+    durations: 06000000060000000600000006000000060000000600000006000000060000000600000006000000
     hitFrame: 0
     branchFrame: 0
     chargeFrame: 0
@@ -719,20 +704,18 @@ MonoBehaviour:
     hasParryContact: 0
     parryContactOffset: {x: 0, y: 0}
     frames:
-    - {fileID: 21300000, guid: 9c95abd1f914b354298a5b8bf58ceb42, type: 3}
-    - {fileID: 21300000, guid: 5055e662c9d9b9c4e986ffeffdf89eeb, type: 3}
-    - {fileID: 21300000, guid: 28e43d8ff8d4c924ba0426c06d42254f, type: 3}
-    - {fileID: 21300000, guid: 5f0d674d26b126f4faabebf1f15c4ef8, type: 3}
-    - {fileID: 21300000, guid: c13cba788357b3341b9f2405d33b74a2, type: 3}
-    - {fileID: 21300000, guid: babb89cbc443e2841867def95ac927af, type: 3}
-    eyeFrames:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    durations: 040000000400000004000000040000000400000004000000
+    - {fileID: 21300000, guid: 62092582733812c458030f932d9617ff, type: 3}
+    - {fileID: 21300000, guid: 1d3904b788f7f9a4883956f78bcec242, type: 3}
+    - {fileID: 21300000, guid: 2b5a9ec7ecb8c70479b0d422fc250d5e, type: 3}
+    - {fileID: 21300000, guid: 81a72834c8922f8459918a8d08635f2d, type: 3}
+    - {fileID: 21300000, guid: 1efa83ecea40e7b42b465d3671bdf1f8, type: 3}
+    - {fileID: 21300000, guid: 66922286c12ad1b4fa087cdce0533b7d, type: 3}
+    - {fileID: 21300000, guid: c5fb5a2165d89e94eadfae39a4fad44c, type: 3}
+    - {fileID: 21300000, guid: 8f0bb1720251c704ab726d9df239afc2, type: 3}
+    - {fileID: 21300000, guid: eaeb533522d23cc4996e40aaf2db40a4, type: 3}
+    - {fileID: 21300000, guid: a9113149a119fcc4aa284bf7b775a54a, type: 3}
+    eyeFrames: []
+    durations: 06000000060000000600000006000000060000000600000006000000060000000600000006000000
     hitFrame: 0
     branchFrame: 0
     chargeFrame: 0
@@ -750,16 +733,9 @@ MonoBehaviour:
     hasParryContact: 0
     parryContactOffset: {x: 0, y: 0}
     frames:
-    - {fileID: 21300000, guid: d02bd6199eb634e4bad5aecc8a7cf0e5, type: 3}
-    - {fileID: 21300000, guid: 3be7ac1a4dae508499aaff9eea5e1ceb, type: 3}
-    - {fileID: 21300000, guid: b56fdb68784831343864dc0c9b69244e, type: 3}
-    - {fileID: 21300000, guid: ed4c2b8a42ab36643bcba7bfdd9749ac, type: 3}
-    eyeFrames:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    durations: 04000000040000000400000004000000
+    - {fileID: 21300000, guid: bfc06de8937b9ab4ba8c22ed5b81bbff, type: 3}
+    eyeFrames: []
+    durations: 0a000000
     hitFrame: 0
     branchFrame: 0
     chargeFrame: 0
@@ -777,20 +753,15 @@ MonoBehaviour:
     hasParryContact: 0
     parryContactOffset: {x: 0, y: 0}
     frames:
-    - {fileID: 21300000, guid: 0c821fa265daa5243b18cfeb6c3f3e9f, type: 3}
-    - {fileID: 21300000, guid: d15e7492113cc7844ad7f9d2042f589b, type: 3}
-    - {fileID: 21300000, guid: 1aa58e550f9dbb84a88a753eeb3592b0, type: 3}
-    - {fileID: 21300000, guid: 542fec1a4d3e160488dd23be06e320ac, type: 3}
-    - {fileID: 21300000, guid: 8ad4e188fa6cd594dac428917c7898ce, type: 3}
-    - {fileID: 21300000, guid: 0341e86641715344a94bb33eb32fa27a, type: 3}
-    eyeFrames:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    durations: 050000000500000005000000050000000500000005000000
+    - {fileID: 21300000, guid: f4e4d57b638e5df48ba3f821fb19f9d9, type: 3}
+    - {fileID: 21300000, guid: aa4d39f307f635542b9b3cfe4a6deb58, type: 3}
+    - {fileID: 21300000, guid: 04ad0e92949b8b744a37a76dbe28860e, type: 3}
+    - {fileID: 21300000, guid: c0a1c2dfa5468d542beac4f83ebab146, type: 3}
+    - {fileID: 21300000, guid: 0d865b8e80567f7428e79eead47fd61c, type: 3}
+    - {fileID: 21300000, guid: a085e09ca6064104c8e35ad1a10ce562, type: 3}
+    - {fileID: 21300000, guid: 219dfd7432892cc459f93fe26f2602a0, type: 3}
+    eyeFrames: []
+    durations: 03000000050000000600000005000000060000000200000003000000
     hitFrame: 0
     branchFrame: 0
     chargeFrame: 0

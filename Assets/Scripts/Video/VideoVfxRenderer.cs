@@ -9,7 +9,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
     [SerializeField] private bool hybridGlow=true;
     [SerializeField,Range(0,1)] private float intensity=.8f;
     [SerializeField] private bool readableImpacts=true;
-    [SerializeField] private int impactBackdropOrder=-1;
+    [SerializeField] private int impactSortingOrder=30;
     private VideoArtLibrary.Motion electricBurst,parryBurst;
     private readonly List<Sprite> generatedSprites=new();
     private readonly List<Texture2D> generatedTextures=new();
@@ -26,8 +26,8 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         if(effect==null||!readableImpacts) return;
         if(kind=="ElectricKick")
         {
-            // The ring and lightning surround the contact behind both actors.
-            effect.sprite.sortingOrder=impactBackdropOrder;effect.glow.sortingOrder=impactBackdropOrder-1;
+            // Attack effects stay in front of the struck enemy.
+            effect.sprite.sortingOrder=impactSortingOrder;effect.glow.sortingOrder=impactSortingOrder-1;
             effect.sprite.color=new Color(1,1,1,intensity*.65f);
             EmitImpactBurst(true,position,scale,facing,delay);
         }
@@ -78,7 +78,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         effect.glowSeconds=2/60f;effect.permitsGlow=effect.fresh=true;
         effect.fade=false;effect.follow=null;effect.drift=Vector2.zero;
         effect.root.transform.position=position;effect.root.transform.localScale=new Vector3(scale*facing,scale,1);
-        effect.sprite.sortingOrder=electric?impactBackdropOrder:31;effect.glow.sortingOrder=electric?impactBackdropOrder-1:30;
+        effect.sprite.sortingOrder=electric?impactSortingOrder+1:31;effect.glow.sortingOrder=electric?impactSortingOrder:30;
         effect.sprite.sprite=effect.glow.sprite=motion.frames[0];effect.sprite.color=new Color(1,1,1,intensity);
         effect.glow.color=electric?new Color(.5f,.85f,1,.16f*intensity):new Color(1,.88f,.6f,.12f*intensity);
         effect.glow.transform.localScale=Vector3.one;

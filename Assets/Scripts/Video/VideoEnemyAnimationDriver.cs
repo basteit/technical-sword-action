@@ -25,7 +25,6 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     private Quaternion deathContactRotation;
     private float parryRecoilSign;
     private int restSortingOrder;
-    private long contactDepthTick=-1;
     public bool IsHitBacking=>hitbackFrames>0&&hitbackFrame<hitbackFrames;
     public float LastHitbackDistance {get;private set;}
     public bool IsLaunched=>IsHitBacking&&launchHeight>0;
@@ -69,7 +68,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     {
         hitbackFrame=hitbackFrames=0;hitbackStartTick=-1;LastHitbackDistance=launchHeight=LastLaunchHeight=0;
         deathContactSprite=null;deathContactTick=-1;parryRecoilSign=0;
-        contactDepthTick=-1;visual.sortingOrder=restSortingOrder;
+        visual.sortingOrder=restSortingOrder;
         visual.transform.localPosition=restPosition;visual.transform.localRotation=Quaternion.identity;visual.color=Color.white;
         if(animator!=null) animator.Rebind();Play("Idle");
     }
@@ -97,8 +96,6 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     }
     public void CombatTickTimers()
     {
-        if(contactDepthTick>=0&&CombatTimeController.TickCount>contactDepthTick)
-        {visual.sortingOrder=restSortingOrder;contactDepthTick=-1;}
         if(deathContactSprite==null) return;
         if(CombatTimeController.TickCount==deathContactTick) RestoreDeathContact();
         else { deathContactSprite=null;deathContactTick=-1; }
@@ -113,10 +110,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     {
         ApplyHitback(distance,frames,direction);
         launchHeight=LastLaunchHeight=Mathf.Max(0,height);
-        // The authored kick has a broad foreground trail. Keep the struck body readable
-        // over that trail only for the contact tick and its hitstop, then restore depth.
-        var attacker=player!=null?player.GetComponent<SpriteRenderer>():null;
-        if(attacker!=null){contactDepthTick=CombatTimeController.TickCount;visual.sortingOrder=Mathf.Max(restSortingOrder,attacker.sortingOrder+1);}
+        // Keep attack trails in front; contact pose/position still hold during hitstop.
     }
     private void AdvanceHitback()
     {
@@ -165,7 +159,6 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     {
         hitbackFrame=hitbackFrames=0;hitbackStartTick=-1;launchHeight=0;
         if(visual!=null){visual.transform.localRotation=Quaternion.identity;visual.transform.localPosition=restPosition;visual.sortingOrder=restSortingOrder;}
-        contactDepthTick=-1;
         parryRecoilSign=0;
         if(health!=null) { health.HitReceived-=OnHit;health.Parried-=OnParried;health.Died-=OnDeath;health.ResetPerformed-=OnReset; }
         if(ai!=null) ai.AttackStarted-=OnAttack;CombatTimeController.Unregister(this);CombatTimeController.UnregisterAnimator(animator,this);

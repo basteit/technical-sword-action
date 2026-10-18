@@ -86,7 +86,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             {
                 Call(director,"StepCapture",1d/fps);
                 if(Get<string>(ai,"CurrentStateName")=="Approach"&&Mathf.Abs(rear.transform.position.x-rearX)>.1f)
-                {walked=true;Assert.That(rearVisual.sprite.name,Does.StartWith("Enemy_Move_"));}
+                {walked=true;Assert.That(rearVisual.sprite.name,Does.StartWith("EnemySample_walk_"));}
                 if(!Marks().Any(m=>Get<string>(m,"kind")=="CounterStart"))
                     Assert.That(state.transform.position.x,Is.EqualTo(originX).Within(.002f));
                 if(Get<bool>(counter,"IsActive")&&Get<int>(counter,"ElapsedFrames")>=Get<int>(counter,"BlinkArrivalFrame"))
@@ -271,12 +271,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(enemy.transform.position,Is.EqualTo(rootBefore),"Launch starts after the contact tick and its hitstop.");
             Assert.That(targetVisual.transform.localPosition,Is.EqualTo(localBefore),"Death must not shift the contact body during hitstop.");
             Assert.That(Quaternion.Angle(targetVisual.transform.localRotation,rotationBefore),Is.LessThan(.001f));
-            Assert.That(targetVisual.sortingOrder,Is.GreaterThan(state.GetComponent<SpriteRenderer>().sortingOrder),"The struck body stays visible over the authored trail during contact.");
+            Assert.That(targetVisual.sortingOrder,Is.LessThan(state.GetComponent<SpriteRenderer>().sortingOrder),"Attack trails stay in front of the struck body.");
             var vfx=Find("VideoVfxRenderer");var renderers=vfx.GetComponentsInChildren<SpriteRenderer>();
             var ring=renderers.First(r=>r.sprite!=null&&r.sprite.name=="Fx_ElectricKick_01");
             var bolts=renderers.First(r=>r.sprite!=null&&r.sprite.name=="Video_ElectricDischarge_01");
-            Assert.That(ring.sortingOrder,Is.LessThan(targetVisual.sortingOrder));
-            Assert.That(bolts.sortingOrder,Is.LessThan(state.GetComponent<SpriteRenderer>().sortingOrder));
+            Assert.That(ring.sortingOrder,Is.GreaterThan(targetVisual.sortingOrder));
+            Assert.That(bolts.sortingOrder,Is.GreaterThan(targetVisual.sortingOrder));
             Assert.That(bolts.sprite.texture.filterMode,Is.EqualTo(FilterMode.Point));
             var pixels=bolts.sprite.texture.GetPixels32();int size=bolts.sprite.texture.width;
             for(int y=size/2-8;y<=size/2+8;y++)for(int x=size/2-8;x<=size/2+8;x++)
@@ -307,7 +307,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Call(vfx,"Emit",kind,Vector2.zero,1f,1,0f);
                 if(kind=="ElectricKick")
                     Assert.That(vfx.GetComponentsInChildren<SpriteRenderer>().First(r=>r.sprite!=null&&r.sprite.name=="Fx_ElectricKick_01").sortingOrder,
-                        Is.LessThan(0),"The shared effect also needs to stay behind prototype actors at default sorting order.");
+                        Is.GreaterThan(0),"The shared attack effect stays in front of prototype actors at default sorting order.");
                 if(!hybrid)Assert.That(vfx.GetComponentsInChildren<SpriteRenderer>().Where(r=>r.name=="OptionalGlow").All(r=>!r.enabled),Is.True);
                 if(run==0)
                 {
@@ -457,7 +457,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(renderer.sprite,Is.SameAs(before));
             for(int i=0;i<6;i++) { Step();Assert.That(renderer.sprite,Is.SameAs(before)); }
             for(int i=0;i<10;i++) Step();
-            Assert.That(renderer.sprite.name,Does.StartWith("Enemy_Death_"));
+            Assert.That(renderer.sprite.name,Does.StartWith("EnemySample_down_"));
         }
         [TestCase("VerticalSlash",9,17,38)] [TestCase("HorizontalSlash",8,13,34)]
         public void SubmittedAttackPreservesItsPixelScaleAndCumulativeNativeTiming(string name,int count,int hit,int total)
