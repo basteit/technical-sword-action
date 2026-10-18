@@ -123,6 +123,10 @@ public static class PrototypeActionStageInstaller
             if (effector == null) effector = obj.AddComponent<PlatformEffector2D>();
             effector.useOneWay = true;
             effector.useOneWayGrouping = true;
+            // The default 180-degree arc includes horizontal contact normals at box ends.
+            effector.surfaceArc = 160f;
+            effector.useSideFriction = false;
+            effector.useSideBounce = false;
         }
     }
 }

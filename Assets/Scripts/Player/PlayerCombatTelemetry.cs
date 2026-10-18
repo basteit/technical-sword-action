@@ -34,13 +34,15 @@ public sealed class PlayerCombatTelemetry : MonoBehaviour
         Disconnect();
         attack = GetComponent<PlayerAttack2D>(); counter = GetComponent<PlayerParryCounter2D>();
         special = GetComponent<PlayerSpecialSkill2D>(); health = GetComponent<PlayerDamageReceiver2D>();
-        if (attack != null) attack.HitConfirmed += OnAttackHit;
+        if (attack != null) attack.HitConfirmed += HandleAttackHitConfirmed;
         if (counter != null) counter.HitConfirmed += OnCounterHit;
         if (special != null) special.HitConfirmed += OnSpecialHit;
         if (health != null) health.DamageReceived += OnDamageReceived;
         ResetMeasurements();
     }
-    private void OnAttackHit(Damageable2D enemy, int step, Vector2 point) => RecordDamage(enemy.LastDamageTaken);
+    // AnimationEvents broadcast by method name to every component on the Animator object.
+    // Keep this C# event callback distinct from PlayerAttack2D.OnAttackHit(int).
+    private void HandleAttackHitConfirmed(Damageable2D enemy, int step, Vector2 point) => RecordDamage(enemy.LastDamageTaken);
     private void OnCounterHit(Damageable2D enemy, Vector2 point) => RecordDamage(enemy.LastDamageTaken);
     private void OnSpecialHit(Damageable2D enemy, int amount) => RecordDamage(amount);
     public void RecordDamage(int amount)
@@ -64,7 +66,7 @@ public sealed class PlayerCombatTelemetry : MonoBehaviour
     }
     private void Disconnect()
     {
-        if (attack != null) attack.HitConfirmed -= OnAttackHit;
+        if (attack != null) attack.HitConfirmed -= HandleAttackHitConfirmed;
         if (counter != null) counter.HitConfirmed -= OnCounterHit;
         if (special != null) special.HitConfirmed -= OnSpecialHit;
         if (health != null) health.DamageReceived -= OnDamageReceived;

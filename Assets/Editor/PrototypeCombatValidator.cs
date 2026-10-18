@@ -90,6 +90,14 @@ public static class PrototypeCombatValidator
             if (actionPlatforms == null || actionPlatforms.GetComponentsInChildren<BoxCollider2D>().Length != 3 ||
                 actionPlatforms.GetComponentsInChildren<PlatformEffector2D>().Length != 2)
                 errors.Add("Action practice requires one solid step and two one-way platforms.");
+            if (actionPlatforms != null)
+                foreach (var effector in actionPlatforms.GetComponentsInChildren<PlatformEffector2D>())
+                {
+                    var collider = effector.GetComponent<BoxCollider2D>();
+                    if (collider == null || !collider.usedByEffector || !effector.useOneWay || !effector.useOneWayGrouping ||
+                        effector.surfaceArc <= 0 || effector.surfaceArc >= 180 || effector.useSideFriction || effector.useSideBounce)
+                        errors.Add(effector.name + ": one-way floors must not block horizontal side entry.");
+                }
         }
         finally
         {

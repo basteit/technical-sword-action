@@ -128,6 +128,109 @@ namespace TechnicalSwordAction.PlayerState.Tests
             AssertStandingOn("OneWayFloor");
         }
 
+        [TestCase("OneWayFloor", -1, false)] [TestCase("OneWayFloor", 1, false)]
+        [TestCase("UpperOneWayFloor", -1, false)] [TestCase("UpperOneWayFloor", 1, false)]
+        [TestCase("OneWayFloor", -1, true)] [TestCase("OneWayFloor", 1, true)]
+        [TestCase("UpperOneWayFloor", -1, true)] [TestCase("UpperOneWayFloor", 1, true)]
+        public void PlatformSidesDoNotBlockHorizontalMovement(string name, int direction, bool dash)
+        {
+            var platform = GameObject.Find(name).GetComponent<BoxCollider2D>();
+            var body = player.GetComponent<Rigidbody2D>();
+            float gravity = body.gravityScale;
+            try
+            {
+                body.gravityScale = 0;
+                float edge = direction > 0 ? platform.bounds.min.x : platform.bounds.max.x;
+                // Feet are below the platform's top, but clear of the solid step and the other floor.
+                Place(edge - direction * .575f, platform.bounds.max.y - .35f);
+                Call(motor, "SetMoveInput", Vector2.right * direction);
+                if (dash) Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Dash), Is.True);
+                // Dash must enter through the side during its movement window; afterward it may fall onto solid geometry.
+                Frames(dash ? 10 : 75);
+                float exit = dash ? edge + direction * .5f : direction > 0 ? platform.bounds.max.x + .35f : platform.bounds.min.x - .35f;
+                Assert.That((body.position.x - exit) * direction, Is.GreaterThan(0),
+                    $"{name} side blocked {(dash ? "Dash" : "movement")}: {body.position}");
+            }
+            finally { body.gravityScale = gravity; }
+        }
+
+        [TestCase(false, false)] [TestCase(false, true)]
+        [TestCase(true, false)] [TestCase(true, true)]
+        public void RealAnimatorFourStepAttackHasNoEventErrorsAndCountsEachHitOnce(bool airborne, bool withTarget)
+        {
+            GameObject target = null;
+            var body = player.GetComponent<Rigidbody2D>();
+            float gravity = body.gravityScale;
+            try
+            {
+                Place(0, 0);
+                Call(motor, "SetFacing", 1);
+                if (airborne)
+                {
+                    Call(motor, "SetJumpHeld", true);
+                    Jump(); Frames(8);
+                    body.gravityScale = 0;
+                    body.linearVelocity = Vector2.zero;
+                    Assert.That(Get<bool>(motor, "IsGrounded"), Is.False);
+                }
+                Component damageable = null;
+                if (withTarget)
+                {
+                    target = new GameObject("AttackEventTestTarget");
+                    target.SetActive(false); target.layer = LayerMask.NameToLayer("Enemy");
+                    target.AddComponent<BoxCollider2D>().isTrigger = true;
+                    damageable = target.AddComponent(T("Damageable2D"));
+                    Set(damageable, "applyPresetOnAwake", false);
+                    Set(damageable, "knockbackPower", 0f);
+                    Set(damageable, "blockContactPushFromPlayer", false);
+                    target.SetActive(true);
+                    Call(damageable, "ResetForCapture", player.transform.position + Vector3.right, 1000);
+                }
+                var attack = player.GetComponent(T("PlayerAttack2D"));
+                var telemetry = player.GetComponent(T("PlayerCombatTelemetry"));
+                Call(telemetry, "ResetMeasurements");
+                var settings = Get<object>(player.GetComponent(T("CombatFeedback2D")), "Settings");
+                Set(settings, "masterVolume", 0f);
+                int damage = 0;
+                for (int step = 1; step <= 4; step++)
+                {
+                    Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+                    AdvanceAttack(1, damageable);
+                    Assert.That(Get<int>(attack, "ComboStep"), Is.EqualTo(step));
+                    int limit = 180;
+                    while (Get<object>(attack, "Phase").ToString() != "Cancel" && --limit > 0)
+                        AdvanceAttack(1, damageable);
+                    Assert.That(limit, Is.GreaterThan(0), "Each real clip must reach its configured cancel window.");
+                    damage += new[] { 10, 10, 15, 25 }[step - 1];
+                    if (withTarget)
+                    {
+                        Assert.That(Get<int>(damageable, "CurrentHp"), Is.EqualTo(1000 - damage));
+                        Assert.That(Get<int>(damageable, "HitCount"), Is.EqualTo(step));
+                    }
+                    Assert.That(Get<int>(telemetry, "TotalDamage"), Is.EqualTo(withTarget ? damage : 0));
+                }
+                AdvanceAttack(90, damageable);
+                Assert.That(Get<PlayerActionState>(player, "ActionState"), Is.EqualTo(PlayerActionState.Neutral));
+                Assert.That(Get<bool>(attack, "IsAttacking"), Is.False);
+                LogAssert.NoUnexpectedReceived();
+            }
+            finally
+            {
+                body.gravityScale = gravity;
+                if (target != null) Object.DestroyImmediate(target);
+            }
+        }
+
+        private void AdvanceAttack(int count, Component target)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                // A stationary-in-relative-space fixture isolates event dispatch from enemy AI/knockback.
+                if (target != null) target.transform.position = player.transform.position + Vector3.right;
+                Physics2D.SyncTransforms(); Frames(1);
+            }
+        }
+
         private void Place(float x, float feet)
         {
             var body = player.GetComponent<Rigidbody2D>();
@@ -149,5 +252,6 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private static Type T(string name) => Type.GetType(name + ", Assembly-CSharp", true);
         private static object Call(object target, string name, params object[] args) => target.GetType().GetMethod(name, Flags).Invoke(target, args);
         private static TValue Get<TValue>(object target, string name) => (TValue)target.GetType().GetProperty(name, Flags).GetValue(target);
+        private static void Set(object target, string name, object value) => target.GetType().GetField(name, Flags).SetValue(target, value);
     }
 }
