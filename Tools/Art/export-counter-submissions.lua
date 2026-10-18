@@ -11,9 +11,16 @@ for _,cel in ipairs(guide.cels) do for p in cel.image:pixels() do
   assert(app.pixelColor.rgbaA(p())==0 or p()==app.pixelColor.rgba(0,0,0,255),'Guide contains artwork')
 end end
 guide.isVisible=false
+local body,sample,effect
+for _,l in ipairs(s.layers) do
+  if l.name=='Body' then body=l elseif l.name=='Sample' then sample=l elseif l.name=='Effect' then effect=l end
+end
+local drawn=not transfer and body and body.isVisible and sample and not sample.isVisible
 local removedMarkers=0
-if not transfer then
-  local sample=s.layers[#s.layers];assert(sample.name=='Sample' and sample.isVisible and sample.opacity==255)
+if drawn then
+  assert(effect and effect.isVisible,'Preserve the submitted electricity')
+elseif not transfer then
+  assert(sample and sample.isVisible and sample.opacity==255 and not body.isVisible)
   -- The seven isolated reference dots are outside the silhouette, not a body part.
   for i=1,7 do local c=assert(sample:cel(i));local im=c.image:clone()
     local x,y=91-c.position.x,44-c.position.y
@@ -25,13 +32,18 @@ if not transfer then
     im:drawPixel(x,y,app.pixelColor.rgba(0,0,0,0));c.image=im;removedMarkers=removedMarkers+1
   end
 end
--- The four tucked poses ease toward the extension; native source durations stay untouched.
-local ticks=transfer and {1,1,2,2,2,1,1,2} or {2,2,2,3,2,2,1,1,1,2,2,2,2,2,2}
+-- The drawn revision charges from its first cel; the native document keeps its own timing.
+local ticks=transfer and {1,1,2,2,2,1,1,2} or drawn and {2,1,1,1,1,1,1,1,1,2,2,2,2,2,2} or {2,2,2,3,2,2,1,1,1,2,2,2,2,2,2}
 local frames,eyes,native={},{},{};local start=0;local sheet=Image(size*count,size,ColorMode.RGB)
 for i,f in ipairs(s.frames) do
   local im=Image(s.spec);im:drawSprite(s,i)
   if not transfer and i==9 then
-    assert(im:getPixel(73,86)==app.pixelColor.rgba(34,32,52,255),'The drawn contact moved; inspect the toe before changing gameplay metadata')
+    if drawn then
+      local c=assert(body:cel(i));local p=c.image:getPixel(83-c.position.x,86-c.position.y)
+      assert(p==app.pixelColor.rgba(91,110,225,255),'The drawn toe moved; inspect the contact metadata')
+    else
+      assert(im:getPixel(73,86)==app.pixelColor.rgba(34,32,52,255),'Inspect the sample toe before changing gameplay metadata')
+    end
   end
   local file=name..'_'..string.format('%02d',i)
   im:saveAs(out..'/'..file..'.png');sheet:drawImage(im,Point((i-1)*size,0))
@@ -56,8 +68,12 @@ s:saveAs(out..'/'..review);s:close()
 local check=assert(app.open(out..'/'..review));assert(#check.frames==count and not check.layers[1].isVisible and check.tags[1].name==name)
 for i,f in ipairs(check.frames) do assert(math.floor(f.duration*1000+.5)==native[i].durationMs) end
 check:close()
-local action={name=name,provisional=true,canvasWidth=size,canvasHeight=size,pivotX=32,pivotY=38,count=count,totalFrames=start,frames=frames}
-if not transfer then action.chargeFrame=6;action.releaseFrame=14;action.hitFrame=15;action.landingFrame=28;action.recoveryFrame=28 end
+local action={name=name,provisional=not drawn,canvasWidth=size,canvasHeight=size,pivotX=32,pivotY=38,count=count,totalFrames=start,frames=frames}
+if not transfer then
+  action.chargeFrame=drawn and 0 or 6;action.releaseFrame=drawn and 8 or 14;action.hitFrame=drawn and 9 or 15
+  action.landingFrame=start;action.recoveryFrame=start;action.includesCounterTrail=drawn
+  action.counterContactOffset={x=(drawn and 51 or 41)/32,y=4/32}
+end
 local function write(file,value) local f=assert(io.open(out..'/'..file,'w'));f:write(json.encode(value));f:close() end
 write('timing-manifest.json',{actions={action}});write('eye-mask-manifest.json',{frames=eyes})
-write('submission-validation.json',{sourceUnmodified=true,reviewCopyReopened=true,guideHidden=true,removedIsolatedGuidePixels=removedMarkers,nativeFrames=native,gameFrames=start,kind=kind,silhouetteSampleOnly=not transfer,pivot={x=32,y=38},contact=not transfer and {frame=9,x=73,y=86} or nil})
+write('submission-validation.json',{sourceUnmodified=true,reviewCopyReopened=true,guideHidden=true,removedIsolatedGuidePixels=removedMarkers,nativeFrames=native,gameFrames=start,kind=kind,silhouetteSampleOnly=not transfer and not drawn,submittedBodyAndEffect=drawn,pivot={x=32,y=38},contact=not transfer and {frame=9,x=drawn and 83 or 73,y=86} or nil})

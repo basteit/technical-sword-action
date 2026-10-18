@@ -98,7 +98,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             foreach (string action in new[] { "Heal", "Death", "Hit", "Rest", "Respawn", "Special", "Fall" })
                 Assert.That(Field(Entry(action), "status").ToString(), Is.EqualTo("Substitute"), action);
             Assert.That(Field(Entry("ParryCounter"), "source"), Is.EqualTo("CounterKick"));
-            Assert.That(Field(Entry("ParryCounter"), "status").ToString(), Is.EqualTo("SubmittedProvisional"));
+            Assert.That(Field(Entry("ParryCounter"), "status").ToString(), Is.EqualTo("Received"));
         }
     }
 }

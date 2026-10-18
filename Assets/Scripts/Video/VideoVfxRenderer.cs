@@ -25,7 +25,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         effect.root.transform.position=position;effect.root.transform.localScale=new Vector3(scale*facing,scale,1);
         effect.root.SetActive(true);effect.sprite.color=new Color(1,1,1,intensity);
         effect.glow.transform.localScale=Vector3.one*1.08f;
-        effect.glow.color=new Color(1,.8f,.55f,.16f*intensity);
+        effect.glow.color=kind=="ElectricKick"?new Color(.6f,.9f,1,.16f*intensity):new Color(1,.8f,.55f,.16f*intensity);
         effect.sprite.enabled=delay<=0;effect.glow.enabled=hybridGlow&&delay<=0;
         effect.sprite.sprite=effect.glow.sprite=motion.frames[0];EmissionCount++;
         return effect;

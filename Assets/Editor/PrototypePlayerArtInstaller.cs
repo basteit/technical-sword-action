@@ -227,7 +227,7 @@ public static class PrototypePlayerArtInstaller
                     // The extended-state animation driver enters this state one visual tick
                     // after its gameplay timer begins. Compensate in the artwork, not in damage.
                     Retimed(Motion("CounterKick"), Mathf.Max(0, counter.hitFrame - 1) / 60f);
-                    entry.status = Status.SubmittedProvisional; break;
+                    entry.status = Motion("CounterKick").provisional ? Status.SubmittedProvisional : Status.Received; break;
                 case "Special":
                 {
                     var skill = new SerializedObject(player.GetComponent<PlayerSpecialSkill2D>());

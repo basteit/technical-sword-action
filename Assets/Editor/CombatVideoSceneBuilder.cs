@@ -129,7 +129,7 @@ public static class CombatVideoSceneBuilder
         Set(counter,"overheadHeelDrop",submitted==null);
         Set(counter,"overheadHeight",submitted!=null?4/32f:1.35f);
         Set(counter,"heelImpactHeight",submitted!=null?2/32f:1.15f);
-        Set(counter,"airborneContactOffset",new Vector2(41/32f,4/32f));
+        Set(counter,"airborneContactOffset",kick.counterContactOffset!=Vector2.zero?kick.counterContactOffset:new Vector2(41/32f,4/32f));
         Set(counter,"heelContactOffset",new Vector2(10/32f,-22/32f));
         Set(counter,"heelTargetHeadOffsetX",7/32f);
     }

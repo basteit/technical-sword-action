@@ -781,10 +781,10 @@
     },
     "counter_kick": {
       "name": "反撃キック",
-      "status": "provisional",
-      "notes": "Sample表示・Body非表示の動き確認用シルエット。人物清書・目・足の青白い電気は未完成。",
+      "status": "received",
+      "notes": "2026-10-19受領。BodyとEffectを表示した人物・電気の作画版。原稿登録とゲーム使用版の検証は別記録。",
       "current": "Current/Player_counter_kick.aseprite",
-      "current_sha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db",
+      "current_sha256": "a763a95f3ff125bb379c8edee7f2b15c360c8afe6810edc710b1cdfae7898862",
       "revisions": [
         {
           "sha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db",
@@ -900,6 +900,120 @@
             "width": 128
           },
           "original_project_path": "Assets/Art/Player/VideoSubmitted/20261018/Player_counter_kick.aseprite"
+        },
+        {
+          "sha256": "a763a95f3ff125bb379c8edee7f2b15c360c8afe6810edc710b1cdfae7898862",
+          "file": "History/counter_kick/a763a95f3ff125bb379c8edee7f2b15c360c8afe6810edc710b1cdfae7898862.aseprite",
+          "original_name": "Player_counter_kick.aseprite",
+          "registered_at": "2026-10-18T18:51:41+00:00",
+          "received_on": "2026-10-19",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              },
+              {
+                "duration_ms": 100,
+                "frame": 9
+              },
+              {
+                "duration_ms": 100,
+                "frame": 10
+              },
+              {
+                "duration_ms": 60,
+                "frame": 11
+              },
+              {
+                "duration_ms": 60,
+                "frame": 12
+              },
+              {
+                "duration_ms": 60,
+                "frame": 13
+              },
+              {
+                "duration_ms": 60,
+                "frame": 14
+              },
+              {
+                "duration_ms": 60,
+                "frame": 15
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 105,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
         }
       ],
       "uses": [

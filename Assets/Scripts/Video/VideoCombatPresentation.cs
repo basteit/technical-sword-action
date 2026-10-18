@@ -100,7 +100,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         CombatTimeController.RequestHitstop(counter,8*CombatTimeController.StepSeconds);
         ShakeDirectional(.25f,.24f,counter.AttacksFromBehind?new Vector2(counter.KickFacingSign,-.25f):new Vector2(counter.KickFacingSign*.35f,-1),2.75f);
         flashRemaining=flashDuration=3/60f;flashStrength=.12f;flashTint=Color.white;
-        vfx.Emit(counter.IsOverheadHeelDrop?"HeelLightning":"Kick",foot,counter.IsOverheadHeelDrop?1f:1.55f,counter.KickFacingSign);
+        bool authored=library!=null&&library.Find("CounterKick")?.includesCounterTrail==true;
+        vfx.Emit(counter.IsOverheadHeelDrop?"HeelLightning":authored?"ElectricKick":"Kick",foot,counter.IsOverheadHeelDrop?1f:authored?1.15f:1.55f,counter.KickFacingSign);
     }
     private void OnLanding()=>ShakeDirectional(.11f,.065f,Vector2.down,1.5f);
     private void OnFinished(bool hit)
