@@ -573,7 +573,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 689758915}
+  m_Father: {fileID: 1638376570}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &106246691
 SpriteRenderer:
@@ -755,7 +755,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 907002374}
+  m_Father: {fileID: 993046830}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &136821837
 SpriteRenderer:
@@ -937,7 +937,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1208784951}
+  m_Father: {fileID: 581097556}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &146651535
 SpriteRenderer:
@@ -1986,7 +1986,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1208784951}
+  m_Father: {fileID: 581097556}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &413669105
 GameObject:
@@ -2685,7 +2685,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1208784951}
+  m_Father: {fileID: 581097556}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &515091853
 SpriteRenderer:
@@ -2928,6 +2928,41 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &581097555
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 581097556}
+  m_Layer: 0
+  m_Name: CounterLaunchVisual
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &581097556
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 581097555}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 515091852}
+  - {fileID: 852652925}
+  - {fileID: 146651534}
+  - {fileID: 377482083}
+  m_Father: {fileID: 1208784951}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &598784566
 GameObject:
   m_ObjectHideFlags: 0
@@ -3123,6 +3158,7 @@ GameObject:
   - component: {fileID: 689758913}
   - component: {fileID: 689758911}
   - component: {fileID: 689758912}
+  - component: {fileID: 689758916}
   m_Layer: 6
   m_Name: Melee_1
   m_TagString: Untagged
@@ -3278,11 +3314,25 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1048344829}
-  - {fileID: 106246690}
-  - {fileID: 866457084}
+  - {fileID: 1638376570}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &689758916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 689758910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c7e21ac62f02214aa8193fbc1bc3521, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCounterLaunch2D
+  visualRoot: {fileID: 1638376570}
+  obstacles:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1 &757847922
 GameObject:
   m_ObjectHideFlags: 0
@@ -3801,7 +3851,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1208784951}
+  m_Father: {fileID: 581097556}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &852652926
 SpriteRenderer:
@@ -4042,7 +4092,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 689758915}
+  m_Father: {fileID: 1638376570}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &872905339
 GameObject:
@@ -4274,6 +4324,7 @@ GameObject:
   - component: {fileID: 907002372}
   - component: {fileID: 907002370}
   - component: {fileID: 907002371}
+  - component: {fileID: 907002375}
   m_Layer: 6
   m_Name: Melee_2
   m_TagString: Untagged
@@ -4429,11 +4480,25 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1640708941}
-  - {fileID: 136821836}
-  - {fileID: 1840181672}
+  - {fileID: 993046830}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &907002375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 907002369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c7e21ac62f02214aa8193fbc1bc3521, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCounterLaunch2D
+  visualRoot: {fileID: 993046830}
+  obstacles:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1 &915269280
 GameObject:
   m_ObjectHideFlags: 0
@@ -5162,6 +5227,40 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &993046829
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 993046830}
+  m_Layer: 0
+  m_Name: CounterLaunchVisual
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &993046830
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993046829}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1640708941}
+  - {fileID: 136821836}
+  - {fileID: 1840181672}
+  m_Father: {fileID: 907002374}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1042588127
 GameObject:
   m_ObjectHideFlags: 0
@@ -5243,7 +5342,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 689758915}
+  m_Father: {fileID: 1638376570}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1048344830
 SpriteRenderer:
@@ -5760,6 +5859,7 @@ GameObject:
   - component: {fileID: 1208784948}
   - component: {fileID: 1208784947}
   - component: {fileID: 1208784946}
+  - component: {fileID: 1208784952}
   m_Layer: 6
   m_Name: StrongMelee
   m_TagString: Untagged
@@ -6012,12 +6112,25 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 515091852}
-  - {fileID: 852652925}
-  - {fileID: 146651534}
-  - {fileID: 377482083}
+  - {fileID: 581097556}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1208784952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208784945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c7e21ac62f02214aa8193fbc1bc3521, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCounterLaunch2D
+  visualRoot: {fileID: 581097556}
+  obstacles:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1 &1218971979
 GameObject:
   m_ObjectHideFlags: 0
@@ -7711,6 +7824,40 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1638376569
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1638376570}
+  m_Layer: 0
+  m_Name: CounterLaunchVisual
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1638376570
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1638376569}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1048344829}
+  - {fileID: 106246690}
+  - {fileID: 866457084}
+  m_Father: {fileID: 689758915}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1640708940
 GameObject:
   m_ObjectHideFlags: 0
@@ -7741,7 +7888,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 907002374}
+  m_Father: {fileID: 993046830}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1640708942
 SpriteRenderer:
@@ -8244,7 +8391,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 907002374}
+  m_Father: {fileID: 993046830}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1851218131
 GameObject:
@@ -8366,6 +8513,8 @@ GameObject:
   - component: {fileID: 1882940579}
   - component: {fileID: 1882940595}
   - component: {fileID: 1882940596}
+  - component: {fileID: 1882940598}
+  - component: {fileID: 1882940597}
   m_Layer: 7
   m_Name: PrototypePlayer
   m_TagString: Player
@@ -8486,6 +8635,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerParryCounter2D
   definition: {fileID: 11400000, guid: edcafb8a80423b84b85f5c503605df87, type: 2}
+  cinematicProfile: {fileID: 11400000, guid: ff5d0bf51c617104b8464345e7738878, type: 2}
   hitFrame: 6
   endFrame: 24
   damage: 3
@@ -9049,6 +9199,39 @@ MonoBehaviour:
   artwork: {fileID: 1059065870}
   body: {fileID: 1882940593}
   artSet: {fileID: 11400000, guid: 271b098413b1d1048bb3e8050ddf46b1, type: 2}
+--- !u!114 &1882940597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882940575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 398bc8d1f11825c4db70b980c91b8e87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PrototypeCounterPresentation
+  counter: {fileID: 1882940582}
+  playerArt: {fileID: 1882940596}
+  feedback: {fileID: 1882940595}
+  effects: {fileID: 1882940598}
+  gameplayCamera: {fileID: 212492668}
+--- !u!114 &1882940598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882940575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d0b7b0a319e8f442815248f5fc27b95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VideoVfxRenderer
+  library: {fileID: 11400000, guid: ab36d370549d43d468f63601f86bc147, type: 2}
+  glowMaterial: {fileID: 2100000, guid: d69bc0a8e01c76344849c87d7ec93600, type: 2}
+  hybridGlow: 1
+  intensity: 0.8
 --- !u!1 &1903729382
 GameObject:
   m_ObjectHideFlags: 0

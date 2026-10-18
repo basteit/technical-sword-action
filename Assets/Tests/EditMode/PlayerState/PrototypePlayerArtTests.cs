@@ -97,8 +97,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Keys("Jump").Select(key => key.value).Distinct().Count(), Is.EqualTo(6));
             foreach (string action in new[] { "Heal", "Death", "Hit", "Rest", "Respawn", "Special", "Fall" })
                 Assert.That(Field(Entry(action), "status").ToString(), Is.EqualTo("Substitute"), action);
-            Assert.That(Field(Entry("ParryCounter"), "source"), Is.EqualTo("CounterKick"));
-            Assert.That(Field(Entry("ParryCounter"), "status").ToString(), Is.EqualTo("Received"));
+            Assert.That(Field(Entry("ParryCounter"), "source"), Is.EqualTo("CounterTransfer + CounterKick"));
+            Assert.That(Field(Entry("ParryCounter"), "status").ToString(), Is.EqualTo("SubmittedProvisional"), "The received kick includes a provisional transfer; do not label the whole motion finished.");
         }
     }
 }

@@ -59,6 +59,18 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     private bool[] initialColliderStates;
     private readonly Dictionary<object,float> stunHolds=new();
     private readonly List<object> stunHoldOwners=new();
+    private readonly Dictionary<object, float> deathPresentationHolds = new();
+    private readonly HashSet<object> motionOwners = new();
+    public int DeathPresentationOwnerCount => deathPresentationHolds.Count;
+    public int MotionOwnerCount => motionOwners.Count;
+    public void HoldDeathPresentation(object owner, float combatSeconds)
+    {
+        if (owner != null && isActiveAndEnabled && float.IsFinite(combatSeconds) && combatSeconds > 0)
+            deathPresentationHolds[owner] = Mathf.Max(deathPresentationHolds.TryGetValue(owner, out float remaining) ? remaining : 0, combatSeconds);
+    }
+    public void ReleaseDeathPresentation(object owner) { if (owner != null) deathPresentationHolds.Remove(owner); }
+    public void AcquireMotionControl(object owner) { if (owner != null) { motionOwners.Add(owner); knockbackVelocity = Vector2.zero; } }
+    public void ReleaseMotionControl(object owner) { if (owner != null) motionOwners.Remove(owner); knockbackVelocity = Vector2.zero; }
     private bool participatingInCombat = true;
     public bool ParticipatingInCombat => IsAlive && participatingInCombat;
     public EnemyCombatRank CombatRank => combatRank;
@@ -138,6 +150,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         currentBreak = 0f;
         lightResistanceTimer = 0;
         stunHolds.Clear();
+        deathPresentationHolds.Clear(); motionOwners.Clear();
         knockbackVelocity = Vector2.zero;
         if (spriteRenderer != null)
         {
@@ -176,7 +189,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     public void CombatTick()
     {
-        if (knockbackVelocity.sqrMagnitude > 0.0001f)
+        if (motionOwners.Count == 0 && knockbackVelocity.sqrMagnitude > 0.0001f)
         {
             transform.position += (Vector3)(knockbackVelocity * CombatTimeController.StepSeconds);
         }
@@ -188,10 +201,16 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         stunHoldOwners.Clear();stunHoldOwners.AddRange(stunHolds.Keys);
         foreach(object owner in stunHoldOwners)
         { float value=CombatTimeController.AdvanceTimer(stunHolds[owner]);if(value<=0) stunHolds.Remove(owner);else stunHolds[owner]=value; }
+        stunHoldOwners.Clear(); stunHoldOwners.AddRange(deathPresentationHolds.Keys);
+        foreach (object owner in stunHoldOwners)
+        {
+            float value = CombatTimeController.AdvanceTimer(deathPresentationHolds[owner]);
+            if (value <= 0) deathPresentationHolds.Remove(owner); else deathPresentationHolds[owner] = value;
+        }
         if (currentHp <= 0)
         {
             deathTimer = CombatTimeController.AdvanceTimer(deathTimer);
-            if (deathTimer <= 0f) gameObject.SetActive(false);
+            if (deathTimer <= 0f && deathPresentationHolds.Count == 0) gameObject.SetActive(false);
             return;
         }
         if (breakResistTimer > 0f)
@@ -297,7 +316,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
             deathTimer = deathDisplayDuration;
             foreach (Collider2D body in bodyColliders) if (body != null) body.enabled = false;
             Died?.Invoke(this, dir);
-            if (deathTimer <= 0f) gameObject.SetActive(false);
+            if (deathTimer <= 0f && deathPresentationHolds.Count == 0) gameObject.SetActive(false);
         }
         return true;
     }
@@ -342,6 +361,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         flashTimer = stunTimer = deathTimer = currentBreak = breakResistTimer = 0f;
         lightResistanceTimer = 0; LastHitReaction = "None";
         stunHolds.Clear();
+        deathPresentationHolds.Clear(); motionOwners.Clear();
         HitCount = DeathCount = 0;
         knockbackVelocity = Vector2.zero;
         if (spriteRenderer != null) spriteRenderer.color = defaultColor;

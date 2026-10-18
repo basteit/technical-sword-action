@@ -753,11 +753,11 @@ MonoBehaviour:
     contactSprite: {fileID: 0}
     visualHitFrame: 0
   - action: ParryCounter
-    source: CounterKick
-    status: 0
+    source: CounterTransfer + CounterKick
+    status: 1
     clip: {fileID: 7400000, guid: 9afcdef72634eea4b839ee7d82b2a41a, type: 2}
     contactSprite: {fileID: 21300000, guid: 3fa3157504dd1f146a5d26503a51f05d, type: 3}
-    visualHitFrame: 17
+    visualHitFrame: 21
   - action: ParryFail
     source: ParryReady
     status: 3

@@ -265,6 +265,8 @@ public static class PrototypePlayerArtInstaller
         }
         controller.ApplyOverrides(overrides);
         set.controller = controller; set.entries = entries.ToArray();
+        var cinematic = player.GetComponent<PlayerParryCounter2D>().CinematicProfile;
+        if (cinematic != null) PrototypeCounterCinematicInstaller.ApplyCounterArtwork(set, cinematic);
         EditorUtility.SetDirty(controller); AssetDatabase.SaveAssetIfDirty(controller);
         EditorUtility.SetDirty(set); AssetDatabase.SaveAssetIfDirty(set);
         return set;

@@ -155,7 +155,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(player.GetComponent(T("PlayerDamageReceiver2D")), "CurrentHp"), Is.EqualTo(100));
             var counter = player.GetComponent(T("PlayerParryCounter2D"));
             Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(1));
-            Frames(10); Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True); Frames(50);
+            Frames(10); Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            int limit = 180;
+            while (Get<int>(counter, "HitCount") == 0 && --limit > 0) Frames(1);
+            Assert.That(limit, Is.GreaterThan(0));
             Assert.That(Get<int>(counter, "HitCount"), Is.EqualTo(1));
             Assert.That(Get<bool>(enemy.GetComponent(T("Damageable2D")), "IsAlive"), Is.False);
             Call(arena, "ResetActionsOnly");

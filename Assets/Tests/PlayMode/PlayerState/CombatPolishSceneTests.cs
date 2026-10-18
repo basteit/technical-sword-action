@@ -46,7 +46,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Frames(30); Request(PlayerActionRequest.Parry); Frames(14);
             Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(100));
             Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(1));
-            Frames(10); Request(PlayerActionRequest.Attack); Frames(32);
+            Frames(10); Request(PlayerActionRequest.Attack);
+            int limit = 180;
+            while (Get<int>(counter, "HitCount") == 0 && --limit > 0) Frames(1);
+            Assert.That(limit, Is.GreaterThan(0), "The authored charge uses real time; wait for the hit rather than the legacy 32F timeout.");
             Assert.That(Get<int>(enemyHealth, "CurrentHp"), Is.EqualTo(30));
             Assert.That(Get<bool>(enemyHealth, "IsAlive"), Is.True);
             Assert.That(Get<int>(counter, "HitCount"), Is.EqualTo(1));

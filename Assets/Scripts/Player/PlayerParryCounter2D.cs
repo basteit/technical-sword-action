@@ -7,6 +7,7 @@ using UnityEngine;
 public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHandler, ICombatTickListener, ICombatTimerListener
 {
     [SerializeField] private ParryCounterDefinition definition;
+    [SerializeField] private CounterCinematicProfile cinematicProfile;
     [SerializeField, Min(1)] private int hitFrame = 6;
     [SerializeField, Min(1)] private int endFrame = 24;
     [SerializeField, Min(1)] private int damage = 3;
@@ -54,6 +55,11 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public int SelectedDamage => selectedDamage;
     public bool CanDefenseCancel => active && !airborneKick && definition != null && elapsed >= definition.cancelStartFrame;
     public ParryCounterDefinition Definition => definition;
+    public CounterCinematicProfile CinematicProfile => cinematicProfile;
+    private bool UsesGameplayRules => definition != null && (!airborneKick || cinematicProfile != null);
+    public string CinematicPhase => !active ? "Idle" : cinematicProfile == null ? "Legacy" :
+        elapsed < blinkStartFrame ? "Transfer" : elapsed < BlinkArrivalFrame ? "Blink" :
+        elapsed < chargeReleaseFrame ? "Charge" : elapsed < hitFrame ? "Release" : "FollowThrough";
     public IReadOnlyList<Damageable2D> Stocks => stocks;
     public Damageable2D SelectedTarget { get; private set; }
     public int StockCount { get { PruneStocks(); return stocks.Count; } }
@@ -83,6 +89,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public int CombatTickOrder => 210;
     public float LockRemaining => active ? Mathf.Max(0, Mathf.Max(endFrame, hitFrame) - elapsed) * CombatTimeController.StepSeconds : 0f;
     public bool CanStartAction => isActiveAndEnabled && !active && state != null &&
+        (cinematicProfile == null || (definition != null && cinematicProfile.IsValid)) &&
         state.LifeState == PlayerLifeState.Alive &&
         (state.ActionState == PlayerActionState.ParrySuccess || state.ActionState == PlayerActionState.Neutral) && FindEligible() != null;
     public event Action Started;
@@ -103,6 +110,18 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         {
             hitFrame = definition.hitFrame; endFrame = definition.endFrame; damage = definition.baseDamage;
             maxApproach = definition.approachDistance; obstacleLayers = definition.obstacleLayers;
+        }
+        if (cinematicProfile != null)
+        {
+            var p = cinematicProfile;
+            airborneKick = blinkApproach = behindTarget = invincibleDuringKick = true;
+            overheadHeelDrop = false; landingRollDistance = 0;
+            hitFrame = p.hitFrame; endFrame = landingFrame = p.endFrame;
+            chargeFrame = p.chargeFrame; chargeReleaseFrame = p.releaseFrame;
+            blinkStartFrame = p.blinkStartFrame; blinkTravelFrames = p.blinkTravelFrames;
+            airborneContactOffset = p.contactOffset; radius = p.hitRadius;
+            overheadHeight = p.hoverHeight; heelImpactHeight = p.impactHeight; heelTargetHeadOffsetX = p.targetHeadOffsetX;
+            if (definition != null) { damage = definition.baseDamage; obstacleLayers = definition.obstacleLayers; }
         }
         state?.RegisterActionHandler(this); CombatTimeController.Register(this);
     }
@@ -146,11 +165,40 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         int direction = motor != null ? motor.FacingSign : 1;
         if (delta.sqrMagnitude > .0001f && Vector2.Dot(delta.normalized, Vector2.right * direction) < .5f) return "Behind";
         if (Physics2D.Linecast(transform.position, enemy.transform.position, obstacleLayers).collider != null) return "Obstructed";
+        if (cinematicProfile != null && !HasSafeRearApproach(enemy)) return "RearPositionBlocked";
         return "Eligible";
+    }
+    private int RearFacing(Damageable2D target)
+    {
+        var enemy = target.GetComponent<EnemyMeleeChaser2D>();
+        return enemy != null && Mathf.Abs(enemy.Facing.x) > .01f ? (enemy.Facing.x > 0 ? 1 : -1) :
+            -(motor != null ? motor.FacingSign : 1);
+    }
+    private bool HasSafeRearApproach(Damageable2D target)
+    {
+        if (bodyCollider == null || cinematicProfile == null) return false;
+        int sign = RearFacing(target);
+        Vector2 destination = (Vector2)target.transform.position + new Vector2(
+            sign * (-cinematicProfile.targetHeadOffsetX - cinematicProfile.contactOffset.x), cinematicProfile.hoverHeight);
+        Vector2 delta = destination - (Vector2)transform.position;
+        if (delta.sqrMagnitude < .000001f || obstacleLayers.value == 0) return true;
+        var filter = new ContactFilter2D { useLayerMask = true, layerMask = obstacleLayers, useTriggers = false };
+        int count = bodyCollider.Cast(delta.normalized, filter, movementHits, delta.magnitude);
+        for (int i = 0; i < count; i++)
+            if (BlocksCinematicMovement(movementHits[i], delta) && movementHits[i].distance < delta.magnitude - .005f)
+                return false;
+        return true;
+    }
+    private bool BlocksCinematicMovement(RaycastHit2D hit, Vector2 delta)
+    {
+        if (Vector2.Dot(delta.normalized, hit.normal) >= -.001f) return false;
+        var platform = hit.collider != null ? hit.collider.GetComponent<PlatformEffector2D>() : null;
+        return platform == null || !platform.enabled || !platform.useOneWay || !hit.collider.usedByEffector ||
+            (delta.y < 0 && hit.normal.y > .5f && bodyCollider.bounds.min.y >= hit.collider.bounds.max.y - .03f);
     }
     public bool ReserveNextCounter()
     {
-        if (!active || airborneKick || definition == null || endFrame - elapsed > definition.chainBufferFrames)
+        if (!active || (airborneKick && cinematicProfile == null) || definition == null || endFrame - elapsed > definition.chainBufferFrames)
             return false;
         queuedCounter = true;
         return true;
@@ -172,18 +220,18 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         if (!CanStartAction) return false;
         SelectedTarget = FindEligible(); RemoveStock(SelectedTarget);
         ConsumedCount++; LastStockReason = "Consumed:" + SelectedTarget.IndividualId;
-        SelectedMultiplier = definition != null && !airborneKick ? SelectedTarget.CounterMultiplier : 1f;
+        SelectedMultiplier = UsesGameplayRules ? SelectedTarget.CounterMultiplier : 1f;
         selectedDamage = Mathf.Max(1, Mathf.FloorToInt(damage * SelectedMultiplier + .5f));
         queuedCounter = false;
         active = true; elapsed = 0; hitApplied = charged = confirmedHit = chargeReleased = landed = false; StartCount++;
+        LastEndReason = "Running";
         origin = body != null ? body.position : (Vector2)transform.position;
         facing = motor != null ? motor.FacingSign : 1;
         if (AttacksFromBehind)
         {
             // Snapshot the attacker's direction before its stun. Do not make the
             // target turn around to face the teleport destination.
-            var enemy = SelectedTarget.GetComponent<EnemyMeleeChaser2D>();
-            facing = enemy != null && Mathf.Abs(enemy.Facing.x) > .01f ? (enemy.Facing.x > 0 ? 1 : -1) : -facing;
+            facing = RearFacing(SelectedTarget);
         }
         var contact = IsOverheadHeelDrop ? heelContactOffset : airborneContactOffset;
         float headX = AttacksFromBehind ? -heelTargetHeadOffsetX : heelTargetHeadOffsetX;
@@ -248,7 +296,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
             int count = bodyCollider.Cast(delta.normalized, filter, movementHits, delta.magnitude);
             float distance = delta.magnitude;
             for (int i = 0; i < count; i++)
-                if(Vector2.Dot(delta.normalized,movementHits[i].normal)<-.001f)
+                if(cinematicProfile != null ? BlocksCinematicMovement(movementHits[i], delta) : Vector2.Dot(delta.normalized,movementHits[i].normal)<-.001f)
                     distance = Mathf.Min(distance, Mathf.Max(0f, movementHits[i].distance - .005f));
             if((overheadHeelDrop||AttacksFromBehind)&&frame>blinkStartFrame&&frame<=BlinkArrivalFrame&&distance<delta.magnitude-.001f)
             { Finish("ApproachBlocked");return; }
@@ -281,13 +329,19 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
             foreach (Collider2D c in contacts)
                 if (c.GetComponentInParent<Damageable2D>() == SelectedTarget) { contactsTarget = true; break; }
             bool clearPath=SelectedTarget!=null&&Physics2D.Linecast(transform.position,SelectedTarget.transform.position,obstacleLayers).collider==null;
+            if (cinematicProfile != null && SelectedTarget != null && contactsTarget && clearPath)
+                SelectedTarget.HoldDeathPresentation(this, (cinematicProfile.launchFrames + 3) / 60f);
             if (SelectedTarget != null && SelectedTarget.IsAlive && contactsTarget && clearPath && SelectedTarget.TryTakeCombatHit(selectedDamage, Vector2.right * facing, EnemyHitStrength.Strong))
             {
                 confirmedHit=true;HitCount++;
-                if (definition != null && !airborneKick) GetComponent<PlayerSpecialGauge>()?.AddOnAttackHit(definition.gaugeGain);
+                if (UsesGameplayRules) GetComponent<PlayerSpecialGauge>()?.AddOnAttackHit(definition.gaugeGain);
                 HitConfirmed?.Invoke(SelectedTarget, foot);
             }
-            else { CombatTimeController.ReleaseSlow(this);HitMissed?.Invoke(); }
+            else
+            {
+                if (cinematicProfile != null && SelectedTarget != null) SelectedTarget.ReleaseDeathPresentation(this);
+                CombatTimeController.ReleaseSlow(this); HitMissed?.Invoke();
+            }
         }
         if(airborneKick&&!landed&&elapsed>=landingFrame) { landed=true;Landed?.Invoke(); }
         if (elapsed >= Mathf.Max(endFrame, hitFrame)) Finish("Complete");
@@ -302,12 +356,14 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public void CancelAction()
     {
         bool wasActive = active; bool didHit = confirmedHit;
+        if (wasActive && LastEndReason == "Running") LastEndReason = "Canceled";
         active = false; elapsed = 0; queuedCounter = false; hitApplied = charged = confirmedHit = chargeReleased = landed = false;
         if (wasActive && body != null) { body.gravityScale = savedGravity; body.linearVelocity = Vector2.zero; }
         if(SelectedTarget!=null)
         {
             SelectedTarget.ReleaseStun(this);
-            if (wasActive && !didHit && SelectedTarget.IsAlive && definition != null && !airborneKick) SelectedTarget.ExtendStun(12f / 60f);
+            if (cinematicProfile != null) SelectedTarget.ReleaseDeathPresentation(this);
+            if (wasActive && !didHit && SelectedTarget.IsAlive && UsesGameplayRules) SelectedTarget.ExtendStun(12f / 60f);
         }
         SelectedTarget = null; CombatTimeController.ReleaseOwner(this);
         if (wasActive) Finished?.Invoke(didHit);

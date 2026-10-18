@@ -74,6 +74,9 @@ public class PlayerDebugOverlay : MonoBehaviour
             {
                 text.AppendLine($"Stocks {counter.StockCount} / Selected {counter.SelectedTarget?.IndividualId ?? "None"} / Chain {counter.HasQueuedCounter}");
                 text.AppendLine($"Consume {counter.ConsumedCount} / {counter.LastStockReason}\n{counter.LastSelectionReason} / {counter.SelectedDamage} damage x{counter.SelectedMultiplier:0.0}");
+                var cinematic = GetComponent<PrototypeCounterPresentation>();
+                text.AppendLine($"Counter {counter.CinematicPhase} {counter.ElapsedFrames}F / Hit {counter.HitFrame}F / End {counter.LandingFrame}F / Invincible {counter.IsCounterInvincible} / {counter.LastEndReason}");
+                if (cinematic != null) text.AppendLine($"Dim {cinematic.DimAlpha:0.00} / Hidden {cinematic.IsBodyHidden} / VFX {cinematic.ActiveEffectCount}");
                 for (int i = 0; i < counter.Stocks.Count; i++)
                     text.AppendLine($"  #{i + 1} {counter.Stocks[i].IndividualId}: {counter.EligibilityReason(counter.Stocks[i])}");
                 text.AppendLine("Opportunity: separate timed contract (not a parry stock)");
@@ -96,6 +99,8 @@ public class PlayerDebugOverlay : MonoBehaviour
             {
                 var enemy = enemies[i]; var health = enemy.GetComponent<Damageable2D>();
                 text.AppendLine($"{health.IndividualId}: {enemy.CurrentStateName}, {health.CurrentHp}/{health.MaxHp} HP / {enemy.AttackKind}\n  Windup {enemy.WindupRemainingFrames}F / Active {enemy.ActiveRemainingFrames}F / Attack {enemy.AttackId} #{enemy.AttackSequence}\n  Role {enemy.AttackRoleReason} / Counter x{health.CounterMultiplier:0.00} / Reaction {health.LastHitReaction} / Armor {enemy.ResistsHitStun}");
+                var launch = enemy.GetComponent<EnemyCounterLaunch2D>();
+                if (launch != null) text.AppendLine($"  Launch {launch.IsActive} {launch.ElapsedFrames}F / {launch.TravelDistance:0.00}u / {launch.LastEndReason} / Motion owners {health.MotionOwnerCount}");
             }
             var feedback = GetComponent<CombatFeedback2D>();
             if (feedback != null) text.AppendLine($"Feedback {feedback.LastKind} @{feedback.LastEmissionTick} / emissions {feedback.EmissionCount} / active {feedback.ActiveEffectCount} / flash {feedback.ActiveFlashCount}");

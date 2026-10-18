@@ -48,7 +48,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             yield return null;
         }
 
-        [Test] public void SceneUsesNewArtWithoutChangingColliderOrCounterMechanics()
+        [Test] public void SceneUsesNewArtAndOptInCounterWithoutChangingCollider()
         {
             Assert.That(presentation, Is.Not.Null); Refresh();
             Assert.That(player.GetComponent<Animator>().runtimeAnimatorController, Is.TypeOf<AnimatorOverrideController>());
@@ -59,7 +59,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(collider.size, Is.EqualTo(new Vector2(.65f, 1.6f)));
             Assert.That(collider.offset, Is.EqualTo(Vector2.zero));
             Assert.That(artwork.transform.localPosition.y, Is.EqualTo(.2f).Within(.00001f));
-            Assert.That(Get<bool>(player.GetComponent(T("PlayerParryCounter2D")), "IsAirborneKick"), Is.False);
+            Assert.That(Get<object>(player.GetComponent(T("PlayerParryCounter2D")), "CinematicProfile"), Is.Not.Null);
+            Assert.That(Get<bool>(player.GetComponent(T("PlayerParryCounter2D")), "IsAirborneKick"), Is.True);
             Assert.That(Object.FindObjectsByType(T("EnemyMeleeChaser2D"), FindObjectsSortMode.None), Is.Empty);
         }
 
@@ -140,7 +141,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             finally { Object.DestroyImmediate(target); }
         }
 
-        [Test] public void ProvisionalCounterShowsContactWithoutEnablingVideoWarpOrChangingDamage()
+        [Test] public void CinematicCounterShowsContactWithoutVideoDirectorOrChangingDamage()
         {
             var target = new GameObject("ArtworkCounterTarget"); target.SetActive(false);
             target.layer = LayerMask.NameToLayer("Enemy"); target.AddComponent<BoxCollider2D>().isTrigger = true;
@@ -164,8 +165,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     $"Counter clock {Get<int>(counter, "ElapsedFrames")}, animation {animation.normalizedTime * animation.length * 60:0.000}F.");
                 Assert.That(Get<int>(hp, "CurrentHp"), Is.EqualTo(910));
                 Assert.That(Get<int>(counter, "StockCount"), Is.Zero);
-                Assert.That(Get<bool>(counter, "IsAirborneKick"), Is.False);
-                Assert.That(Get<bool>(counter, "UsesBlinkApproach"), Is.False);
+                Assert.That(Get<bool>(counter, "IsAirborneKick"), Is.True);
+                Assert.That(Get<bool>(counter, "UsesBlinkApproach"), Is.True);
+                Assert.That(player.GetComponent(T("VideoCombatPresentation")), Is.Null);
+                Assert.That(player.GetComponent(T("CombatVideoDirector")), Is.Null);
                 Assert.That(Mathf.Abs(player.transform.position.y - start.y), Is.LessThan(.1f));
                 Frames(90); Assert.That(Get<PlayerActionState>(player, "ActionState"), Is.EqualTo(PlayerActionState.Neutral));
             }
