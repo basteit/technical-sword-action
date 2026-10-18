@@ -86,6 +86,16 @@
             "Assets/Settings/CombatVideoArt.asset"
           ],
           "evidence": "docs/video/counter-submissions-20261018.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "Idle",
+          "source_sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
         }
       ]
     },
@@ -182,6 +192,16 @@
             "Assets/Settings/CombatVideoArt.asset"
           ],
           "evidence": "docs/video/counter-submissions-20261018.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "Move",
+          "source_sha256": "92fc9e07636331d2d6b5aac363dc3ac6a53e030608db1533d9cae1505ae5f107",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
         }
       ]
     },
@@ -294,6 +314,16 @@
             "Assets/Settings/CombatVideoArt.asset"
           ],
           "evidence": "docs/video/counter-submissions-20261018.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "Attack_1",
+          "source_sha256": "d994e5fdba1d091018c8ba1b2e4029068aa2a1f6351485aade2124be80bf2650",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
         }
       ]
     },
@@ -402,6 +432,16 @@
             "Assets/Settings/CombatVideoArt.asset"
           ],
           "evidence": "docs/video/counter-submissions-20261018.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "Attack_2",
+          "source_sha256": "ccdb5da3908f8dc0fd730291036964c5b6c2380991cf1def238e13a5fa5ce781",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
         }
       ]
     },
@@ -504,6 +544,16 @@
             "Assets/Settings/CombatVideoArt.asset"
           ],
           "evidence": "docs/video/counter-submissions-20261018.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "Parry",
+          "source_sha256": "01adf3b9dfcc81dff09749a7362b77971ddef73afcd5077468526f5327411d1d",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
         }
       ]
     },
@@ -602,6 +652,16 @@
             "Assets/Settings/CombatVideoArt.asset"
           ],
           "evidence": "docs/video/counter-submissions-20261018.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "ParrySuccess",
+          "source_sha256": "cc31cbbf9b40901cc230f9985a24043fd58b8e46330cacb4d8db0aa9cafd3366",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
         }
       ]
     },
@@ -852,6 +912,16 @@
             "Assets/Settings/CombatVideoArt.asset"
           ],
           "evidence": "docs/video/counter-submissions-20261018.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "ParryCounter",
+          "source_sha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
         }
       ]
     },
@@ -914,7 +984,18 @@
           "original_project_path": "Assets/Art/Player_jamp_start_sample.aseprite"
         }
       ],
-      "uses": []
+      "uses": [
+        {
+          "consumer": "prototype",
+          "motion": "Jump",
+          "source_sha256": "6cda4621e97cd420d8999513bd3cbdf384dbdfb57e0e3779b74173196aaa33c0",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+        }
+      ]
     },
     "jump_up": {
       "name": "ジャンプ上昇サンプル",
@@ -959,7 +1040,18 @@
           "original_project_path": "Assets/Art/Player_jamp_up_sample.aseprite"
         }
       ],
-      "uses": []
+      "uses": [
+        {
+          "consumer": "prototype",
+          "motion": "Jump/Fall/DropThrough/AirRecovery",
+          "source_sha256": "c88edc2b0c0b9cd52195efd8edfd09f959856059f11213e572c3e28b1d94f063",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+        }
+      ]
     },
     "idle_legacy_48": {
       "name": "旧待機サンプル（参考）",

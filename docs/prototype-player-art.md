@@ -33,6 +33,8 @@
 
 CounterTransferは頭上へ移動する動画専用の転移絵であり、地上の踏み込み反撃へ無理に接続しない。反撃の仕組みを変更する場合は別の明示的な仕様変更として扱う。
 
+ジャンプ／反撃の原稿には現在シルエット表示のコマがある。原本の表示状態を勝手に変更して清書に見せず、そのまま仮表示として使用する。原稿管理は `ArtSource/Player/README.md` を参照。今回使用した受領・サンプル9素材の元ファイルSHA256は下記の検証JSONへ記録した。台帳の初回整理 `b9d7677` 完了後に、専用CLIの `record-use --consumer prototype` で使用版と検証証跡を追記し、台帳検証が合格した。Current/History・原稿の完成区分は変更しない。
+
 ## 接続方式
 
 - プロトタイプ専用 `Submitted/PlayerSubmitted.overrideController` で既存24状態のClipだけを上書きする。元Controllerと行動定義は保持する。
@@ -52,4 +54,14 @@ CounterTransferは頭上へ移動する動画専用の転移絵であり、地�
 
 ## 検証結果
 
-実装・Unity接続後に記録する。並行作業中の未コミット変更を含む環境の結果を、クリーンcheckoutの結果として扱わない。
+実装コミット `f071850361b67c1818511dee6447fc5217a5729c`、Unity 6000.3.9f1 / ULoop 2.1.3、2026-10-18に確認した。
+
+- Compile: Error 0 / Warning 0。設定・Clip・Scene参照検証: 合格。
+- EditMode全体: **196 / 196**、PlayMode全体: **381 / 381**、失敗・Skipなし。既存動画／Studio／攻撃／足場の回帰を含む。
+- 今回追加した16件: 素材参照・イベント・4段接触・100/80ms・Controller契約など10件、実Sceneの接地・色/向き・描画復元・48px表示正規化・Pause/Reset・全4段と反撃の命中姿勢など6件。
+- 通常攻撃は4段各1Hit、合計60ダメージ。命中・Hitstopの瞬間に接触Spriteを表示。地上反撃は18F、90ダメージ、ストック1件消費、動画ワープ無効を確認した。
+- インストール再実行でScene・生成Clip/Controller・ArtSetのSHA256不変。素材の二重接続・子Objectの増殖なし。
+- 1920x1080のGame Viewで待機の接地、攻撃1の接触姿勢、ジャンプのシルエット、地上反撃の仮キックを確認。画面確認後もConsole Error 0 / Warning 0。
+- 一時ターゲット、手動時計、入力無効化を解除し、敵なし・NeutralへリセットしてPlayModeを終了した。
+
+機械可読の結果は `docs/validation/prototype-player-art-2026-10-18.json`。画面は `docs/validation/prototype-player-art-2026-10-18.png`。並行作業中の未コミット変更を含む環境であり、クリーンcheckout、物理ゲームパッド、15分の操作感、Development Build、素材の最終受入は未実施。

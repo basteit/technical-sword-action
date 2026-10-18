@@ -48,6 +48,15 @@
     "resumptionDependency": "Apply parallel video submissions, Library, Clips and scenes consistently with the updated video tests before full regression"
   },
   "sceneSaveApprovedByUser": true,
+  "subsequentFullRegression": {
+    "implementationCommit": "f071850361b67c1818511dee6447fc5217a5729c",
+    "completed": true,
+    "editModePassed": 196,
+    "playModePassed": 381,
+    "consoleErrors": 0,
+    "consoleWarningsAfterVisualSmoke": 0,
+    "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+  },
   "parallelVideoDefaultsPreservedUncommitted": ["blinkStartFrame = 0", "behindTarget = 0"],
   "preExistingAndParallelChangesPreserved": true,
   "cleanCheckoutValidated": false,
