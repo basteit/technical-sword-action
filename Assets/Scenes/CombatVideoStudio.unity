@@ -1771,16 +1771,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerParryCounter2D
   definition: {fileID: 0}
-  hitFrame: 25
-  endFrame: 38
+  hitFrame: 27
+  endFrame: 40
   damage: 3
   radius: 0.5
   airborneKick: 1
   airborneContactOffset: {x: 1.28125, y: 0.125}
   invincibleDuringKick: 1
   chargeFrame: 18
-  chargeReleaseFrame: 24
-  landingFrame: 38
+  chargeReleaseFrame: 26
+  landingFrame: 40
   landingRollDistance: 0
   jumpHeight: 0.55
   maxApproach: 1.2
@@ -4522,7 +4522,7 @@ MonoBehaviour:
   playerVisual: {fileID: 515800907}
   library: {fileID: 11400000, guid: 948efd1e09648894f8c35efd70bbd0fb, type: 2}
   chargeScale: 0.15
-  chargeRealSeconds: 0.7
+  chargeRealSeconds: 0.95
   normalSize: 2.109375
   closeSize: 1.6875
   adaptiveFocusHeight: 1

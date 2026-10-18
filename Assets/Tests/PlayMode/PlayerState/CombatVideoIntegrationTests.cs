@@ -69,8 +69,34 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
             Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
-            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.0d,4.3d));
-            Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.63f,.71f));
+            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.25d,4.55d));
+            Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.85f,.94f));
+        }
+        [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
+        [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
+        public void CounterPreparationShowsAllFourPosesAndAcceleratesIntoTheExtension(int fps,bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            var visual=state.GetComponent<SpriteRenderer>();
+            var exposure=new System.Collections.Generic.Dictionary<string,double>();
+            for(int i=0;i<fps*6&&!Get<bool>(counter,"HasReleasedCharge");i++)
+            {
+                Call(director,"StepCapture",1d/fps);
+                if(!Get<bool>(presentation,"IsCharged")) continue;
+                Assert.That((float)clockType.GetProperty("SlowScale").GetValue(null),Is.EqualTo(.15f),"The slow lease must last through every preparation pose.");
+                string pose=visual.sprite.name;
+                exposure.TryGetValue(pose,out double seconds);exposure[pose]=seconds+1d/fps;
+            }
+            Assert.That(Get<bool>(counter,"HasReleasedCharge"),Is.True);
+            Assert.That(exposure.Count,Is.EqualTo(4),"Read the preparation as movement rather than a single held image.");
+            int[] ticks={3,2,2,1};
+            // Sprite sampling crosses the fixed 60Hz Animator update as well as the render frame.
+            double tolerance=Math.Max(1d/fps,1d/60)+.001d;
+            for(int i=0;i<ticks.Length;i++)
+                Assert.That(exposure["CounterKick_"+(i+4).ToString("00")],Is.EqualTo(ticks[i]/9d).Within(tolerance));
+            Assert.That(exposure["CounterKick_04"],Is.GreaterThan(exposure["CounterKick_07"]*2));
+            Assert.That((float)clockType.GetProperty("SlowScale").GetValue(null),Is.EqualTo(1));
+            Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
         [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
@@ -91,10 +117,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 if(!release&&Get<bool>(counter,"HasReleasedCharge"))
                 {
                     release=true;
-                    // A 30fps render can observe frame 25 after advancing two combat frames.
+                    // A 30fps render can observe the impact after advancing two combat frames.
                     int releaseFrame=Get<int>(counter,"ElapsedFrames");
-                    Assert.That(releaseFrame,Is.InRange(24,25));
-                    Assert.That(visual.sprite.name,Is.EqualTo(releaseFrame==24?"CounterKick_08":"CounterKick_09"),"Release must immediately show the supplied extended leg.");
+                    Assert.That(releaseFrame,Is.InRange(26,27));
+                    Assert.That(visual.sprite.name,Is.EqualTo(releaseFrame==26?"CounterKick_08":"CounterKick_09"),"Release must immediately show the supplied extended leg.");
                 }
                 if(Get<int>(counter,"HitCount")>previousHits)
                 {
@@ -291,7 +317,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             Assert.That(Get<bool>(art,"playerArtworkIsRough"),Is.True,"Submitted attacks do not finish the remaining artwork.");
         }
-        [TestCase("CounterTransfer",8,64,12)] [TestCase("CounterKick",15,128,26)]
+        [TestCase("CounterTransfer",8,64,12)] [TestCase("CounterKick",15,128,28)]
         public void CounterSubmissionsPreserveCanvasPivotAndProvisionalStatus(string name,int count,int size,int total)
         {
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
@@ -504,7 +530,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             object Mark(string name)=>marks.Single(m=>(string)m.GetType().GetField("kind").GetValue(m)==name);
             long Tick(string name)=>(long)Mark(name).GetType().GetField("tick").GetValue(Mark(name));
             double Real(string name)=>(double)Mark(name).GetType().GetField("realSeconds").GetValue(Mark(name));
-            Assert.That(Tick("ChargeRelease")-Tick("ChargeStart"),Is.EqualTo(6));
+            Assert.That(Tick("ChargeRelease")-Tick("ChargeStart"),Is.EqualTo(8));
             Assert.That(Tick("Kick")-Tick("ChargeRelease"),Is.EqualTo(1));
             Assert.That(Tick("Landing")-Tick("Kick"),Is.EqualTo(13));
             Assert.That(Real("Kick")-Real("ChargeRelease"),Is.InRange(.008d,.04d));

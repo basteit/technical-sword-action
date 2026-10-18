@@ -25,7 +25,8 @@ if not transfer then
     im:drawPixel(x,y,app.pixelColor.rgba(0,0,0,0));c.image=im;removedMarkers=removedMarkers+1
   end
 end
-local ticks=transfer and {1,1,2,2,2,1,1,2} or {2,2,2,2,1,1,2,1,1,2,2,2,2,2,2}
+-- The four tucked poses ease toward the extension; native source durations stay untouched.
+local ticks=transfer and {1,1,2,2,2,1,1,2} or {2,2,2,3,2,2,1,1,1,2,2,2,2,2,2}
 local frames,eyes,native={},{},{};local start=0;local sheet=Image(size*count,size,ColorMode.RGB)
 for i,f in ipairs(s.frames) do
   local im=Image(s.spec);im:drawSprite(s,i)
@@ -56,7 +57,7 @@ local check=assert(app.open(out..'/'..review));assert(#check.frames==count and n
 for i,f in ipairs(check.frames) do assert(math.floor(f.duration*1000+.5)==native[i].durationMs) end
 check:close()
 local action={name=name,provisional=true,canvasWidth=size,canvasHeight=size,pivotX=32,pivotY=38,count=count,totalFrames=start,frames=frames}
-if not transfer then action.chargeFrame=6;action.releaseFrame=12;action.hitFrame=13;action.landingFrame=26;action.recoveryFrame=26 end
+if not transfer then action.chargeFrame=6;action.releaseFrame=14;action.hitFrame=15;action.landingFrame=28;action.recoveryFrame=28 end
 local function write(file,value) local f=assert(io.open(out..'/'..file,'w'));f:write(json.encode(value));f:close() end
 write('timing-manifest.json',{actions={action}});write('eye-mask-manifest.json',{frames=eyes})
 write('submission-validation.json',{sourceUnmodified=true,reviewCopyReopened=true,guideHidden=true,removedIsolatedGuidePixels=removedMarkers,nativeFrames=native,gameFrames=start,kind=kind,silhouetteSampleOnly=not transfer,pivot={x=32,y=38},contact=not transfer and {frame=9,x=73,y=86} or nil})

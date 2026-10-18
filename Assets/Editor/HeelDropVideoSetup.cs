@@ -25,6 +25,7 @@ public static class HeelDropVideoSetup
             var scene=EditorSceneManager.OpenScene(path);
             var player=UnityEngine.Object.FindFirstObjectByType<PlayerParryCounter2D>();
             CombatVideoSceneBuilder.ConfigureCounter(player,library);
+            CombatVideoSceneBuilder.Set(UnityEngine.Object.FindFirstObjectByType<VideoCombatPresentation>(),"chargeRealSeconds",.95f);
             CombatVideoSceneBuilder.ConfigureAttack(player.GetComponent<PlayerAttack2D>(),library,path!=CombatVideoSceneBuilder.DefenseCancelScenePath);
             CombatVideoSceneBuilder.Set(player.GetComponent<VideoPlayerAnimationDriver>(),"skipAttackRecovery",true);
             if(path==CombatVideoSceneBuilder.ScenePath)

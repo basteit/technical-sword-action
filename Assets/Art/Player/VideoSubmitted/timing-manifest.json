@@ -273,32 +273,28 @@
           "start": 4
         },
         {
-          "frames": 2,
+          "frames": 3,
           "start": 6
         },
         {
-          "frames": 1,
-          "start": 8
-        },
-        {
-          "frames": 1,
+          "frames": 2,
           "start": 9
         },
         {
           "frames": 2,
-          "start": 10
-        },
-        {
-          "frames": 1,
-          "start": 12
+          "start": 11
         },
         {
           "frames": 1,
           "start": 13
         },
         {
-          "frames": 2,
+          "frames": 1,
           "start": 14
+        },
+        {
+          "frames": 1,
+          "start": 15
         },
         {
           "frames": 2,
@@ -319,17 +315,21 @@
         {
           "frames": 2,
           "start": 24
+        },
+        {
+          "frames": 2,
+          "start": 26
         }
       ],
-      "hitFrame": 13,
-      "landingFrame": 26,
+      "hitFrame": 15,
+      "landingFrame": 28,
       "name": "CounterKick",
       "pivotX": 32,
       "pivotY": 38,
       "provisional": true,
-      "recoveryFrame": 26,
-      "releaseFrame": 12,
-      "totalFrames": 26
+      "recoveryFrame": 28,
+      "releaseFrame": 14,
+      "totalFrames": 28
     }
   ]
 }

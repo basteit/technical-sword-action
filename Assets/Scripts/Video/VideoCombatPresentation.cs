@@ -11,7 +11,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField] private SpriteRenderer playerVisual;
     [SerializeField] private VideoArtLibrary library;
     [SerializeField, Range(.1f,1f)] private float chargeScale=.15f;
-    [SerializeField, Range(.5f,1f)] private float chargeRealSeconds=.7f;
+    [SerializeField, Range(.5f,1f)] private float chargeRealSeconds=.95f;
     [SerializeField] private float normalSize=2.109375f;
     [SerializeField] private float closeSize=1.6875f;
     [SerializeField] private bool adaptiveFocusHeight;
