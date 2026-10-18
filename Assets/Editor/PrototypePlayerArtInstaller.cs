@@ -19,6 +19,19 @@ public static class PrototypePlayerArtInstaller
     public const string BaseControllerPath = "Assets/Animations/Player/Prototype/PlayerPrototypeAnimator.controller";
     private static readonly EditorCurveBinding SpriteBinding = EditorCurveBinding.PPtrCurve("", typeof(SpriteRenderer), "m_Sprite");
 
+    [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Walking Display Crops")]
+    public static void RefreshWalkingDisplayCrops()
+    {
+        if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode before updating artwork.");
+        var set = AssetDatabase.LoadAssetAtPath<PrototypePlayerArtSet>(SetPath);
+        var library = AssetDatabase.LoadAssetAtPath<VideoArtLibrary>("Assets/Settings/CombatVideoArt.asset");
+        if (set == null || library == null) throw new InvalidOperationException("Install the prototype artwork before refreshing its walking display.");
+        // Do not regenerate other clips from a video library that may have changed independently.
+        BuildWalkDisplayOverrides(set, library.Find("WalkReference"));
+        EditorUtility.SetDirty(set); AssetDatabase.SaveAssetIfDirty(set);
+        ValidateOrThrow();
+    }
+
     [MenuItem("Tools/Technical Sword Action/Prototype/Install Submitted Player Art")]
     public static void Install()
     {
@@ -87,6 +100,7 @@ public static class PrototypePlayerArtInstaller
         EditorUtility.SetDirty(presentationController); AssetDatabase.SaveAssetIfDirty(presentationController);
         var set = AssetDatabase.LoadAssetAtPath<PrototypePlayerArtSet>(SetPath);
         if (set == null) { set = ScriptableObject.CreateInstance<PrototypePlayerArtSet>(); AssetDatabase.CreateAsset(set, SetPath); }
+        BuildWalkDisplayOverrides(set, library.Find("WalkReference"));
         var controller = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(ControllerPath);
         if (controller == null) { controller = new AnimatorOverrideController(); AssetDatabase.CreateAsset(controller, ControllerPath); }
         controller.runtimeAnimatorController = presentationController;
@@ -256,6 +270,46 @@ public static class PrototypePlayerArtInstaller
         return set;
     }
 
+    private static void BuildWalkDisplayOverrides(PrototypePlayerArtSet set, VideoArtLibrary.Motion walk)
+    {
+        if (walk == null || walk.frames == null || walk.frames.Length != 8 || walk.frames.Any(sprite => sprite == null))
+            throw new InvalidOperationException("The reviewed eight-cel walking source is required for its display crop.");
+        var existing = AssetDatabase.LoadAllAssetsAtPath(SetPath).OfType<Sprite>().ToDictionary(sprite => sprite.name);
+        var replacements = new List<PrototypePlayerArtSet.DisplayOverride>();
+        foreach (var source in walk.frames)
+        {
+            // This received 64px source has a floor guide at row 5 from the bottom.
+            // Rows 0..4 are transparent; all character pixels start at row 6 or higher.
+            // Crop UVs/mesh only, keeping the shared texture and world-space pixel positions.
+            if (source.rect.size != new Vector2(64, 64) || source.pivot != new Vector2(32, 38))
+                throw new InvalidOperationException("Review the walking guide crop after source dimensions/pivot change: " + source.name);
+            var rect = new Rect(source.rect.x, source.rect.y + 6, source.rect.width, source.rect.height - 6);
+            var pivotPixels = source.pivot - Vector2.up * 6;
+            string name = source.name + "_PrototypeDisplay";
+            existing.TryGetValue(name, out var display);
+            if (display == null || display.texture != source.texture || display.rect != rect ||
+                display.pivot != pivotPixels || !Mathf.Approximately(display.pixelsPerUnit, source.pixelsPerUnit))
+            {
+                var created = Sprite.Create(source.texture, rect, new Vector2(pivotPixels.x / rect.width, pivotPixels.y / rect.height),
+                    source.pixelsPerUnit, 0, SpriteMeshType.FullRect);
+                created.name = name;
+                if (display == null)
+                {
+                    display = created;
+                    AssetDatabase.AddObjectToAsset(display, set);
+                }
+                else
+                {
+                    EditorUtility.CopySerialized(created, display);
+                    Object.DestroyImmediate(created);
+                }
+                EditorUtility.SetDirty(display);
+            }
+            replacements.Add(new PrototypePlayerArtSet.DisplayOverride { source = source, display = display });
+        }
+        set.displayOverrides = replacements.ToArray();
+    }
+
     private static Sprite[] LoadSamples(string path)
     {
         var sprites = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().OrderBy(s => s.name).ToArray();
@@ -281,6 +335,18 @@ public static class PrototypePlayerArtInstaller
         var errors = new List<string>();
         var set = AssetDatabase.LoadAssetAtPath<PrototypePlayerArtSet>(SetPath);
         if (set == null || set.controller == null || set.entries.Length != 24) return new[] { "Missing prototype art set or 24 clip overrides." };
+        if (set.displayOverrides == null || set.displayOverrides.Length != 8)
+            errors.Add("Missing eight prototype-only walking display crops.");
+        else foreach (var replacement in set.displayOverrides)
+        {
+            if (replacement == null || replacement.source == null || replacement.display == null)
+            { errors.Add("Missing walking display source/crop."); continue; }
+            var source = replacement.source; var display = replacement.display;
+            if (display.texture != source.texture || AssetDatabase.GetAssetPath(display) != SetPath ||
+                display.rect != new Rect(source.rect.x, source.rect.y + 6, source.rect.width, source.rect.height - 6) ||
+                display.pivot + Vector2.up * 6 != source.pivot || !Mathf.Approximately(display.pixelsPerUnit, source.pixelsPerUnit))
+                errors.Add(source.name + ": walking display crop changes pixels, pivot, scale or source ownership.");
+        }
         if (AssetDatabase.GetAssetPath(set.controller.runtimeAnimatorController) != PresentationControllerPath)
             errors.Add("Artwork must preserve the prototype controller/state contract.");
         var presentationController = set.controller.runtimeAnimatorController as AnimatorController;

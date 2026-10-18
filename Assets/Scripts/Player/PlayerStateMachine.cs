@@ -104,6 +104,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         LifeState == PlayerLifeState.Dead ||
         CombatSuspended ||
         DialogueController.GameplayInputBlocked ||
+        ActionState == PlayerActionState.Parry ||
         ActionState == PlayerActionState.ParrySuccess ||
         ActionState == PlayerActionState.ParryFail ||
         ActionState == PlayerActionState.ParryCounter ||

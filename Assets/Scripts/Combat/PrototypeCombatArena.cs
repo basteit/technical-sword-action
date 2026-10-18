@@ -84,11 +84,12 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     }
     private void OnGUI()
     {
-        GUILayout.BeginArea(new Rect(Screen.width - 310, 12, 298, 260), GUI.skin.box);
+        GUILayout.BeginArea(new Rect(Screen.width - 310, 12, 298, 280), GUI.skin.box);
         GUILayout.Label("Prototype action / combat acceptance");
-        GUILayout.Label("F2: Reset actions only (no enemies)");
-        GUILayout.Label("Optional F1: One normal / F3: Two");
-        GUILayout.Label("F4: Strong / F5: Normal + Strong");
+        if (GUILayout.Button("F1: Parry practice (one normal)")) ResetArena(false);
+        if (GUILayout.Button("F2: Reset actions only (no enemies)")) ResetActionsOnly();
+        GUILayout.Label("F3: Two / F4: Strong / F5: Mixed");
+        GUILayout.Label("K / RMB: Parry - J / LMB: Counter");
         if (coordinator != null) GUILayout.Label($"Attack roles: {coordinator.ActiveAttackers}/{coordinator.MaximumAttackers}");
         if (feedback != null && feedback.Settings != null)
         {

@@ -34,7 +34,7 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour
         }
         source.forceRenderingOff = true;
         artwork.enabled = source.enabled;
-        artwork.sprite = source.sprite;
+        artwork.sprite = artSet.DisplaySpriteFor(source.sprite);
         artwork.color = source.color;
         artwork.flipX = source.flipX; artwork.flipY = source.flipY;
         artwork.sortingLayerID = source.sortingLayerID;
