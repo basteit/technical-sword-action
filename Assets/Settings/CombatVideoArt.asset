@@ -1086,6 +1086,14 @@ MonoBehaviour:
     - {fileID: 21300000, guid: c0da5e40ef0ff29459c9146a44bbfd6d, type: 3}
     - {fileID: 21300000, guid: 1d3f1030961937d408c4d7cc9bd14fdb, type: 3}
     eyeFrames:
+    - {fileID: 21300000, guid: b0c8dce42365e7a488a17d622e2b246c, type: 3}
+    - {fileID: 21300000, guid: f0e3bc6a267bd2a48ad6d1092d7275f5, type: 3}
+    - {fileID: 21300000, guid: e741537577742ed40ae47d490ed6e097, type: 3}
+    - {fileID: 21300000, guid: ad4c233ce30f61e43a56adc677ca90a5, type: 3}
+    - {fileID: 21300000, guid: 6f21870d019c6b740a0468841ce83854, type: 3}
+    - {fileID: 21300000, guid: b35e9ece0a590c04f815fcf39d3853bf, type: 3}
+    - {fileID: 21300000, guid: c4de18b6d874265408e2ae4a541a8b91, type: 3}
+    - {fileID: 21300000, guid: b571f4094e35b004c9d0e837ee815494, type: 3}
     - {fileID: 0}
     - {fileID: 0}
     - {fileID: 0}
@@ -1093,21 +1101,13 @@ MonoBehaviour:
     - {fileID: 0}
     - {fileID: 0}
     - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    durations: 020000000100000001000000010000000100000001000000010000000100000001000000020000000200000002000000020000000200000002000000
-    hitFrame: 9
+    durations: 020000000100000001000000010000000200000002000000010000000100000001000000020000000200000002000000020000000200000002000000
+    hitFrame: 11
     branchFrame: 0
     chargeFrame: 0
-    releaseFrame: 8
-    landingFrame: 22
-    recoveryFrame: 22
+    releaseFrame: 10
+    landingFrame: 24
+    recoveryFrame: 24
   - name: CounterTransfer
     provisional: 1
     includesSlashTrail: 0

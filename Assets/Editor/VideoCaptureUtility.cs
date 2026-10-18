@@ -51,7 +51,8 @@ public static class VideoCaptureUtility
                 Check(!presentation.IsSpotlightVisible&&!presentation.AreEyesVisible,"Subject lift or eye light remained.");
                 Check(presentation.IsPlayerBodyVisible&&!presentation.IsTransitShadowVisible,"Blink visibility remained.");
                 Check(fx.ActiveCount==0,"VFX remained active.");
-                Check(presentation.ChargeRealElapsed>=.5f&&presentation.ChargeRealElapsed<=1f,"Charge duration outside .5–1 seconds.");
+                // Latest direction: show the charged lightning for about 1.1 real seconds.
+                Check(presentation.ChargeRealElapsed>=1.08f&&presentation.ChargeRealElapsed<=1.15f,"Electrical preparation duration outside 1.08–1.15 seconds.");
                 records.Add(new RunRecord{stages=stages,mirrored=mirrored,duration=director.RealElapsed,frontHits=director.FrontEnemy.HitCount,rearHits=director.RearEnemy.HitCount,chargeSeconds=presentation.ChargeRealElapsed});
                 director.ResetTake(stages);
                 Check(presentation.DimAlpha==0&&!presentation.IsDimVisible,"Slow dim overlay not reset.");

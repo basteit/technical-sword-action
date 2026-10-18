@@ -33,7 +33,8 @@ elseif not transfer then
   end
 end
 -- The drawn revision charges from its first cel; the native document keeps its own timing.
-local ticks=transfer and {1,1,2,2,2,1,1,2} or drawn and {2,1,1,1,1,1,1,1,1,2,2,2,2,2,2} or {2,2,2,3,2,2,1,1,1,2,2,2,2,2,2}
+-- Hold the two strongest electrical cels longer without slowing the release or landing.
+local ticks=transfer and {1,1,2,2,2,1,1,2} or drawn and {2,1,1,1,2,2,1,1,1,2,2,2,2,2,2} or {2,2,2,3,2,2,1,1,1,2,2,2,2,2,2}
 local frames,eyes,native={},{},{};local start=0;local sheet=Image(size*count,size,ColorMode.RGB)
 for i,f in ipairs(s.frames) do
   local im=Image(s.spec);im:drawSprite(s,i)
@@ -48,11 +49,12 @@ for i,f in ipairs(s.frames) do
   local file=name..'_'..string.format('%02d',i)
   im:saveAs(out..'/'..file..'.png');sheet:drawImage(im,Point((i-1)*size,0))
   local mask=Image(s.spec);local pixels=0
-  if transfer then
-    -- Use the authored Eye layer even when its preview opacity is 50 percent.
+  if transfer or drawn then
+    -- Use only an authored, visible Eye layer, including a newly submitted kick's eye trail.
+    -- Transfer previews may keep their original 50 percent opacity in the body image.
     local eye
     for _,l in ipairs(s.layers) do if l.name=='Eye' then eye=l end end
-    local cel=eye and eye:cel(i)
+    local cel=eye and eye.isVisible and eye:cel(i)
     if cel then for p in cel.image:pixels() do if app.pixelColor.rgbaA(p())>0 then
       mask:drawPixel(p.x+cel.position.x,p.y+cel.position.y,app.pixelColor.rgba(255,255,255,255));pixels=pixels+1
     end end end
@@ -70,7 +72,7 @@ for i,f in ipairs(check.frames) do assert(math.floor(f.duration*1000+.5)==native
 check:close()
 local action={name=name,provisional=not drawn,canvasWidth=size,canvasHeight=size,pivotX=32,pivotY=38,count=count,totalFrames=start,frames=frames}
 if not transfer then
-  action.chargeFrame=drawn and 0 or 6;action.releaseFrame=drawn and 8 or 14;action.hitFrame=drawn and 9 or 15
+  action.chargeFrame=drawn and 0 or 6;action.releaseFrame=frames[8].start;action.hitFrame=frames[9].start
   action.landingFrame=start;action.recoveryFrame=start;action.includesCounterTrail=drawn
   action.counterContactOffset={x=(drawn and 51 or 41)/32,y=4/32}
 end

@@ -281,28 +281,24 @@
           "start": 4
         },
         {
-          "frames": 1,
+          "frames": 2,
           "start": 5
         },
         {
-          "frames": 1,
-          "start": 6
-        },
-        {
-          "frames": 1,
+          "frames": 2,
           "start": 7
-        },
-        {
-          "frames": 1,
-          "start": 8
         },
         {
           "frames": 1,
           "start": 9
         },
         {
-          "frames": 2,
+          "frames": 1,
           "start": 10
+        },
+        {
+          "frames": 1,
+          "start": 11
         },
         {
           "frames": 2,
@@ -323,18 +319,22 @@
         {
           "frames": 2,
           "start": 20
+        },
+        {
+          "frames": 2,
+          "start": 22
         }
       ],
-      "hitFrame": 9,
+      "hitFrame": 11,
       "includesCounterTrail": true,
-      "landingFrame": 22,
+      "landingFrame": 24,
       "name": "CounterKick",
       "pivotX": 32,
       "pivotY": 38,
       "provisional": false,
-      "recoveryFrame": 22,
-      "releaseFrame": 8,
-      "totalFrames": 22
+      "recoveryFrame": 24,
+      "releaseFrame": 10,
+      "totalFrames": 24
     }
   ]
 }

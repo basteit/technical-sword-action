@@ -782,9 +782,9 @@
     "counter_kick": {
       "name": "反撃キック",
       "status": "received",
-      "notes": "2026-10-19受領。BodyとEffectを表示した人物・電気の作画版。原稿登録とゲーム使用版の検証は別記録。",
+      "notes": "2026-10-19更新。Body/Effect/Eyeを表示した人物・足の電気・目の残光の作画版。原稿登録とゲーム使用版の検証は別記録。",
       "current": "Current/Player_counter_kick.aseprite",
-      "current_sha256": "a763a95f3ff125bb379c8edee7f2b15c360c8afe6810edc710b1cdfae7898862",
+      "current_sha256": "cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5",
       "revisions": [
         {
           "sha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db",
@@ -1001,6 +1001,126 @@
               {
                 "is_group": false,
                 "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 105,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
+        },
+        {
+          "sha256": "cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5",
+          "file": "History/counter_kick/cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5.aseprite",
+          "original_name": "Player_counter_kick.aseprite",
+          "registered_at": "2026-10-18T19:31:49+00:00",
+          "received_on": "2026-10-19",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              },
+              {
+                "duration_ms": 100,
+                "frame": 9
+              },
+              {
+                "duration_ms": 100,
+                "frame": 10
+              },
+              {
+                "duration_ms": 60,
+                "frame": 11
+              },
+              {
+                "duration_ms": 60,
+                "frame": 12
+              },
+              {
+                "duration_ms": 60,
+                "frame": 13
+              },
+              {
+                "duration_ms": 60,
+                "frame": 14
+              },
+              {
+                "duration_ms": 60,
+                "frame": 15
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
                 "opacity": 255,
                 "visible": true
               },

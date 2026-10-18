@@ -69,8 +69,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
             Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
-            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.1d,4.4d));
-            Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.85f,.94f));
+            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.3d,4.65d));
+            Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(1.08f,1.15f));
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
         [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
@@ -89,12 +89,14 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             Assert.That(Get<bool>(counter,"HasReleasedCharge"),Is.True);
             Assert.That(exposure.Count,Is.EqualTo(7),"The first three supplied cels must be readable too.");
-            int[] ticks={2,1,1,1,1,1,1};
+            int[] ticks={2,1,1,1,2,2,1};
             // Sprite sampling crosses the fixed 60Hz Animator update as well as the render frame.
             double tolerance=Math.Max(1d/fps,1d/60)+.001d;
             for(int i=0;i<ticks.Length;i++)
                 Assert.That(exposure["CounterKick_"+(i+1).ToString("00")],Is.EqualTo(ticks[i]/9d).Within(tolerance));
             Assert.That(exposure["CounterKick_01"],Is.GreaterThan(exposure["CounterKick_07"]*1.5));
+            Assert.That(exposure["CounterKick_05"],Is.GreaterThanOrEqualTo(exposure["CounterKick_03"]+1d/fps-.001d),"The strong lightning must be readable before release.");
+            Assert.That(exposure["CounterKick_06"],Is.GreaterThanOrEqualTo(exposure["CounterKick_07"]+1d/fps-.001d));
             Assert.That((float)clockType.GetProperty("SlowScale").GetValue(null),Is.EqualTo(1));
             Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
         }
@@ -119,8 +121,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     release=true;
                     // A 30fps render can observe the impact after advancing two combat frames.
                     int releaseFrame=Get<int>(counter,"ElapsedFrames");
-                    Assert.That(releaseFrame,Is.InRange(20,21));
-                    Assert.That(visual.sprite.name,Is.EqualTo(releaseFrame==20?"CounterKick_08":"CounterKick_09"),"The last tucked cel releases into the newly drawn contact cel.");
+                    Assert.That(releaseFrame,Is.InRange(22,23));
+                    Assert.That(visual.sprite.name,Is.EqualTo(releaseFrame==22?"CounterKick_08":"CounterKick_09"),"The last tucked cel releases into the newly drawn contact cel.");
                 }
                 if(Get<int>(counter,"HitCount")>previousHits)
                 {
@@ -317,7 +319,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             Assert.That(Get<bool>(art,"playerArtworkIsRough"),Is.True,"Submitted attacks do not finish the remaining artwork.");
         }
-        [TestCase("CounterTransfer",8,64,12)] [TestCase("CounterKick",15,128,22)]
+        [TestCase("CounterTransfer",8,64,12)] [TestCase("CounterKick",15,128,24)]
         public void CounterSubmissionsPreserveCanvasPivotAndReceivedStatus(string name,int count,int size,int total)
         {
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
@@ -535,10 +537,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
             object Mark(string name)=>marks.Single(m=>(string)m.GetType().GetField("kind").GetValue(m)==name);
             long Tick(string name)=>(long)Mark(name).GetType().GetField("tick").GetValue(Mark(name));
             double Real(string name)=>(double)Mark(name).GetType().GetField("realSeconds").GetValue(Mark(name));
-            Assert.That(Tick("ChargeRelease")-Tick("ChargeStart"),Is.EqualTo(8));
+            Assert.That(Tick("ChargeRelease")-Tick("ChargeStart"),Is.EqualTo(10));
             Assert.That(Tick("Kick")-Tick("ChargeRelease"),Is.EqualTo(1));
             Assert.That(Tick("Landing")-Tick("Kick"),Is.EqualTo(13));
-            Assert.That(Real("Kick")-Real("ChargeRelease"),Is.InRange(.008d,.04d));
+            // At 30fps both 60Hz events can fall in the same sampled render frame.
+            // Their tick difference above still proves a full-speed one-tick release.
+            Assert.That(Real("Kick")-Real("ChargeRelease"),Is.InRange(0d,Math.Max(1d/fps,1d/60)+.001d));
             Assert.That(Get<PlayerActionState>(state,"ActionState"),Is.EqualTo(PlayerActionState.Neutral));
         }
         [TestCase(false)] [TestCase(true)]
@@ -563,10 +567,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(director,"StartTake",2,true);
             for(int i=0;i<280&&!Get<bool>(presentation,"IsCharged");i++) Step();
             for(int i=0;i<5;i++) Step();
-            Assert.That(Get<bool>(presentation,"AreEyesVisible"),Is.False,"The supplied charging cels close the eyes; do not invent an eye mask.");
+            Assert.That(Get<bool>(presentation,"AreEyesVisible"),Is.True,"Use the submitted kick's newly authored Eye layer.");
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
-            var transfer=Call(Get<object>(driver,"Art"),"Find","CounterTransfer");
-            state.GetComponent<SpriteRenderer>().sprite=Get<Sprite[]>(transfer,"frames")[5];
+            var kick=Call(Get<object>(driver,"Art"),"Find","CounterKick");
+            state.GetComponent<SpriteRenderer>().sprite=Get<Sprite[]>(kick,"frames")[8];
+            Call(presentation,"AdvanceVisuals",0f);
+            Assert.That(Get<bool>(presentation,"AreEyesVisible"),Is.False,"The contact cel has no Eye layer; do not invent a mask.");
+            state.GetComponent<SpriteRenderer>().sprite=Get<Sprite[]>(kick,"frames")[0];
             Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Get<bool>(presentation,"AreEyesVisible"),Is.True);
             var focus=state.transform.Find("VideoHeroFocus");
