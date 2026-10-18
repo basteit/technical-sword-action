@@ -1,6 +1,8 @@
 # 動画制作 #69 — 作業・受入記録
 
-2026-10-18最新：`Player_parry_light.aseprite` を仮受領し、待機→成功（軽）→頭上のかかと落としを接続。2段撃破・その場の斬撃・攻撃後の直接Idleを維持する。[最新の素材・動画・検証、Unity/作画のエフェクト分担、反撃の配色案](video/parry-light-submission-and-effects.md)。新しい反撃の移行用/追撃用の人の素材と全体の最終受入は未完了。以下の旧版の清書未受領や回し蹴りの記述は当時の記録であり、最新リンクを優先する。
+2026-10-18最新：移行とキックの仮素材を接続。提出Sampleのキックを使い、弾いた敵の背後へ回り込んでから敵へ向き直る。18〜24Fのスローを維持し、解除の次tickに命中、3.2unitの大きな吹っ飛びへ接続した。主動画は2段撃破・4.083333秒・1080p60・無音。[素材・時間表・再現・検証・未達](video/counter-submissions-20261018.md)。原本保持の編集可能Asepriteを用意し、全体EditMode186/PlayMode375、通常/攻防切替計80回を確認。キックの人物清書・足の電気・最終受入は残り、#69は未完了。
+
+2026-10-18 前版：`Player_parry_light.aseprite` を仮受領し、待機→成功（軽）→頭上のかかと落としを接続。2段撃破・その場の斬撃・攻撃後の直接Idleを維持する。[最新の素材・動画・検証、Unity/作画のエフェクト分担、反撃の配色案](video/parry-light-submission-and-effects.md)。新しい反撃の移行用/追撃用の人の素材と全体の最終受入は未完了。以下の旧版の清書未受領や回し蹴りの記述は当時の記録であり、最新リンクを優先する。
 
 作業場所は `C:\Users\hirot\GitHub\technical-sword-action` 固定。着手時ブランチは `codex/49-basic-actions`、HEADは `83eed84`。既存の攻撃移動・Animator・Scene・要件・素材等の未コミット変更を保持し、`codex/69-combat-video` へ引き継ぐ。着手差分は `.uloop/outputs/video-production-baseline/preexisting.patch` に保存した。
 
