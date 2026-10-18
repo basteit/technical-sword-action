@@ -1020,22 +1020,22 @@
         {
           "consumer": "video",
           "motion": "CounterKick",
-          "source_sha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db",
+          "source_sha256": "a763a95f3ff125bb379c8edee7f2b15c360c8afe6810edc710b1cdfae7898862",
           "references": [
-            "Assets/Art/Player/VideoSubmitted/CounterKick_01.png",
+            "Assets/Art/Player/VideoSubmitted/timing-manifest.json",
             "Assets/Settings/CombatVideoArt.asset"
           ],
-          "evidence": "docs/video/counter-submissions-20261018.md"
+          "evidence": "docs/video/submitted-kick-20261019.md"
         },
         {
           "consumer": "prototype",
           "motion": "ParryCounter",
-          "source_sha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db",
+          "source_sha256": "a763a95f3ff125bb379c8edee7f2b15c360c8afe6810edc710b1cdfae7898862",
           "references": [
             "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
-            "Assets/Scenes/PrototypeCombatValidation.unity"
+            "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim"
           ],
-          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+          "evidence": "docs/video/previews/submitted-kick-20261019-validation.json"
         }
       ]
     },
