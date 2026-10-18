@@ -12,6 +12,18 @@ public static class CombatVideoSceneBuilder
     internal const float BackgroundGridUnit=.5f;
     internal static readonly Vector3 SequentialFrontStart=new Vector3(1.35f+BackgroundGridUnit,1,0);
     internal static readonly Vector3 SequentialRearStart=new Vector3(-1.1f-BackgroundGridUnit,1,0);
+    [MenuItem("Tools/Technical Sword Action/Video/Apply Rear Entrance Layout")]
+    public static void ApplyRearEntranceLayout()
+    {
+        if(Application.isPlaying)throw new System.InvalidOperationException("Exit PlayMode before updating capture layout.");
+        for(int i=0;i<SceneManager.sceneCount;i++)
+            if(SceneManager.GetSceneAt(i).isDirty)throw new System.InvalidOperationException("Preserve loaded scene edits before updating capture layout.");
+        string previous=SceneManager.GetActiveScene().path;
+        var scene=EditorSceneManager.OpenScene(ScenePath);
+        ConfigureSequentialLayout(Object.FindFirstObjectByType<CombatVideoDirector>());
+        EditorSceneManager.MarkSceneDirty(scene);EditorSceneManager.SaveScene(scene);
+        if(previous!=ScenePath&&!string.IsNullOrEmpty(previous))EditorSceneManager.OpenScene(previous);
+    }
     [MenuItem("Tools/Technical Sword Action/Video/Build Art and Capture Scene")]
     public static void BuildAll()
     {
@@ -180,11 +192,14 @@ public static class CombatVideoSceneBuilder
     {
         Set(director,"frontStart",SequentialFrontStart);Set(director,"rearStart",SequentialRearStart);
         Set(director,"useSpacingApproaches",false);
-        director.FrontEnemy.transform.position=SequentialFrontStart;
-        director.RearEnemy.transform.position=SequentialRearStart;
+        Set(director,"rearEntranceEnabled",true);Set(director,"twoStageRightShift",1f);
+        Set(director,"rearEntranceDistance",1.6f);Set(director,"rearEntranceSpeed",2.4f);Set(director,"rearEntranceReach",1.6f);
+        director.Player.transform.position=director.InitialPlayerPosition;
+        director.FrontEnemy.transform.position=director.InitialFrontPosition;
+        director.RearEnemy.transform.position=director.InitialRearPosition;
         var rearAi=director.RearEnemy.GetComponent<EnemyMeleeChaser2D>();
-        // The selected two-stage take keeps this AI held until its scripted
-        // windup. The retained four-stage comparison may still release pursuit.
+        // The selected two-stage take temporarily overrides pursuit when the first slash lands.
+        // Keep the saved baseline for the retained four-stage comparison and every reset.
         Set(rearAi,"moveSpeed",4f);Set(rearAi,"attackRange",1.9f);Set(rearAi,"preferredMaxDistance",1.35f);
     }
     internal static void Set(Object target, string name, Object value)

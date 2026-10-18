@@ -46,6 +46,8 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     private bool pendingMeleeHit;
     private long attackSequence;
     private bool captureHeld;
+    private bool capturePursuitConfigured;
+    private float captureSavedSpeed,captureSavedRange,captureSavedPreferredMax;
     private readonly HashSet<int> hitReceivers = new();
     private readonly RaycastHit2D[] movementHits = new RaycastHit2D[8];
     private Collider2D ownCollider;
@@ -90,6 +92,11 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
 
     public void ResetForCapture(Transform playerTarget, bool held = true)
     {
+        if(capturePursuitConfigured)
+        {
+            moveSpeed=captureSavedSpeed;attackRange=captureSavedRange;preferredMaxDistance=captureSavedPreferredMax;
+            capturePursuitConfigured=false;
+        }
         attackCoordinator?.Release(this);
         target = playerTarget;
         captureHeld = held;
@@ -100,6 +107,16 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
         activeRemaining = 0; nextAttackIndex = 0; currentAttack = null; AttackRoleReason = "Reset";
         ApplyAttackSettings(null);
         facing = target != null ? ((Vector2)(target.position - transform.position)).normalized : Vector2.right;
+    }
+
+    /// <summary>Walk into a staged attack using normal AI and collision checks; the next capture reset restores its settings.</summary>
+    public void BeginCaptureApproach(Transform playerTarget,float speed,float reach)
+    {
+        ResetForCapture(playerTarget,false);
+        captureSavedSpeed=moveSpeed;captureSavedRange=attackRange;captureSavedPreferredMax=preferredMaxDistance;
+        capturePursuitConfigured=true;
+        moveSpeed=Mathf.Clamp(speed,0,10);attackRange=Mathf.Max(preferredMinDistance,reach);
+        preferredMaxDistance=Mathf.Min(preferredMaxDistance,attackRange);
     }
 
     public bool BeginCaptureAttack()

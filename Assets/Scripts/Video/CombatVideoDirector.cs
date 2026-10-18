@@ -13,6 +13,11 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     [SerializeField] private int comboStages = 2;
     [SerializeField] private bool defenseCancelTake;
     [SerializeField] private bool useSpacingApproaches;
+    [SerializeField] private bool rearEntranceEnabled;
+    [SerializeField] private float twoStageRightShift=1f;
+    [SerializeField] private float rearEntranceDistance=1.6f;
+    [SerializeField] private float rearEntranceSpeed=2.4f;
+    [SerializeField] private float rearEntranceReach=1.6f;
     [SerializeField] private VideoCombatPresentation presentation;
     [SerializeField] private VideoVfxRenderer vfx;
     [SerializeField] private Vector3 playerStart=new Vector3(0,1,0);
@@ -45,6 +50,17 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     // Preserve the optional four-stage comparison's travel while the selected
     // two-stage take uses the supplied sword artwork without an approach.
     public bool UsesSpacingApproaches=>useSpacingApproaches||!defenseCancelTake&&comboStages==4;
+    public bool UsesRearEntrance=>rearEntranceEnabled&&!defenseCancelTake&&comboStages==2&&!UsesSpacingApproaches;
+    public Vector3 InitialPlayerPosition=>playerStart+Vector3.right*(UsesRearEntrance?twoStageRightShift*(MirrorLayout?-1:1):0);
+    public Vector3 InitialFrontPosition=>InitialPosition(frontStart,false);
+    public Vector3 InitialRearPosition=>InitialPosition(rearStart,true);
+    private Vector3 InitialPosition(Vector3 baseline,bool rear)
+    {
+        int sign=MirrorLayout?-1:1;
+        baseline.x=InitialPlayerPosition.x+(baseline.x-playerStart.x)*sign;
+        if(rear&&UsesRearEntrance)baseline.x-=rearEntranceDistance*sign;
+        return baseline;
+    }
     public int CombatTickOrder=>-200;
     private void Awake()
     {
@@ -122,16 +138,14 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         returnDashSent=returnDashObserved=returnAttackSent=counterLanded=AttackWasCancelledForParry=false;
         CombatTimeController.ResetSession();
         player.ResetToSafeState("VideoReset");
-        player.transform.position = playerStart;
+        player.transform.position = InitialPlayerPosition;
         int layoutSign=MirrorLayout ? -1 : 1;
         player.GetComponent<PlayerMotor2D>().SetFacing(layoutSign);
         player.GetComponent<PlayerMotor2D>().SetMoveInput(Vector2.zero);
         player.GetComponent<PlayerDamageReceiver2D>().ResetHealth();
         player.GetComponent<PlayerSpecialGauge>().ResetGauge();
-        var frontPosition=frontStart;frontPosition.x=playerStart.x+(frontStart.x-playerStart.x)*layoutSign;
-        var rearPosition=rearStart;rearPosition.x=playerStart.x+(rearStart.x-playerStart.x)*layoutSign;
-        frontEnemy.ResetForCapture(frontPosition, (comboStages == 4 ? 7 : 2)+(defenseCancelTake?1:0));
-        rearEnemy.ResetForCapture(rearPosition, 3);
+        frontEnemy.ResetForCapture(InitialFrontPosition, (comboStages == 4 ? 7 : 2)+(defenseCancelTake?1:0));
+        rearEnemy.ResetForCapture(InitialRearPosition, 3);
         frontEnemy.GetComponent<EnemyMeleeChaser2D>().ResetForCapture(player.transform);
         rearEnemy.GetComponent<EnemyMeleeChaser2D>().ResetForCapture(player.transform);
         player.GetComponent<VideoPlayerAnimationDriver>()?.ResetVisual();
@@ -172,15 +186,20 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         }
         if(attack.IsAttacking && attack.ComboStep<comboStages && attack.IsComboWindowOpen && queuedStep!=attack.ComboStep)
         { queuedStep=attack.ComboStep;attack.RequestAttack(); }
-        if(!frontEnemy.IsAlive && !attack.IsAttacking && !rearStarted)
-        { rearWindupTick=tick+12;rearStarted=true; }
         var ai=rearEnemy.GetComponent<EnemyMeleeChaser2D>();
-        if(rearStarted && tick==rearWindupTick)
+        if(UsesRearEntrance&&frontEnemy.HitCount>0&&!rearStarted)
+        {
+            rearStarted=true;ai.BeginCaptureApproach(player.transform,rearEntranceSpeed,rearEntranceReach);
+            MarkEvent("RearApproach",rearEnemy);
+        }
+        if(!UsesRearEntrance&&!frontEnemy.IsAlive && !attack.IsAttacking && !rearStarted)
+        { rearWindupTick=tick+12;rearStarted=true; }
+        if(!UsesRearEntrance&&rearStarted && tick==rearWindupTick)
         {
             if(UsesSpacingApproaches) { ai.ResetForCapture(player.transform,false);MarkEvent("RearApproach",rearEnemy); }
             else { ai.BeginCaptureAttack();MarkEvent("RearWindup",rearEnemy);rearWindupMarked=true; }
         }
-        if(UsesSpacingApproaches&&rearStarted&&ai.IsWindingUp&&!rearWindupMarked)
+        if((UsesRearEntrance||UsesSpacingApproaches)&&rearStarted&&ai.IsWindingUp&&!rearWindupMarked)
         { rearWindupMarked=true;MarkEvent("RearWindup",rearEnemy); }
         int readyLead=player.GetComponent<VideoPlayerAnimationDriver>().Art.Find("ParryReady")!=null?9:5;
         if(ai.IsWindingUp && ai.WindupRemaining<=readyLead*CombatTimeController.StepSeconds && !parrySent)

@@ -73,9 +73,7 @@ public static class VideoCaptureUtility
                     Check(enemy.GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0).shortNameHash==Animator.StringToHash("EnemyVideo_Idle"),"Enemy Animator not reset.");
                 }
                 Check(state.GetComponent<Rigidbody2D>().gravityScale==3,"Gravity not restored.");
-                float frontX=defenseCancel?1.1f:CombatVideoSceneBuilder.SequentialFrontStart.x;
-                float rearX=defenseCancel?-1.45f:CombatVideoSceneBuilder.SequentialRearStart.x;
-                Check(state.transform.position==new Vector3(0,1,0)&&Mathf.Approximately(director.FrontEnemy.transform.position.x,frontX*(mirrored?-1:1))&&Mathf.Approximately(director.RearEnemy.transform.position.x,rearX*(mirrored?-1:1)),"Actor positions not reset.");
+                Check(state.transform.position==director.InitialPlayerPosition&&director.FrontEnemy.transform.position==director.InitialFrontPosition&&director.RearEnemy.transform.position==director.InitialRearPosition,"Actor positions not reset.");
             }
             return JsonUtility.ToJson(new ValidationReport{runsPassed=records.Count,runs=records.ToArray()},true);
         }
@@ -92,7 +90,7 @@ public static class VideoCaptureUtility
         string folder=Path.GetFullPath($".uloop/outputs/video/{(defenseCancel?"defense-cancel-":"")}{stages}stage-{(hybrid?"hybrid":"pixel")}");Directory.CreateDirectory(folder);
         bool previous=clock.ManualAdvanceOnly;clock.ManualAdvanceOnly=true;
         director.MirrorLayout=false;director.StartTake(stages,hybrid);
-        Vector3 initialFrontPosition=director.FrontEnemy.transform.position,initialRearPosition=director.RearEnemy.transform.position;
+        Vector3 initialPlayerPosition=director.Player.transform.position,initialFrontPosition=director.FrontEnemy.transform.position,initialRearPosition=director.RearEnemy.transform.position;
         var target=new RenderTexture(1920,1080,24,RenderTextureFormat.ARGB32);target.Create();
         var image=new Texture2D(1920,1080,TextureFormat.RGB24,false);
         var camera=Camera.main;int frame=0;var previousActive=RenderTexture.active;
@@ -109,7 +107,7 @@ public static class VideoCaptureUtility
             Check(director.Completed,"Capture did not complete.");
             var art=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(CombatVideoArtBuilder.LibraryPath);
             var counter=director.Player.GetComponent<PlayerParryCounter2D>();
-            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,playerArtworkIsRough=defenseCancel||(stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough),takeKind=defenseCancel?"defense-cancel":"sequential",counterAction=counter.AttacksFromBehind?"RearSubmittedKick":counter.IsOverheadHeelDrop?"OverheadHeelDrop":"AirRoundhouse",provisionalActions=art.motions.Where(m=>m.provisional).Select(m=>m.name).ToArray(),skipAttackRecovery=director.Player.GetComponent<VideoPlayerAnimationDriver>().SkipAttackRecovery,spacingApproaches=director.UsesSpacingApproaches,initialFrontPosition=initialFrontPosition,initialRearPosition=initialRearPosition,events=director.Marks.ToArray()},true));
+            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,playerArtworkIsRough=defenseCancel||(stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough),takeKind=defenseCancel?"defense-cancel":"sequential",counterAction=counter.AttacksFromBehind?"RearSubmittedKick":counter.IsOverheadHeelDrop?"OverheadHeelDrop":"AirRoundhouse",provisionalActions=art.motions.Where(m=>m.provisional).Select(m=>m.name).ToArray(),skipAttackRecovery=director.Player.GetComponent<VideoPlayerAnimationDriver>().SkipAttackRecovery,spacingApproaches=director.UsesSpacingApproaches,rearEntrance=director.UsesRearEntrance,initialPlayerPosition=initialPlayerPosition,initialFrontPosition=initialFrontPosition,initialRearPosition=initialRearPosition,events=director.Marks.ToArray()},true));
             return folder;
         }
         finally
@@ -118,5 +116,5 @@ public static class VideoCaptureUtility
             director.ResetTake(stages);clock.ManualAdvanceOnly=previous;
         }
     }
-    [Serializable] private sealed class CaptureReport { public int frameCount,fps;public double duration;public bool playerArtworkIsRough,skipAttackRecovery,spacingApproaches;public Vector3 initialFrontPosition,initialRearPosition;public string takeKind,counterAction;public string[] provisionalActions;public CombatVideoDirector.Mark[] events; }
+    [Serializable] private sealed class CaptureReport { public int frameCount,fps;public double duration;public bool playerArtworkIsRough,skipAttackRecovery,spacingApproaches,rearEntrance;public Vector3 initialPlayerPosition,initialFrontPosition,initialRearPosition;public string takeKind,counterAction;public string[] provisionalActions;public CombatVideoDirector.Mark[] events; }
 }

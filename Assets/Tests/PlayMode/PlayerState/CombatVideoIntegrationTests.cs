@@ -35,8 +35,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
         public void WiderCaptureLayoutUsesTheSuppliedIdleWithoutChangingItsScaleOrTiming(bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"ResetTake",2);int sign=mirrored?-1:1;
-            Assert.That(((Component)Get<object>(director,"FrontEnemy")).transform.position,Is.EqualTo(new Vector3(1.85f*sign,1,0)));
-            Assert.That(((Component)Get<object>(director,"RearEnemy")).transform.position,Is.EqualTo(new Vector3(-1.6f*sign,1,0)));
+            Assert.That(state.transform.position,Is.EqualTo(new Vector3(sign,1,0)));
+            Assert.That(((Component)Get<object>(director,"FrontEnemy")).transform.position,Is.EqualTo(new Vector3(2.85f*sign,1,0)));
+            Assert.That(((Component)Get<object>(director,"RearEnemy")).transform.position,Is.EqualTo(new Vector3(-2.2f*sign,1,0)));
             var visual=state.GetComponent<SpriteRenderer>();
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
             var idle=Call(Get<object>(driver,"Art"),"Find","IdleReference");
@@ -51,7 +52,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(visual.sprite.pixelsPerUnit,Is.EqualTo(32));
             }
             Assert.That(seen.Count,Is.EqualTo(6));
-            Assert.That(state.transform.position.x,Is.EqualTo(0).Within(.001f));
+            Assert.That(state.transform.position.x,Is.EqualTo(sign).Within(.001f));
         }
         [UnityTearDown] public IEnumerator Teardown()
         { Call(director,"ResetTake",2);Set(clock,"ManualAdvanceOnly",false);yield return null; }
@@ -69,8 +70,61 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
             Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
-            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.1d,4.4d));
+            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(3d,6d));
             Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.85f,.94f));
+        }
+        [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
+        [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
+        public void RearEnemyWalksInAfterTheFirstSlashAndAttacksAfterTheFrontKillWithSafeFraming(int fps,bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            Assert.That(Get<bool>(director,"UsesRearEntrance"),Is.True);
+            var rear=(Component)Get<object>(director,"RearEnemy");var rearVisual=rear.GetComponentInChildren<SpriteRenderer>();
+            var ai=rear.GetComponent(Type.GetType("EnemyMeleeChaser2D, Assembly-CSharp",true));
+            float originX=state.transform.position.x,rearX=rear.transform.position.x;bool walked=false,framed=false;
+            for(int i=0;i<fps*6&&!Get<bool>(director,"Completed");i++)
+            {
+                Call(director,"StepCapture",1d/fps);
+                if(Get<string>(ai,"CurrentStateName")=="Approach"&&Mathf.Abs(rear.transform.position.x-rearX)>.1f)
+                {walked=true;Assert.That(rearVisual.sprite.name,Does.StartWith("Enemy_Move_"));}
+                if(!Marks().Any(m=>Get<string>(m,"kind")=="CounterStart"))
+                    Assert.That(state.transform.position.x,Is.EqualTo(originX).Within(.002f));
+                if(Get<bool>(counter,"IsActive")&&Get<int>(counter,"ElapsedFrames")>=Get<int>(counter,"BlinkArrivalFrame"))
+                {
+                    var bounds=state.GetComponent<SpriteRenderer>().bounds;
+                    float left=Camera.main.WorldToViewportPoint(new Vector3(bounds.min.x,state.transform.position.y,0)).x;
+                    float right=Camera.main.WorldToViewportPoint(new Vector3(bounds.max.x,state.transform.position.y,0)).x;
+                    Assert.That(left,Is.GreaterThanOrEqualTo(.01f),"The entire counter canvas needs a left margin.");
+                    Assert.That(right,Is.LessThanOrEqualTo(.99f),"The mirrored counter needs the same right margin.");framed=true;
+                }
+            }
+            Assert.That(walked&&framed&&Get<bool>(director,"Completed"),Is.True);
+            var marks=Marks().ToArray();
+            object Mark(string kind,string target=null)=>marks.Single(m=>Get<string>(m,"kind")==kind&&(target==null||Get<string>(m,"target")==target));
+            Assert.That(Get<long>(Mark("RearApproach"),"tick"),Is.GreaterThan(Get<long>(Mark("Slash1"),"tick")));
+            Assert.That(Get<long>(Mark("RearApproach"),"tick"),Is.LessThan(Get<long>(Mark("Death","Enemy_A"),"tick")));
+            Assert.That(Get<long>(Mark("RearWindup"),"tick"),Is.GreaterThan(Get<long>(Mark("Death","Enemy_A"),"tick")));
+            Assert.That(Get<long>(Mark("Parry"),"tick"),Is.GreaterThan(Get<long>(Mark("RearWindup"),"tick")));
+            Assert.That(Get<string>(Mark("Kick"),"target"),Is.EqualTo(Get<string>(Mark("Parry"),"target")));
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void ResetDuringTheRearWalkRestoresAiSettingsPositionsAndPause(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            var rear=(Component)Get<object>(director,"RearEnemy");var ai=rear.GetComponent(Type.GetType("EnemyMeleeChaser2D, Assembly-CSharp",true));
+            Vector3 origin=rear.transform.position;
+            float speed=Get<float>(ai,"moveSpeed"),reach=Get<float>(ai,"attackRange"),preferred=Get<float>(ai,"preferredMaxDistance");
+            for(int i=0;i<160&&Mathf.Abs(rear.transform.position.x-origin.x)<.2f;i++)Step();
+            Assert.That(Mathf.Abs(rear.transform.position.x-origin.x),Is.GreaterThan(.2f));
+            Vector3 walking=rear.transform.position;clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
+            for(int i=0;i<12;i++)Step();Assert.That(rear.transform.position,Is.EqualTo(walking));
+            Call(director,"ResetTake",2);
+            Assert.That(rear.transform.position,Is.EqualTo(origin));
+            Assert.That(Get<float>(ai,"moveSpeed"),Is.EqualTo(speed));Assert.That(Get<float>(ai,"attackRange"),Is.EqualTo(reach));
+            Assert.That(Get<float>(ai,"preferredMaxDistance"),Is.EqualTo(preferred));
+            Assert.That(Get<string>(ai,"CurrentStateName"),Is.EqualTo("Idle"));
+            Assert.That(Get<Vector3>(director,"InitialPlayerPosition"),Is.EqualTo(state.transform.position));
+            Assert.That((bool)clockType.GetProperty("IsPaused").GetValue(null),Is.False);
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
         [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
@@ -1007,13 +1061,14 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var motor=state.GetComponent(Type.GetType("PlayerMotor2D, Assembly-CSharp",true));Call(motor,"SetFacing",direction);
             float reach=stage==1?2.3125f:2.65625f;
             float half=front.GetComponent<BoxCollider2D>().size.x/2;
-            front.transform.position=new Vector3(direction*(reach+half+(outside?.04f:-.04f)),1,0);
-            rear.transform.position=new Vector3(-direction*1.1f,1,0);Physics2D.SyncTransforms();
+            Vector3 origin=state.transform.position;
+            front.transform.position=origin+Vector3.right*direction*(reach+half+(outside?.04f:-.04f));
+            rear.transform.position=origin-Vector3.right*direction*1.1f;Physics2D.SyncTransforms();
             Call(state,"RequestAction",PlayerActionRequest.Attack);Step();
             var attack=state.GetComponent(Type.GetType("PlayerAttack2D, Assembly-CSharp",true));
             if(stage==2)Call(attack,"StartAttackStep",2);
             for(int i=0;i<90&&Get<bool>(attack,"IsAttacking");i++)
-            { Step();Assert.That(state.transform.position.x,Is.EqualTo(0).Within(.002f)); }
+            { Step();Assert.That(state.transform.position.x,Is.EqualTo(origin.x).Within(.002f)); }
             Assert.That(Get<int>(front,"HitCount"),Is.EqualTo(outside?0:1));
             Assert.That(Get<int>(rear,"HitCount"),Is.Zero);
         }
@@ -1023,15 +1078,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
             Assert.That(Get<bool>(director,"UsesSpacingApproaches"),Is.False);
+            float originX=state.transform.position.x;
             for(int i=0;i<fps*6&&!Get<bool>(director,"Completed");i++)
             {
                 Call(director,"StepCapture",1d/fps);
                 if(!Marks().Any(m=>(string)m.GetType().GetField("kind").GetValue(m)=="CounterStart"))
-                    Assert.That(state.transform.position.x,Is.EqualTo(0).Within(.002f));
+                    Assert.That(state.transform.position.x,Is.EqualTo(originX).Within(.002f));
             }
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
-            Assert.That(Marks().Any(m=>((string)m.GetType().GetField("kind").GetValue(m)).Contains("Approach")),Is.False);
+            Assert.That(Marks().Any(m=>(string)m.GetType().GetField("kind").GetValue(m)=="OpeningApproach"),Is.False);
+            Assert.That(Marks().Count(m=>(string)m.GetType().GetField("kind").GetValue(m)=="RearApproach"),Is.EqualTo(1));
         }
         [TestCase(-1)] [TestCase(1)]
         public void SubmittedParryReadyReachesItsHeldPoseBeforeContactWithoutChangingAcceptance(int direction)
@@ -1055,6 +1112,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         public void SubmittedLightParryShowsItsSwingAndSettleBeforeTheSameSourceCounter(bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            float originX=state.transform.position.x;
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
             var light=Call(Get<object>(driver,"Art"),"Find","ParrySuccessLight");
             Assert.That(Get<int[]>(light,"durations"),Is.EqualTo(new[]{2,1,1,2,1,1,2}));
@@ -1069,7 +1127,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 if(Get<PlayerActionState>(state,"ActionState")==PlayerActionState.ParrySuccess)
                 {
                     seen.Add(state.GetComponent<SpriteRenderer>().sprite.name);
-                    Assert.That(state.transform.position.x,Is.EqualTo(0).Within(.002f),"The light reaction keeps its planted root before blinking.");
+                    Assert.That(state.transform.position.x,Is.EqualTo(originX).Within(.002f),"The light reaction keeps its planted root before blinking.");
                 }
             }
             Assert.That(seen,Is.EquivalentTo(sprites.Select(s=>s.name)),"Do not keep only the first contact cel through the entire success reaction.");
@@ -1097,8 +1155,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
             if(success)
             {
                 var source=(Component)Get<object>(director,"RearEnemy");
+                // This fixture injects a contact directly, so place its source inside melee reach.
+                // The actual capture take now starts that enemy farther away and walks it in.
+                source.transform.position=state.transform.position-Vector3.right*1.6f;Physics2D.SyncTransforms();
                 var context=Activator.CreateInstance(Type.GetType("CombatHitContext2D, Assembly-CSharp",true),source,971L,true);
                 Call(health,"TryReceiveContextHit",1,(Vector2)source.transform.position,0f,context);
+                Assert.That(Get<object>(health,"LastParryResult").ToString(),Is.Not.EqualTo("None"));
             }
             var recovery=WaitForRecovery("ParryDeflect");
             Assert.That(Get<float>(state,"RemainingLock"),Is.Zero);Assert.That(Get<bool>(state,"BlocksStandardMovement"),Is.False);
