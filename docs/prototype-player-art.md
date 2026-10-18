@@ -65,3 +65,5 @@ CounterTransferは頭上へ移動する動画専用の転移絵であり、地�
 - 一時ターゲット、手動時計、入力無効化を解除し、敵なし・NeutralへリセットしてPlayModeを終了した。
 
 機械可読の結果は `docs/validation/prototype-player-art-2026-10-18.json`。画面は `docs/validation/prototype-player-art-2026-10-18.png`。並行作業中の未コミット変更を含む環境であり、クリーンcheckout、物理ゲームパッド、15分の操作感、Development Build、素材の最終受入は未実施。
+
+2026-10-19追補: ユーザーのプレイで判明した歩行素材の黒いガイド線をプロトタイプ専用の表示範囲から除外し、Parry構え中の通常横移動を停止した。既存F1/F2を右上のボタンからも実行可能にした。原稿・動画・他のClip・戦闘時刻は維持。追加9件を含む全196/396件の結果、画面、撮影時だけの警告、残る人間確認は [歩行・パリィ移動の修正](prototype-player-movement-fixes.md) を参照。

@@ -35,4 +35,13 @@
 - 修正・表示Sprite接続後は同じ9件がすべて合格した。歩行は左右×8コマの実Camera描画でガイド位置が黒くないこと、同じTextureと補正pivotで接地を保つことを確認した。
 - 既存F1の敵1体で、実攻撃をパリィしてHP100を維持し、反撃1Hitで撃破、F2で敵とストックを消せることを確認した。
 
-全体回帰・画面確認は後続で追記する。人間の操作感確認は自動結果と区別する。
+- 実装コミット `3b27e776498bdac248546de1fc5e890e3089d782` でCompile Error 0 / Warning 0、参照検証合格。全EditMode **196/196**、全PlayMode **396/396**、失敗・Skipなし。全体テスト後Console Error 0 / Warning 0。
+- 1920x1080のGame Viewで、歩行時の黒線がないこと、右上の練習／リセットボタンを確認。左移動からパリィに入った6F間の横位置は `-0.8954983` のまま、速度は `(0,0)`。敵1体の実攻撃への通常パリィ成功でHP100・ストック1、その後の反撃1Hitで敵HP0・ストック0となった。
+- 同じTextureを参照する表示用Spriteを8件ArtSetのsubassetとして保持する。初回のUnity UVデータ正規化後、歩行専用更新を再実行してファイルSHA256不変。8枚の共用歩行PNG、原稿2か所、Scene、動画2ファイル、既存Controller、攻撃・パリィ・反撃設定の計17ファイルは着手時のSHA256と一致し、他のClipにも差分なし。
+- 撮影後の終了時だけ `Releasing render texture that is set to be RenderTexture.active!` が1種類出た。ULoopの画面取得ユーティリティではBlit後にactiveを退避しており、撮影後処理との関連が疑われる。撮影を行わない通常PlayMode再起動・終了ではError 0 / Warning 0。ゲーム側修正の成功と混同せず記録し、今回パッケージキャッシュは変更していない。
+- Game Viewのフォーカスが外れた最初の手動時計による敵確認では、リセット直後の入力ガードでParry要求が拒否された。Game Viewへ戻して再試行し、上記の成功を確認した。入力ガードは迂回・変更していない。
+- 一時的な手動時計・入力無効化を解除し、F2相当の敵なしへリセットしてPlayMode終了。Sceneに未保存変更なし。既存の未コミット変更は今回のコミットへ含めていない。
+
+証跡: [検証JSON](validation/prototype-player-movement-2026-10-19.json)、[歩行画面](validation/prototype-player-movement-walk-2026-10-19.png)、[敵へのパリィ成功](validation/prototype-player-movement-parry-2026-10-19.png)。
+
+人間の操作感、物理ゲームパッド、15分操作、Development Buildは未確認。上の手動チェックリストは未チェックのまま残す。
