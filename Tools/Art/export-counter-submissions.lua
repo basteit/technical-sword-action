@@ -33,8 +33,8 @@ elseif not transfer then
   end
 end
 -- The drawn revision charges from its first cel; the native document keeps its own timing.
--- Hold the two strongest electrical cels longer without slowing the release or landing.
-local ticks=transfer and {1,1,2,2,2,1,1,2} or drawn and {2,1,1,1,2,2,1,1,1,2,2,2,2,2,2} or {2,2,2,3,2,2,1,1,1,2,2,2,2,2,2}
+-- Restore the original preparation, then give the sweep and settling poses more screen time.
+local ticks=transfer and {1,1,2,2,2,1,1,2} or drawn and {2,1,1,1,1,1,1,1,1,4,4,4,4,4,3} or {2,2,2,3,2,2,1,1,1,2,2,2,2,2,2}
 local frames,eyes,native={},{},{};local start=0;local sheet=Image(size*count,size,ColorMode.RGB)
 for i,f in ipairs(s.frames) do
   local im=Image(s.spec);im:drawSprite(s,i)

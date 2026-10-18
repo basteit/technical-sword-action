@@ -11,8 +11,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField] private SpriteRenderer playerVisual;
     [SerializeField] private VideoArtLibrary library;
     [SerializeField, Range(.1f,1f)] private float chargeScale=.15f;
-    // The electrical preparation now lasts 10 ticks at .15 speed; leave a small lease margin.
-    [SerializeField, Range(.5f,1.25f)] private float chargeRealSeconds=1.2f;
+    // Eight preparation ticks at .15 speed, with a small real-time lease margin.
+    [SerializeField, Range(.5f,1f)] private float chargeRealSeconds=.95f;
     [SerializeField] private float normalSize=2.109375f;
     [SerializeField] private float closeSize=1.6875f;
     [SerializeField] private bool adaptiveFocusHeight;

@@ -69,8 +69,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(director,"Completed"),Is.True);
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
             Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
-            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.3d,4.65d));
-            Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(1.08f,1.15f));
+            Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(4.1d,4.4d));
+            Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.85f,.94f));
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
         [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
@@ -89,16 +89,38 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             Assert.That(Get<bool>(counter,"HasReleasedCharge"),Is.True);
             Assert.That(exposure.Count,Is.EqualTo(7),"The first three supplied cels must be readable too.");
-            int[] ticks={2,1,1,1,2,2,1};
+            int[] ticks={2,1,1,1,1,1,1};
             // Sprite sampling crosses the fixed 60Hz Animator update as well as the render frame.
             double tolerance=Math.Max(1d/fps,1d/60)+.001d;
             for(int i=0;i<ticks.Length;i++)
                 Assert.That(exposure["CounterKick_"+(i+1).ToString("00")],Is.EqualTo(ticks[i]/9d).Within(tolerance));
             Assert.That(exposure["CounterKick_01"],Is.GreaterThan(exposure["CounterKick_07"]*1.5));
-            Assert.That(exposure["CounterKick_05"],Is.GreaterThanOrEqualTo(exposure["CounterKick_03"]+1d/fps-.001d),"The strong lightning must be readable before release.");
-            Assert.That(exposure["CounterKick_06"],Is.GreaterThanOrEqualTo(exposure["CounterKick_07"]+1d/fps-.001d));
             Assert.That((float)clockType.GetProperty("SlowScale").GetValue(null),Is.EqualTo(1));
             Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
+        }
+        [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
+        [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
+        public void CounterFollowThroughShowsEveryCelAtFullSpeed(int fps,bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            var visual=state.GetComponent<SpriteRenderer>();
+            var exposure=new System.Collections.Generic.Dictionary<string,double>();
+            for(int i=0;i<fps*6&&!Get<bool>(director,"Completed");i++)
+            {
+                Call(director,"StepCapture",1d/fps);
+                string pose=visual.sprite.name;
+                if(!pose.StartsWith("CounterKick_")||!int.TryParse(pose.Substring("CounterKick_".Length),out int cel)||cel<10) continue;
+                Assert.That((float)clockType.GetProperty("SlowScale").GetValue(null),Is.EqualTo(1),"Only the cel exposure is extended; full-speed gameplay must resume.");
+                Assert.That((bool)clockType.GetProperty("IsHitStopped").GetValue(null),Is.False,"Do not lengthen the kick by adding more hitstop.");
+                exposure.TryGetValue(pose,out double seconds);exposure[pose]=seconds+1d/fps;
+            }
+            Assert.That(Get<bool>(director,"Completed"),Is.True);
+            Assert.That(exposure.Count,Is.EqualTo(6),"Show every follow-through and settling cel.");
+            int[] ticks={4,4,4,4,4,3};double tolerance=Math.Max(1d/fps,1d/60)+.001d;
+            for(int i=0;i<ticks.Length;i++)
+                Assert.That(exposure["CounterKick_"+(i+10).ToString("00")],Is.EqualTo(ticks[i]/60d).Within(tolerance));
+            Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
+            Assert.That(Get<PlayerActionState>(state,"ActionState"),Is.EqualTo(PlayerActionState.Neutral));
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
         [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
@@ -121,8 +143,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     release=true;
                     // A 30fps render can observe the impact after advancing two combat frames.
                     int releaseFrame=Get<int>(counter,"ElapsedFrames");
-                    Assert.That(releaseFrame,Is.InRange(22,23));
-                    Assert.That(visual.sprite.name,Is.EqualTo(releaseFrame==22?"CounterKick_08":"CounterKick_09"),"The last tucked cel releases into the newly drawn contact cel.");
+                    Assert.That(releaseFrame,Is.InRange(20,21));
+                    Assert.That(visual.sprite.name,Is.EqualTo(releaseFrame==20?"CounterKick_08":"CounterKick_09"),"The last tucked cel releases into the newly drawn contact cel.");
                 }
                 if(Get<int>(counter,"HitCount")>previousHits)
                 {
@@ -319,7 +341,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             Assert.That(Get<bool>(art,"playerArtworkIsRough"),Is.True,"Submitted attacks do not finish the remaining artwork.");
         }
-        [TestCase("CounterTransfer",8,64,12)] [TestCase("CounterKick",15,128,24)]
+        [TestCase("CounterTransfer",8,64,12)] [TestCase("CounterKick",15,128,33)]
         public void CounterSubmissionsPreserveCanvasPivotAndReceivedStatus(string name,int count,int size,int total)
         {
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
@@ -508,7 +530,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(director,"ResetTake",2);
         }
         [TestCase(30)] [TestCase(60)] [TestCase(120)]
-        public void ReleasePrecedesImpactAndLandingIsFastAtEveryRenderRate(int fps)
+        public void ReleasePrecedesImpactAndFollowThroughReachesGroundAtEveryRenderRate(int fps)
         {
             Call(director,"StartTake",4,true);
             float impactHeight=0;bool sawRelease=false,sawLanding=false;
@@ -537,9 +559,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
             object Mark(string name)=>marks.Single(m=>(string)m.GetType().GetField("kind").GetValue(m)==name);
             long Tick(string name)=>(long)Mark(name).GetType().GetField("tick").GetValue(Mark(name));
             double Real(string name)=>(double)Mark(name).GetType().GetField("realSeconds").GetValue(Mark(name));
-            Assert.That(Tick("ChargeRelease")-Tick("ChargeStart"),Is.EqualTo(10));
+            Assert.That(Tick("ChargeRelease")-Tick("ChargeStart"),Is.EqualTo(8));
             Assert.That(Tick("Kick")-Tick("ChargeRelease"),Is.EqualTo(1));
-            Assert.That(Tick("Landing")-Tick("Kick"),Is.EqualTo(13));
+            Assert.That(Tick("Landing")-Tick("Kick"),Is.EqualTo(24));
             // At 30fps both 60Hz events can fall in the same sampled render frame.
             // Their tick difference above still proves a full-speed one-tick release.
             Assert.That(Real("Kick")-Real("ChargeRelease"),Is.InRange(0d,Math.Max(1d/fps,1d/60)+.001d));

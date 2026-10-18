@@ -281,60 +281,60 @@
           "start": 4
         },
         {
-          "frames": 2,
+          "frames": 1,
           "start": 5
         },
         {
-          "frames": 2,
+          "frames": 1,
+          "start": 6
+        },
+        {
+          "frames": 1,
           "start": 7
+        },
+        {
+          "frames": 1,
+          "start": 8
         },
         {
           "frames": 1,
           "start": 9
         },
         {
-          "frames": 1,
+          "frames": 4,
           "start": 10
         },
         {
-          "frames": 1,
-          "start": 11
-        },
-        {
-          "frames": 2,
-          "start": 12
-        },
-        {
-          "frames": 2,
+          "frames": 4,
           "start": 14
         },
         {
-          "frames": 2,
-          "start": 16
-        },
-        {
-          "frames": 2,
+          "frames": 4,
           "start": 18
         },
         {
-          "frames": 2,
-          "start": 20
+          "frames": 4,
+          "start": 22
         },
         {
-          "frames": 2,
-          "start": 22
+          "frames": 4,
+          "start": 26
+        },
+        {
+          "frames": 3,
+          "start": 30
         }
       ],
-      "hitFrame": 11,
+      "hitFrame": 9,
       "includesCounterTrail": true,
-      "landingFrame": 24,
+      "landingFrame": 33,
       "name": "CounterKick",
       "pivotX": 32,
       "pivotY": 38,
       "provisional": false,
-      "recoveryFrame": 24,
-      "releaseFrame": 10,
-      "totalFrames": 24
+      "recoveryFrame": 33,
+      "releaseFrame": 8,
+      "totalFrames": 33
     }
   ]
 }
