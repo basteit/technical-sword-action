@@ -776,6 +776,17 @@
             "Assets/Settings/CombatVideoArt.asset"
           ],
           "evidence": "docs/video/counter-submissions-20261018.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "ParryCounter",
+          "source_sha256": "299dc68428aa7653ea56bfad548cbde0f737bbd5a36f10afe964b93261a41b2b",
+          "references": [
+            "Assets/Settings/PrototypeCombat/CounterCinematicArt.asset",
+            "Assets/Settings/PrototypeCombat/CounterCinematic.asset",
+            "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim"
+          ],
+          "evidence": "docs/validation/prototype-counter-cinematic-2026-10-19.json"
         }
       ]
     },
@@ -1138,16 +1149,6 @@
       ],
       "uses": [
         {
-          "consumer": "prototype",
-          "motion": "ParryCounter",
-          "source_sha256": "cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5",
-          "references": [
-            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
-            "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim"
-          ],
-          "evidence": "docs/video/electric-hold-20261019.md"
-        },
-        {
           "consumer": "video",
           "motion": "CounterKick",
           "source_sha256": "cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5",
@@ -1156,6 +1157,18 @@
             "Assets/Settings/CombatVideoArt.asset"
           ],
           "evidence": "docs/video/counter-follow-through-20261019.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "ParryCounter",
+          "source_sha256": "cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5",
+          "references": [
+            "Assets/Settings/PrototypeCombat/CounterCinematicArt.asset",
+            "Assets/Settings/PrototypeCombat/CounterCinematic.asset",
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim"
+          ],
+          "evidence": "docs/validation/prototype-counter-cinematic-2026-10-19.json"
         }
       ]
     },

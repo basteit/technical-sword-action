@@ -36,4 +36,22 @@
 
 ## 実装・検証
 
-実装後に追記する。
+実装コミット `222d468`（基点 `5b1ce50`）、Unity 6000.3.9f1 / ULoop 2.1.3。未コミットの既存作業を保持した環境で検証した。
+
+- Compile: Error 0 / Warning 0。専用・共通の設定／Clip／Scene検証が合格。
+- EditMode **207 / 207**、PlayMode **441 / 441**、失敗・Skipなし。新規は設定11件＋実Scene31件。既存4段攻撃、足場、パリィ移動、動画／Studioを含む。新規Play初回4件の失敗は、初期ゲージ100を3と期待したテストFixtureを訂正し、再実行で全31件が合格した。
+- 各phaseのPause、Reset／Disable／死亡、対象喪失前後、左右／空中、壁、致死／生存、次の押下による連鎖、0%設定の時間・移動・ダメージ不変、Scene変更時の所有権解除を確認。
+- Installerを2回再実行し、Scene・Profile・独立Art Snapshot・ArtSet・反撃Clipの5ファイルSHA256不変。攻撃Clipや既存反撃Definition、原稿／共用PNG／撮影C#を変更しない。
+- Game Viewで14Fの暗転0.965／背後到着、21Fの`CounterKick_09`／1Hit／HP120→30／8F停止、30Fの飛距離約2.54unitを確認した。最終飛距離3.2unit、カメラ5.625、終了後の暗転0・Motion/Slow owner0。実画面は時計・行動APIを操作した確認で、人間の操作感テストとは別。
+- 画面取得と停止後もConsole Error 0 / Warning 0。入力と時計を復元し、敵なしNeutralへリセット、保存済み・未保存変更なしの`PrototypeCombatValidation`のEditModeへ戻した。
+- 検証後に移行／キックの`prototype`使用記録を更新した。原稿台帳validate合格、未登録のCurrent編集・更新待ち0、原稿管理ツール20/20合格。既存のvideo使用記録とHistoryは保持した。
+
+証跡: [検証JSON](validation/prototype-counter-cinematic-2026-10-19.json)、[暗転・背後到着](validation/prototype-counter-2026-10-19/Game_20261019_055005_019.png)、[21F命中](validation/prototype-counter-2026-10-19/Game_20261019_055035_868.png)、[吹っ飛び](validation/prototype-counter-2026-10-19/Game_20261019_055058_589.png)。画像はGame Viewウィンドウの969×477px取得（ゲーム設定は1920×1080、Editor表示倍率0.42）。クリーンcheckout・実機ゲームパッド・Development Build・15分の新演出操作感は未検証。
+
+## 接続と再調整
+
+- `CounterCinematic.asset`が本編専用の時間・暗転・吹っ飛び設定。`CounterCinematicArt.asset`は移行／キック／電撃VFXの3動作だけを持つ独立Snapshotで、撮影側の時間表更新が本編へ自動流入しない。
+- 再接続は`Tools/Technical Sword Action/Prototype/Install Counter Cinematic`。既存Profileの調整値は残し、未保存の対象Sceneがあれば停止する。素材Installerの再生成時も専用Profileの反撃を維持する。
+- `PlayerParryCounter2D`が対象固定・地形の事前検査・移動／無敵・命中を所有し、`PrototypeCounterPresentation`が時計に同期したSprite・暗転・スロー・VFXを所有する。共通Feedbackだけがカメラを動かす。
+- `EnemyCounterLaunch2D`が地形に沿う吹っ飛びを所有する。`Damageable2D`の期限付き死亡表示と移動所有権により、致死Hitでも飛び終えるまで表示し、生存個体の通常Knockback／AIとの二重移動を避ける。足場から落ちた生存個体は接地まで落下を続ける。
+- DebugのAttack / Counter欄でphase・frame・命中／終了・無敵・暗転・残像、Enemy / Damage欄で飛距離と移動所有者数を確認できる。原稿の清書・動画VFX調整・新演出の人間受入は別作業として残す。
