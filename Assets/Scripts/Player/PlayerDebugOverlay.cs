@@ -78,7 +78,7 @@ public class PlayerDebugOverlay : MonoBehaviour
                 text.AppendLine($"Counter {counter.CinematicPhase} {counter.ElapsedFrames}F / Hit {counter.HitFrame}F / End {counter.LandingFrame}F / Invincible {counter.IsCounterInvincible} / {counter.LastEndReason}");
                 if (cinematic != null) text.AppendLine($"Dim {cinematic.DimAlpha:0.00} / Hidden {cinematic.IsBodyHidden} / VFX {cinematic.ActiveEffectCount}");
                 for (int i = 0; i < counter.Stocks.Count; i++)
-                    text.AppendLine($"  #{i + 1} {counter.Stocks[i].IndividualId}: {counter.EligibilityReason(counter.Stocks[i])}");
+                    text.AppendLine($"  #{i + 1} {counter.Stocks[i].IndividualId}: {counter.Stocks[i].ParryStaggerRemainingFrames}F / {counter.EligibilityReason(counter.Stocks[i])}");
                 text.AppendLine("Opportunity: separate timed contract (not a parry stock)");
             }
             text.AppendLine(specialGauge != null ? $"Gauge {specialGauge.CurrentGauge:0}/{specialGauge.MaxGauge:0}" : "Gauge: N/A (PlayerSpecialGauge missing)");
@@ -100,6 +100,7 @@ public class PlayerDebugOverlay : MonoBehaviour
                 var enemy = enemies[i]; var health = enemy.GetComponent<Damageable2D>();
                 text.AppendLine($"{health.IndividualId}: {enemy.CurrentStateName}, {health.CurrentHp}/{health.MaxHp} HP / {enemy.AttackKind}\n  Windup {enemy.WindupRemainingFrames}F / Active {enemy.ActiveRemainingFrames}F / Attack {enemy.AttackId} #{enemy.AttackSequence}\n  Role {enemy.AttackRoleReason} / Counter x{health.CounterMultiplier:0.00} / Reaction {health.LastHitReaction} / Armor {enemy.ResistsHitStun}");
                 var launch = enemy.GetComponent<EnemyCounterLaunch2D>();
+                text.AppendLine($"  Parry stagger {health.ParryStaggerRemainingFrames}F / configured {health.ConfiguredParryStaggerFrames}F");
                 if (launch != null) text.AppendLine($"  Launch {launch.IsActive} {launch.ElapsedFrames}F / {launch.TravelDistance:0.00}u / {launch.LastEndReason} / Motion owners {health.MotionOwnerCount}");
             }
             var feedback = GetComponent<CombatFeedback2D>();

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombatDefinition
   rank: 0
   maxHp: 30
+  parryStaggerFrames: 180
   moveSpeed: 2.2
   windupFrames: 30
   activeFrames: 3

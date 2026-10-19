@@ -22,6 +22,7 @@ MonoBehaviour:
   hitKnockback: 0.2
   normalParryStunFrames: 32
   justParryStunFrames: 44
+  parryStaggerFrames: 180
   attacks:
   - {fileID: 11400000, guid: d6976c44fe7d651439397b636863b007, type: 2}
   - {fileID: 11400000, guid: 7901b57c3b4b14d448241ef6b480178c, type: 2}

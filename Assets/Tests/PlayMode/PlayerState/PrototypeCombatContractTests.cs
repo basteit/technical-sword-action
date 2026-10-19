@@ -68,19 +68,63 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [Test]
-        public void StocksArePerIndividualAndRetainedAcrossTimeRangeAndOrdinaryHit()
+        public void StocksArePerIndividualAndRetainedAcrossRangeAndOrdinaryHitOnlyWithinStagger()
         {
             var a = Enemy(.9f, 1000); var b = Enemy(1.1f, 1000);
             Grant(a); Grant(a); Grant(b);
             Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(2));
             a.transform.position += Vector3.right * 5;
-            Frames(400);
+            Frames(60);
             Call(health, "TryReceiveHit", 1, (Vector2)player.transform.position + Vector2.left, 0f);
             Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(2));
             Call(state, "CompleteAction", PlayerActionState.Hit, "TestHitEnd");
             Start(PlayerActionRequest.Attack);
             Assert.That(Get<object>(counter, "SelectedTarget"), Is.SameAs(b));
             Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(1));
+        }
+
+        [TestCase(179, true)] [TestCase(180, false)] [TestCase(400, false)]
+        public void AttackOnlyCountersDuringTheThreeSecondParryStagger(int frames, bool canCounter)
+        {
+            var enemy = Enemy(.9f, 1000); Grant(enemy); Frames(frames);
+            Assert.That(Get<bool>(enemy, "IsParryStaggered"), Is.EqualTo(canCounter));
+            Assert.That(Get<int>(enemy, "ParryStaggerRemainingFrames"), Is.EqualTo(Mathf.Max(0, 180 - frames)));
+            Start(PlayerActionRequest.Attack);
+            Assert.That(Get<PlayerActionState>(state, "ActionState"), Is.EqualTo(canCounter ? PlayerActionState.ParryCounter : PlayerActionState.Attack));
+            Assert.That(Get<int>(counter, "StockCount"), Is.Zero);
+            Assert.That(Get<int>(counter, "ConsumedCount"), Is.EqualTo(canCounter ? 1 : 0));
+            if (canCounter)
+            {
+                Assert.That(Get<bool>(enemy, "IsParryStaggered"), Is.False, "Counter consumes the window, its own lease now holds the target.");
+                Frames(35);
+                Assert.That(Get<int>(enemy, "HitCount"), Is.EqualTo(1), "Starting on the final valid tick must still finish.");
+            }
+        }
+
+        [Test]
+        public void RepeatedParryRefreshesOneWindowWithoutReorderingOtherIndividuals()
+        {
+            var a = Enemy(.9f, 1000); var b = Enemy(1.1f, 1000);
+            Grant(a); Frames(60); Grant(b); Frames(60); Grant(a);
+            Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(2));
+            Assert.That(Get<int>(a, "ParryStaggerRemainingFrames"), Is.EqualTo(180));
+            Assert.That(Get<int>(b, "ParryStaggerRemainingFrames"), Is.EqualTo(120));
+            Frames(120);
+            Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(1));
+            Assert.That(Get<bool>(b, "IsParryStaggered"), Is.False);
+            Start(PlayerActionRequest.Attack);
+            Assert.That(Get<object>(counter, "SelectedTarget"), Is.SameAs(a));
+        }
+
+        [Test]
+        public void OrdinaryHitStunCannotReviveAnExpiredParryCounter()
+        {
+            var enemy = Enemy(.9f, 1000); Grant(enemy); Frames(180);
+            Call(enemy, "ExtendStun", 5f);
+            Assert.That(Get<bool>(enemy, "IsStunned"), Is.True);
+            Assert.That(Get<bool>(enemy, "IsParryStaggered"), Is.False);
+            Start(PlayerActionRequest.Attack);
+            Assert.That(Get<PlayerActionState>(state, "ActionState"), Is.EqualTo(PlayerActionState.Attack));
         }
 
         [Test]
@@ -251,6 +295,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<object>(parry, "LastReactionWeight").ToString(),
                 Is.EqualTo(Get<object>(primary, "AttackParryReaction").ToString()));
             Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(2));
+            Assert.That(Get<bool>(firstEnemy, "IsParryStaggered"), Is.True);
+            Assert.That(Get<bool>(secondEnemy, "IsParryStaggered"), Is.True);
         }
 
         [Test]

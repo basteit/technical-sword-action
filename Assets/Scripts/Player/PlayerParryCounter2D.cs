@@ -128,6 +128,8 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public void RegisterParriedEnemy(Damageable2D enemy)
     {
         PruneStocks();
+        if (enemy != null) enemy.RefreshParryStagger();
+        if (enemy == null || !enemy.IsParryStaggered) return;
         if (enemy != null && enemy.ParticipatingInCombat && !stocks.Contains(enemy))
         {
             stocks.Add(enemy);
@@ -154,11 +156,12 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     private void PruneStocks()
     {
         for (int i = stocks.Count - 1; i >= 0; i--)
-            if (stocks[i] == null || !stocks[i].ParticipatingInCombat) RemoveStock(stocks[i]);
+            if (stocks[i] == null || !stocks[i].IsParryStaggered) RemoveStock(stocks[i]);
     }
     public string EligibilityReason(Damageable2D enemy)
     {
         if (enemy == null || !enemy.ParticipatingInCombat) return "TargetLost";
+        if (!enemy.IsParryStaggered) return "ParryWindowExpired";
         Vector2 delta = enemy.transform.position - transform.position;
         if (delta.magnitude > 1.9f) return "OutOfRange";
         if (Mathf.Abs(delta.y) > 1.25f) return "Height";
@@ -219,6 +222,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     {
         if (!CanStartAction) return false;
         SelectedTarget = FindEligible(); RemoveStock(SelectedTarget);
+        SelectedTarget.EndParryStagger();
         ConsumedCount++; LastStockReason = "Consumed:" + SelectedTarget.IndividualId;
         SelectedMultiplier = UsesGameplayRules ? SelectedTarget.CounterMultiplier : 1f;
         selectedDamage = Mathf.Max(1, Mathf.FloorToInt(damage * SelectedMultiplier + .5f));

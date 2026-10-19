@@ -32,7 +32,7 @@ MonoBehaviour:
   dimStrength: 0.965
   heroLiftStrength: 0.6
   dimFadeSeconds: 0.05
-  cameraOrthographicSize: 1.875
+  cameraOrthographicSize: 2.8125
   cameraFocusOffset: {x: 0.45, y: 0.4}
   cameraBlendSeconds: 0.1
   launchDistance: 3.2

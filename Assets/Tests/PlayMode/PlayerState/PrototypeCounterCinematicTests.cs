@@ -250,7 +250,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Set(Get<object>(feedback, "Settings"), "shake", 1f);
             var camera = Camera.main; Vector3 original = camera.transform.position;
             var target = Begin(); ToFrame(14);
-            Assert.That(camera.orthographicSize, Is.LessThan(2));
+            Assert.That(camera.orthographicSize, Is.EqualTo(2.8125f).Within(.00001f));
             Set(Get<object>(feedback, "Settings"), "shake", 0f); Frames(1);
             Assert.That(camera.orthographicSize, Is.EqualTo(5.625f));
             Assert.That(Vector3.Distance(camera.transform.position, original), Is.LessThan(.0001f));
@@ -366,6 +366,29 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Until(() => !Get<bool>(counter, "IsActive")); Frames(20);
                 Assert.That(Get<int>(counter, "StartCount"), Is.EqualTo(1)); Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(1));
             }
+        }
+
+        [Test] public void ParryStaggerSwaysUntilExpiryWithoutMovingColliderOrLaunchVisual()
+        {
+            var target = Enemy("StrongMelee", new Vector2(1.15f, .81f), 120);
+            var ai = target.GetComponent(T("EnemyMeleeChaser2D")); ((Behaviour)ai).enabled = false;
+            var cue = target.GetComponent(T("EnemyCombatCue2D"));
+            var silhouette = Get<Transform>(cue, "silhouette"); var weapon = Get<Transform>(cue, "weapon");
+            var launchVisual = target.transform.Find("CounterLaunchVisual");
+            var rootPosition = target.transform.position; var launchRotation = launchVisual.localRotation;
+            Call(target, "ApplyParryStun", Enum.Parse(T("ParryResult"), "Normal"));
+            var first = silhouette.localRotation; var sword = weapon.localRotation;
+            Frames(6);
+            Assert.That(Quaternion.Angle(silhouette.localRotation, first), Is.GreaterThan(1));
+            Assert.That(Quaternion.Angle(weapon.localRotation, sword), Is.GreaterThan(1));
+            Assert.That(target.transform.position, Is.EqualTo(rootPosition));
+            Assert.That(launchVisual.localRotation, Is.EqualTo(launchRotation));
+            Frames(173); Assert.That(Get<bool>(target, "IsParryStaggered"), Is.True);
+            Frames(1); Assert.That(Get<bool>(target, "IsParryStaggered"), Is.False);
+            Assert.That(Quaternion.Angle(silhouette.localRotation, Quaternion.identity), Is.LessThan(.001f));
+            Call(target, "RefreshParryStagger"); Frames(6);
+            target.gameObject.SetActive(false);
+            Assert.That(Quaternion.Angle(silhouette.localRotation, Quaternion.identity), Is.LessThan(.001f));
         }
 
         [UnityTest] public IEnumerator ZeroPresentationSettingsPreserveMotionDamageAndTiming()

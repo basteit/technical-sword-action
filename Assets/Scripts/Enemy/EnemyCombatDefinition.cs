@@ -18,6 +18,8 @@ public sealed class EnemyCombatDefinition : ScriptableObject
     [Min(0)] public float hitKnockback = .5f;
     [Min(0)] public int normalParryStunFrames = 32;
     [Min(0)] public int justParryStunFrames = 44;
+    [Tooltip("Counter opportunity and visible stagger after either successful parry, in 60 Hz combat ticks.")]
+    [Min(1)] public int parryStaggerFrames = 180;
     [Tooltip("Optional attack sequence. Empty preserves the original single-attack settings below.")]
     public EnemyAttackDefinition[] attacks = new EnemyAttackDefinition[0];
     [Min(0)] public float moveSpeed = 2.2f;
@@ -47,7 +49,7 @@ public sealed class EnemyCombatDefinition : ScriptableObject
         get
         {
             if (maxHp <= 0 || !float.IsFinite(CounterMultiplier) || CounterMultiplier <= 0 ||
-                lightHitStunFrames < 0 || strongHitStunFrames < 0 || lightStunResistanceFrames < 0) return false;
+                lightHitStunFrames < 0 || strongHitStunFrames < 0 || lightStunResistanceFrames < 0 || parryStaggerFrames <= 0) return false;
             if (attacks != null && attacks.Length > 0)
             {
                 foreach (var attack in attacks) if (attack == null || !attack.IsValid) return false;

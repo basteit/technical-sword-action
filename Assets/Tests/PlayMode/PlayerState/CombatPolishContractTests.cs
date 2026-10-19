@@ -76,6 +76,59 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(enemy, "CurrentHp"), Is.EqualTo(100));
             Assert.That(Get<string>(enemy, "LastHitReaction"), Is.EqualTo("LightResistance"));
         }
+        [TestCase("Normal")] [TestCase("Just")]
+        public void SuccessfulParryHoldsTheEnemyForExactlyThreeCombatSeconds(string result)
+        {
+            var enemy = Enemy(Data(120));
+            Call(enemy, "ApplyParryStun", Enum.Parse(T("ParryResult"), result));
+            Assert.That(Get<int>(enemy, "ParryStaggerRemainingFrames"), Is.EqualTo(180));
+            for (int i = 0; i < 179; i++) Call(enemy, "CombatTickTimers");
+            Assert.That(Get<bool>(enemy, "IsParryStaggered"), Is.True);
+            Assert.That(Get<bool>(enemy, "IsStunned"), Is.True);
+            Call(enemy, "CombatTickTimers");
+            Assert.That(Get<int>(enemy, "ParryStaggerRemainingFrames"), Is.Zero);
+            Assert.That(Get<bool>(enemy, "IsStunned"), Is.False);
+        }
+        [Test]
+        public void EnemyTypeAndInstanceCanTuneStaggerWithoutChangingSharedData()
+        {
+            var data = Data(120); Set(data, "parryStaggerFrames", 120);
+            var a = Enemy(data); var b = Enemy(data);
+            Call(a, "ConfigureParryStaggerFrames", 240);
+            Call(a, "RefreshParryStagger"); Call(b, "RefreshParryStagger");
+            Assert.That(Get<int>(a, "ParryStaggerRemainingFrames"), Is.EqualTo(240));
+            Assert.That(Get<int>(b, "ParryStaggerRemainingFrames"), Is.EqualTo(120));
+            Call(a, "ResetForCapture", a.transform.position, 120); Call(a, "RefreshParryStagger");
+            Assert.That(Get<int>(a, "ParryStaggerRemainingFrames"), Is.EqualTo(240));
+            Call(a, "ConfigureParryStaggerFrames", 0); Call(a, "RefreshParryStagger");
+            Assert.That(Get<int>(a, "ParryStaggerRemainingFrames"), Is.EqualTo(120));
+            Set(data, "parryStaggerFrames", 0); Assert.That(Get<bool>(data, "IsValid"), Is.False);
+        }
+        [Test]
+        public void PauseAndHitstopFreezeTheStaggerWindow()
+        {
+            var enemy = Enemy(Data(120)); Call(enemy, "RefreshParryStagger");
+            Static("SetPaused", true);
+            for (int i = 0; i < 120; i++) Call(clock, "AdvanceFrame", 1d / 60d);
+            Assert.That(Get<int>(enemy, "ParryStaggerRemainingFrames"), Is.EqualTo(180));
+            Static("SetPaused", false); Static("RequestHitstop", enemy, 3f / 60f);
+            for (int i = 0; i < 3; i++) Call(clock, "AdvanceFrame", 1d / 60d);
+            Assert.That(Get<int>(enemy, "ParryStaggerRemainingFrames"), Is.EqualTo(180));
+            Call(clock, "AdvanceFrame", 1d / 60d);
+            Assert.That(Get<int>(enemy, "ParryStaggerRemainingFrames"), Is.EqualTo(179));
+        }
+        [TestCase("Death")] [TestCase("Disable")] [TestCase("Reset")] [TestCase("Exit")]
+        public void LeavingTheOpportunityNeverRetainsStagger(string reason)
+        {
+            var enemy = Enemy(Data(120)); Call(enemy, "RefreshParryStagger");
+            if (reason == "Death") Call(enemy, "TryTakeHit", 1000, Vector2.right);
+            else if (reason == "Disable") enemy.gameObject.SetActive(false);
+            else if (reason == "Reset") Call(enemy, "ResetForCapture", enemy.transform.position, 120);
+            else Call(enemy, "SetCombatParticipation", false);
+            Assert.That(Get<int>(enemy, "ParryStaggerRemainingFrames"), Is.Zero);
+            Assert.That(Get<bool>(enemy, "IsParryStaggered"), Is.False);
+        }
+
         [Test]
         public void AttackRolesAreBoundedAndReleasedOnParryDeathDisableAndReset()
         {
