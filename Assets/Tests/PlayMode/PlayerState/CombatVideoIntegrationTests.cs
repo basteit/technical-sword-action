@@ -108,6 +108,31 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<string>(Mark("Kick"),"target"),Is.EqualTo(Get<string>(Mark("Parry"),"target")));
         }
         [TestCase(false)] [TestCase(true)]
+        public void SubmittedEnemyShowsTheLargeMouthFlashBeforeTheParryContact(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            var rear=(Component)Get<object>(director,"RearEnemy");
+            var visual=rear.GetComponentInChildren<SpriteRenderer>();
+            var ai=rear.GetComponent(Type.GetType("EnemyMeleeChaser2D, Assembly-CSharp",true));
+            int peakFrames=0;long firstPeak=-1,lastPeak=-1;
+            for(int i=0;i<240&&!Marks().Any(m=>Get<string>(m,"kind")=="Parry");i++)
+            {
+                Step();
+                if(visual.sprite.name!="EnemySample_attack_08")continue;
+                Assert.That(Get<bool>(ai,"IsWindingUp"),Is.True,"The mouth flash is a visible warning, before the damaging attack.");
+                long tick=(long)clockType.GetProperty("TickCount").GetValue(null);
+                if(firstPeak<0)firstPeak=tick;lastPeak=tick;peakFrames++;
+            }
+            Assert.That(peakFrames,Is.GreaterThanOrEqualTo(3),"Show the large flash for multiple recorded frames.");
+            var parry=Marks().Single(m=>Get<string>(m,"kind")=="Parry");
+            long parryTick=Get<long>(parry,"tick");
+            // Capture starts after the global clock's reset; compare relative ticks.
+            long origin=Get<long>(director,"startTick");
+            Assert.That(parryTick,Is.GreaterThan(lastPeak-origin));
+            Assert.That(parryTick-(firstPeak-origin),Is.GreaterThanOrEqualTo(6));
+            Assert.That(Get<string>(parry,"target"),Is.EqualTo("Enemy_B"));
+        }
+        [TestCase(false)] [TestCase(true)]
         public void ResetDuringTheRearWalkRestoresAiSettingsPositionsAndPause(bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);

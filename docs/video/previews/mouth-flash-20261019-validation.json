@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-19",
+  "sourceAttackSha256": "4791d63fcf957a068a25a0cd3270c23a98d6b770cd027e1654200241a24ee5b6",
+  "windup": {
+    "sourceFrames": [
+      1,
+      11
+    ],
+    "ticks": 30,
+    "durations": [
+      2,
+      4,
+      4,
+      4,
+      4,
+      2,
+      2,
+      4,
+      2,
+      1,
+      1
+    ],
+    "largeFlashFrame": 8,
+    "largeFlashTicks": 4,
+    "contactAfterFlashStartsTicks": 8
+  },
+  "attack": {
+    "sourceFrames": [
+      12,
+      14
+    ],
+    "ticks": 16,
+    "durations": [
+      3,
+      7,
+      6
+    ]
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "limitedPlayModeTests": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-19T02:53:55.1210592Z",
+    "TestCount": 2,
+    "PassedCount": 2,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "fullSuiteRerun": false,
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 100,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-mouth-flash-20261019.mp4",
+    "sha256": "48ae35fba3a899addce32a1221a6f6992a150ab3fb44eff50e0d7a0990840fff",
+    "decodedFrames": 242,
+    "durationSeconds": 4.033333333333333,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "eventsUnchanged": true
+  },
+  "previewCrf": 22,
+  "vfxDesignChangesApplied": false,
+  "overallVideoAccepted": false
+}

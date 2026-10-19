@@ -30,13 +30,19 @@ public static class EnemySubmissionSetup
             settings.spriteAlignment=(int)SpriteAlignment.Custom;settings.spritePivot=new Vector2(32f/source.width,38f/source.height);
             importer.SetTextureSettings(settings);importer.SaveAndReimport();
         }
-        VideoArtLibrary.Motion Set(string state,string source,int first,int count,int total)
+        VideoArtLibrary.Motion Set(string state,string source,int first,int count,int total,int[] fixedDurations=null)
         {
             var input=manifest.motions.Single(m=>m.name==source);
             var frames=Enumerable.Range(first,count).Select(i=>AssetDatabase.LoadAssetAtPath<Sprite>($"{Folder}/EnemySample_{source}_{i:00}.png")).ToArray();
             int sum=input.frames.Skip(first-1).Take(count).Sum(f=>f.durationMs),elapsed=0;
             int cumulative=0;var times=new int[count];
             for(int i=0;i<count;i++){cumulative+=input.frames[first-1+i].durationMs;int next=Mathf.RoundToInt(cumulative*total/(float)sum);times[i]=next-elapsed;elapsed=next;}
+            if(fixedDurations!=null)
+            {
+                if(fixedDurations.Length!=count||fixedDurations.Any(t=>t<=0)||fixedDurations.Sum()!=total)
+                    throw new InvalidOperationException("Invalid enemy timing for "+state);
+                times=(int[])fixedDurations.Clone();
+            }
             var motion=new VideoArtLibrary.Motion{name="Enemy_"+state,frames=frames,durations=times};
             int index=Array.FindIndex(library.motions,m=>m.name==motion.name);
             if(index<0)throw new InvalidOperationException("Missing enemy state "+state);
@@ -50,7 +56,10 @@ public static class EnemySubmissionSetup
             AnimationUtility.SetAnimationClipSettings(clip,clipSettings);EditorUtility.SetDirty(clip);return motion;
         }
         Set("Idle","idle",1,10,60);Set("Move","walk",1,10,60);
-        Set("Windup","attack",1,7,30);Set("Attack","attack",8,7,16);
+        // Show the mouth's large flash before the lunge/contact, rather than
+        // interrupting that flash immediately with the parried reaction.
+        Set("Windup","attack",1,11,30,new[]{2,4,4,4,4,2,2,4,2,1,1});
+        Set("Attack","attack",12,3,16);
         Set("Hit","chance",1,1,6);Set("Parried","chance",1,1,10);Set("Death","down",1,1,39);
         EditorUtility.SetDirty(library);AssetDatabase.SaveAssets();
     }

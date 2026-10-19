@@ -8,7 +8,7 @@ Unity用は `Assets/Art/Enemy/Submitted/20261019/`。`Tools/Art/export-enemy-sub
 | --- | --- |
 | idle | 待機、10枚・1秒ループ |
 | walk | 移動、10枚・1秒ループ |
-| attack | 1〜7枚目を予兆30tick、8〜14枚目を攻撃16tick |
+| attack | 1〜11枚目を予兆30tick、12〜14枚目を攻撃16tick。8枚目の大きな発光を4tick見せてから接触 |
 | chance | パリィやられ。未提出の通常被弾にも一時流用 |
 | down | 撃破。接触停止後に表示して消滅 |
 
