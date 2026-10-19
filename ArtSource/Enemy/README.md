@@ -8,8 +8,8 @@ Unity用は `Assets/Art/Enemy/Submitted/20261019/`。`Tools/Art/export-enemy-sub
 | --- | --- |
 | idle | 待機、10枚・1秒ループ |
 | walk | 移動、10枚・1秒ループ |
-| attack | 1〜11枚目を予兆30tick、12〜14枚目を攻撃16tick。8枚目の大きな発光を4tick見せてから接触 |
+| attack | 1〜12枚目を接触前96tick（1.6秒）、13〜14枚目を攻撃後24tick（0.4秒）。大きな発光と突き出しまで原稿の表示時間で見せてから接触 |
 | chance | パリィやられ。未提出の通常被弾にも一時流用 |
 | down | 撃破。接触停止後に表示して消滅 |
 
-32PPU、Pivot=(32px,38px)。攻撃だけ128px、他64pxのキャンバスをそのまま使う。原稿の攻撃2秒は保持し、撮影の予兆/命中時刻へ接続するゲーム用Clipだけを短縮する。`EnemySubmissionSetup.Apply()` は敵のLibrary参照と7Clipだけを更新し、主人公のClipやSceneを再生成しない。撮影/Studioの共通敵に適用し、本編の別敵Prefabは今回の対象に含めない。
+32PPU、Pivot=(32px,38px)。攻撃だけ128px、他64pxのキャンバスをそのまま使う。攻撃2秒は原稿の表示時間通りに出力する。主2段テイクは接触までのAI予兆も1.6秒へ合わせ、Resetで元の値を復元する。別の比較/練習設定では、そのAIの予兆時間へアニメの再生倍率を合わせる。`EnemySubmissionSetup.Apply()` は敵のLibrary参照と7Clipだけを更新し、主人公のClipやSceneを再生成しない。撮影/Studioの共通敵に適用し、本編の別敵Prefabは今回の対象に含めない。

@@ -189,7 +189,9 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         var ai=rearEnemy.GetComponent<EnemyMeleeChaser2D>();
         if(UsesRearEntrance&&frontEnemy.HitCount>0&&!rearStarted)
         {
-            rearStarted=true;ai.BeginCaptureApproach(player.transform,rearEntranceSpeed,rearEntranceReach);
+            var startup=player.GetComponent<VideoPlayerAnimationDriver>().Art.Find("Enemy_Windup");
+            float windup=startup!=null?startup.TotalFrames*CombatTimeController.StepSeconds:.5f;
+            rearStarted=true;ai.BeginCaptureApproachWithWindup(player.transform,rearEntranceSpeed,rearEntranceReach,windup);
             MarkEvent("RearApproach",rearEnemy);
         }
         if(!UsesRearEntrance&&!frontEnemy.IsAlive && !attack.IsAttacking && !rearStarted)

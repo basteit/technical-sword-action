@@ -56,10 +56,10 @@ public static class EnemySubmissionSetup
             AnimationUtility.SetAnimationClipSettings(clip,clipSettings);EditorUtility.SetDirty(clip);return motion;
         }
         Set("Idle","idle",1,10,60);Set("Move","walk",1,10,60);
-        // Show the mouth's large flash before the lunge/contact, rather than
-        // interrupting that flash immediately with the parried reaction.
-        Set("Windup","attack",1,11,30,new[]{2,4,4,4,4,2,2,4,2,1,1});
-        Set("Attack","attack",12,3,16);
+        // Preserve the submitted anticipation, flash and lunge before contact.
+        // The last two cels are the return after an uninterrupted attack.
+        Set("Windup","attack",1,12,96);
+        Set("Attack","attack",13,2,24);
         Set("Hit","chance",1,1,6);Set("Parried","chance",1,1,10);Set("Death","down",1,1,39);
         EditorUtility.SetDirty(library);AssetDatabase.SaveAssets();
     }

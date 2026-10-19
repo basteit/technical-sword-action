@@ -46,8 +46,14 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     {
         motion=name;elapsed=0;
         if(animator!=null&&animator.runtimeAnimatorController!=null)
-        { animator.Play("EnemyVideo_"+name,0,0);animator.Update(0); }
+        { animator.speed=PlaybackSpeed(name);animator.Play("EnemyVideo_"+name,0,0);animator.Update(0); }
         Show();
+    }
+    private float PlaybackSpeed(string name)
+    {
+        var clip=library!=null?library.Find("Enemy_"+name):null;
+        return name=="Windup"&&clip!=null&&ai!=null&&ai.WindupDuration>0?
+            clip.TotalFrames*CombatTimeController.StepSeconds/ai.WindupDuration:1f;
     }
     private void OnHit(Damageable2D source,int damage,Vector2 direction) { if(source.IsAlive) Play("Hit"); }
     private void OnParried(Damageable2D source,ParryResult result)
@@ -79,7 +85,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
         {
             string desired=health.IsStunned?(motion=="Hit"?"Hit":"Parried"):
                 ai.IsWindingUp?"Windup":ai.CurrentStateName=="Approach"?"Move":"Idle";
-            if (motion=="Attack" && elapsed<16) desired="Attack";
+            if (motion=="Attack" && elapsed<(library?.Find("Enemy_Attack")?.TotalFrames??16)) desired="Attack";
             if (motion=="Hit" && elapsed<6) desired="Hit";
             if(desired!=motion) Play(desired);
             if(player!=null&&!health.IsStunned) visual.flipX=player.position.x<transform.position.x;
@@ -134,7 +140,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     {
         if(library==null || visual==null) return;
         var clip=library.Find("Enemy_"+motion);
-        if(clip!=null&&(animator==null||animator.runtimeAnimatorController==null)) visual.sprite=clip.At(elapsed,motion=="Idle"||motion=="Move");
+        if(clip!=null&&(animator==null||animator.runtimeAnimatorController==null)) visual.sprite=clip.At(Mathf.FloorToInt(elapsed*PlaybackSpeed(motion)),motion=="Idle"||motion=="Move");
         if(motion=="Parried")
         {
             // Contact stays planted during hitstop; recoil peaks over the next three ticks.
@@ -157,6 +163,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     }
     private void OnDisable()
     {
+        if(animator!=null)animator.speed=1;
         hitbackFrame=hitbackFrames=0;hitbackStartTick=-1;launchHeight=0;
         if(visual!=null){visual.transform.localRotation=Quaternion.identity;visual.transform.localPosition=restPosition;visual.sortingOrder=restSortingOrder;}
         parryRecoilSign=0;

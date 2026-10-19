@@ -108,22 +108,27 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<string>(Mark("Kick"),"target"),Is.EqualTo(Get<string>(Mark("Parry"),"target")));
         }
         [TestCase(false)] [TestCase(true)]
-        public void SubmittedEnemyShowsTheLargeMouthFlashBeforeTheParryContact(bool mirrored)
+        public void SubmittedEnemyShowsTheCompleteStartupFlashAndLungeBeforeTheParryContact(bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
             var rear=(Component)Get<object>(director,"RearEnemy");
             var visual=rear.GetComponentInChildren<SpriteRenderer>();
             var ai=rear.GetComponent(Type.GetType("EnemyMeleeChaser2D, Assembly-CSharp",true));
-            int peakFrames=0;long firstPeak=-1,lastPeak=-1;
+            int peakFrames=0,lungeFrames=0;long firstPeak=-1,lastPeak=-1;
+            var seen=new System.Collections.Generic.HashSet<string>();
             for(int i=0;i<240&&!Marks().Any(m=>Get<string>(m,"kind")=="Parry");i++)
             {
                 Step();
+                if(visual.sprite.name.StartsWith("EnemySample_attack_"))seen.Add(visual.sprite.name);
+                if(visual.sprite.name=="EnemySample_attack_12")lungeFrames++;
                 if(visual.sprite.name!="EnemySample_attack_08")continue;
                 Assert.That(Get<bool>(ai,"IsWindingUp"),Is.True,"The mouth flash is a visible warning, before the damaging attack.");
                 long tick=(long)clockType.GetProperty("TickCount").GetValue(null);
                 if(firstPeak<0)firstPeak=tick;lastPeak=tick;peakFrames++;
             }
-            Assert.That(peakFrames,Is.GreaterThanOrEqualTo(3),"Show the large flash for multiple recorded frames.");
+            Assert.That(peakFrames,Is.GreaterThanOrEqualTo(5),"Show the submitted flash at its native duration.");
+            Assert.That(lungeFrames,Is.GreaterThanOrEqualTo(4),"The lunge must be visible before it is parried.");
+            for(int frame=1;frame<=12;frame++)Assert.That(seen,Does.Contain($"EnemySample_attack_{frame:00}"));
             var parry=Marks().Single(m=>Get<string>(m,"kind")=="Parry");
             long parryTick=Get<long>(parry,"tick");
             // Capture starts after the global clock's reset; compare relative ticks.
@@ -131,6 +136,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(parryTick,Is.GreaterThan(lastPeak-origin));
             Assert.That(parryTick-(firstPeak-origin),Is.GreaterThanOrEqualTo(6));
             Assert.That(Get<string>(parry,"target"),Is.EqualTo("Enemy_B"));
+            var windup=Marks().Single(m=>Get<string>(m,"kind")=="RearWindup");
+            Assert.That(Get<double>(parry,"realSeconds")-Get<double>(windup,"realSeconds"),Is.InRange(1.5d,1.65d));
         }
         [TestCase(false)] [TestCase(true)]
         public void ResetDuringTheRearWalkRestoresAiSettingsPositionsAndPause(bool mirrored)
@@ -138,7 +145,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
             var rear=(Component)Get<object>(director,"RearEnemy");var ai=rear.GetComponent(Type.GetType("EnemyMeleeChaser2D, Assembly-CSharp",true));
             Vector3 origin=rear.transform.position;
-            float speed=Get<float>(ai,"moveSpeed"),reach=Get<float>(ai,"attackRange"),preferred=Get<float>(ai,"preferredMaxDistance");
+            float speed=Get<float>(ai,"moveSpeed"),reach=Get<float>(ai,"attackRange"),preferred=Get<float>(ai,"preferredMaxDistance"),windup=Get<float>(ai,"attackWindupDuration");
             for(int i=0;i<160&&Mathf.Abs(rear.transform.position.x-origin.x)<.2f;i++)Step();
             Assert.That(Mathf.Abs(rear.transform.position.x-origin.x),Is.GreaterThan(.2f));
             Vector3 walking=rear.transform.position;clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
@@ -147,6 +154,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(rear.transform.position,Is.EqualTo(origin));
             Assert.That(Get<float>(ai,"moveSpeed"),Is.EqualTo(speed));Assert.That(Get<float>(ai,"attackRange"),Is.EqualTo(reach));
             Assert.That(Get<float>(ai,"preferredMaxDistance"),Is.EqualTo(preferred));
+            Assert.That(Get<float>(ai,"attackWindupDuration"),Is.EqualTo(windup),"Capture startup timing must not remain after reset.");
             Assert.That(Get<string>(ai,"CurrentStateName"),Is.EqualTo("Idle"));
             Assert.That(Get<Vector3>(director,"InitialPlayerPosition"),Is.EqualTo(state.transform.position));
             Assert.That((bool)clockType.GetProperty("IsPaused").GetValue(null),Is.False);

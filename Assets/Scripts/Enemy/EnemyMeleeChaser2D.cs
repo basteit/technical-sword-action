@@ -47,7 +47,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     private long attackSequence;
     private bool captureHeld;
     private bool capturePursuitConfigured;
-    private float captureSavedSpeed,captureSavedRange,captureSavedPreferredMax;
+    private float captureSavedSpeed,captureSavedRange,captureSavedPreferredMax,captureSavedWindup;
     private readonly HashSet<int> hitReceivers = new();
     private readonly RaycastHit2D[] movementHits = new RaycastHit2D[8];
     private Collider2D ownCollider;
@@ -76,6 +76,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
         damageable != null && damageable.IsStunned ? "Stunned" : currentState.ToString();
     public bool IsWindingUp => currentState == State.AttackWindup;
     public float WindupRemaining => IsWindingUp ? stateTimer : 0f;
+    public float WindupDuration => attackWindupDuration;
     public long AttackSequence => attackSequence;
     public event Action WindupStarted;
     public event Action AttackStarted;
@@ -95,6 +96,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
         if(capturePursuitConfigured)
         {
             moveSpeed=captureSavedSpeed;attackRange=captureSavedRange;preferredMaxDistance=captureSavedPreferredMax;
+            attackWindupDuration=captureSavedWindup;
             capturePursuitConfigured=false;
         }
         attackCoordinator?.Release(this);
@@ -113,10 +115,17 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     public void BeginCaptureApproach(Transform playerTarget,float speed,float reach)
     {
         ResetForCapture(playerTarget,false);
-        captureSavedSpeed=moveSpeed;captureSavedRange=attackRange;captureSavedPreferredMax=preferredMaxDistance;
+        captureSavedSpeed=moveSpeed;captureSavedRange=attackRange;captureSavedPreferredMax=preferredMaxDistance;captureSavedWindup=attackWindupDuration;
         capturePursuitConfigured=true;
         moveSpeed=Mathf.Clamp(speed,0,10);attackRange=Mathf.Max(preferredMinDistance,reach);
         preferredMaxDistance=Mathf.Min(preferredMaxDistance,attackRange);
+    }
+
+    /// <summary>Use the submitted startup duration for a staged legacy enemy; reset restores its original timing.</summary>
+    public void BeginCaptureApproachWithWindup(Transform playerTarget,float speed,float reach,float windup)
+    {
+        BeginCaptureApproach(playerTarget,speed,reach);
+        if(combatDefinition==null)attackWindupDuration=Mathf.Clamp(windup,.1f,10f);
     }
 
     public bool BeginCaptureAttack()

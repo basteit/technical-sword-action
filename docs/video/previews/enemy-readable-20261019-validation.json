@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-19",
+  "sourceAttackSha256": "4791d63fcf957a068a25a0cd3270c23a98d6b770cd027e1654200241a24ee5b6",
+  "startup": {
+    "sourceFrames": [
+      1,
+      12
+    ],
+    "ticks": 96,
+    "seconds": 1.6,
+    "nativeDurations": true,
+    "largeFlashFrame": 8,
+    "lungeFrame": 12
+  },
+  "return": {
+    "sourceFrames": [
+      13,
+      14
+    ],
+    "ticks": 24,
+    "seconds": 0.4
+  },
+  "timingOverride": "selected two-stage rear approach; reset restores the serialized AI duration",
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "limitedPlayModeTests": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-19T05:15:49.6732898Z",
+    "TestCount": 4,
+    "PassedCount": 4,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "fullSuiteRerun": false,
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 100,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-enemy-readable-20261019.mp4",
+    "sha256": "5ddf90a57acc645268e9b0516278f28401b3b2ccceddb91532a19c6e592cfba3",
+    "decodedFrames": 308,
+    "durationSeconds": 5.133333333333334,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "eventKindsAndTargetsUnchanged": true,
+    "parryAndLaterShiftSeconds": 1.1,
+    "counterRelativeTimingUnchanged": true
+  },
+  "previewCrf": 22,
+  "overallVideoAccepted": false
+}

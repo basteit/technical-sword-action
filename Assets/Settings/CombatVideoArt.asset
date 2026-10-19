@@ -609,11 +609,10 @@ MonoBehaviour:
     hasParryContact: 0
     parryContactOffset: {x: 0, y: 0}
     frames:
-    - {fileID: 21300000, guid: b3e4a4cd9de843049a43aa7f5754d418, type: 3}
     - {fileID: 21300000, guid: b071004e00055af49a24becaff8b8b26, type: 3}
     - {fileID: 21300000, guid: 8c8705761d1355142bc9dc52b15b078d, type: 3}
     eyeFrames: []
-    durations: 030000000700000006000000
+    durations: 0c0000000c000000
     hitFrame: 0
     branchFrame: 0
     chargeFrame: 0
@@ -760,8 +759,9 @@ MonoBehaviour:
     - {fileID: 21300000, guid: f495e587f7befc046a79bfb44156b888, type: 3}
     - {fileID: 21300000, guid: e8006709d52f0c649b7695f0cb4135dd, type: 3}
     - {fileID: 21300000, guid: 5d8570cb38d24e54bb364ab229792e40, type: 3}
+    - {fileID: 21300000, guid: b3e4a4cd9de843049a43aa7f5754d418, type: 3}
     eyeFrames: []
-    durations: 0200000004000000040000000400000004000000020000000200000004000000020000000100000001000000
+    durations: 060000000c0000000c0000000c0000000c00000006000000060000000600000006000000060000000600000006000000
     hitFrame: 0
     branchFrame: 0
     chargeFrame: 0
