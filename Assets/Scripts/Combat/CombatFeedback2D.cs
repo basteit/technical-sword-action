@@ -40,6 +40,11 @@ public sealed class CombatFeedback2D : MonoBehaviour
     private CombatFeedbackSettings runtimeSettings;
     private Vector3 baseCameraPosition;
     private Vector3 appliedShake;
+    private UnityEngine.Object cameraFocusOwner;
+    private Transform cameraSubject;
+    private Vector2 cameraFocusOffset;
+    private float baseCameraSize, cameraFocusSize, cameraFocusBlend, cameraBlendSeconds;
+    private bool hasCameraFocus, cameraFocusRequested;
     private float shakeAge, shakeDuration, shakeMagnitude;
     private long lastAudioTick = -1;
     private int lastAudioPriority = -1;
@@ -63,6 +68,8 @@ public sealed class CombatFeedback2D : MonoBehaviour
     public CombatFeedbackKind LastKind { get; private set; }
     public long LastEmissionTick { get; private set; }
     public Vector3 ShakeOffset => appliedShake;
+    public bool HasCameraFocus => hasCameraFocus;
+    public float CameraFocusBlend => cameraFocusBlend;
     public static bool IsManaging(GameObject target)
     {
         var feedback = target != null ? target.GetComponent<CombatFeedback2D>() : null;
@@ -171,6 +178,38 @@ public sealed class CombatFeedback2D : MonoBehaviour
             sound.Play(); lastAudioTick = CombatTimeController.TickCount; lastAudioPriority = priority;
         }
     }
+    public bool FocusCamera(UnityEngine.Object owner, Transform subject, Vector2 offset, float size, float blendSeconds)
+    {
+        if (!IsReady || owner == null || subject == null || feedbackCamera == null || !feedbackCamera.orthographic ||
+            !float.IsFinite(size) || size <= 0 || !float.IsFinite(blendSeconds) || blendSeconds <= 0 ||
+            (hasCameraFocus && cameraFocusOwner != owner)) return false;
+        if (!hasCameraFocus)
+        {
+            baseCameraPosition = feedbackCamera.transform.position - appliedShake;
+            baseCameraSize = feedbackCamera.orthographicSize;
+            cameraFocusBlend = 0; hasCameraFocus = true;
+        }
+        cameraFocusOwner = owner; cameraSubject = subject; cameraFocusOffset = offset;
+        cameraFocusSize = size; cameraBlendSeconds = blendSeconds; cameraFocusRequested = true;
+        return true;
+    }
+    public void ReleaseCameraFocus(UnityEngine.Object owner, bool immediate)
+    {
+        if (!hasCameraFocus || cameraFocusOwner != owner) return;
+        cameraFocusRequested = false;
+        if (immediate) RestoreCameraFocus();
+    }
+    private void RestoreCameraFocus()
+    {
+        if (!hasCameraFocus) return;
+        if (feedbackCamera != null)
+        {
+            feedbackCamera.transform.position = baseCameraPosition + appliedShake;
+            feedbackCamera.orthographicSize = baseCameraSize;
+        }
+        hasCameraFocus = cameraFocusRequested = false; cameraFocusBlend = 0;
+        cameraFocusOwner = null; cameraSubject = null;
+    }
     private Effect CreateEffect(int index)
     {
         var root = new GameObject("PooledCombatFeedback_" + index); root.transform.SetParent(transform, false);
@@ -229,13 +268,32 @@ public sealed class CombatFeedback2D : MonoBehaviour
         shakeAge += realSeconds;
         if (feedbackCamera != null)
         {
-            // Remove only our previous offset, preserving another non-shake base-position writer.
-            baseCameraPosition = feedbackCamera.transform.position - appliedShake;
+            // Compose focus and shake here so no second component writes the camera.
+            if (hasCameraFocus && (cameraFocusOwner == null || cameraSubject == null)) RestoreCameraFocus();
+            Vector3 cameraPosition;
+            if (hasCameraFocus)
+            {
+                float focusStrength = Mathf.Clamp01(Settings.shake);
+                cameraFocusBlend = focusStrength <= 0 ? 0 : Mathf.MoveTowards(cameraFocusBlend,
+                    cameraFocusRequested ? focusStrength : 0, realSeconds / cameraBlendSeconds);
+                if (cameraFocusBlend < .00001f) cameraFocusBlend = 0;
+                Vector3 subject = cameraSubject.position + (Vector3)cameraFocusOffset;
+                subject.z = baseCameraPosition.z;
+                cameraPosition = Vector3.Lerp(baseCameraPosition, subject, cameraFocusBlend);
+                feedbackCamera.orthographicSize = Mathf.Lerp(baseCameraSize, cameraFocusSize, cameraFocusBlend);
+                if (!cameraFocusRequested && cameraFocusBlend == 0) RestoreCameraFocus();
+            }
+            else
+            {
+                // Preserve a normal follow-camera writer when no close-up is active.
+                baseCameraPosition = feedbackCamera.transform.position - appliedShake;
+                cameraPosition = baseCameraPosition;
+            }
             float strength = shakeDuration > 0 ? Mathf.Clamp01(1 - shakeAge / shakeDuration) : 0;
             appliedShake = Settings.shake <= 0 ? Vector3.zero : new Vector3(Mathf.Sin(shakeAge * 95), Mathf.Cos(shakeAge * 71) * .4f) * (shakeMagnitude * strength);
             appliedShake.x = Mathf.Round(appliedShake.x * 32) / 32;
             appliedShake.y = Mathf.Round(appliedShake.y * 32) / 32;
-            feedbackCamera.transform.position = baseCameraPosition + appliedShake;
+            feedbackCamera.transform.position = cameraPosition + appliedShake;
         }
         if (shakeAge >= shakeDuration) shakeMagnitude = shakeDuration = 0;
     }
@@ -252,6 +310,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
         foreach (var e in pool) if (e.root != null) e.root.SetActive(false);
         foreach (var f in flashes) if (f.renderer != null) f.renderer.color = f.original;
         flashes.Clear();
+        RestoreCameraFocus();
         if (feedbackCamera != null) feedbackCamera.transform.position -= appliedShake;
         appliedShake = Vector3.zero; shakeAge = shakeDuration = shakeMagnitude = 0;
         sound?.Stop(); lastAudioTick = -1; lastAudioPriority = -1;

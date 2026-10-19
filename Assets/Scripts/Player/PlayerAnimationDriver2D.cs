@@ -48,6 +48,7 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
         observedParryCount = damageReceiver != null ? damageReceiver.BlockedByParry : 0;
         parrySuccessTimer = 0f;
         lastDrivenState = (PlayerState)(-1);
+        lastExtendedAction = TechnicalSwordAction.PlayerState.PlayerActionState.Neutral;
     }
 
     public int CombatTickOrder => 300;
@@ -67,9 +68,16 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
             return;
         }
         var extended = stateMachine.ActionState;
+        // Observe a deflection even when a buffered counter has already taken
+        // over. Its success pose must never be deferred until after the counter.
+        if (TryPlayNewParrySuccess())
+        {
+            return;
+        }
         if (extended == TechnicalSwordAction.PlayerState.PlayerActionState.Heal ||
             extended == TechnicalSwordAction.PlayerState.PlayerActionState.ParryCounter)
         {
+            parrySuccessTimer = 0f;
             if (lastExtendedAction != extended)
                 animator.Play(extended == TechnicalSwordAction.PlayerState.PlayerActionState.Heal ? "PlayerPrototype_Heal" : "PlayerPrototype_ParryCounter", 0, 0);
             lastExtendedAction = extended;
@@ -78,11 +86,6 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
         }
         lastExtendedAction = extended;
         if (attack != null && attack.IsRecovering) return;
-
-        if (TryPlayNewParrySuccess())
-        {
-            return;
-        }
 
         if (extended == TechnicalSwordAction.PlayerState.PlayerActionState.ParrySuccess)
         {
@@ -144,6 +147,11 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
         }
 
         observedParryCount = parryCount;
+        if (stateMachine.ActionState != TechnicalSwordAction.PlayerState.PlayerActionState.ParrySuccess)
+        {
+            parrySuccessTimer = 0f;
+            return false;
+        }
         parrySuccessTimer = parrySuccessPoseDuration;
         string reaction = parry != null && parry.LastReactionWeight == ParryReactionWeight.Heavy ? "Heavy" : "Light";
         int success = Animator.StringToHash("PlayerPrototype_ParrySuccess" + reaction);

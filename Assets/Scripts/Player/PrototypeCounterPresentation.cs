@@ -71,6 +71,9 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     {
         RestoreBody(); charged = true;
         CombatTimeController.RequestSlow(counter, Profile.chargeScale, Profile.chargeRealSeconds);
+        feedback?.FocusCamera(this, transform,
+            new Vector2(Profile.cameraFocusOffset.x * counter.KickFacingSign, Profile.cameraFocusOffset.y),
+            Profile.cameraOrthographicSize, Profile.cameraBlendSeconds);
     }
     private void OnRelease() { charged = false; CombatTimeController.ReleaseSlow(counter); }
     private void OnHit(Damageable2D target, Vector2 contact)
@@ -88,6 +91,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     private void OnFinished(bool _)
     {
         RestoreBody(); OnRelease();
+        feedback?.ReleaseCameraFocus(this, counter.LastEndReason != "Complete");
         if (counter.LastEndReason != "Complete") ResetPresentation();
     }
     public void AdvanceVisuals(float realSeconds)
@@ -150,6 +154,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     public void ResetPresentation()
     {
         RestoreBody(); charged = false; dimBlend = trailAge = 0;
+        feedback?.ReleaseCameraFocus(this, true);
         if (counter != null) CombatTimeController.ReleaseOwner(counter);
         if (effects != null) effects.ResetEffects();
         foreach (var enemy in launchedEnemies) if (enemy != null && enemy.IsActive) enemy.CancelLaunch();

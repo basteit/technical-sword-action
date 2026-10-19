@@ -23,6 +23,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(profile, "hitFrame"), Is.EqualTo(21)); Assert.That(Get<int>(profile, "endFrame"), Is.EqualTo(45));
             Assert.That(Get<float>(profile, "chargeScale"), Is.EqualTo(.15f)); Assert.That(Get<int>(profile, "launchFrames"), Is.EqualTo(22));
             Assert.That(Get<float>(profile, "launchDistance"), Is.EqualTo(3.2f));
+            Assert.That(Get<float>(profile, "cameraOrthographicSize"), Is.EqualTo(1.875f));
+            Assert.That(Get<float>(profile, "cameraBlendSeconds"), Is.EqualTo(.1f));
             var art = Get<Object>(profile, "art"); Assert.That(AssetDatabase.GetAssetPath(art), Is.EqualTo(Folder + "CounterCinematicArt.asset"));
             var motions = Get<Array>(art, "motions").Cast<object>().ToArray();
             Assert.That(motions.Select(m => Get<string>(m, "name")), Is.EquivalentTo(new[] { "CounterTransfer", "CounterKick", "Fx_ElectricKick" }));
@@ -64,6 +66,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [TestCase("chargeScale", 0f)] [TestCase("chargeRealSeconds", .1f)] [TestCase("hitRadius", -1f)] [TestCase("dimFadeSeconds", 0f)]
+        [TestCase("cameraOrthographicSize", 0f)] [TestCase("cameraBlendSeconds", 0f)]
         public void UnsafeOrInconsistentNumericSettingsAreRejected(string field, float value)
         {
             var copy = Object.Instantiate(Profile);

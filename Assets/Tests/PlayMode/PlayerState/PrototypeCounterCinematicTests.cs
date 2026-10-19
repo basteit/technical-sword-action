@@ -77,6 +77,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(TimeValue<float>("SlowScale"), Is.EqualTo(1));
             Assert.That(body.gravityScale, Is.GreaterThan(0));
             Assert.That(Camera.main.orthographicSize, Is.EqualTo(5.625f));
+            Assert.That(Get<bool>(feedback, "HasCameraFocus"), Is.False);
         }
 
         [UnitySetUp] public IEnumerator Setup()
@@ -136,6 +137,125 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(target, "CurrentHp"), Is.EqualTo(30)); Assert.That(Get<int>(target, "HitCount"), Is.EqualTo(1));
             Assert.That(Get<int>(target, "MotionOwnerCount"), Is.Zero); Assert.That(Get<int>(target, "DeathPresentationOwnerCount"), Is.Zero);
             Assert.That(body.gravityScale, Is.EqualTo(gravity)); AssertClean();
+        }
+
+        [TestCase(5)] [TestCase(10)]
+        public void BufferedCounterConsumesParryPoseWithoutReplayingSuccessAfterward(int parryFrame)
+        {
+            body.position = new Vector2(0, .81f); player.transform.position = body.position;
+            var target = Enemy("StrongMelee", new Vector2(1.15f, .81f), 120);
+            var parry = player.GetComponent(T("PlayerParry2D"));
+            var receiver = player.GetComponent(T("PlayerDamageReceiver2D"));
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Parry), Is.True);
+            Until(() => Get<int>(parry, "ElapsedFrames") >= parryFrame);
+            object context = Activator.CreateInstance(T("CombatHitContext2D"), target, 91L, true,
+                Enum.Parse(T("ParryReactionWeight"), "Light"));
+            Call(receiver, "TryReceiveContextHit", 10, (Vector2)target.transform.position, 0f, context);
+            Assert.That(Get<object>(parry, "LastParryResult").ToString(), Is.EqualTo(parryFrame == 5 ? "Just" : "Normal"));
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Until(() => Get<bool>(counter, "IsActive"));
+            Until(() => !Get<bool>(counter, "IsActive"));
+            var animator = player.GetComponent<Animator>();
+            for (int i = 0; i < 18; i++)
+            {
+                Frames(1); animator.Update(0);
+                var state = animator.GetCurrentAnimatorStateInfo(0);
+                Assert.That(state.IsName("PlayerPrototype_ParrySuccessLight") || state.IsName("PlayerPrototype_ParrySuccessHeavy") ||
+                    state.IsName("PlayerPrototype_ParrySuccess") || state.IsName("PlayerPrototype_Recovery_Parry"), Is.False);
+            }
+        }
+
+        [TestCase(1)] [TestCase(-1)]
+        public void ImpactKeepsItsWorldContactAndFacingWhenPlayerMovesAndTurns(int direction)
+        {
+            Begin(direction); ToFrame(21);
+            var effects = player.GetComponent(T("VideoVfxRenderer"));
+            var profile = Get<object>(counter, "CinematicProfile");
+            var motion = Call(Get<object>(profile, "art"), "Find", "Fx_ElectricKick");
+            var sprites = Get<Sprite[]>(motion, "frames");
+            var impact = effects.GetComponentsInChildren<SpriteRenderer>().Single(r => sprites.Contains(r.sprite) && r.name == "PooledVideoVfx");
+            Vector3 contact = Get<Vector2>(counter, "ContactPoint");
+            Assert.That(Vector3.Distance(impact.transform.position, contact), Is.LessThan(.0001f));
+            Vector3 local = new Vector3(.4f, .2f);
+            Vector3 expected = contact + new Vector3(.4f * -direction, .2f) * 1.15f;
+            Assert.That(Vector3.Distance(impact.transform.TransformPoint(local), expected), Is.LessThan(.0001f));
+            body.position += Vector2.right * 3; player.transform.position = body.position;
+            Call(motor, "SetFacing", direction); Call(effects, "AdvanceVisuals", 0f);
+            Assert.That(Vector3.Distance(impact.transform.position, contact), Is.LessThan(.0001f));
+            Assert.That(Vector3.Distance(impact.transform.TransformPoint(local), expected), Is.LessThan(.0001f));
+        }
+
+        [TestCase(1, "Afterimage")] [TestCase(-1, "Afterimage")]
+        [TestCase(1, "TransitSilhouette")] [TestCase(-1, "TransitSilhouette")]
+        [TestCase(1, "EyeTrail")] [TestCase(-1, "EyeTrail")]
+        public void SpriteEffectsCopyTheDisplayedArtPoseOnce(int direction, string kind)
+        {
+            Call(motor, "SetFacing", direction);
+            var profile = Get<object>(counter, "CinematicProfile");
+            player.GetComponent<SpriteRenderer>().sprite = Get<Sprite[]>(Get<object>(profile, "Kick"), "frames")[0];
+            Call(art, "RefreshVisual");
+            var drawing = Get<SpriteRenderer>(art, "Artwork");
+            var effects = player.GetComponent(T("VideoVfxRenderer")); Call(effects, "ResetEffects");
+            if (kind == "TransitSilhouette") Call(effects, "EmitTransitSilhouette", drawing, direction, (Vector2)drawing.transform.position, Vector2.one, .45f);
+            else Call(effects, "Emit" + kind, drawing, direction);
+            var image = effects.GetComponentsInChildren<SpriteRenderer>().Single(r => r.name == "PooledVideoVfx");
+            var sample = new Vector3(.65f, .35f);
+            Vector3 expected = drawing.transform.TransformPoint(sample);
+            Assert.That(Vector3.Distance(image.transform.TransformPoint(sample), expected), Is.LessThan(.0001f));
+            body.position += Vector2.right * 3; player.transform.position = body.position;
+            Call(motor, "SetFacing", -direction); Call(effects, "AdvanceVisuals", 0f);
+            Assert.That(Vector3.Distance(image.transform.TransformPoint(sample), expected), Is.LessThan(.0001f));
+        }
+
+        [TestCase(1)] [TestCase(-1)]
+        public void CounterCloseUpFramesTheHeroFreezesOnPauseAndReturnsToTheOriginalCamera(int direction)
+        {
+            Set(Get<object>(feedback, "Settings"), "shake", 1f);
+            var camera = Camera.main; Vector3 original = camera.transform.position;
+            Begin(direction); ToFrame(14);
+            var profile = Get<object>(counter, "CinematicProfile");
+            Assert.That(camera.orthographicSize, Is.EqualTo(Get<float>(profile, "cameraOrthographicSize")).Within(.00001f));
+            Vector2 offset = Get<Vector2>(profile, "cameraFocusOffset");
+            Vector3 focus = player.transform.position + new Vector3(offset.x * -direction, offset.y);
+            focus.z = original.z;
+            Assert.That(Vector3.Distance(camera.transform.position - Get<Vector3>(feedback, "ShakeOffset"), focus), Is.LessThan(.0001f));
+            var viewport = camera.WorldToViewportPoint(player.transform.position);
+            Assert.That(viewport.x, Is.InRange(.3f, .7f)); Assert.That(viewport.y, Is.InRange(.2f, .8f));
+            Vector3 paused = camera.transform.position; float size = camera.orthographicSize;
+            Static("SetPaused", true); Frames(60);
+            Assert.That(camera.transform.position, Is.EqualTo(paused)); Assert.That(camera.orthographicSize, Is.EqualTo(size));
+            Static("SetPaused", false); Until(() => !Get<bool>(counter, "IsActive")); Frames(8);
+            Assert.That(Vector3.Distance(camera.transform.position, original), Is.LessThan(.0001f)); AssertClean();
+        }
+
+        [TestCase("Reset")] [TestCase("Disable")] [TestCase("Death")] [TestCase("TargetLost")]
+        public void CounterCloseUpImmediatelyRestoresOnInterruption(string operation)
+        {
+            Set(Get<object>(feedback, "Settings"), "shake", 1f);
+            var camera = Camera.main; Vector3 original = camera.transform.position;
+            var target = Begin(); ToFrame(14);
+            Assert.That(Get<bool>(feedback, "HasCameraFocus"), Is.True);
+            if (operation == "Reset") Call(arena, "ResetActionsOnly");
+            else if (operation == "Disable") { player.gameObject.SetActive(false); player.gameObject.SetActive(true); }
+            else if (operation == "Death") { Call(player, "SetDead", "CounterCameraTest"); Call(player, "Revive", "CounterCameraTest"); }
+            else { target.gameObject.SetActive(false); Until(() => !Get<bool>(counter, "IsActive")); }
+            Assert.That(Get<bool>(feedback, "HasCameraFocus"), Is.False);
+            Assert.That(camera.orthographicSize, Is.EqualTo(5.625f));
+            Assert.That(Vector3.Distance(camera.transform.position - Get<Vector3>(feedback, "ShakeOffset"), original), Is.LessThan(.0001f));
+            Frames(8); AssertClean();
+        }
+
+        [Test] public void DisablingCameraMotionDuringChargeRestoresTheViewWithoutChangingTheCounter()
+        {
+            Set(Get<object>(feedback, "Settings"), "shake", 1f);
+            var camera = Camera.main; Vector3 original = camera.transform.position;
+            var target = Begin(); ToFrame(14);
+            Assert.That(camera.orthographicSize, Is.LessThan(2));
+            Set(Get<object>(feedback, "Settings"), "shake", 0f); Frames(1);
+            Assert.That(camera.orthographicSize, Is.EqualTo(5.625f));
+            Assert.That(Vector3.Distance(camera.transform.position, original), Is.LessThan(.0001f));
+            Until(() => !Get<bool>(counter, "IsActive")); Frames(6);
+            Assert.That(Get<int>(target, "CurrentHp"), Is.EqualTo(30)); AssertClean();
         }
 
         [TestCase(1)] [TestCase(-1)]
@@ -273,6 +393,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [UnityTest] public IEnumerator ActiveSceneChangeRestoresCounterAndLaunchOwnership()
         {
+            Set(Get<object>(feedback, "Settings"), "shake", 1f);
             var target = Begin(); ToFrame(22); var previous = SceneManager.GetActiveScene();
             var temporary = SceneManager.CreateScene("CounterCinematicSceneChangeTest"); SceneManager.SetActiveScene(temporary);
             AssertClean(); Assert.That(Get<int>(target, "MotionOwnerCount"), Is.Zero); Assert.That(Get<int>(target, "DeathPresentationOwnerCount"), Is.Zero);

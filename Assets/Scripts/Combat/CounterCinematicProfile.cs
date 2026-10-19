@@ -25,6 +25,10 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Range(0, 1)] public float dimStrength = .965f;
     [Range(0, 1)] public float heroLiftStrength = .6f;
     [Min(.001f)] public float dimFadeSeconds = 3f / 60f;
+    [Header("Gameplay camera close-up")]
+    [Min(.01f)] public float cameraOrthographicSize = 1.875f;
+    public Vector2 cameraFocusOffset = new Vector2(.45f, .4f);
+    [Min(.001f)] public float cameraBlendSeconds = .1f;
     [Min(0)] public float launchDistance = 3.2f;
     [Min(0)] public float launchHeight = .65f;
     [Min(1)] public int launchFrames = 22;
@@ -43,6 +47,8 @@ public sealed class CounterCinematicProfile : ScriptableObject
         Finite(dimStrength) && dimStrength >= 0 && dimStrength <= 1 &&
         Finite(heroLiftStrength) && heroLiftStrength >= 0 && heroLiftStrength <= 1 &&
         Finite(dimFadeSeconds) && dimFadeSeconds > 0 && Valid(Transfer) && Valid(Kick) &&
+        Finite(cameraOrthographicSize) && cameraOrthographicSize > 0 &&
+        Finite(cameraFocusOffset.x) && Finite(cameraFocusOffset.y) && Finite(cameraBlendSeconds) && cameraBlendSeconds > 0 &&
         Transfer.TotalFrames == BlinkArrivalFrame && Transfer.TotalFrames + Kick.TotalFrames == endFrame &&
         Valid(art.Find("Fx_ElectricKick")) && subjectLiftShader != null && glowMaterial != null;
     public Sprite Sample(int frame) => frame < BlinkArrivalFrame ? Transfer.At(frame) : Kick.At(frame - BlinkArrivalFrame);

@@ -94,7 +94,8 @@ public sealed class PrototypeCombatArena : MonoBehaviour
         if (feedback != null && feedback.Settings != null)
         {
             var s = feedback.Settings;
-            GUILayout.Label($"F6 Shake {s.shake:P0} / F7 Flash {s.flash:P0}");
+            GUILayout.Label($"F6 Camera (shake / zoom) {s.shake:P0}");
+            GUILayout.Label($"F7 Flash {s.flash:P0}");
             GUILayout.Label($"F8 VFX {s.vfx:P0} / F9 Sound {s.masterVolume:P0}");
             GUILayout.Label("0% keeps essential hit/telegraph shapes");
             GUILayout.Label($"Feedback: {feedback.LastKind} @{feedback.LastEmissionTick}");

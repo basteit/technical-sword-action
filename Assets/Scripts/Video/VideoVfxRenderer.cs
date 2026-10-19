@@ -14,7 +14,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
     private readonly List<Sprite> generatedSprites=new();
     private readonly List<Texture2D> generatedTextures=new();
     private sealed class Effect
-    { public GameObject root;public SpriteRenderer sprite,glow;public VideoArtLibrary.Motion motion;public float age,duration,glowSeconds;public bool permitsGlow,fresh,fade;public Transform follow;public Vector2 offset,drift;public Color tint,glowTint; }
+    { public GameObject root;public SpriteRenderer sprite,glow;public VideoArtLibrary.Motion motion;public float age,duration,glowSeconds;public bool permitsGlow,fresh,fade;public Transform follow;public Vector2 offset,drift;public Color tint,glowTint;public Vector3 position,worldScale;public Quaternion rotation; }
     private readonly List<Effect> pool=new();
     public bool ReadableImpacts { get=>readableImpacts;set=>readableImpacts=value; }
     public bool HybridGlow { get=>hybridGlow;set=>hybridGlow=value; }
@@ -33,7 +33,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         }
         else if(kind=="Parry")
         {
-            effect.root.transform.localScale*=.75f;
+            effect.worldScale*=.75f;ApplyPose(effect);
             EmitImpactBurst(false,position,scale,facing,delay);
         }
     }
@@ -44,7 +44,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         effect.glowSeconds=readableImpacts&&(kind=="ElectricKick"||kind=="Parry")?2/60f:motion.TotalFrames/60f*.6f;
         effect.motion=motion;effect.age=-delay;effect.duration=motion.TotalFrames/60f;effect.permitsGlow=effect.fresh=true;
         effect.follow=null;effect.drift=Vector2.zero;effect.fade=false;effect.sprite.sortingOrder=30;effect.glow.sortingOrder=29;
-        effect.root.transform.position=position;effect.root.transform.localScale=new Vector3(scale*facing,scale,1);
+        SetPose(effect,position,new Vector3(scale*facing,scale,1),Quaternion.identity);
         effect.root.SetActive(true);effect.sprite.color=new Color(1,1,1,intensity);
         effect.glow.transform.localScale=Vector3.one*1.08f;
         effect.glow.color=kind=="ElectricKick"?new Color(.6f,.9f,1,.16f*intensity):new Color(1,.8f,.55f,.16f*intensity);
@@ -65,7 +65,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         effect.age=0;effect.duration=(readableImpacts?6:8)/60f;effect.glowSeconds=effect.duration*.6f;effect.permitsGlow=effect.fresh=effect.fade=true;
         effect.follow=null;effect.drift=Vector2.right*(-facing*1.8f);
         effect.tint=new Color(.75f,.95f,1,readableImpacts?.45f:.8f);effect.glowTint=new Color(.65f,.9f,1,readableImpacts?.18f:.4f);
-        effect.root.transform.position=player.transform.position;effect.root.transform.localScale=new Vector3(facing,1,1);
+        SetSpritePose(effect,player,player.transform.position,Vector2.one);
         effect.sprite.sprite=effect.glow.sprite=eyes;effect.sprite.color=effect.tint;
         effect.glow.color=effect.glowTint;effect.glow.transform.localScale=Vector3.one;
         effect.sprite.sortingOrder=1020;effect.glow.sortingOrder=1019;
@@ -77,7 +77,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         var effect=Obtain();effect.motion=motion;effect.age=-delay;effect.duration=motion.TotalFrames/60f;
         effect.glowSeconds=2/60f;effect.permitsGlow=effect.fresh=true;
         effect.fade=false;effect.follow=null;effect.drift=Vector2.zero;
-        effect.root.transform.position=position;effect.root.transform.localScale=new Vector3(scale*facing,scale,1);
+        SetPose(effect,position,new Vector3(scale*facing,scale,1),Quaternion.identity);
         effect.sprite.sortingOrder=electric?impactSortingOrder+1:31;effect.glow.sortingOrder=electric?impactSortingOrder:30;
         effect.sprite.sprite=effect.glow.sprite=motion.frames[0];effect.sprite.color=new Color(1,1,1,intensity);
         effect.glow.color=electric?new Color(.5f,.85f,1,.16f*intensity):new Color(1,.88f,.6f,.12f*intensity);
@@ -149,7 +149,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         var e=Obtain();e.motion=new VideoArtLibrary.Motion{name="Afterimage",frames=new[]{player.sprite},durations=new[]{6}};
         e.age=0;e.duration=.1f;e.permitsGlow=false;e.fresh=true;
         e.follow=null;e.drift=Vector2.zero;e.fade=false;e.sprite.sortingOrder=9;e.glow.sortingOrder=8;
-        e.root.transform.position=player.transform.position;e.root.transform.localScale=new Vector3(facing,1,1);
+        SetSpritePose(e,player,player.transform.position,Vector2.one);
         e.sprite.sprite=player.sprite;e.sprite.color=new Color(.12f,.14f,.22f,.24f*intensity);e.sprite.enabled=true;e.glow.enabled=false;
         e.root.SetActive(true);EmissionCount++;
     }
@@ -158,9 +158,33 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         var e=Obtain();e.motion=new VideoArtLibrary.Motion{name="TransitSilhouette",frames=new[]{player.sprite},durations=new[]{10}};
         e.age=0;e.duration=10/60f;e.permitsGlow=false;e.fresh=e.fade=true;e.follow=null;e.drift=Vector2.zero;
         e.tint=new Color(0,0,0,opacity*intensity);e.glowTint=Color.clear;
-        e.root.transform.position=position;e.root.transform.localScale=new Vector3(scale.x*facing,scale.y,1);
+        SetSpritePose(e,player,position,scale);
         e.sprite.sprite=player.sprite;e.sprite.color=e.tint;e.sprite.sortingOrder=12;e.glow.sortingOrder=11;
         e.sprite.enabled=true;e.glow.enabled=false;e.root.SetActive(true);EmissionCount++;
+    }
+    private static void SetPose(Effect effect,Vector3 position,Vector3 scale,Quaternion rotation)
+    {
+        effect.position=position;effect.worldScale=scale;effect.rotation=rotation;
+        effect.sprite.flipX=effect.glow.flipX=effect.sprite.flipY=effect.glow.flipY=false;
+        ApplyPose(effect);
+    }
+    private static void SetSpritePose(Effect effect,SpriteRenderer source,Vector3 position,Vector2 scale)
+    {
+        SetPose(effect,position,Vector3.Scale(source.transform.lossyScale,new Vector3(scale.x,scale.y,1)),source.transform.rotation);
+        effect.sprite.flipX=effect.glow.flipX=source.flipX;
+        effect.sprite.flipY=effect.glow.flipY=source.flipY;
+    }
+    private static void ApplyPose(Effect effect)
+    {
+        // The pool can live under a moving, mirrored player. Keep emitted art
+        // in its captured world pose rather than inheriting that transform twice.
+        var parent=effect.root.transform.parent;
+        var scale=parent!=null?parent.lossyScale:Vector3.one;
+        effect.root.transform.SetPositionAndRotation(effect.position,effect.rotation);
+        effect.root.transform.localScale=new Vector3(
+            effect.worldScale.x/(Mathf.Abs(scale.x)>.00001f?scale.x:1),
+            effect.worldScale.y/(Mathf.Abs(scale.y)>.00001f?scale.y:1),
+            effect.worldScale.z/(Mathf.Abs(scale.z)>.00001f?scale.z:1));
     }
     public void AdvanceVisuals(float realSeconds)
     {
@@ -168,12 +192,18 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         foreach(var e in pool)
         {
             if(!e.root.activeSelf) continue;
-            if(e.fresh) { e.fresh=false;continue; }
+            if(e.fresh)
+            {
+                e.fresh=false;
+                if(e.follow!=null) e.position=(Vector2)e.follow.position+e.offset;
+                ApplyPose(e);continue;
+            }
             e.age+=realSeconds;
             if(e.age>=e.duration) { e.root.SetActive(false);continue; }
             e.sprite.enabled=e.age>=0;e.glow.enabled=e.permitsGlow&&hybridGlow&&e.age>=0&&e.age<e.glowSeconds;
-            if(e.follow!=null) e.root.transform.position=(Vector2)e.follow.position+e.offset;
-            else e.root.transform.position+=(Vector3)(e.drift*realSeconds);
+            if(e.follow!=null) e.position=(Vector2)e.follow.position+e.offset;
+            else e.position+=(Vector3)(e.drift*realSeconds);
+            ApplyPose(e);
             if(e.fade)
             {
                 float opacity=Mathf.Clamp01(1-e.age/e.duration);
