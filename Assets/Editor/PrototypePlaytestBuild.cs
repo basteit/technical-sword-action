@@ -13,6 +13,7 @@ using Debug = UnityEngine.Debug;
 public static class PrototypePlaytestBuild
 {
     private const string StatusKey = "TechnicalSwordAction.PrototypePlaytestBuild";
+    private const string PendingKey = StatusKey + ".Pending";
     private static string Root => Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
     public static string Status => SessionState.GetString(StatusKey, "Idle");
 
@@ -61,7 +62,35 @@ public static class PrototypePlaytestBuild
         };
         Directory.CreateDirectory(directory);
         SessionState.SetString(StatusKey, "Queued:" + result.reportPath);
-        EditorApplication.delayCall += () => Build(result);
+        SessionState.SetString(PendingKey, JsonUtility.ToJson(result));
+        RestoreQueuedBuild();
+        EditorApplication.QueuePlayerLoopUpdate();
+    }
+
+    [InitializeOnLoadMethod]
+    private static void RestoreQueuedBuild()
+    {
+        if (string.IsNullOrEmpty(SessionState.GetString(PendingKey, ""))) return;
+        EditorApplication.update -= RunPending;
+        EditorApplication.update += RunPending;
+    }
+
+    public static void RunPending()
+    {
+        if (Application.isPlaying || EditorApplication.isCompiling || EditorApplication.isUpdating || BuildPipeline.isBuildingPlayer) return;
+        EditorApplication.update -= RunPending;
+        string pending = SessionState.GetString(PendingKey, "");
+        if (string.IsNullOrEmpty(pending)) return;
+        SessionState.EraseString(PendingKey);
+        Build(JsonUtility.FromJson<Result>(pending));
+    }
+
+    public static void CancelQueued()
+    {
+        if (BuildPipeline.isBuildingPlayer) throw new InvalidOperationException("Do not cancel an active Unity build.");
+        EditorApplication.update -= RunPending;
+        SessionState.EraseString(PendingKey);
+        SessionState.SetString(StatusKey, "Idle");
     }
 
     private static void Build(Result result)
