@@ -793,9 +793,9 @@
     "counter_kick": {
       "name": "反撃キック",
       "status": "received",
-      "notes": "2026-10-19更新。Body/Effect/Eyeを表示した人物・足の電気・目の残光の作画版。原稿登録とゲーム使用版の検証は別記録。",
+      "notes": "2026-10-24受領。後ろ髪を更新した人物原稿。独立VFX原稿counter_kick_effectと同期接続する。登録とUnity反映・検証は別記録。",
       "current": "Current/Player_counter_kick.aseprite",
-      "current_sha256": "cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5",
+      "current_sha256": "10061865424f45625e064e07cf0bca00ab188fce995263e12b6ba8ae807894dd",
       "revisions": [
         {
           "sha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db",
@@ -1145,30 +1145,148 @@
             "tags": [],
             "width": 128
           }
+        },
+        {
+          "sha256": "10061865424f45625e064e07cf0bca00ab188fce995263e12b6ba8ae807894dd",
+          "file": "History/counter_kick/10061865424f45625e064e07cf0bca00ab188fce995263e12b6ba8ae807894dd.aseprite",
+          "original_name": "Player_counter_kick.aseprite",
+          "registered_at": "2026-10-23T23:08:39+00:00",
+          "received_on": "2026-10-24",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              },
+              {
+                "duration_ms": 100,
+                "frame": 9
+              },
+              {
+                "duration_ms": 100,
+                "frame": 10
+              },
+              {
+                "duration_ms": 60,
+                "frame": 11
+              },
+              {
+                "duration_ms": 60,
+                "frame": 12
+              },
+              {
+                "duration_ms": 60,
+                "frame": 13
+              },
+              {
+                "duration_ms": 60,
+                "frame": 14
+              },
+              {
+                "duration_ms": 60,
+                "frame": 15
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 105,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
         }
       ],
       "uses": [
         {
           "consumer": "video",
           "motion": "CounterKick",
-          "source_sha256": "cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5",
+          "source_sha256": "10061865424f45625e064e07cf0bca00ab188fce995263e12b6ba8ae807894dd",
           "references": [
             "Assets/Art/Player/VideoSubmitted/timing-manifest.json",
             "Assets/Settings/CombatVideoArt.asset"
           ],
-          "evidence": "docs/video/counter-follow-through-20261019.md"
+          "evidence": "docs/video/counter-split-20261024.md"
         },
         {
           "consumer": "prototype",
           "motion": "ParryCounter",
-          "source_sha256": "cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5",
+          "source_sha256": "10061865424f45625e064e07cf0bca00ab188fce995263e12b6ba8ae807894dd",
           "references": [
             "Assets/Settings/PrototypeCombat/CounterCinematicArt.asset",
-            "Assets/Settings/PrototypeCombat/CounterCinematic.asset",
-            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
             "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim"
           ],
-          "evidence": "docs/validation/prototype-counter-cinematic-2026-10-19.json"
+          "evidence": "docs/video/counter-split-20261024.md"
         }
       ]
     },
@@ -1368,6 +1486,144 @@
         }
       ],
       "uses": []
+    },
+    "counter_kick_effect": {
+      "name": "反撃キック・独立エフェクト",
+      "status": "received",
+      "notes": "2026-10-24受領。人物と別キャンバスの独立VFX。counter_kickと同期して接続。登録だけでは使用済みにしない。",
+      "current": "Current/Player_counter_kick_effect.aseprite",
+      "current_sha256": "ba044fd315c892a65dfeae2e138d825407f04f4bb7b99b7ec8d994314be1ec1e",
+      "revisions": [
+        {
+          "sha256": "ba044fd315c892a65dfeae2e138d825407f04f4bb7b99b7ec8d994314be1ec1e",
+          "file": "History/counter_kick_effect/ba044fd315c892a65dfeae2e138d825407f04f4bb7b99b7ec8d994314be1ec1e.aseprite",
+          "original_name": "Player_counter_kick_effect.aseprite",
+          "registered_at": "2026-10-23T23:08:39+00:00",
+          "received_on": "2026-10-24",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              },
+              {
+                "duration_ms": 100,
+                "frame": 9
+              },
+              {
+                "duration_ms": 100,
+                "frame": 10
+              },
+              {
+                "duration_ms": 100,
+                "frame": 11
+              },
+              {
+                "duration_ms": 100,
+                "frame": 12
+              },
+              {
+                "duration_ms": 100,
+                "frame": 13
+              },
+              {
+                "duration_ms": 100,
+                "frame": 14
+              },
+              {
+                "duration_ms": 100,
+                "frame": 15
+              }
+            ],
+            "height": 256,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect2",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
+                "opacity": 255,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 256
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "video",
+          "motion": "CounterKickEffect",
+          "source_sha256": "ba044fd315c892a65dfeae2e138d825407f04f4bb7b99b7ec8d994314be1ec1e",
+          "references": [
+            "Assets/Art/Video/Submitted/20261024/timing-manifest.json",
+            "Assets/Settings/CombatVideoArt.asset"
+          ],
+          "evidence": "docs/video/counter-split-20261024.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "CounterKickEffect",
+          "source_sha256": "ba044fd315c892a65dfeae2e138d825407f04f4bb7b99b7ec8d994314be1ec1e",
+          "references": [
+            "Assets/Settings/PrototypeCombat/CounterCinematicArt.asset"
+          ],
+          "evidence": "docs/video/counter-split-20261024.md"
+        }
+      ]
     }
   },
   "references": [

@@ -1,0 +1,179 @@
+{
+  "date": "2026-10-24",
+  "sources": [
+    {
+      "current": "ArtSource/Player/Current/Player_counter_kick.aseprite",
+      "sha256": "10061865424f45625e064e07cf0bca00ab188fce995263e12b6ba8ae807894dd"
+    },
+    {
+      "current": "ArtSource/Player/Current/Player_counter_kick_effect.aseprite",
+      "sha256": "ba044fd315c892a65dfeae2e138d825407f04f4bb7b99b7ec8d994314be1ec1e"
+    }
+  ],
+  "alignment": {
+    "allBodyFramesEqual": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "sourceTopLeftOffset": [
+      89,
+      43
+    ],
+    "effectPivotBottomLeft": [
+      121,
+      123
+    ],
+    "excludedFromEffect": [
+      "Layer 1",
+      "Body",
+      "Eye"
+    ],
+    "excludedFromPlayer": [
+      "Layer 1",
+      "Effect",
+      "Sample",
+      "Sword"
+    ]
+  },
+  "nativeAndGameDurations": {
+    "bodyOffset": {
+      "x": 89,
+      "y": 43
+    },
+    "bodyReferenceMatchesAllFrames": true,
+    "effectBodyAndEyeExcluded": true,
+    "effectPivot": {
+      "x": 121,
+      "y": 123
+    },
+    "nativeDurations": {
+      "CounterKick": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "CounterKickEffect": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ]
+    },
+    "pairedGameTicks": [
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      4,
+      4,
+      4,
+      4,
+      4,
+      3
+    ],
+    "playerEffectExcluded": true,
+    "sourceUnmodified": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0
+  },
+  "editMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-23T23:23:24.1689691Z",
+    "TestCount": 3,
+    "PassedCount": 3,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-23T23:23:43.2550974Z",
+    "TestCount": 16,
+    "PassedCount": 16,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "fullSuiteRerun": false,
+  "repeatedResetSweepRerun": false,
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 8,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ playing = False, scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-counter-split-20261024.mp4",
+    "sha256": "12402427283a37227ac34595870f79fbd9d73fba2a41c8e7d739b0ab62c4ba07",
+    "decodedFrames": 308,
+    "durationSeconds": 5.133333333333334,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "eventsAndTimingUnchanged": true
+  },
+  "previewCrf": 24,
+  "overallVideoAccepted": false,
+  "sourceLibrary": {
+    "errors": [],
+    "valid": true
+  },
+  "preservation": {
+    "baselineFiles": 2206,
+    "changedIntentionally": 35,
+    "byteIdentical": 2171,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 84
+  }
+}

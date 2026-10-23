@@ -10,6 +10,9 @@ public sealed class VideoVfxRenderer : MonoBehaviour
     [SerializeField,Range(0,1)] private float intensity=.8f;
     [SerializeField] private bool readableImpacts=true;
     [SerializeField] private int impactSortingOrder=30;
+    [SerializeField,Range(0,1)] private float authoredCounterOpacity=1;
+    [SerializeField] private bool useAuthoredCounterEffect=true;
+    private Effect counterEffect;
     private VideoArtLibrary.Motion electricBurst,parryBurst;
     private readonly List<Sprite> generatedSprites=new();
     private readonly List<Texture2D> generatedTextures=new();
@@ -20,8 +23,23 @@ public sealed class VideoVfxRenderer : MonoBehaviour
     public bool HybridGlow { get=>hybridGlow;set=>hybridGlow=value; }
     public int ActiveCount { get { int n=0;foreach(var e in pool) if(e.root.activeSelf) n++;return n; } }
     public int EmissionCount { get; private set; }
+    public bool UseAuthoredCounterEffect {get=>useAuthoredCounterEffect;set=>useAuthoredCounterEffect=value;}
+    public bool HasAuthoredCounterEffect=>useAuthoredCounterEffect&&library!=null&&library.Find("CounterKickEffect")!=null;
+    public void SampleCounterEffect(SpriteRenderer source,int frame,bool visible,float strength=1)
+    {
+        var motion=library!=null?library.Find("CounterKickEffect"):null;
+        if(!HasAuthoredCounterEffect||!visible||source==null||motion==null||frame<0||frame>=motion.TotalFrames||strength<=0)
+        {if(counterEffect!=null)counterEffect.root.SetActive(false);return;}
+        counterEffect??=Obtain();counterEffect.root.name="AuthoredCounterEffect";
+        SetSpritePose(counterEffect,source,source.transform.position,Vector2.one);
+        counterEffect.sprite.sprite=motion.At(frame);counterEffect.sprite.color=new Color(1,1,1,authoredCounterOpacity*Mathf.Clamp01(strength));
+        // Above the dimmer, below the lifted body/eyes while charging.
+        counterEffect.sprite.sortingOrder=1009;counterEffect.sprite.enabled=true;counterEffect.glow.enabled=false;
+        counterEffect.root.SetActive(true);
+    }
     public void Emit(string kind,Vector2 position,float scale=1,int facing=1,float delay=0)
     {
+        if(kind=="ElectricKick"&&HasAuthoredCounterEffect)return;
         var effect=EmitEffect(kind,position,scale,facing,delay);
         if(effect==null||!readableImpacts) return;
         if(kind=="ElectricKick")
@@ -133,7 +151,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
     }
     private Effect Obtain()
     {
-        Effect effect=pool.Find(e=>!e.root.activeSelf);
+        Effect effect=pool.Find(e=>e!=counterEffect&&!e.root.activeSelf);
         if(effect==null)
         {
             effect=new Effect();effect.root=new GameObject("PooledVideoVfx");effect.root.transform.SetParent(transform);
@@ -191,6 +209,7 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         if(CombatTimeController.IsPaused) return;
         foreach(var e in pool)
         {
+            if(e==counterEffect)continue;
             if(!e.root.activeSelf) continue;
             if(e.fresh)
             {

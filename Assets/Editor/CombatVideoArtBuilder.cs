@@ -50,8 +50,11 @@ public static class CombatVideoArtBuilder
             // Split parry tags are additions rather than replacements of ParryDeflect.
             manifest.actions=manifest.actions.Concat(final.actions.Where(a=>!manifest.actions.Any(old=>old.name==a.name))).ToArray();
         }
+        const string splitFxFolder="Assets/Art/Video/Submitted/20261024";
+        if(File.Exists(splitFxFolder+"/timing-manifest.json"))
+            manifest.actions=manifest.actions.Concat(JsonUtility.FromJson<Manifest>(File.ReadAllText(splitFxFolder+"/timing-manifest.json")).actions).ToArray();
         var motions=new List<VideoArtLibrary.Motion>();
-        var paths=SelectCleanFrames("Assets/Art/Player/VideoRough").Concat(Directory.GetFiles("Assets/Art/Player/VideoRough","*Reference_??.png")).Concat(Directory.GetFiles("Assets/Art/Video","*.png"));
+        var paths=SelectCleanFrames("Assets/Art/Player/VideoRough").Concat(Directory.GetFiles("Assets/Art/Player/VideoRough","*Reference_??.png")).Concat(Directory.GetFiles("Assets/Art/Video","*.png",SearchOption.AllDirectories));
         if(hasShowcase) paths=paths.Concat(SelectCleanFrames(showcaseFolder));
         if(hasHeel) paths=paths.Concat(SelectCleanFrames(heelFolder));
         if(hasSubmitted) paths=paths.Concat(SelectCleanFrames(submittedFolder));

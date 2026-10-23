@@ -292,7 +292,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
         [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
-        public void ElectricImpactKeepsTheContactClearAndFreezesItsOuterBoltsOnPause(int fps,bool mirrored)
+        public void SubmittedCounterEffectAlignsAndFreezesWithTheKickOnPauseAndHitstop(int fps,bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
             var enemy=(Component)Get<object>(director,"RearEnemy");var targetVisual=enemy.GetComponentInChildren<SpriteRenderer>();
@@ -306,22 +306,26 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Quaternion.Angle(targetVisual.transform.localRotation,rotationBefore),Is.LessThan(.001f));
             Assert.That(targetVisual.sortingOrder,Is.LessThan(state.GetComponent<SpriteRenderer>().sortingOrder),"Attack trails stay in front of the struck body.");
             var vfx=Find("VideoVfxRenderer");var renderers=vfx.GetComponentsInChildren<SpriteRenderer>();
-            var ring=renderers.First(r=>r.sprite!=null&&r.sprite.name=="Fx_ElectricKick_01");
-            var bolts=renderers.First(r=>r.sprite!=null&&r.sprite.name=="Video_ElectricDischarge_01");
-            Assert.That(ring.sortingOrder,Is.GreaterThan(targetVisual.sortingOrder));
-            Assert.That(bolts.sortingOrder,Is.GreaterThan(targetVisual.sortingOrder));
-            Assert.That(bolts.sprite.texture.filterMode,Is.EqualTo(FilterMode.Point));
-            var pixels=bolts.sprite.texture.GetPixels32();int size=bolts.sprite.texture.width;
-            for(int y=size/2-8;y<=size/2+8;y++)for(int x=size/2-8;x<=size/2+8;x++)
-                if((x-size/2)*(x-size/2)+(y-size/2)*(y-size/2)<64)Assert.That(pixels[y*size+x].a,Is.Zero,"Keep the impact center clear.");
-            var sprite=bolts.sprite;var position=bolts.transform.position;int active=Get<int>(vfx,"ActiveCount");
+            var effect=renderers.Single(r=>r.name=="AuthoredCounterEffect");
+            var drawing=state.GetComponent<SpriteRenderer>();
+            Assert.That(effect.sprite.name,Is.EqualTo("CounterKickEffect_09"));
+            Assert.That(effect.sortingOrder,Is.GreaterThan(targetVisual.sortingOrder));
+            Assert.That(effect.sprite.texture.filterMode,Is.EqualTo(FilterMode.Point));
+            Assert.That(effect.sprite.rect.size,Is.EqualTo(new Vector2(256,256)));
+            // Body toe (83,86 top-origin) maps to (172,129) on the separate canvas.
+            Assert.That(Vector2.Distance(effect.sprite.pivot,new Vector2(121,123)),Is.LessThan(.001f));
+            Assert.That(Vector3.Distance(effect.transform.TransformPoint(new Vector3(51/32f,4/32f)),
+                drawing.transform.TransformPoint(new Vector3(51/32f,4/32f))),Is.LessThan(.001f));
+            Assert.That(renderers.Any(r=>r.sprite!=null&&(r.sprite.name.StartsWith("Fx_ElectricKick_")||r.sprite.name.StartsWith("Video_ElectricDischarge_"))),Is.False,"Do not overlay the old ring/discharge on the received effect.");
+            var sprite=effect.sprite;var position=effect.transform.position;int active=Get<int>(vfx,"ActiveCount");
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
             for(int i=0;i<fps;i++)Call(director,"StepCapture",1d/fps);
-            Assert.That(bolts.sprite,Is.SameAs(sprite));Assert.That(bolts.transform.position,Is.EqualTo(position));
+            Assert.That(effect.sprite,Is.SameAs(sprite));Assert.That(effect.transform.position,Is.EqualTo(position));
             Assert.That(Get<int>(vfx,"ActiveCount"),Is.EqualTo(active));
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
             for(int i=0;i<Mathf.CeilToInt(fps*.06f);i++)Call(director,"StepCapture",1d/fps);
             Assert.That(enemy.transform.position,Is.EqualTo(rootBefore));
+            Assert.That(effect.sprite,Is.SameAs(sprite),"The authored impact cel shares the combat hitstop.");
             for(int i=0;i<fps*2&&!Get<bool>(director,"Completed");i++)Call(director,"StepCapture",1d/fps);
             Assert.That(targetVisual.sortingOrder,Is.EqualTo(restOrder));
             Call(director,"ResetTake",2);
@@ -333,7 +337,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("Parry",false)] [TestCase("Parry",true)]
         public void ImpactSpritesAreReusedAndPurePixelModeNeverEnablesGlow(string kind,bool hybrid)
         {
-            Call(director,"ResetTake",2);var vfx=Find("VideoVfxRenderer");Set(vfx,"HybridGlow",hybrid);
+            Call(director,"ResetTake",2);var vfx=Find("VideoVfxRenderer");Set(vfx,"HybridGlow",hybrid);Set(vfx,"UseAuthoredCounterEffect",false);
             int pooled=0,generated=0;
             for(int run=0;run<10;run++)
             {
@@ -386,11 +390,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
             { beforeContact=enemy.GetComponent<Collider2D>().bounds;Step(); }
             Assert.That(Get<int>(enemy,"HitCount"),Is.EqualTo(1));
             var kick=Find("VideoVfxRenderer").GetComponentsInChildren<SpriteRenderer>()
-                .First(r=>r.sprite!=null&&r.sprite.name=="Fx_ElectricKick_01");
+                .Single(r=>r.name=="AuthoredCounterEffect");
             int facing=mirrored?-1:1;
             // Drawn electrical toe is (83,86), pivot (32,90 top-origin).
             Vector3 expected=state.transform.position+new Vector3(facing*51f/32f,4f/32f,0);
-            Assert.That(Vector3.Distance(kick.transform.position,expected),Is.LessThan(.001f));
+            Assert.That(Vector3.Distance(kick.transform.TransformPoint(new Vector3(51/32f,4/32f)),expected),Is.LessThan(.001f));
             Assert.That(beforeContact.Contains(expected),Is.True);
             Assert.That(state.GetComponent<SpriteRenderer>().sprite.name,Is.EqualTo("CounterKick_09"));
         }

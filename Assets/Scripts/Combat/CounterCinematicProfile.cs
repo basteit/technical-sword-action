@@ -50,7 +50,9 @@ public sealed class CounterCinematicProfile : ScriptableObject
         Finite(cameraOrthographicSize) && cameraOrthographicSize > 0 &&
         Finite(cameraFocusOffset.x) && Finite(cameraFocusOffset.y) && Finite(cameraBlendSeconds) && cameraBlendSeconds > 0 &&
         Transfer.TotalFrames == BlinkArrivalFrame && Transfer.TotalFrames + Kick.TotalFrames == endFrame &&
-        Valid(art.Find("Fx_ElectricKick")) && subjectLiftShader != null && glowMaterial != null;
+        Valid(art.Find("Fx_ElectricKick")) &&
+        (art.Find("CounterKickEffect")==null||Valid(art.Find("CounterKickEffect"))&&art.Find("CounterKickEffect").TotalFrames==Kick.TotalFrames) &&
+        subjectLiftShader != null && glowMaterial != null;
     public Sprite Sample(int frame) => frame < BlinkArrivalFrame ? Transfer.At(frame) : Kick.At(frame - BlinkArrivalFrame);
     private static bool Finite(float value) => float.IsFinite(value);
     private static bool Valid(VideoArtLibrary.Motion motion) => motion != null && motion.frames != null &&

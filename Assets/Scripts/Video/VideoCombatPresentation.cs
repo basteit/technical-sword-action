@@ -151,6 +151,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         flashRemaining=Mathf.Max(0,flashRemaining-realSeconds);
         if(flashRenderer!=null) { flashRenderer.color=new Color(flashTint.r,flashTint.g,flashTint.b,flashStrength*flashRemaining/Mathf.Max(.001f,flashDuration));flashRenderer.enabled=flashRemaining>0; }
         UpdateSpotlight();
+        bool showCounter=counter!=null&&counter.IsActive&&counter.HasAuthoredTransfer&&counter.ElapsedFrames>=counter.BlinkArrivalFrame&&playerVisual!=null&&playerVisual.enabled;
+        vfx.SampleCounterEffect(playerVisual,showCounter?counter.ElapsedFrames-counter.BlinkArrivalFrame:-1,showCounter);
         if(transitShadow!=null&&transitShadow.enabled&&counter!=null)
             transitShadow.transform.localPosition=new Vector3(0,shadowGroundY-counter.transform.position.y,0);
         if(charged&&dimAlpha>0&&playerVisual!=null)

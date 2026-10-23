@@ -1182,3 +1182,37 @@ MonoBehaviour:
     releaseFrame: 0
     landingFrame: 0
     recoveryFrame: 0
+  - name: CounterKickEffect
+    provisional: 0
+    includesSlashTrail: 0
+    includesCounterTrail: 0
+    counterContactOffset: {x: 0, y: 0}
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 5555ff73dcb4e4f458fe5f6608e490c5, type: 3}
+    - {fileID: 21300000, guid: cc37b33d806c1e84087519c5efdfed39, type: 3}
+    - {fileID: 21300000, guid: 36c3424973b83cb42bd140b771addd33, type: 3}
+    - {fileID: 21300000, guid: abacd811dd78a264e8850620c7e1861f, type: 3}
+    - {fileID: 21300000, guid: b7e5811df23474949af442cd80f94be6, type: 3}
+    - {fileID: 21300000, guid: 685ff1860d7c14344a26f19df5b9bff5, type: 3}
+    - {fileID: 21300000, guid: c3e22b6f9e813084db79c8c66e42209d, type: 3}
+    - {fileID: 21300000, guid: 5b48268da0fe589468d357fbf712a654, type: 3}
+    - {fileID: 21300000, guid: 95e47eafd8b35c149be51807f0947001, type: 3}
+    - {fileID: 21300000, guid: 3a79f99dd13ea9f4f9634dd4af1f89ba, type: 3}
+    - {fileID: 21300000, guid: ed5276561a8b41d45975af18c443730b, type: 3}
+    - {fileID: 21300000, guid: ae5fc52dfc4c126439e0a652added157, type: 3}
+    - {fileID: 21300000, guid: 710bf0fc883d0214d879784236037001, type: 3}
+    - {fileID: 21300000, guid: 696016b985f5845429c7e3145b99ef1a, type: 3}
+    - {fileID: 21300000, guid: 67b5a296e10b11f4a845b20128dd9c77, type: 3}
+    eyeFrames: []
+    durations: 020000000100000001000000010000000100000001000000010000000100000001000000040000000400000004000000040000000400000003000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0

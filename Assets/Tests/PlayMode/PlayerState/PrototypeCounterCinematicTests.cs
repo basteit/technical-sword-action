@@ -168,8 +168,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(1)] [TestCase(-1)]
         public void ImpactKeepsItsWorldContactAndFacingWhenPlayerMovesAndTurns(int direction)
         {
-            Begin(direction); ToFrame(21);
             var effects = player.GetComponent(T("VideoVfxRenderer"));
+            effects.GetType().GetProperty("UseAuthoredCounterEffect").SetValue(effects, false);
+            Begin(direction); ToFrame(21);
             var profile = Get<object>(counter, "CinematicProfile");
             var motion = Call(Get<object>(profile, "art"), "Find", "Fx_ElectricKick");
             var sprites = Get<Sprite[]>(motion, "frames");
@@ -183,6 +184,28 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(motor, "SetFacing", direction); Call(effects, "AdvanceVisuals", 0f);
             Assert.That(Vector3.Distance(impact.transform.position, contact), Is.LessThan(.0001f));
             Assert.That(Vector3.Distance(impact.transform.TransformPoint(local), expected), Is.LessThan(.0001f));
+        }
+
+        [TestCase(1)] [TestCase(-1)]
+        public void SeparateCounterEffectTracksTheDisplayedArtworkAndClearsOnReset(int direction)
+        {
+            Begin(direction); ToFrame(14);
+            var effects = player.GetComponent(T("VideoVfxRenderer"));
+            var drawing = Get<SpriteRenderer>(art, "Artwork");
+            var effect = effects.GetComponentsInChildren<SpriteRenderer>().Single(r => r.name == "AuthoredCounterEffect");
+            Assert.That(effect.sprite.name, Is.EqualTo("CounterKickEffect_02"));
+            Assert.That(Vector3.Distance(effect.transform.TransformPoint(new Vector3(.65f, .35f)), drawing.transform.TransformPoint(new Vector3(.65f, .35f))), Is.LessThan(.0001f));
+            Assert.That(effect.flipX, Is.EqualTo(drawing.flipX));
+            Assert.That(effect.sortingOrder, Is.EqualTo(1009), "Keep authored electricity visible above the dimmer and below the lifted actor.");
+            var sprite = effect.sprite; Static("SetPaused", true); Frames(60);
+            Assert.That(effect.sprite, Is.SameAs(sprite));
+            Static("SetPaused", false); ToFrame(21);
+            Assert.That(effect.sprite.name, Is.EqualTo("CounterKickEffect_09"));
+            sprite = effect.sprite; Frames(3);
+            Assert.That(effect.sprite, Is.SameAs(sprite));
+            Assert.That(effects.GetComponentsInChildren<SpriteRenderer>().Any(r => r.sprite != null && r.sprite.name.StartsWith("Fx_ElectricKick_")), Is.False);
+            Call(arena, "ResetActionsOnly"); Frames(6);
+            Assert.That(Get<int>(presentation, "ActiveEffectCount"), Is.Zero); AssertClean();
         }
 
         [TestCase(1, "Afterimage")] [TestCase(-1, "Afterimage")]

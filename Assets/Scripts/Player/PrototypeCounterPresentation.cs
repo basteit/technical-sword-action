@@ -117,6 +117,8 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         if (Profile == null || playerArt == null || playerArt.Artwork == null) return;
         playerArt.RefreshVisual(); var drawing = playerArt.Artwork;
         if (hidden) drawing.enabled = false;
+        effects?.SampleCounterEffect(drawing,counter.ElapsedFrames-Profile.BlinkArrivalFrame,
+            counter.IsActive&&counter.ElapsedFrames>=Profile.BlinkArrivalFrame&&drawing.enabled,VfxStrength);
         if (dimmer == null) return;
         float alpha = dimBlend * Profile.dimStrength * FlashStrength;
         dimmer.color = new Color(0, 0, 0, alpha); dimmer.enabled = alpha > 0;

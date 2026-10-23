@@ -74,7 +74,7 @@ public static class PrototypeCounterCinematicInstaller
         var art = AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(ArtPath);
         if (art == null) { art = ScriptableObject.CreateInstance<VideoArtLibrary>(); AssetDatabase.CreateAsset(art, ArtPath); }
         art.playerArtworkIsRough = source.playerArtworkIsRough; art.fourStageArtworkIsRough = source.fourStageArtworkIsRough;
-        art.motions = new[] { "CounterTransfer", "CounterKick", "Fx_ElectricKick" }.Select(name =>
+        art.motions = new[] { "CounterTransfer", "CounterKick", "Fx_ElectricKick", "CounterKickEffect" }.Where(name=>source.Find(name)!=null).Select(name =>
         {
             var motion = source.Find(name); if (motion == null) throw new InvalidOperationException("Missing counter source: " + name);
             return new VideoArtLibrary.Motion
@@ -129,7 +129,8 @@ public static class PrototypeCounterCinematicInstaller
         var errors = new List<string>();
         var profile = AssetDatabase.LoadAssetAtPath<CounterCinematicProfile>(ProfilePath);
         if (profile == null || !profile.IsValid) return new[] { "Missing/invalid prototype counter cinematic profile." };
-        if (AssetDatabase.GetAssetPath(profile.art) != ArtPath || profile.art.motions.Length != 3)
+        int expectedMotions=profile.art.Find("CounterKickEffect")!=null?4:3;
+        if (AssetDatabase.GetAssetPath(profile.art) != ArtPath || profile.art.motions.Length != expectedMotions)
             errors.Add("Prototype counter must use its own minimal art snapshot, not the full mutable filming library.");
         var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(ClipPath);
         var set = AssetDatabase.LoadAssetAtPath<PrototypePlayerArtSet>(PrototypePlayerArtInstaller.SetPath);

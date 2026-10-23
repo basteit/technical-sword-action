@@ -15,7 +15,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private static V Get<V>(object obj, string name) => (V)(obj.GetType().GetProperty(name)?.GetValue(obj) ?? obj.GetType().GetField(name).GetValue(obj));
         private static object Call(object obj, string method, params object[] args) => obj.GetType().GetMethod(method).Invoke(obj, args);
 
-        [Test] public void GameplaySnapshotHasExplicitVideoTimingAndOnlyThreeRequiredMotions()
+        [Test] public void GameplaySnapshotIncludesTheSynchronizedIndependentCounterEffect()
         {
             var profile = Profile; Assert.That(profile, Is.Not.Null); Assert.That(Get<bool>(profile, "IsValid"), Is.True);
             Assert.That(Get<int>(profile, "blinkStartFrame"), Is.EqualTo(10)); Assert.That(Get<int>(profile, "BlinkArrivalFrame"), Is.EqualTo(12));
@@ -27,7 +27,16 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<float>(profile, "cameraBlendSeconds"), Is.EqualTo(.1f));
             var art = Get<Object>(profile, "art"); Assert.That(AssetDatabase.GetAssetPath(art), Is.EqualTo(Folder + "CounterCinematicArt.asset"));
             var motions = Get<Array>(art, "motions").Cast<object>().ToArray();
-            Assert.That(motions.Select(m => Get<string>(m, "name")), Is.EquivalentTo(new[] { "CounterTransfer", "CounterKick", "Fx_ElectricKick" }));
+            Assert.That(motions.Select(m => Get<string>(m, "name")), Is.EquivalentTo(new[] { "CounterTransfer", "CounterKick", "Fx_ElectricKick", "CounterKickEffect" }));
+            var kick = Call(art, "Find", "CounterKick");
+            var effect = Call(art, "Find", "CounterKickEffect");
+            Assert.That(Get<int[]>(effect, "durations"), Is.EqualTo(Get<int[]>(kick, "durations")), "Both submissions must show the same cel during slow motion and hitstop.");
+            foreach (var sprite in Get<Sprite[]>(effect, "frames"))
+            {
+                Assert.That(sprite.rect.size, Is.EqualTo(new Vector2(256, 256)));
+                Assert.That(Vector2.Distance(sprite.pivot, new Vector2(121, 123)), Is.LessThan(.001f));
+                Assert.That(sprite.texture.filterMode, Is.EqualTo(FilterMode.Point));
+            }
             var video = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Settings/CombatVideoArt.asset");
             Assert.That(art, Is.Not.SameAs(video));
             foreach (var motion in motions)
