@@ -345,7 +345,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 2.4107144
+  orthographic size: 2.8125
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -1714,8 +1714,8 @@ MonoBehaviour:
   library: {fileID: 11400000, guid: 948efd1e09648894f8c35efd70bbd0fb, type: 2}
   chargeScale: 0.15
   chargeRealSeconds: 0.95
-  normalSize: 2.4107144
-  closeSize: 2.109375
+  normalSize: 2.8125
+  closeSize: 2.4107144
   adaptiveFocusHeight: 0
   slowDimStrength: 0.965
   heroLiftStrength: 0.6

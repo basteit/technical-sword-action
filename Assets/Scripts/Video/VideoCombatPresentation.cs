@@ -5,9 +5,9 @@ using UnityEngine;
 [DefaultExecutionOrder(11000)]
 public sealed class VideoCombatPresentation : MonoBehaviour
 {
-    // 1080p at 32 PPU: seven screen pixels per art pixel normally, eight in the close-up.
-    public const float DefaultNormalSize=1080f/(2*32*7);
-    public const float DefaultCloseSize=1080f/(2*32*8);
+    // 1080p at 32 PPU: six screen pixels per art pixel normally, seven in the close-up.
+    public const float DefaultNormalSize=1080f/(2*32*6);
+    public const float DefaultCloseSize=1080f/(2*32*7);
     [SerializeField] private Camera captureCamera;
     [SerializeField] private PlayerParryCounter2D counter;
     [SerializeField] private VideoVfxRenderer vfx;
@@ -115,7 +115,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     { ShakeDirectional(realSeconds,strength,new Vector2(1,.35f),3); }
     public void SetCameraFrame(Vector3 position,float size)
     {
-        restPosition=position;normalSize=Mathf.Max(.5f,size);closeSize=normalSize*(7f/8f);
+        restPosition=position;normalSize=Mathf.Max(.5f,size);closeSize=normalSize*(6f/7f);
         if(zoom==0&&captureCamera!=null)
         { captureCamera.transform.position=restPosition;captureCamera.orthographicSize=normalSize; }
     }
