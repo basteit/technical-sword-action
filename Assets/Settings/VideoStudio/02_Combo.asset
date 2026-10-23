@@ -17,7 +17,7 @@ MonoBehaviour:
   playerPosition: {x: 0, y: 1}
   faceLeft: 0
   followCamera: 1
-  cameraSize: 2.109375
+  cameraSize: 2.4107144
   cameraCenter: {x: 0, y: 1.05}
   enemies:
   - prefab: {fileID: 0}

@@ -21,7 +21,7 @@ public sealed class CombatVideoStudio : MonoBehaviour, ICombatTickListener
     [SerializeField] private Vector2 playerHome = Vector2.up;
     [SerializeField] private bool faceLeft;
     [SerializeField] private bool followCamera = true;
-    [SerializeField] private float cameraSize = 2.109375f;
+    [SerializeField] private float cameraSize = VideoCombatPresentation.DefaultNormalSize;
     [SerializeField] private Vector2 fixedCameraCenter = new Vector2(0, 1.05f);
     [SerializeField] private bool showDiagnostics;
     private CombatTimeController clock;

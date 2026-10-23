@@ -2571,7 +2571,7 @@ MonoBehaviour:
   playerHome: {x: 0, y: 1}
   faceLeft: 0
   followCamera: 1
-  cameraSize: 2.109375
+  cameraSize: 2.4107144
   fixedCameraCenter: {x: 0, y: 1.05}
   showDiagnostics: 0
   nextEnemyId: 1
@@ -3482,7 +3482,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 2.109375
+  orthographic size: 2.4107144
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -4523,8 +4523,8 @@ MonoBehaviour:
   library: {fileID: 11400000, guid: 948efd1e09648894f8c35efd70bbd0fb, type: 2}
   chargeScale: 0.15
   chargeRealSeconds: 0.95
-  normalSize: 2.109375
-  closeSize: 1.6875
+  normalSize: 2.4107144
+  closeSize: 2.109375
   adaptiveFocusHeight: 1
   slowDimStrength: 0.965
   heroLiftStrength: 0.6

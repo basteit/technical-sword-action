@@ -5,6 +5,9 @@ using UnityEngine;
 [DefaultExecutionOrder(11000)]
 public sealed class VideoCombatPresentation : MonoBehaviour
 {
+    // 1080p at 32 PPU: seven screen pixels per art pixel normally, eight in the close-up.
+    public const float DefaultNormalSize=1080f/(2*32*7);
+    public const float DefaultCloseSize=1080f/(2*32*8);
     [SerializeField] private Camera captureCamera;
     [SerializeField] private PlayerParryCounter2D counter;
     [SerializeField] private VideoVfxRenderer vfx;
@@ -13,8 +16,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField, Range(.1f,1f)] private float chargeScale=.15f;
     // Eight preparation ticks at .15 speed, with a small real-time lease margin.
     [SerializeField, Range(.5f,1f)] private float chargeRealSeconds=.95f;
-    [SerializeField] private float normalSize=2.109375f;
-    [SerializeField] private float closeSize=1.6875f;
+    [SerializeField] private float normalSize=DefaultNormalSize;
+    [SerializeField] private float closeSize=DefaultCloseSize;
     [SerializeField] private bool adaptiveFocusHeight;
     [SerializeField,Range(0,1)] private float slowDimStrength=.965f;
     [SerializeField,Range(0,1)] private float heroLiftStrength=.6f;
@@ -112,7 +115,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     { ShakeDirectional(realSeconds,strength,new Vector2(1,.35f),3); }
     public void SetCameraFrame(Vector3 position,float size)
     {
-        restPosition=position;normalSize=Mathf.Max(.5f,size);closeSize=normalSize*.8f;
+        restPosition=position;normalSize=Mathf.Max(.5f,size);closeSize=normalSize*(7f/8f);
         if(zoom==0&&captureCamera!=null)
         { captureCamera.transform.position=restPosition;captureCamera.orthographicSize=normalSize; }
     }

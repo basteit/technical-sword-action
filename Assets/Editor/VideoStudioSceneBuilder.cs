@@ -47,7 +47,7 @@ public static class VideoStudioSceneBuilder
         player.name="02_Player";
         player.AddComponent<PlayerHeal2D>();
         var camera=new GameObject("03_StudioCamera",typeof(Camera)).GetComponent<Camera>(); camera.tag="MainCamera";
-        camera.orthographic=true; camera.orthographicSize=2.109375f; camera.transform.position=new Vector3(0,1.05f,-10);
+        camera.orthographic=true; camera.orthographicSize=VideoCombatPresentation.DefaultNormalSize; camera.transform.position=new Vector3(0,1.05f,-10);
         camera.backgroundColor=new Color(.98f,.985f,.99f); camera.clearFlags=CameraClearFlags.SolidColor;
         var effects=new GameObject("04_Effects");
         var vfx=effects.AddComponent<VideoVfxRenderer>(); Set(vfx,"library",library);

@@ -66,7 +66,7 @@ public static class CombatVideoSceneBuilder
         cameraObject.tag = "MainCamera";
         cameraObject.transform.position = new Vector3(0, 1.05f, -10);
         var camera = cameraObject.GetComponent<Camera>();
-        camera.orthographic = true; camera.orthographicSize = 2.109375f;
+        camera.orthographic = true; camera.orthographicSize = VideoCombatPresentation.DefaultNormalSize;
         camera.backgroundColor = new Color(.98f,.985f,.99f);
         var actor = CreatePlayer(library, ground, enemy, playerLayer, defenseCancel);
         var counter = actor.GetComponent<PlayerParryCounter2D>();

@@ -38,7 +38,7 @@ public sealed class StudioPreset : ScriptableObject
     public Vector2 playerPosition = Vector2.up;
     public bool faceLeft;
     public bool followCamera = true;
-    public float cameraSize = 2.109375f;
+    public float cameraSize = VideoCombatPresentation.DefaultNormalSize;
     public Vector2 cameraCenter = new Vector2(0,1.05f);
     public StudioEnemySetup[] enemies = Array.Empty<StudioEnemySetup>();
     public StudioGimmickSetup[] gimmicks = Array.Empty<StudioGimmickSetup>();
