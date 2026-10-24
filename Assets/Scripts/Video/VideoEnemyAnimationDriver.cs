@@ -23,13 +23,14 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     private long deathContactTick=-1;
     private Vector3 deathContactPosition;
     private Quaternion deathContactRotation;
-    private bool deathFacingLeft,defeatSlide;
+    private bool deathFacingLeft;
     private const int DefeatFrames=39;
+    private const int DefeatKnockbackFrames=18;
+    public const float DefaultSwordDefeatDistance=.4f;
     private int restSortingOrder;
     public bool IsHitBacking=>hitbackFrames>0&&hitbackFrame<hitbackFrames;
     public float LastHitbackDistance {get;private set;}
     public bool IsLaunched=>IsHitBacking&&launchHeight>0;
-    public bool IsDefeatSliding=>IsHitBacking&&defeatSlide;
     public float LastLaunchHeight {get;private set;}
     public string MotionName=>motion;
     public int CombatTickOrder=>320;
@@ -53,6 +54,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     }
     private float PlaybackSpeed(string name)
     {
+        if(name=="Parried"||name=="Death") return 0;
         var clip=library!=null?library.Find("Enemy_"+name):null;
         return name=="Windup"&&clip!=null&&ai!=null&&ai.WindupDuration>0?
             clip.TotalFrames*CombatTimeController.StepSeconds/ai.WindupDuration:1f;
@@ -64,10 +66,11 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     }
     private void OnDeath(Damageable2D source,Vector2 direction)
     {
-        // Keep the body at the actual contact during hitstop. Collapsing immediately
-        // moves the head away from the heel before the viewer can read the hit.
-        deathContactSprite=visual.sprite;deathContactTick=CombatTimeController.TickCount;
-        deathContactPosition=visual.transform.localPosition;deathContactRotation=visual.transform.localRotation;
+        // Use the same authored reaction from contact onward. Animator evaluation may
+        // temporarily restore its old cel before this event, so do not capture that cel.
+        deathContactSprite=library?.Find("Enemy_Death")?.At(0)??visual.sprite;
+        deathContactTick=CombatTimeController.TickCount;
+        deathContactPosition=restPosition+Vector3.down*(2f/32);deathContactRotation=Quaternion.identity;
         deathFacingLeft=player!=null?player.position.x<transform.position.x:direction.x>0;
         visual.flipX=deathFacingLeft;
         Play("Death");RestoreDeathContact();
@@ -76,7 +79,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     private void OnReset(Damageable2D source)
     {
         hitbackFrame=hitbackFrames=0;hitbackStartTick=-1;LastHitbackDistance=launchHeight=LastLaunchHeight=0;
-        deathContactSprite=null;deathContactTick=-1;defeatSlide=false;deathFacingLeft=false;
+        deathContactSprite=null;deathContactTick=-1;deathFacingLeft=false;
         visual.sortingOrder=restSortingOrder;
         visual.transform.localPosition=restPosition;visual.transform.localRotation=Quaternion.identity;visual.color=Color.white;
         if(animator!=null) animator.Rebind();Play("Idle");
@@ -102,22 +105,22 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
         hitbackDirection=direction.sqrMagnitude>0?direction.normalized:Vector2.right;
         hitbackFrame=0;hitbackFrames=Mathf.Max(1,frames);hitbackStartTick=CombatTimeController.TickCount;LastHitbackDistance=hitbackDistance;
         launchHeight=LastLaunchHeight=0;if(deathContactTick!=CombatTimeController.TickCount)visual.transform.localRotation=Quaternion.identity;
-        defeatSlide=false;
     }
     public void ApplySwordHitback(int step,Vector2 direction)
     {
         step=Mathf.Clamp(step,1,4);float distance=new[]{.10f,.18f,.30f,.58f}[step-1];int frames=6+step;
-        // Match the original contact velocity, then keep sliding through the fade.
-        if(!health.IsAlive) ApplyDefeatSlide(distance*2/frames*DefeatFrames/1.2f,direction);
+        // Retain the first enemy's small hop, with a little more backward travel.
+        if(!health.IsAlive) ApplyDefeatKnockback(distance+.22f,.12f,direction);
         else ApplyHitback(distance,frames,direction);
     }
-    public void ApplyDefeatSlide(float distance,Vector2 direction)
+    public void ApplyDefeatKnockback(float distance,float height,Vector2 direction)
     {
-        ApplyHitback(distance,DefeatFrames,new Vector2(direction.x<0?-1:1,0));
-        defeatSlide=true;
+        ApplyLaunch(distance,height,DefeatKnockbackFrames,new Vector2(direction.x<0?-1:1,0));
     }
     public void CombatTickTimers()
     {
+        // Animator evaluation runs after CombatTick; keep both reactions on the down cel.
+        if(motion=="Parried"||motion=="Death") Show();
         if(deathContactSprite==null) return;
         if(CombatTimeController.TickCount==deathContactTick) RestoreDeathContact();
         else { deathContactSprite=null;deathContactTick=-1; }
@@ -139,7 +142,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
         if(!IsHitBacking||CombatTimeController.TickCount<=hitbackStartTick) return;
         hitbackFrame++;
         float t=hitbackFrame/(float)hitbackFrames;
-        float travel=defeatSlide?t*(1.2f-.2f*t):launchHeight>0?1-Mathf.Pow(1-t,3):1-(1-t)*(1-t);
+        float travel=launchHeight>0?1-Mathf.Pow(1-t,3):1-(1-t)*(1-t);
         Vector2 desired=(Vector2)hitbackOrigin+hitbackDirection*hitbackDistance*travel+Vector2.up*launchHeight*Mathf.Sin(t*Mathf.PI);
         Vector2 delta=desired-(Vector2)transform.position;
         if(bodyCollider!=null&&hitbackObstacles.value!=0&&delta.sqrMagnitude>.000001f)
@@ -150,26 +153,29 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
                 delta=delta.normalized*Mathf.Max(0,hit.distance-.01f);
         }
         transform.position+=(Vector3)delta;
-        if(launchHeight>0) visual.transform.localRotation=Quaternion.Euler(0,0,-hitbackDirection.x*95*Mathf.Sin(t*Mathf.PI*.8f));
     }
     private void Show()
     {
         if(library==null || visual==null) return;
-        var clip=library.Find("Enemy_"+motion);
-        if(clip!=null&&(animator==null||animator.runtimeAnimatorController==null)) visual.sprite=clip.At(Mathf.FloorToInt(elapsed*PlaybackSpeed(motion)),motion=="Idle"||motion=="Move");
-        if(motion=="Parried")
+        bool heldReaction=motion=="Parried"||motion=="Death";
+        var clip=library.Find("Enemy_"+(heldReaction?"Death":motion));
+        if(clip!=null&&(heldReaction||animator==null||animator.runtimeAnimatorController==null))
+            visual.sprite=clip.At(heldReaction?0:Mathf.FloorToInt(elapsed*PlaybackSpeed(motion)),motion=="Idle"||motion=="Move");
+        if(heldReaction)
         {
-            // The authored chance cel carries the stagger; do not interpolate the body.
+            if(motion=="Death"&&deathContactTick==CombatTimeController.TickCount){RestoreDeathContact();return;}
+            // The submitted down cel's lowest pixel is two pixels above idle/chance.
+            visual.transform.localPosition=restPosition+Vector3.down*(2f/32);
+            visual.transform.localRotation=Quaternion.identity;
+        }
+        else
+        {
             visual.transform.localPosition=restPosition;visual.transform.localRotation=Quaternion.identity;
         }
         if(motion=="Death")
         {
-            if(deathContactTick==CombatTimeController.TickCount){RestoreDeathContact();return;}
             float t=Mathf.Clamp01(elapsed/(float)DefeatFrames);
-            // The submitted down cel's lowest pixel is two pixels above idle/chance.
-            // Plant that cel on the same floor and face the attacker throughout the slide.
-            visual.transform.localPosition=restPosition+Vector3.down*(2f/32);
-            visual.transform.localRotation=Quaternion.identity;visual.flipX=deathFacingLeft;
+            visual.flipX=deathFacingLeft;
             visual.color=new Color(1,1,1,1-Mathf.Clamp01((t-.6f)/.4f));
         }
     }
@@ -178,7 +184,6 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
         if(animator!=null)animator.speed=1;
         hitbackFrame=hitbackFrames=0;hitbackStartTick=-1;launchHeight=0;
         if(visual!=null){visual.transform.localRotation=Quaternion.identity;visual.transform.localPosition=restPosition;visual.sortingOrder=restSortingOrder;}
-        defeatSlide=false;
         if(health!=null) { health.HitReceived-=OnHit;health.Parried-=OnParried;health.Died-=OnDeath;health.ResetPerformed-=OnReset; }
         if(ai!=null) ai.AttackStarted-=OnAttack;CombatTimeController.Unregister(this);CombatTimeController.UnregisterAnimator(animator,this);
     }

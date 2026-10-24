@@ -101,7 +101,9 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     }
     private void OnKick(Damageable2D target,Vector2 point)
     {
-        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyDefeatSlide(counter.AttacksFromBehind?3.2f:counter.IsOverheadHeelDrop?1.4f:defenseCancelTake?1.75f:2.25f,Vector2.right*counter.KickFacingSign);
+        var first=frontEnemy.GetComponent<VideoEnemyAnimationDriver>();
+        float firstDistance=!frontEnemy.IsAlive&&first!=null?first.LastHitbackDistance:VideoEnemyAnimationDriver.DefaultSwordDefeatDistance;
+        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyDefeatKnockback(firstDistance*2,.18f,Vector2.right*counter.KickFacingSign);
         MarkEvent("Kick",target);
     }
     private void OnCharge()=>MarkEvent("ChargeStart",counter.SelectedTarget);
