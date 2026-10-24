@@ -2,7 +2,7 @@
 
 自由操作で敵・足場・アクションを試し、SNS用の静止画／動画を撮る場合は[撮影スタジオの使い方](studio-guide.md)へ。以下は決まったシナリオを全フレーム収録する手順。
 
-2026-10-24最新：[固定被弾ポーズで浮いて止まるノックバック](enemy-knockback-arc-20261024.md)。1体目は後方0.40/上昇0.12unit、2体目は後方0.80/上昇0.18unit、どちらも18戦闘Fで着地して停止→消滅する。パリィ後も撃破時と同じdownコマを固定。通常ortho3.375/タメ2.8125/命中最小2.64375、強い揺れ、4F/Just5F・キック10F停止と0.900秒タメを保持。下記の初期ラフの表より最新記録を優先する。[距離と停止時間](mid-camera-hitstop-20261024.md) / [前版の距離比較](counter-revision-and-camera-comparison-20261024.md)。`CaptureAtDistance(normalSize,closeSize)` で一時比較でき、収録中の背景/床補完と比較距離は終了時に戻す。
+2026-10-24最新：[後方2倍・上昇1.5倍のノックバック](enemy-knockback-boost-20261024.md)。1体目は後方0.80/上昇0.18unit、2体目は後方1.60/上昇0.27unit、どちらも18戦闘Fで着地して停止→消滅する。パリィ後も撃破時と同じdownコマを固定。通常ortho3.375/タメ2.8125/命中最小2.64375、強い揺れ、4F/Just5F・キック10F停止と0.900秒タメを保持。下記の初期ラフの表より最新記録を優先する。[距離と停止時間](mid-camera-hitstop-20261024.md) / [前版の距離比較](counter-revision-and-camera-comparison-20261024.md)。`CaptureAtDistance(normalSize,closeSize)` で一時比較でき、収録中の背景/床補完と比較距離は終了時に戻す。
 
 作業場所は `C:\Users\hirot\GitHub\technical-sword-action`。Unity 6000.3.9f1、uloop CLI 2.1.3、Aseprite 1.3.18.6で確認した。音声は録画・書き出しに含めない。
 

@@ -103,7 +103,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     {
         var first=frontEnemy.GetComponent<VideoEnemyAnimationDriver>();
         float firstDistance=!frontEnemy.IsAlive&&first!=null?first.LastHitbackDistance:VideoEnemyAnimationDriver.DefaultSwordDefeatDistance;
-        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyDefeatKnockback(firstDistance*2,.18f,Vector2.right*counter.KickFacingSign);
+        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyDefeatKnockback(firstDistance*2,.27f,Vector2.right*counter.KickFacingSign);
         MarkEvent("Kick",target);
     }
     private void OnCharge()=>MarkEvent("ChargeStart",counter.SelectedTarget);

@@ -879,7 +879,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 }
             }
             Assert.That(hits,Is.EqualTo(4));Assert.That(Get<int>(rear,"HitCount"),Is.EqualTo(1));
-            Assert.That((enemy.transform.position.x-originX)*(mirrored?-1:1),Is.InRange(1.36f,1.40f));
+            Assert.That((enemy.transform.position.x-originX)*(mirrored?-1:1),Is.InRange(2.16f,2.20f));
         }
         [TestCase(2,false,60)] [TestCase(4,true,60)] [TestCase(4,false,30)] [TestCase(4,true,120)]
         public void AuthoredTransferPrecedesTwoTickRearBlinkAndRevealsTheSubmittedKick(int stages,bool mirrored,int fps)
@@ -990,7 +990,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for(int i=0;i<16;i++) Step();
             Vector3 airborne=enemy.transform.position;var visual=enemy.GetComponentInChildren<SpriteRenderer>();Quaternion rotation=visual.transform.localRotation;
             double real=Get<double>(director,"RealElapsed");
-            Assert.That(airborne.y-origin.y,Is.InRange(.14f,.18f));Assert.That(Mathf.Abs(airborne.x-origin.x),Is.GreaterThan(.4f));
+            Assert.That(airborne.y-origin.y,Is.InRange(.21f,.27f));Assert.That(Mathf.Abs(airborne.x-origin.x),Is.GreaterThan(.4f));
             Assert.That(rotation,Is.EqualTo(Quaternion.identity));Assert.That(visual.flipX,Is.EqualTo(!mirrored));
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});for(int i=0;i<60;i++) Step();
             Assert.That(enemy.transform.position,Is.EqualTo(airborne));Assert.That(enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation,Is.EqualTo(rotation));
@@ -1055,10 +1055,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 }
                 Assert.That(Get<bool>(director,"Completed"),Is.True);Assert.That(began,Is.All.True);
                 Assert.That(stopped,Is.All.True);Assert.That(stoppedFade,Is.All.GreaterThan(5));
-                Assert.That(peakHeight[0],Is.InRange(.11f,.13f));Assert.That(peakHeight[1],Is.InRange(.17f,.19f));
+                Assert.That(peakHeight[0],Is.InRange(.17f,.19f));Assert.That(peakHeight[1],Is.InRange(.26f,.28f));
                 float firstDistance=(endpoints[0].x-origins[0].x)*(mirrored?-1:1);
                 float secondDistance=(endpoints[1].x-origins[1].x)*(mirrored?-1:1);
-                Assert.That(firstDistance,Is.EqualTo(.4f).Within(.001f));
+                Assert.That(firstDistance,Is.EqualTo(.8f).Within(.001f));
                 Assert.That(secondDistance,Is.EqualTo(firstDistance*2).Within(.001f));
                 Assert.That(Get<int>(enemies[0],"HitCount"),Is.EqualTo(2));Assert.That(Get<int>(enemies[1],"HitCount"),Is.EqualTo(1));
                 Assert.That(Get<string>(Marks().Single(m=>Get<string>(m,"kind")=="Kick"),"target"),Is.EqualTo(Get<string>(enemies[1],"IndividualId")));

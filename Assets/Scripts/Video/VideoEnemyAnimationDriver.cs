@@ -26,7 +26,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     private bool deathFacingLeft;
     private const int DefeatFrames=39;
     private const int DefeatKnockbackFrames=18;
-    public const float DefaultSwordDefeatDistance=.4f;
+    public const float DefaultSwordDefeatDistance=.8f;
     private int restSortingOrder;
     public bool IsHitBacking=>hitbackFrames>0&&hitbackFrame<hitbackFrames;
     public float LastHitbackDistance {get;private set;}
@@ -109,8 +109,8 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     public void ApplySwordHitback(int step,Vector2 direction)
     {
         step=Mathf.Clamp(step,1,4);float distance=new[]{.10f,.18f,.30f,.58f}[step-1];int frames=6+step;
-        // Retain the first enemy's small hop, with a little more backward travel.
-        if(!health.IsAlive) ApplyDefeatKnockback(distance+.22f,.12f,direction);
+        // Double backward travel and increase the held-pose hop height by 50%.
+        if(!health.IsAlive) ApplyDefeatKnockback((distance+.22f)*2,.18f,direction);
         else ApplyHitback(distance,frames,direction);
     }
     public void ApplyDefeatKnockback(float distance,float height,Vector2 direction)

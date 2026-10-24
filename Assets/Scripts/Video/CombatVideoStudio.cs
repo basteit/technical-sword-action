@@ -300,7 +300,7 @@ public sealed class CombatVideoStudio : MonoBehaviour, ICombatTickListener
     }
     private void OnKick(Damageable2D target,Vector2 point)
     {
-        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyDefeatKnockback(VideoEnemyAnimationDriver.DefaultSwordDefeatDistance*2,.18f,Vector2.right*counter.KickFacingSign);
+        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyDefeatKnockback(VideoEnemyAnimationDriver.DefaultSwordDefeatDistance*2,.27f,Vector2.right*counter.KickFacingSign);
         LastEvent="反撃: "+target.IndividualId;
     }
     private void OnDeath(Damageable2D target,Vector2 direction) => vfx.EmitFollowing("Vanish",target.transform,Vector2.down*.2f,.6f,.18f);
