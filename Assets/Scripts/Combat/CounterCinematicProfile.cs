@@ -26,7 +26,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Range(0, 1)] public float heroLiftStrength = .6f;
     [Min(.001f)] public float dimFadeSeconds = 3f / 60f;
     [Header("Gameplay camera close-up")]
-    [Min(.01f)] public float cameraOrthographicSize = 2.8125f;
+    [Min(.01f)] public float cameraOrthographicSize = 3.75f;
     public Vector2 cameraFocusOffset = new Vector2(.45f, .4f);
     [Min(.001f)] public float cameraBlendSeconds = .1f;
     [Min(0)] public float launchDistance = 3.2f;

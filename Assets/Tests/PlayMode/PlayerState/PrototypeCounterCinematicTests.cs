@@ -273,7 +273,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Set(Get<object>(feedback, "Settings"), "shake", 1f);
             var camera = Camera.main; Vector3 original = camera.transform.position;
             var target = Begin(); ToFrame(14);
-            Assert.That(camera.orthographicSize, Is.EqualTo(2.8125f).Within(.00001f));
+            Assert.That(camera.orthographicSize, Is.EqualTo(3.75f).Within(.00001f));
             Set(Get<object>(feedback, "Settings"), "shake", 0f); Frames(1);
             Assert.That(camera.orthographicSize, Is.EqualTo(5.625f));
             Assert.That(Vector3.Distance(camera.transform.position, original), Is.LessThan(.0001f));
