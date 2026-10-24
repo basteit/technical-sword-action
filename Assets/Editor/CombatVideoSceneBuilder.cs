@@ -130,11 +130,14 @@ public static class CombatVideoSceneBuilder
     {
         var submitted=library.Find("CounterKick");var kick=submitted??library.Find("AirRoundhouse");
         int transfer=submitted!=null?(library.Find("CounterTransfer")?.TotalFrames??0):0;
+        // Filming-only hold: one extra slow tick on the final tucked cel, then the
+        // original one-tick release. Shared source/prototype art timing stays intact.
+        int hold=submitted!=null?1:0;
         Set(counter,"airborneKick",true);Set(counter,"invincibleDuringKick",true);
-        Set(counter,"hitFrame",transfer+kick.hitFrame);Set(counter,"chargeFrame",transfer+kick.chargeFrame);
-        Set(counter,"endFrame",transfer+(kick.recoveryFrame>0?kick.recoveryFrame:kick.TotalFrames));
-        Set(counter,"chargeReleaseFrame",transfer+(kick.releaseFrame>0?kick.releaseFrame:24));
-        Set(counter,"landingFrame",transfer+(kick.landingFrame>0?kick.landingFrame:36));
+        Set(counter,"hitFrame",transfer+kick.hitFrame+hold);Set(counter,"chargeFrame",transfer+kick.chargeFrame);
+        Set(counter,"endFrame",transfer+(kick.recoveryFrame>0?kick.recoveryFrame:kick.TotalFrames)+hold);
+        Set(counter,"chargeReleaseFrame",transfer+(kick.releaseFrame>0?kick.releaseFrame:24)+hold);
+        Set(counter,"landingFrame",transfer+(kick.landingFrame>0?kick.landingFrame:36)+hold);
         Set(counter,"radius",.5f);Set(counter,"maxApproach",1.2f);Set(counter,"landingRollDistance",0f);
         Set(counter,"blinkApproach",true);Set(counter,"blinkTravelFrames",2);
         Set(counter,"blinkStartFrame",Mathf.Max(0,transfer-2));Set(counter,"behindTarget",submitted!=null);
@@ -193,7 +196,7 @@ public static class CombatVideoSceneBuilder
         Set(director,"frontStart",SequentialFrontStart);Set(director,"rearStart",SequentialRearStart);
         Set(director,"useSpacingApproaches",false);
         Set(director,"rearEntranceEnabled",true);Set(director,"twoStageRightShift",1f);
-        Set(director,"rearEntranceDistance",1.6f);Set(director,"rearEntranceSpeed",2.4f);Set(director,"rearEntranceReach",1.6f);
+        Set(director,"rearEntranceDistance",1.6f);Set(director,"rearEntranceSpeed",3.6f);Set(director,"rearEntranceReach",1.6f);
         director.Player.transform.position=director.InitialPlayerPosition;
         director.FrontEnemy.transform.position=director.InitialFrontPosition;
         director.RearEnemy.transform.position=director.InitialRearPosition;

@@ -71,11 +71,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>((Component)Get<object>(director,"FrontEnemy"),"HitCount"),Is.EqualTo(2));
             Assert.That(Get<int>((Component)Get<object>(director,"RearEnemy"),"HitCount"),Is.EqualTo(1));
             Assert.That(Get<double>(director,"RealElapsed"),Is.InRange(3d,6d));
-            Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.85f,.94f));
+            Assert.That(Get<float>(presentation,"ChargeRealElapsed"),Is.InRange(.98f,1.05f));
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
         [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
-        public void RearEnemyWalksInAfterTheFirstSlashAndAttacksAfterTheFrontKillWithSafeFraming(int fps,bool mirrored)
+        public void RearEnemyApproachesFromTheOpeningAndOverlapsItsFullAttackWithTheFrontCombo(int fps,bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
             Assert.That(Get<bool>(director,"UsesRearEntrance"),Is.True);
@@ -101,11 +101,14 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(walked&&framed&&Get<bool>(director,"Completed"),Is.True);
             var marks=Marks().ToArray();
             object Mark(string kind,string target=null)=>marks.Single(m=>Get<string>(m,"kind")==kind&&(target==null||Get<string>(m,"target")==target));
-            Assert.That(Get<long>(Mark("RearApproach"),"tick"),Is.GreaterThan(Get<long>(Mark("Slash1"),"tick")));
+            Assert.That(Get<long>(Mark("RearApproach"),"tick"),Is.LessThan(Get<long>(Mark("Slash1"),"tick")));
             Assert.That(Get<long>(Mark("RearApproach"),"tick"),Is.LessThan(Get<long>(Mark("Death","Enemy_A"),"tick")));
-            Assert.That(Get<long>(Mark("RearWindup"),"tick"),Is.GreaterThan(Get<long>(Mark("Death","Enemy_A"),"tick")));
+            Assert.That(Get<long>(Mark("RearWindup"),"tick"),Is.LessThan(Get<long>(Mark("Death","Enemy_A"),"tick")));
             Assert.That(Get<long>(Mark("Parry"),"tick"),Is.GreaterThan(Get<long>(Mark("RearWindup"),"tick")));
             Assert.That(Get<string>(Mark("Kick"),"target"),Is.EqualTo(Get<string>(Mark("Parry"),"target")));
+            Assert.That(Get<double>(Mark("RearWindup"),"realSeconds"),Is.InRange(.4d,.7d));
+            Assert.That(Get<double>(Mark("Parry"),"realSeconds"),Is.InRange(2.05d,2.3d));
+            Assert.That(Get<double>(Mark("Parry"),"realSeconds")-Get<double>(Mark("Death","Enemy_A"),"realSeconds"),Is.LessThan(1.3d));
         }
         [TestCase(false)] [TestCase(true)]
         public void SubmittedEnemyShowsTheCompleteStartupFlashAndLungeBeforeTheParryContact(bool mirrored)
@@ -137,7 +140,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(parryTick-(firstPeak-origin),Is.GreaterThanOrEqualTo(6));
             Assert.That(Get<string>(parry,"target"),Is.EqualTo("Enemy_B"));
             var windup=Marks().Single(m=>Get<string>(m,"kind")=="RearWindup");
-            Assert.That(Get<double>(parry,"realSeconds")-Get<double>(windup,"realSeconds"),Is.InRange(1.5d,1.65d));
+            Assert.That(parryTick-Get<long>(windup,"tick"),Is.EqualTo(95),"Keep the full 96-tick attack, including its first pose.");
+            Assert.That(Get<double>(parry,"realSeconds")-Get<double>(windup,"realSeconds"),Is.InRange(1.58d,1.7d));
         }
         [TestCase(false)] [TestCase(true)]
         public void ResetDuringTheRearWalkRestoresAiSettingsPositionsAndPause(bool mirrored)
@@ -175,8 +179,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 exposure.TryGetValue(pose,out double seconds);exposure[pose]=seconds+1d/fps;
             }
             Assert.That(Get<bool>(counter,"HasReleasedCharge"),Is.True);
-            Assert.That(exposure.Count,Is.EqualTo(7),"The first three supplied cels must be readable too.");
-            int[] ticks={2,1,1,1,1,1,1};
+            Assert.That(exposure.Count,Is.EqualTo(8),"Include the final tucked cel before release.");
+            int[] ticks={2,1,1,1,1,1,1,1};
             // Sprite sampling crosses the fixed 60Hz Animator update as well as the render frame.
             double tolerance=Math.Max(1d/fps,1d/60)+.001d;
             for(int i=0;i<ticks.Length;i++)
@@ -230,8 +234,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     release=true;
                     // A 30fps render can observe the impact after advancing two combat frames.
                     int releaseFrame=Get<int>(counter,"ElapsedFrames");
-                    Assert.That(releaseFrame,Is.InRange(20,21));
-                    Assert.That(visual.sprite.name,Is.EqualTo(releaseFrame==20?"CounterKick_08":"CounterKick_09"),"The last tucked cel releases into the newly drawn contact cel.");
+                    Assert.That(releaseFrame,Is.InRange(21,22));
+                    Assert.That(visual.sprite.name,Is.EqualTo(releaseFrame==21?"CounterKick_08":"CounterKick_09"),"The held last tucked cel releases into the contact cel.");
                 }
                 if(Get<int>(counter,"HitCount")>previousHits)
                 {

@@ -16,7 +16,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     [SerializeField] private bool rearEntranceEnabled;
     [SerializeField] private float twoStageRightShift=1f;
     [SerializeField] private float rearEntranceDistance=1.6f;
-    [SerializeField] private float rearEntranceSpeed=2.4f;
+    [SerializeField] private float rearEntranceSpeed=3.6f;
     [SerializeField] private float rearEntranceReach=1.6f;
     [SerializeField] private VideoCombatPresentation presentation;
     [SerializeField] private VideoVfxRenderer vfx;
@@ -189,7 +189,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         if(attack.IsAttacking && attack.ComboStep<comboStages && attack.IsComboWindowOpen && queuedStep!=attack.ComboStep)
         { queuedStep=attack.ComboStep;attack.RequestAttack(); }
         var ai=rearEnemy.GetComponent<EnemyMeleeChaser2D>();
-        if(UsesRearEntrance&&frontEnemy.HitCount>0&&!rearStarted)
+        if(UsesRearEntrance&&!rearStarted)
         {
             var startup=player.GetComponent<VideoPlayerAnimationDriver>().Art.Find("Enemy_Windup");
             float windup=startup!=null?startup.TotalFrames*CombatTimeController.StepSeconds:.5f;

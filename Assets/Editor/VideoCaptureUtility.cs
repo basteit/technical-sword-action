@@ -51,7 +51,7 @@ public static class VideoCaptureUtility
                 Check(!presentation.IsSpotlightVisible&&!presentation.AreEyesVisible,"Subject lift or eye light remained.");
                 Check(presentation.IsPlayerBodyVisible&&!presentation.IsTransitShadowVisible,"Blink visibility remained.");
                 Check(fx.ActiveCount==0,"VFX remained active.");
-                Check(presentation.ChargeRealElapsed>=.85f&&presentation.ChargeRealElapsed<=.94f,"Preparation duration outside .85–.94 seconds.");
+                Check(presentation.ChargeRealElapsed>=.98f&&presentation.ChargeRealElapsed<=1.05f,"Preparation duration outside .98–1.05 seconds.");
                 records.Add(new RunRecord{stages=stages,mirrored=mirrored,duration=director.RealElapsed,frontHits=director.FrontEnemy.HitCount,rearHits=director.RearEnemy.HitCount,chargeSeconds=presentation.ChargeRealElapsed});
                 director.ResetTake(stages);
                 Check(presentation.DimAlpha==0&&!presentation.IsDimVisible,"Slow dim overlay not reset.");

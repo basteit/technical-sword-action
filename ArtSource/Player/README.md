@@ -2,7 +2,9 @@
 
 [素材一覧を開く](INDEX.md)
 
-2026-10-24最新：`counter_kick` は細部修正の5版目、`counter_kick_effect` は2版目を使用します。人物128px/電撃256pxの各15コマを同期し、現在版をCurrentへ、旧版をHistoryへ保持。動画用と本編用を検証し、従来の撮影距離とゲーム画面に近い距離で比較撮影しました。[最新の素材・比較動画・検証](../../docs/video/counter-revision-and-camera-comparison-20261024.md)／[位置合わせ・再出力手順](../../docs/video/counter-split-20261024.md)。タメ0.9秒と蹴った後の長さは維持しています。[前版の時間配分](../../docs/video/counter-follow-through-20261019.md)と初回Sample等は履歴です。
+2026-10-24撮影時間の追加調整：同じ原稿版を使い、蹴り出す直前の8コマ目を撮影側だけ1→7動画Fへ延長しました。人物と独立電撃を同期させ、タメ全体は1.0秒。Current/History・原稿の表示時間・PNG・Clip・共有Library・本編用時間表は保持し、撮影ゲートと表示フレーム対応で延ばしています。[最新の動画・時間配分・検証](../../docs/video/early-rear-charge-hold-20261024.md)。原稿版の追加登録はしていません。
+
+2026-10-24素材更新/比較時点：`counter_kick` は細部修正の5版目、`counter_kick_effect` は2版目を使用します。人物128px/電撃256pxの各15コマを同期し、現在版をCurrentへ、旧版をHistoryへ保持。動画用と本編用を検証し、従来の撮影距離とゲーム画面に近い距離で比較撮影しました。[素材・比較動画・検証](../../docs/video/counter-revision-and-camera-comparison-20261024.md)／[位置合わせ・再出力手順](../../docs/video/counter-split-20261024.md)。この比較時点ではタメ0.9秒と蹴った後の長さを維持しました。[前版の時間配分](../../docs/video/counter-follow-through-20261019.md)と初回Sample等は履歴です。
 
 これまで受領したAsepriteを、動画用・本編用に共通して探せる場所です。現在の編集用原本を `Current/` に集め、登録したすべての版を `History/<動作ID>/` に保持します。Asepriteのレイヤー・表示状態・タグ・コマ・表示時間は変えません。
 

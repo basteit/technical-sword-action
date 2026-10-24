@@ -22,6 +22,17 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     private string parryRecoveryMotion = "ParryDeflect";
     public bool IsRecovering=>recovery!=null&&recovery.IsPlaying;
     public VideoArtLibrary Art=>library;
+    public int CounterArtFrame
+    {
+        get
+        {
+            int frame=counter.ElapsedFrames-(counter.HasAuthoredTransfer?counter.BlinkArrivalFrame:0);
+            var kick=library!=null?library.Find("CounterKick"):null;
+            if(kick==null||!counter.HasAuthoredTransfer) return frame;
+            int hold=Mathf.Max(0,counter.ChargeReleaseFrame-counter.BlinkArrivalFrame-kick.releaseFrame);
+            return frame<=kick.releaseFrame?frame:Mathf.Max(kick.releaseFrame,frame-hold);
+        }
+    }
     public Vector2 ParryContactPoint
     {
         get
@@ -123,7 +134,7 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
             var transfer=library.Find("CounterTransfer");
             bool transferring=counter.HasAuthoredTransfer&&transfer!=null&&counter.ElapsedFrames<counter.BlinkArrivalFrame;
             var motion=transferring?transfer:library.Find("CounterKick")??library.Find("AirRoundhouse");
-            int localFrame=counter.ElapsedFrames-(counter.HasAuthoredTransfer&&!transferring?counter.BlinkArrivalFrame:0);
+            int localFrame=transferring?counter.ElapsedFrames:CounterArtFrame;
             if(motion!=null) visual.sprite=motion.At(localFrame);
             return;
         }

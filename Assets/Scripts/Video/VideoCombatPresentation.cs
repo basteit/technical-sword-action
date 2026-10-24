@@ -14,8 +14,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField] private SpriteRenderer playerVisual;
     [SerializeField] private VideoArtLibrary library;
     [SerializeField, Range(.1f,1f)] private float chargeScale=.15f;
-    // Eight preparation ticks at .15 speed, with a small real-time lease margin.
-    [SerializeField, Range(.5f,1f)] private float chargeRealSeconds=.95f;
+    // Nine preparation ticks at .15 speed, including the final tucked cel.
+    [SerializeField, Range(.5f,1.5f)] private float chargeRealSeconds=1.1f;
     [SerializeField,Min(0)] private int kickHitstopFrames=10;
     [SerializeField,Range(0,.2f)] private float impactZoomAmount=.06f;
     [SerializeField] private float normalSize=DefaultNormalSize;
@@ -169,7 +169,9 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         if(flashRenderer!=null) { flashRenderer.color=new Color(flashTint.r,flashTint.g,flashTint.b,flashStrength*flashRemaining/Mathf.Max(.001f,flashDuration));flashRenderer.enabled=flashRemaining>0; }
         UpdateSpotlight();
         bool showCounter=counter!=null&&counter.IsActive&&counter.HasAuthoredTransfer&&counter.ElapsedFrames>=counter.BlinkArrivalFrame&&playerVisual!=null&&playerVisual.enabled;
-        vfx.SampleCounterEffect(playerVisual,showCounter?counter.ElapsedFrames-counter.BlinkArrivalFrame:-1,showCounter);
+        var animation=counter!=null?counter.GetComponent<VideoPlayerAnimationDriver>():null;
+        int effectFrame=animation!=null?animation.CounterArtFrame:counter!=null?counter.ElapsedFrames-counter.BlinkArrivalFrame:-1;
+        vfx.SampleCounterEffect(playerVisual,showCounter?effectFrame:-1,showCounter);
         if(transitShadow!=null&&transitShadow.enabled&&counter!=null)
             transitShadow.transform.localPosition=new Vector3(0,shadowGroundY-counter.transform.position.y,0);
         if(charged&&dimAlpha>0&&playerVisual!=null)
