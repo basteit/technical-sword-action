@@ -280,7 +280,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(incoming.name,Is.Not.EqualTo("EnemySample_down_01"));
             Assert.That((bool)clockType.GetProperty("IsHitStopped").GetValue(null),Is.False);
             Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero);
-            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
             Assert.That(Get<Vector2>(presentation,"ShakeOffset"),Is.EqualTo(Vector2.zero));
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
             for(int i=0;i<fps;i++)Call(director,"StepCapture",1d/fps);
@@ -307,30 +307,30 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Vector3 contact=state.transform.position+new Vector3(facing*45/32f,6/32f,0);
             Assert.That(Vector2.Distance(Get<Vector2>(driver,"ParryContactPoint"),contact),Is.LessThan(.001f));
             Assert.That(visual.sprite.rect.size,Is.EqualTo(new Vector2(128,128)));
-            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.True);
-            Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero,"The negative replaces the old translucent dark pulse.");
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.True);
+            Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero,"The backlight uses its own camera-local backdrop.");
             var position=Camera.main.transform.position;
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
             for(int i=0;i<fps;i++) Call(director,"StepCapture",1d/fps);
             Assert.That(visual.sprite.name,Is.EqualTo("ParrySuccessLight_03"));
             Assert.That(Camera.main.transform.position,Is.EqualTo(position));
-            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.True);
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.True);
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
             Call(director,"ResetTake",4);
             Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero);
-            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
             Assert.That(Get<int>(presentation,"ActiveShakeCount"),Is.Zero);
             Assert.That(Get<int>(Find("VideoVfxRenderer"),"ActiveCount"),Is.Zero);
         }
         [TestCase(30)] [TestCase(60)] [TestCase(120)]
-        public void ParryNegativeLastsFourRealVideoFramesWhileContactStaysFrozen(int fps)
+        public void ParryBacklightLastsFourRealVideoFramesWhileContactStaysFrozen(int fps)
         {
             Call(director,"StartTake",2,true);
-            for(int i=0;i<fps*3&&!Get<bool>(presentation,"IsParryInverted");i++)Call(director,"StepCapture",1d/fps);
-            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.True);
+            for(int i=0;i<fps*3&&!Get<bool>(presentation,"IsParryBacklit");i++)Call(director,"StepCapture",1d/fps);
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.True);
             long impactTick=(long)clockType.GetProperty("TickCount").GetValue(null);
             int exposed=0;
-            while(Get<bool>(presentation,"IsParryInverted")&&exposed<fps)
+            while(Get<bool>(presentation,"IsParryBacklit")&&exposed<fps)
             {
                 exposed++;Call(director,"StepCapture",1d/fps);
                 Assert.That((long)clockType.GetProperty("TickCount").GetValue(null),Is.EqualTo(impactTick));
@@ -339,50 +339,66 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(exposed,Is.EqualTo(fps/15),"4/60 seconds, independent of the nine-frame combat stop.");
             Assert.That((int)clockType.GetProperty("HitstopRemainingTicks").GetValue(null),Is.GreaterThan(0));
         }
-        [TestCase("Reset")] [TestCase("Disable")] [TestCase("SessionReset")]
-        public void ActiveParryNegativeClearsImmediatelyOnResetOrDisable(string interruption)
+        [TestCase("Reset")] [TestCase("Disable")] [TestCase("SessionReset")] [TestCase("TargetLost")]
+        public void ActiveParryBacklightClearsImmediatelyOnResetOrDisable(string interruption)
         {
             Call(director,"StartTake",2,true);
-            for(int i=0;i<180&&!Get<bool>(presentation,"IsParryInverted");i++)Step();
-            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.True);
+            for(int i=0;i<180&&!Get<bool>(presentation,"IsParryBacklit");i++)Step();
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.True);
             if(interruption=="Disable")((Behaviour)presentation).enabled=false;
             else if(interruption=="SessionReset")clockType.GetMethod("ResetSession").Invoke(null,null);
+            else if(interruption=="TargetLost"){((Component)Get<object>(presentation,"BacklitEnemy")).gameObject.SetActive(false);Step();}
             else Call(director,"ResetTake",2);
-            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
             Call(presentation,"AdvanceVisuals",1/60f);
-            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
         }
-        [Test]
-        public void ParryNegativeRendersGrayscaleInvertedPixelsOnlyOnTheCaptureCamera()
+        [TestCase(false,true,true)] [TestCase(true,true,true)] [TestCase(false,false,true)] [TestCase(false,true,false)]
+        public void ParryBacklightWhitensBothActorsKeepsGoldAndLeavesOtherCamerasUntouched(bool mirrored,bool hybrid,bool keepGold)
         {
-            Call(director,"StartTake",2,true);
-            for(int i=0;i<180&&!Get<bool>(presentation,"IsParryInverted");i++)Step();
-            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.True);
+            presentation.GetType().GetField("preserveParrySparkColor",Flags).SetValue(presentation,keepGold);
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,hybrid);
+            for(int i=0;i<180&&!Get<bool>(presentation,"IsParryBacklit");i++)Step();
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.True);
             var camera=Camera.main;
-            var feature=Type.GetType("VideoParryInversionFeature, Assembly-CSharp",true);
-            var setVisible=feature.GetMethod("SetVisible");
+            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.False);
+            Assert.That(Get<object>(presentation,"BacklitEnemy"),Is.SameAs(Get<object>(director,"RearEnemy")));
+            var light=camera.GetComponent(Type.GetType("VideoParryBacklight, Assembly-CSharp",true));
+            Assert.That(Get<bool>(light,"IsHaloVisible"),Is.EqualTo(hybrid));
             var other=new GameObject("UnaffectedCamera").AddComponent<Camera>();other.CopyFrom(camera);other.enabled=false;
             other.transform.SetPositionAndRotation(camera.transform.position,camera.transform.rotation);
             try
             {
-                var inverted=RenderParryPixels(camera);
-                setVisible.Invoke(null,new object[]{camera,false});
-                var normal=RenderParryPixels(camera);
-                setVisible.Invoke(null,new object[]{camera,true});
+                var lit=RenderParryPixels(camera);
                 var unaffected=RenderParryPixels(other);
-                int checkedPixels=0,changedPixels=0;
-                for(int i=0;i<normal.Length;i+=13)
+                Call(light,"ResetLight");
+                var normal=RenderParryPixels(camera);
+                Assert.That(lit[0].r+lit[0].g+lit[0].b,Is.LessThan(100),"The distant background must darken.");
+                int gold=0;
+                for(int i=0;i<normal.Length;i++)
                 {
-                    var source=normal[i];var negative=inverted[i];
-                    Assert.That(Math.Abs(negative.r-negative.g),Is.LessThanOrEqualTo(1));
-                    Assert.That(Math.Abs(negative.g-negative.b),Is.LessThanOrEqualTo(1));
-                    float expected=255-(source.r*.2126f+source.g*.7152f+source.b*.0722f);
-                    Assert.That((float)negative.r,Is.EqualTo(expected).Within(3),"Negative must invert the rendered composite, including the background.");
-                    Assert.That(unaffected[i],Is.EqualTo(source),"An unregistered camera keeps the original palette.");
-                    if(Math.Abs(negative.r-source.r)>40)changedPixels++;
-                    checkedPixels++;
+                    var source=normal[i];var bright=lit[i];
+                    Assert.That(unaffected[i],Is.EqualTo(source),"Other cameras keep their original lighting.");
+                    if(source.r>200&&source.g>110&&source.b<140&&source.g>source.r*.45f)
+                    {
+                        gold++;
+                        if(keepGold)Assert.That(Math.Abs(bright.r-source.r)+Math.Abs(bright.g-source.g)+Math.Abs(bright.b-source.b),Is.LessThanOrEqualTo(9),"Keep the authored yellow spark.");
+                        else Assert.That(bright.r>180&&bright.g>180&&bright.b>180&&Math.Abs(bright.r-bright.b)<30,Is.True,"The comparison may whiten the spark without changing its drawing.");
+                    }
                 }
-                Assert.That(changedPixels,Is.GreaterThan(checkedPixels/2));
+                Assert.That(gold,Is.GreaterThan(2));
+                foreach(var actor in new[]{state.GetComponent<SpriteRenderer>(),((Component)Get<object>(director,"RearEnemy")).GetComponentInChildren<SpriteRenderer>()})
+                {
+                    var min=camera.WorldToViewportPoint(actor.bounds.min);var max=camera.WorldToViewportPoint(actor.bounds.max);int colored=0,white=0;
+                    for(int y=Mathf.Max(0,(int)(min.y*180));y<Mathf.Min(180,(int)(max.y*180));y++)
+                    for(int x=Mathf.Max(0,(int)(min.x*320));x<Mathf.Min(320,(int)(max.x*320));x++)
+                    {
+                        int i=y*320+x;var source=normal[i];var bright=lit[i];
+                        if(source.b>source.r+15&&source.b>source.g)
+                        {colored++;if(bright.r>180&&bright.g>180&&bright.b>180&&bright.b-bright.r<30)white++;}
+                    }
+                    Assert.That(colored,Is.GreaterThan(4));Assert.That(white,Is.GreaterThan(colored*.7f),"Both the player and the parried enemy must read as white-lit silhouettes.");
+                }
             }
             finally
             {
@@ -1249,6 +1265,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(firstDistance,Is.EqualTo(.8f).Within(.001f));
                 Assert.That(secondDistance,Is.EqualTo(firstDistance*2).Within(.001f));
                 Assert.That(Get<int>(enemies[0],"HitCount"),Is.EqualTo(2));Assert.That(Get<int>(enemies[1],"HitCount"),Is.EqualTo(1));
+                Assert.That(Get<bool>(presentation,"IsParryImpactVisible"),Is.False);Assert.That(Get<object>(presentation,"BacklitEnemy"),Is.Null);
                 Assert.That(Get<string>(Marks().Single(m=>Get<string>(m,"kind")=="Kick"),"target"),Is.EqualTo(Get<string>(enemies[1],"IndividualId")));
                 Assert.That(Get<float>(presentation,"Zoom"),Is.Zero);Assert.That(Get<float>(presentation,"ImpactZoom"),Is.Zero);
                 Call(director,"ResetTake",2);

@@ -21,6 +21,9 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField, Range(.5f,1.5f)] private float chargeRealSeconds=1.1f;
     [SerializeField,Min(0)] private int kickHitstopFrames=DefaultKickHitstopFrames;
     [SerializeField,Range(0,4)] private int parryInversionFrames=4;
+    [SerializeField] private bool parryBacklight=true;
+    [SerializeField] private bool preserveParrySparkColor=true;
+    [SerializeField] private Material parryBacklightMaterial;
     [SerializeField,Range(0,.2f)] private float impactZoomAmount=.06f;
     [SerializeField] private float normalSize=DefaultNormalSize;
     [SerializeField] private float closeSize=DefaultCloseSize;
@@ -40,6 +43,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     private float flashRemaining,flashStrength,flashDuration;
     private Color flashTint=Color.white;
     private float parryInversionAge=-1,parryInversionDuration;
+    private VideoParryBacklight backlight;
     private SpriteRenderer flashRenderer;
     private float dimAlpha,dimBlend;
     private SpriteRenderer dimRenderer;
@@ -61,6 +65,9 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     public int ActiveShakeCount=>impulses.Count;
     public float FlashAlpha=>flashRenderer!=null&&flashRenderer.enabled?flashRenderer.color.a:0;
     public bool IsParryInverted=>VideoParryInversionFeature.IsVisible(captureCamera);
+    public bool IsParryBacklit=>backlight!=null&&backlight.IsVisible;
+    public bool IsParryImpactVisible=>IsParryBacklit||IsParryInverted;
+    public Damageable2D BacklitEnemy=>backlight!=null?backlight.Target:null;
     public bool IsDimVisible=>dimRenderer!=null&&dimRenderer.enabled;
     public bool IsSpotlightVisible=>heroLift!=null&&heroLift.enabled;
     public bool AreEyesVisible=>eyeLight!=null&&eyeLight.enabled;
@@ -71,6 +78,11 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         if(captureCamera!=null) { restPosition=captureCamera.transform.position;EnsureDimmer(); }
         if(playerVisual==null&&counter!=null) playerVisual=counter.GetComponent<SpriteRenderer>();
+        if(captureCamera!=null)
+        {
+            backlight=captureCamera.gameObject.AddComponent<VideoParryBacklight>();backlight.hideFlags=HideFlags.DontSave;
+            backlight.Configure(captureCamera,playerVisual,parryBacklightMaterial);
+        }
         EnsureSpotlight();
     }
     private void OnEnable()
@@ -131,17 +143,17 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         if(Zoom==0&&captureCamera!=null)
         { captureCamera.transform.position=restPosition;captureCamera.orthographicSize=normalSize; }
     }
-    public void PresentLightParry(int facing)
+    public void PresentLightParry(int facing,Damageable2D source,Vector2 contact)
     {
         // A single beat and return carries the impact, while the hero keeps a stable base.
         ShakeDirectional(9/60f,vfx.ReadableImpacts?.22f:.21f,new Vector2(-facing,-.3f),vfx.ReadableImpacts?1f:1.25f);
         if(parryInversionFrames>0)
         {
-            // Replace the old translucent dark flash for this trial. The pulse
-            // expires in real time while combat stays frozen on the contact cel.
+            // Keep the four-frame impact pulse independent of the combat stop.
             flashRemaining=0;if(flashRenderer!=null)flashRenderer.enabled=false;
             parryInversionAge=0;parryInversionDuration=parryInversionFrames/60f;
-            VideoParryInversionFeature.SetVisible(captureCamera,true);
+            if(parryBacklight)backlight?.Begin(source,contact);
+            VideoParryInversionFeature.SetVisible(captureCamera,!parryBacklight);
         }
         else
         {
@@ -152,11 +164,12 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     private void AdvanceParryInversion(float realSeconds)
     {
         bool visible=parryInversionAge>=0&&parryInversionAge<parryInversionDuration-.000001f;
-        VideoParryInversionFeature.SetVisible(captureCamera,visible);
+        VideoParryInversionFeature.SetVisible(captureCamera,visible&&!parryBacklight);
+        backlight?.Sample(visible&&parryBacklight,vfx.HybridGlow,preserveParrySparkColor);
         parryInversionAge=visible?parryInversionAge+realSeconds:-1;
     }
     private void ResetParryInversion()
-    { parryInversionAge=-1;parryInversionDuration=0;VideoParryInversionFeature.SetVisible(captureCamera,false); }
+    { parryInversionAge=-1;parryInversionDuration=0;VideoParryInversionFeature.SetVisible(captureCamera,false);backlight?.ResetLight(); }
     public void ShakeDirectional(float realSeconds,float strength,Vector2 direction,float cycles=3)
     {
         if(realSeconds<=0||strength<=0) return;
@@ -286,5 +299,6 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         if(eyeGlowMaterial!=null) Destroy(eyeGlowMaterial);
         if(subjectLiftMaterial!=null) Destroy(subjectLiftMaterial);
         if(heroFocus!=null) Destroy(heroFocus);
+        if(backlight!=null)Destroy(backlight);
     }
 }

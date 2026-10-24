@@ -301,8 +301,9 @@ public sealed class CombatVideoStudio : MonoBehaviour, ICombatTickListener
     }
     private void OnParryImpact(Damageable2D target,ParryResult result)
     {
-        vfx.EmitParry(player.GetComponent<VideoPlayerAnimationDriver>().ParryContactPoint,motor.FacingSign,parry.LastReactionWeight);
-        presentation.PresentLightParry(motor.FacingSign);
+        Vector2 contact=player.GetComponent<VideoPlayerAnimationDriver>().ParryContactPoint;
+        vfx.EmitParry(contact,motor.FacingSign,parry.LastReactionWeight);
+        presentation.PresentLightParry(motor.FacingSign,target,contact);
     }
     private void OnKick(Damageable2D target,Vector2 point)
     {
