@@ -37,6 +37,13 @@ public sealed class VideoVfxRenderer : MonoBehaviour
         counterEffect.sprite.sortingOrder=1009;counterEffect.sprite.enabled=true;counterEffect.glow.enabled=false;
         counterEffect.root.SetActive(true);
     }
+    public void EmitParry(Vector2 position,int facing,ParryReactionWeight weight)
+    {
+        var reaction=library!=null?library.FindParrySuccess(weight,out _):null;
+        // An authored reaction already carries its spark, arc and decay in the same cels.
+        if(reaction!=null&&reaction.includesParryEffect)return;
+        Emit("Parry",position,.85f,facing);
+    }
     public void Emit(string kind,Vector2 position,float scale=1,int facing=1,float delay=0)
     {
         if(kind=="ElectricKick"&&HasAuthoredCounterEffect)return;

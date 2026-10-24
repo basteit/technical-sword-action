@@ -87,6 +87,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Field(Entry("ParrySuccess"), "source"), Is.EqualTo("ParrySuccessLight"));
             Assert.That(Keys("Parry").Select(key => key.value).Intersect(Keys("ParrySuccess").Select(key => key.value)), Is.Empty);
             Assert.That(Keys("Parry").Last().value, Is.SameAs(Keys("Parry")[2].value), "Hold the ready cel, never deflect on an empty input.");
+            var success=Keys("ParrySuccess").Select(key=>(Sprite)key.value).Distinct().ToArray();
+            Assert.That(success.Length,Is.EqualTo(8),"The revised light parry must include its authored spark and decay cels.");
+            Assert.That(success.All(sprite=>sprite.rect.size==new Vector2(128,128)&&sprite.pivot==new Vector2(32,38)&&sprite.pixelsPerUnit==32),Is.True);
         }
 
         [Test] public void JumpSamplesAreKeptAsOriginalsAndUnusedActionsAreNotClaimedFinished()

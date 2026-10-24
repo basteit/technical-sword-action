@@ -32,6 +32,27 @@ public static class PrototypePlayerArtInstaller
         ValidateOrThrow();
     }
 
+    [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Light Parry Clip")]
+    public static void RefreshLightParryClip()
+    {
+        if(Application.isPlaying)throw new InvalidOperationException("Exit PlayMode before updating artwork.");
+        var motion=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>("Assets/Settings/CombatVideoArt.asset").Find("ParrySuccessLight");
+        var clip=AssetDatabase.LoadAssetAtPath<AnimationClip>(Folder+"/PlayerPrototype_ParrySuccess.anim");
+        var settings=AnimationUtility.GetAnimationClipSettings(clip);
+        float end=settings.stopTime,lastSample=Mathf.Max(0,end-1f/clip.frameRate);
+        var keys=new List<ObjectReferenceKeyframe>();int frame=0;
+        for(int i=0;i<motion.frames.Length;i++)
+        {
+            float time=end*frame/motion.TotalFrames;
+            if(time<lastSample)keys.Add(new ObjectReferenceKeyframe{time=time,value=motion.frames[i]});
+            frame+=motion.durations[i];
+        }
+        keys.Add(new ObjectReferenceKeyframe{time=lastSample,value=motion.frames[^1]});
+        AnimationUtility.SetObjectReferenceCurve(clip,SpriteBinding,keys.ToArray());
+        AnimationUtility.SetAnimationClipSettings(clip,settings);
+        EditorUtility.SetDirty(clip);AssetDatabase.SaveAssetIfDirty(clip);
+    }
+
     [MenuItem("Tools/Technical Sword Action/Prototype/Install Submitted Player Art")]
     public static void Install()
     {

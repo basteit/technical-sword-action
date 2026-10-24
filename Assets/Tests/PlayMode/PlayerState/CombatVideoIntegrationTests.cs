@@ -266,7 +266,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
         [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
-        public void LightParryFreezesTheBladeContactAndItsShortImpactThenResets(int fps,bool mirrored)
+        public void LightParryFreezesItsAuthoredDrawingWithoutLegacyBurstsThenResets(int fps,bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
             var parry=state.GetComponent(Type.GetType("PlayerParry2D, Assembly-CSharp",true));
@@ -274,11 +274,14 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(parry,"SuccessCount"),Is.EqualTo(1));
             var visual=state.GetComponent<SpriteRenderer>();
             Assert.That(visual.sprite.name,Is.EqualTo("ParrySuccessLight_01"));
-            var effect=Find("VideoVfxRenderer").GetComponentsInChildren<SpriteRenderer>()
-                .First(r=>r.sprite!=null&&r.sprite.name=="Fx_Parry_01");
+            var vfx=Find("VideoVfxRenderer");
+            Assert.That(vfx.GetComponentsInChildren<SpriteRenderer>().Any(r=>r.sprite!=null&&r.sprite.name.StartsWith("Fx_Parry")),Is.False);
+            Assert.That(Get<int>(vfx,"ActiveCount"),Is.Zero,"The parry spark comes from the submitted cels, without legacy sprite/glow/particles.");
             int facing=mirrored?1:-1;
-            Vector3 contact=state.transform.position+new Vector3(facing*12/32f,-12/32f,0);
-            Assert.That(Vector3.Distance(effect.transform.position,contact),Is.LessThan(.001f));
+            Vector3 contact=state.transform.position+new Vector3(facing*45/32f,6/32f,0);
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            Assert.That(Vector2.Distance(Get<Vector2>(driver,"ParryContactPoint"),contact),Is.LessThan(.001f));
+            Assert.That(visual.sprite.rect.size,Is.EqualTo(new Vector2(128,128)));
             var flash=GameObject.Find("VideoImpactFlash").GetComponent<SpriteRenderer>();
             Assert.That(flash.color.r+flash.color.g+flash.color.b,Is.Zero);
             Assert.That(Get<float>(presentation,"FlashAlpha"),Is.GreaterThan(0));
@@ -1378,11 +1381,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
             float originX=state.transform.position.x;
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
             var light=Call(Get<object>(driver,"Art"),"Find","ParrySuccessLight");
-            Assert.That(Get<int[]>(light,"durations"),Is.EqualTo(new[]{2,1,1,2,1,1,2}));
-            var sprites=Get<Sprite[]>(light,"frames");Assert.That(sprites.Length,Is.EqualTo(7));
-            Assert.That(sprites.All(s=>s.pivot==new Vector2(32,38)&&s.rect.size==new Vector2(64,64)&&s.pixelsPerUnit==32),Is.True);
+            Assert.That(Get<int[]>(light,"durations"),Is.EqualTo(new[]{2,1,1,1,1,1,1,2}));
+            var sprites=Get<Sprite[]>(light,"frames");Assert.That(sprites.Length,Is.EqualTo(8));
+            Assert.That(sprites.All(s=>s.pivot==new Vector2(32,38)&&s.rect.size==new Vector2(128,128)&&s.pixelsPerUnit==32),Is.True);
+            Assert.That(Get<bool>(light,"includesParryEffect"),Is.True);
             Assert.That(Get<bool>(light,"hasParryContact"),Is.True);
-            Assert.That(Get<Vector2>(light,"parryContactOffset"),Is.EqualTo(new Vector2(12/32f,-12/32f)));
+            Assert.That(Get<Vector2>(light,"parryContactOffset"),Is.EqualTo(new Vector2(45/32f,6/32f)));
             var seen=new System.Collections.Generic.HashSet<string>();
             for(int i=0;i<300&&!Get<bool>(counter,"IsActive");i++)
             {
@@ -1396,6 +1400,26 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(seen,Is.EquivalentTo(sprites.Select(s=>s.name)),"Do not keep only the first contact cel through the entire success reaction.");
             Assert.That(Get<bool>(counter,"IsActive"),Is.True);
             Assert.That(Get<object>(counter,"SelectedTarget"),Is.SameAs(Get<object>(director,"RearEnemy")));
+        }
+        [Test] public void AuthoredParrySuppressesTheOldBurstWhileUnfinishedReactionsKeepTheirFallback()
+        {
+            Call(director,"ResetTake",2);
+            var vfx=Find("VideoVfxRenderer");
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            var light=Call(Get<object>(driver,"Art"),"Find","ParrySuccessLight");
+            object weight=Enum.Parse(Type.GetType("ParryReactionWeight, Assembly-CSharp",true),"Light");
+            int before=Get<int>(vfx,"EmissionCount");
+            Call(vfx,"EmitParry",Vector2.zero,1,weight);
+            Assert.That(Get<int>(vfx,"EmissionCount"),Is.EqualTo(before));
+            try
+            {
+                light.GetType().GetField("includesParryEffect").SetValue(light,false);
+                Call(vfx,"EmitParry",Vector2.zero,1,weight);
+                Assert.That(Get<int>(vfx,"EmissionCount"),Is.GreaterThan(before));
+                Assert.That(Get<int>(vfx,"ActiveCount"),Is.GreaterThan(0));
+            }
+            finally { light.GetType().GetField("includesParryEffect").SetValue(light,true);Call(vfx,"ResetEffects"); }
+            Assert.That(Get<int>(vfx,"ActiveCount"),Is.Zero);
         }
         [TestCase(1,"VerticalSlash")] [TestCase(2,"HorizontalSlash")]
         [TestCase(3,"RapidSheathe")] [TestCase(4,"IaiSlash")]

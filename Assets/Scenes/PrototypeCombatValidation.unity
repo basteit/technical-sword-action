@@ -3231,6 +3231,8 @@ MonoBehaviour:
   instanceMaxHp: 30
   overrideCounterMultiplier: 0
   instanceCounterMultiplier: 3
+  overrideParryStaggerFrames: 0
+  instanceParryStaggerFrames: 180
   deathDisplayDuration: 0
   lightHitStunDuration: 0.1
   blockContactPushFromPlayer: 1
@@ -4397,6 +4399,8 @@ MonoBehaviour:
   instanceMaxHp: 30
   overrideCounterMultiplier: 0
   instanceCounterMultiplier: 3
+  overrideParryStaggerFrames: 0
+  instanceParryStaggerFrames: 180
   deathDisplayDuration: 0
   lightHitStunDuration: 0.1
   blockContactPushFromPlayer: 1
@@ -6029,6 +6033,8 @@ MonoBehaviour:
   instanceMaxHp: 30
   overrideCounterMultiplier: 0
   instanceCounterMultiplier: 3
+  overrideParryStaggerFrames: 0
+  instanceParryStaggerFrames: 180
   deathDisplayDuration: 0
   lightHitStunDuration: 0
   blockContactPushFromPlayer: 1
@@ -9232,6 +9238,10 @@ MonoBehaviour:
   glowMaterial: {fileID: 2100000, guid: d69bc0a8e01c76344849c87d7ec93600, type: 2}
   hybridGlow: 1
   intensity: 0.8
+  readableImpacts: 1
+  impactSortingOrder: 30
+  authoredCounterOpacity: 1
+  useAuthoredCounterEffect: 1
 --- !u!1 &1903729382
 GameObject:
   m_ObjectHideFlags: 0

@@ -96,7 +96,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         successTick=CombatTimeController.TickCount;MarkEvent("Parry",target);
         int facing=player.GetComponent<PlayerMotor2D>().FacingSign;
         Vector2 contact=player.GetComponent<VideoPlayerAnimationDriver>().ParryContactPoint;
-        if(target!=null) vfx.Emit("Parry",contact,.85f,facing);
+        if(target!=null) vfx.EmitParry(contact,facing,parry.LastReactionWeight);
         presentation.PresentLightParry(facing);
     }
     private void OnKick(Damageable2D target,Vector2 point)

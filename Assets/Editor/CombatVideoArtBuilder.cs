@@ -13,7 +13,7 @@ public static class CombatVideoArtBuilder
     public const string EnemyControllerPath=Folder+"/CombatVideoEnemy.controller";
     public const string LibraryPath="Assets/Settings/CombatVideoArt.asset";
     [Serializable] private sealed class Manifest { public ActionData[] actions; }
-    [Serializable] private sealed class ActionData { public string name;public int hitFrame,branchFrame,totalFrames,chargeFrame,releaseFrame,landingFrame,recoveryFrame,canvasWidth,canvasHeight,pivotX,pivotY;public bool provisional,includesSlashTrail,includesCounterTrail,hasTrailHitbox,hasParryContact;public Vector2 hitboxMin,hitboxMax,parryContactOffset,counterContactOffset;public FrameData[] frames; }
+    [Serializable] private sealed class ActionData { public string name;public int hitFrame,branchFrame,totalFrames,chargeFrame,releaseFrame,landingFrame,recoveryFrame,canvasWidth,canvasHeight,pivotX,pivotY;public bool provisional,includesSlashTrail,includesParryEffect,includesCounterTrail,hasTrailHitbox,hasParryContact;public Vector2 hitboxMin,hitboxMax,parryContactOffset,counterContactOffset;public FrameData[] frames; }
     [Serializable] private sealed class FrameData { public int frames,start; }
     [Serializable] private sealed class EyeManifest { public EyeFrame[] frames; }
     [Serializable] private sealed class EyeFrame { public string file;public int pixels; }
@@ -99,7 +99,7 @@ public static class CombatVideoArtBuilder
             else durations=Enumerable.Repeat(name=="IdleReference"?6:name=="WalkReference"?5:name=="Enemy_Idle"?8:name=="Enemy_Windup"?5:name=="Fx_Vanish"?3:4,group.Count()).ToArray();
             var ordered=group.OrderBy(p=>p).ToArray();
             var eyes=ordered.Select(p=>Path.GetDirectoryName(p).Replace('\\','/')+"/EyeMasks/"+Path.GetFileName(p)).Select(p=>eyeCounts.TryGetValue(p,out int count)&&count>0?AssetDatabase.LoadAssetAtPath<Sprite>(p):null).ToArray();
-            motions.Add(new VideoArtLibrary.Motion {name=name,provisional=action?.provisional??false,includesSlashTrail=action?.includesSlashTrail??false,includesCounterTrail=action?.includesCounterTrail??false,counterContactOffset=action?.counterContactOffset??Vector2.zero,hasTrailHitbox=action?.hasTrailHitbox??false,hitboxMin=action?.hitboxMin??Vector2.zero,hitboxMax=action?.hitboxMax??Vector2.zero,hasParryContact=action?.hasParryContact??false,parryContactOffset=action?.parryContactOffset??Vector2.zero,frames=ordered.Select(p=>AssetDatabase.LoadAssetAtPath<Sprite>(p)).ToArray(),eyeFrames=eyes,durations=durations,hitFrame=action?.hitFrame??0,branchFrame=action?.branchFrame??0,chargeFrame=action?.chargeFrame??0,releaseFrame=action?.releaseFrame??0,landingFrame=action?.landingFrame??0,recoveryFrame=action?.recoveryFrame??0});
+            motions.Add(new VideoArtLibrary.Motion {name=name,provisional=action?.provisional??false,includesSlashTrail=action?.includesSlashTrail??false,includesParryEffect=action?.includesParryEffect??false,includesCounterTrail=action?.includesCounterTrail??false,counterContactOffset=action?.counterContactOffset??Vector2.zero,hasTrailHitbox=action?.hasTrailHitbox??false,hitboxMin=action?.hitboxMin??Vector2.zero,hitboxMax=action?.hitboxMax??Vector2.zero,hasParryContact=action?.hasParryContact??false,parryContactOffset=action?.parryContactOffset??Vector2.zero,frames=ordered.Select(p=>AssetDatabase.LoadAssetAtPath<Sprite>(p)).ToArray(),eyeFrames=eyes,durations=durations,hitFrame=action?.hitFrame??0,branchFrame=action?.branchFrame??0,chargeFrame=action?.chargeFrame??0,releaseFrame=action?.releaseFrame??0,landingFrame=action?.landingFrame??0,recoveryFrame=action?.recoveryFrame??0});
         }
         string backgroundPath="Assets/Art/Video/CaptureTrainingGrid.png";
         var bg=(TextureImporter)AssetImporter.GetAtPath(backgroundPath);bg.textureType=TextureImporterType.Sprite;bg.spritePixelsPerUnit=32;bg.filterMode=FilterMode.Point;bg.textureCompression=TextureImporterCompression.Uncompressed;bg.mipmapEnabled=false;bg.SaveAndReimport();
@@ -170,6 +170,45 @@ public static class CombatVideoArtBuilder
         }
         AssetDatabase.SaveAssets();
         EnemySubmissionSetup.Apply();
+    }
+    [MenuItem("Tools/Technical Sword Action/Video/Refresh Submitted Light Parry")]
+    public static void RefreshSubmittedLightParry()
+    {
+        if(Application.isPlaying)throw new InvalidOperationException("Exit PlayMode before updating artwork.");
+        const string folder="Assets/Art/Player/VideoSubmitted";
+        AssetDatabase.Refresh();
+        var action=JsonUtility.FromJson<Manifest>(File.ReadAllText(folder+"/timing-manifest.json")).actions.Single(a=>a.name=="ParrySuccessLight");
+        var library=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(LibraryPath);
+        var motion=library.Find(action.name);
+        var eyes=JsonUtility.FromJson<EyeManifest>(File.ReadAllText(folder+"/eye-mask-manifest.json")).frames.ToDictionary(f=>f.file,f=>f.pixels);
+        Sprite Import(string path)
+        {
+            var importer=(TextureImporter)AssetImporter.GetAtPath(path);
+            importer.textureType=TextureImporterType.Sprite;importer.spriteImportMode=SpriteImportMode.Single;
+            importer.spritePixelsPerUnit=32;importer.filterMode=FilterMode.Point;importer.textureCompression=TextureImporterCompression.Uncompressed;
+            importer.mipmapEnabled=false;importer.alphaIsTransparency=true;
+            var settings=new TextureImporterSettings();importer.ReadTextureSettings(settings);
+            settings.spriteAlignment=(int)SpriteAlignment.Custom;
+            settings.spritePivot=new Vector2(action.pivotX/(float)action.canvasWidth,action.pivotY/(float)action.canvasHeight);
+            importer.SetTextureSettings(settings);importer.SaveAndReimport();
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        }
+        motion.frames=new Sprite[action.frames.Length];motion.eyeFrames=new Sprite[action.frames.Length];
+        for(int i=0;i<action.frames.Length;i++)
+        {
+            string name=$"{action.name}_{i+1:D2}";
+            motion.frames[i]=Import(folder+"/"+name+".png");
+            var eye=Import(folder+"/EyeMasks/"+name+".png");
+            motion.eyeFrames[i]=eyes.TryGetValue(name,out int pixels)&&pixels>0?eye:null;
+        }
+        motion.durations=action.frames.Select(f=>f.frames).ToArray();
+        motion.provisional=action.provisional;motion.includesParryEffect=action.includesParryEffect;
+        motion.hasParryContact=action.hasParryContact;motion.parryContactOffset=action.parryContactOffset;
+        EditorUtility.SetDirty(library);AssetDatabase.SaveAssetIfDirty(library);
+        // Refresh only the selected clips; preserve the existing controller and all other artwork.
+        Clip("ParrySuccessLight",motion,false);Clip("ParrySuccess",motion,false);
+        AssetDatabase.SaveAssetIfDirty(AssetDatabase.LoadAssetAtPath<AnimationClip>(Folder+"/PlayerVideo_ParrySuccessLight.anim"));
+        AssetDatabase.SaveAssetIfDirty(AssetDatabase.LoadAssetAtPath<AnimationClip>(Folder+"/PlayerVideo_ParrySuccess.anim"));
     }
     private static string[] SelectCleanFrames(string folder)
     {

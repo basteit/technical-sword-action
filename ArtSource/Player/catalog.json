@@ -562,7 +562,7 @@
       "status": "provisional",
       "notes": "軽く弾く反応の仮提出。成功重の専用作画は未受領。",
       "current": "Current/Player_parry_light.aseprite",
-      "current_sha256": "cc31cbbf9b40901cc230f9985a24043fd58b8e46330cacb4d8db0aa9cafd3366",
+      "current_sha256": "115ab7f81eb0016932a93ca36d8eb0c9f667beec19dfb392c4943d9916628996",
       "revisions": [
         {
           "sha256": "cc31cbbf9b40901cc230f9985a24043fd58b8e46330cacb4d8db0aa9cafd3366",
@@ -640,28 +640,115 @@
             "width": 64
           },
           "original_project_path": "Assets/Art/Player/VideoSubmitted/20261018/Player_parry_light.aseprite"
+        },
+        {
+          "sha256": "115ab7f81eb0016932a93ca36d8eb0c9f667beec19dfb392c4943d9916628996",
+          "file": "History/parry_light/115ab7f81eb0016932a93ca36d8eb0c9f667beec19dfb392c4943d9916628996.aseprite",
+          "original_name": "Player_parry_light.aseprite",
+          "registered_at": "2026-10-24T13:36:31+00:00",
+          "received_on": null,
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 80,
+                "frame": 1
+              },
+              {
+                "duration_ms": 80,
+                "frame": 2
+              },
+              {
+                "duration_ms": 80,
+                "frame": 3
+              },
+              {
+                "duration_ms": 80,
+                "frame": 4
+              },
+              {
+                "duration_ms": 80,
+                "frame": 5
+              },
+              {
+                "duration_ms": 80,
+                "frame": 6
+              },
+              {
+                "duration_ms": 80,
+                "frame": 7
+              },
+              {
+                "duration_ms": 80,
+                "frame": 8
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 102,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
         }
       ],
       "uses": [
         {
           "consumer": "video",
           "motion": "ParrySuccessLight",
-          "source_sha256": "cc31cbbf9b40901cc230f9985a24043fd58b8e46330cacb4d8db0aa9cafd3366",
+          "source_sha256": "115ab7f81eb0016932a93ca36d8eb0c9f667beec19dfb392c4943d9916628996",
           "references": [
-            "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_01.png",
-            "Assets/Settings/CombatVideoArt.asset"
+            "Assets/Art/Player/VideoSubmitted/timing-manifest.json",
+            "Assets/Settings/CombatVideoArt.asset",
+            "Assets/Animations/Video/PlayerVideo_ParrySuccessLight.anim"
           ],
-          "evidence": "docs/video/counter-submissions-20261018.md"
+          "evidence": "docs/video/parry-revision-20261024.md"
         },
         {
           "consumer": "prototype",
           "motion": "ParrySuccess",
-          "source_sha256": "cc31cbbf9b40901cc230f9985a24043fd58b8e46330cacb4d8db0aa9cafd3366",
+          "source_sha256": "115ab7f81eb0016932a93ca36d8eb0c9f667beec19dfb392c4943d9916628996",
           "references": [
-            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
-            "Assets/Scenes/PrototypeCombatValidation.unity"
+            "Assets/Animations/Player/Submitted/PlayerPrototype_ParrySuccess.anim",
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset"
           ],
-          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+          "evidence": "docs/video/parry-revision-20261024.md"
         }
       ]
     },

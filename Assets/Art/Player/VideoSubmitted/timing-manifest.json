@@ -165,9 +165,9 @@
     },
     {
       "branchFrame": 0,
-      "canvasHeight": 64,
-      "canvasWidth": 64,
-      "count": 7,
+      "canvasHeight": 128,
+      "canvasWidth": 128,
+      "count": 8,
       "frames": [
         {
           "frames": 2,
@@ -182,8 +182,12 @@
           "start": 3
         },
         {
-          "frames": 2,
+          "frames": 1,
           "start": 4
+        },
+        {
+          "frames": 1,
+          "start": 5
         },
         {
           "frames": 1,
@@ -200,10 +204,11 @@
       ],
       "hasParryContact": true,
       "hitFrame": 0,
+      "includesParryEffect": true,
       "name": "ParrySuccessLight",
       "parryContactOffset": {
-        "x": 0.375,
-        "y": -0.375
+        "x": 1.40625,
+        "y": 0.1875
       },
       "pivotX": 32,
       "pivotY": 38,

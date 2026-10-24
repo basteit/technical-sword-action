@@ -9,6 +9,7 @@ public sealed class VideoArtLibrary : ScriptableObject
         public string name;
         public bool provisional;
         public bool includesSlashTrail;
+        public bool includesParryEffect;
         public bool includesCounterTrail;
         public Vector2 counterContactOffset;
         public bool hasTrailHitbox;

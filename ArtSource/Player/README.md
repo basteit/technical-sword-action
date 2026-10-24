@@ -2,6 +2,8 @@
 
 [素材一覧を開く](INDEX.md)
 
+2026-10-24軽パリィ更新：`parry_light` の2版目（128px/8×80ms、人物＋黄色い弾き）を登録・反映しました。旧原稿をHistoryへ保持し、撮影/StudioではCodex製パリィVFXの重ね描きを停止。個別更新メニューで共有PNG/Libraryと撮影/本編の成功Clipだけを更新できます。[原稿・反映範囲・動画・限定検証](../../docs/video/parry-revision-20261024.md)。本編側はClip/参照のEditMode確認までで、実戦操作の受入や全体完成とは区別します。
+
 2026-10-24撮影時間の追加調整：同じ原稿版を使い、蹴り出す直前の8コマ目を撮影側だけ1→7動画Fへ延長しました。人物と独立電撃を同期させ、タメ全体は1.0秒。Current/History・原稿の表示時間・PNG・Clip・共有Library・本編用時間表は保持し、撮影ゲートと表示フレーム対応で延ばしています。[最新の動画・時間配分・検証](../../docs/video/early-rear-charge-hold-20261024.md)。原稿版の追加登録はしていません。
 
 2026-10-24素材更新/比較時点：`counter_kick` は細部修正の5版目、`counter_kick_effect` は2版目を使用します。人物128px/電撃256pxの各15コマを同期し、現在版をCurrentへ、旧版をHistoryへ保持。動画用と本編用を検証し、従来の撮影距離とゲーム画面に近い距離で比較撮影しました。[素材・比較動画・検証](../../docs/video/counter-revision-and-camera-comparison-20261024.md)／[位置合わせ・再出力手順](../../docs/video/counter-split-20261024.md)。この比較時点ではタメ0.9秒と蹴った後の長さを維持しました。[前版の時間配分](../../docs/video/counter-follow-through-20261019.md)と初回Sample等は履歴です。

@@ -102,11 +102,11 @@
     },
     {
       "file": "ParrySuccessLight_01",
-      "pixels": 9
+      "pixels": 0
     },
     {
       "file": "ParrySuccessLight_02",
-      "pixels": 9
+      "pixels": 0
     },
     {
       "file": "ParrySuccessLight_03",
@@ -114,19 +114,19 @@
     },
     {
       "file": "ParrySuccessLight_04",
-      "pixels": 7
+      "pixels": 0
     },
     {
       "file": "ParrySuccessLight_05",
-      "pixels": 7
+      "pixels": 0
     },
     {
       "file": "ParrySuccessLight_06",
-      "pixels": 7
+      "pixels": 0
     },
     {
       "file": "ParrySuccessLight_07",
-      "pixels": 7
+      "pixels": 0
     },
     {
       "file": "CounterTransfer_01",
@@ -218,6 +218,10 @@
     },
     {
       "file": "CounterKick_15",
+      "pixels": 0
+    },
+    {
+      "file": "ParrySuccessLight_08",
       "pixels": 0
     }
   ]
