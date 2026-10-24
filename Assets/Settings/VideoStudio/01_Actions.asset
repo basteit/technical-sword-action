@@ -17,7 +17,7 @@ MonoBehaviour:
   playerPosition: {x: 0, y: 1}
   faceLeft: 0
   followCamera: 1
-  cameraSize: 2.8125
+  cameraSize: 3.375
   cameraCenter: {x: 0, y: 1.05}
   enemies: []
   gimmicks: []

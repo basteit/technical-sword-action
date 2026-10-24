@@ -199,9 +199,9 @@ public sealed class VideoStudioWindow : EditorWindow
     {
         EditorGUI.BeginChangeCheck();
         bool follow=EditorGUILayout.Toggle("主人公に追従",studio.FollowCamera);
-        float[] sizes={1.6875f,2.109375f,VideoCombatPresentation.DefaultCloseSize,VideoCombatPresentation.DefaultNormalSize,4.21875f};
-        int selected=Array.FindIndex(sizes,s=>Mathf.Approximately(s,studio.CameraSize));if(selected<0)selected=3;
-        selected=EditorGUILayout.Popup("カメラ距離",selected,new[]{"アップ（10倍）","近め（8倍）","寄り（7倍）","標準（6倍）","ステージ確認（4倍）"});
+        float[] sizes={1.6875f,2.109375f,2.4107144f,VideoCombatPresentation.DefaultCloseSize,VideoCombatPresentation.DefaultNormalSize,4.21875f};
+        int selected=Array.FindIndex(sizes,s=>Mathf.Approximately(s,studio.CameraSize));if(selected<0)selected=4;
+        selected=EditorGUILayout.Popup("カメラ距離",selected,new[]{"アップ（10倍）","近め（8倍）","寄り（7倍）","撮影寄り（6倍）","標準（5倍）","ゲーム寄り（4倍）"});
         Vector2 center=studio.FixedCameraCenter;if(!follow)center=EditorGUILayout.Vector2Field("固定する中心",center);
         if(EditorGUI.EndChangeCheck())
         { BeginEdit("Studio camera");studio.FollowCamera=follow;studio.CameraSize=sizes[selected];studio.FixedCameraCenter=center;studio.RefreshCameraFrame();Changed(); }

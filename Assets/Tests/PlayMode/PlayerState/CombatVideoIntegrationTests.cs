@@ -290,6 +290,39 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(presentation,"ActiveShakeCount"),Is.Zero);
             Assert.That(Get<int>(Find("VideoVfxRenderer"),"ActiveCount"),Is.Zero);
         }
+        [TestCase(false)] [TestCase(true)]
+        public void HeavierParryAndKickStopsHoldContactForFourAndTenSlotsAndResume(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            var parry=state.GetComponent(Type.GetType("PlayerParry2D, Assembly-CSharp",true));
+            long Tick()=>(long)clockType.GetProperty("TickCount").GetValue(null);
+            int Remaining()=>(int)clockType.GetProperty("HitstopRemainingTicks").GetValue(null);
+            for(int i=0;i<240&&Get<int>(parry,"SuccessCount")==0;i++)Step();
+            Assert.That(Get<int>(parry,"SuccessCount"),Is.EqualTo(1));Assert.That(Remaining(),Is.EqualTo(4));
+            var visual=state.GetComponent<SpriteRenderer>();var blade=visual.sprite;long tick=Tick();
+            Assert.That(blade.name,Is.EqualTo("ParrySuccessLight_01"));
+            for(int i=0;i<4;i++){Step();Assert.That(Tick(),Is.EqualTo(tick));Assert.That(visual.sprite,Is.SameAs(blade));}
+            Assert.That(Remaining(),Is.Zero);Step();Assert.That(Tick(),Is.EqualTo(tick+1));
+            var target=(Component)Get<object>(director,"RearEnemy");
+            for(int i=0;i<180&&Get<int>(target,"HitCount")==0;i++)Step();
+            Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));Assert.That(Remaining(),Is.EqualTo(10));
+            var effect=Find("VideoVfxRenderer").GetComponentsInChildren<SpriteRenderer>().Single(r=>r.name=="AuthoredCounterEffect");
+            var contact=visual.sprite;var electricity=effect.sprite;var position=target.transform.position;tick=Tick();
+            Assert.That(contact.name,Is.EqualTo("CounterKick_09"));
+            for(int i=0;i<2;i++)Step();
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});for(int i=0;i<60;i++)Step();
+            Assert.That(Remaining(),Is.EqualTo(8));Assert.That(Tick(),Is.EqualTo(tick));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
+            for(int i=0;i<8;i++)
+            {Step();Assert.That(Tick(),Is.EqualTo(tick));Assert.That(visual.sprite,Is.SameAs(contact));Assert.That(effect.sprite,Is.SameAs(electricity));Assert.That(target.transform.position,Is.EqualTo(position));}
+            Assert.That(Remaining(),Is.Zero);Step();Assert.That(Tick(),Is.EqualTo(tick+1));
+            Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));
+            Call(director,"ResetTake",2);Assert.That(Remaining(),Is.Zero);
+            Assert.That((int)clockType.GetProperty("HitstopOwnerCount").GetValue(null),Is.Zero);
+            Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
+            Assert.That(Get<int>(Find("VideoVfxRenderer"),"ActiveCount"),Is.Zero);
+            Assert.That(Get<float>(presentation,"Zoom"),Is.Zero);Assert.That(Camera.main.orthographicSize,Is.EqualTo(3.375f));
+        }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
         [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
         public void SubmittedCounterEffectAlignsAndFreezesWithTheKickOnPauseAndHitstop(int fps,bool mirrored)
