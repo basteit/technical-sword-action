@@ -331,6 +331,7 @@ MonoBehaviour:
   chargeRealSeconds: 1.1
   kickHitstopFrames: 16
   parryBacklightMaterial: {fileID: 2100000, guid: e1ea5eabfa1e06542a2fbfc41d5f42c5, type: 2}
+  counterLightingMaterial: {fileID: 2100000, guid: 51fc69c70358d2e458c0364ef4b41b14, type: 2}
   normalSize: 3.375
   closeSize: 2.8125
   adaptiveFocusHeight: 0

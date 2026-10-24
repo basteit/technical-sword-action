@@ -12,7 +12,7 @@
 | 攻撃2段目 (`attack_2`) | [Player_attack_2.aseprite](Current/Player_attack_2.aseprite) | 仮提出 | 128×128 / 8コマ / 560ms | video：登録版一致, prototype：登録版一致 | [1版](History/attack_2/) |
 | パリィ待機 (`parry_wait`) | [Player_parry_wait.aseprite](Current/Player_parry_wait.aseprite) | 受領済み | 64×64 / 8コマ / 800ms | video：登録版一致, prototype：登録版一致 | [2版](History/parry_wait/) |
 | パリィ成功（軽） (`parry_light`) | [Player_parry_light.aseprite](Current/Player_parry_light.aseprite) | 仮提出 | 128×128 / 8コマ / 640ms | video：登録版一致, prototype：登録版一致 | [3版](History/parry_light/) |
-| 反撃への移行 (`counter_transfer`) | [Player_counter_transfer.aseprite](Current/Player_counter_transfer.aseprite) | 仮提出 | 64×64 / 8コマ / 800ms | video：登録版一致, prototype：登録版一致 | [1版](History/counter_transfer/) |
+| 反撃への移行 (`counter_transfer`) | [Player_counter_transfer.aseprite](Current/Player_counter_transfer.aseprite) | 仮提出 | 64×64 / 8コマ / 800ms | video：登録版一致, prototype：登録版一致 | [2版](History/counter_transfer/) |
 | 反撃キック (`counter_kick`) | [Player_counter_kick.aseprite](Current/Player_counter_kick.aseprite) | 受領済み | 128×128 / 15コマ / 1300ms | video：登録版一致, prototype：登録版一致 | [5版](History/counter_kick/) |
 | ジャンプ開始サンプル (`jump_start`) | [Player_jamp_start_sample.aseprite](Current/Player_jamp_start_sample.aseprite) | 既存サンプル | 48×48 / 5コマ / 500ms | prototype：登録版一致 | [1版](History/jump_start/) |
 | ジャンプ上昇サンプル (`jump_up`) | [Player_jamp_up_sample.aseprite](Current/Player_jamp_up_sample.aseprite) | 既存サンプル | 48×48 / 1コマ / 100ms | prototype：登録版一致 | [1版](History/jump_up/) |

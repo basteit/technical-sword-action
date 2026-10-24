@@ -175,6 +175,8 @@ public static class CombatVideoArtBuilder
     public static void RefreshSubmittedLightParry()=>RefreshSubmittedParry("ParrySuccessLight");
     [MenuItem("Tools/Technical Sword Action/Video/Refresh Submitted Parry Ready")]
     public static void RefreshSubmittedParryReady()=>RefreshSubmittedParry("ParryReady");
+    [MenuItem("Tools/Technical Sword Action/Video/Refresh Submitted Counter Transfer")]
+    public static void RefreshSubmittedCounterTransfer()=>RefreshSubmittedParry("CounterTransfer");
     private static void RefreshSubmittedParry(string actionName)
     {
         if(Application.isPlaying)throw new InvalidOperationException("Exit PlayMode before updating artwork.");
@@ -210,7 +212,9 @@ public static class CombatVideoArtBuilder
         motion.hasParryContact=action.hasParryContact;motion.parryContactOffset=action.parryContactOffset;
         EditorUtility.SetDirty(library);AssetDatabase.SaveAssetIfDirty(library);
         // Refresh only the selected clips; preserve the existing controller and all other artwork.
-        string[] clips=actionName=="ParryReady"?new[]{"Parry"}:new[]{"ParrySuccessLight","ParrySuccess"};
+        // Transfer reuses the eight Sprite GUIDs and the existing twelve-tick keys.
+        // Keep its already-edited clip/controller intact when replacing only the artwork.
+        string[] clips=actionName=="CounterTransfer"?Array.Empty<string>():actionName=="ParryReady"?new[]{"Parry"}:new[]{"ParrySuccessLight","ParrySuccess"};
         foreach(string name in clips)
         {
             Clip(name,motion,false);

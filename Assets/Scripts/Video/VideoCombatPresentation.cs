@@ -24,6 +24,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField] private bool parryBacklight=true;
     [SerializeField] private bool preserveParrySparkColor=true;
     [SerializeField] private Material parryBacklightMaterial;
+    [SerializeField] private bool counterLightingEnabled=true;
+    [SerializeField] private Material counterLightingMaterial;
     [SerializeField,Range(0,.2f)] private float impactZoomAmount=.06f;
     [SerializeField] private float normalSize=DefaultNormalSize;
     [SerializeField] private float closeSize=DefaultCloseSize;
@@ -44,6 +46,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     private Color flashTint=Color.white;
     private float parryInversionAge=-1,parryInversionDuration;
     private VideoParryBacklight backlight;
+    private VideoCounterLighting counterLighting;
+    private bool counterLightReady;
     private SpriteRenderer flashRenderer;
     private float dimAlpha,dimBlend;
     private SpriteRenderer dimRenderer;
@@ -68,6 +72,9 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     public bool IsParryBacklit=>backlight!=null&&backlight.IsVisible;
     public bool IsParryImpactVisible=>IsParryBacklit||IsParryInverted;
     public Damageable2D BacklitEnemy=>backlight!=null?backlight.Target:null;
+    public bool IsCounterLightVisible=>counterLighting!=null&&counterLighting.IsVisible;
+    public string CounterLightPhase=>counterLighting!=null?counterLighting.Phase:"None";
+    public int CounterLightFrame=>counterLighting!=null?counterLighting.ImpactFrame:-1;
     public bool IsDimVisible=>dimRenderer!=null&&dimRenderer.enabled;
     public bool IsSpotlightVisible=>heroLift!=null&&heroLift.enabled;
     public bool AreEyesVisible=>eyeLight!=null&&eyeLight.enabled;
@@ -82,6 +89,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         {
             backlight=captureCamera.gameObject.AddComponent<VideoParryBacklight>();backlight.hideFlags=HideFlags.DontSave;
             backlight.Configure(captureCamera,playerVisual,parryBacklightMaterial);
+            counterLighting=captureCamera.gameObject.AddComponent<VideoCounterLighting>();counterLighting.hideFlags=HideFlags.DontSave;
+            counterLighting.Configure(captureCamera,playerVisual,counterLightingMaterial);
         }
         EnsureSpotlight();
     }
@@ -115,7 +124,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     }
     private void OnCharge()
     {
-        RestorePlayerBody();charged=true;ChargeRealElapsed=0;
+        RestorePlayerBody();charged=true;counterLightReady=true;ChargeRealElapsed=0;
         focus=(counter.transform.position+counter.SelectedTarget.transform.position)*.5f;
         focus.y=counter.IsOverheadHeelDrop?focus.y-.15f:adaptiveFocusHeight?counter.transform.position.y-.5f:1.05f;focus.z=restPosition.z;
         CombatTimeController.RequestSlow(counter,chargeScale,chargeRealSeconds);
@@ -125,6 +134,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         charged=false;CombatTimeController.ReleaseSlow(counter);
         CombatTimeController.RequestHitstop(counter,kickHitstopFrames*CombatTimeController.StepSeconds);
+        if(counterLightReady&&counterLightingEnabled&&vfx.HybridGlow)counterLighting?.BeginImpact(enemy,foot,counter.KickFacingSign);
         impactZoomAge=0;impactZoom=0;
         ShakeDirectional(.30f,vfx.ReadableImpacts?.38f:.36f,counter.AttacksFromBehind?new Vector2(counter.KickFacingSign,-.25f):new Vector2(counter.KickFacingSign*.35f,-1),vfx.ReadableImpacts?1.75f:2.25f);
         flashRemaining=flashDuration=(vfx.ReadableImpacts?2:3)/60f;flashStrength=vfx.ReadableImpacts?.20f:.12f;flashTint=Color.white;
@@ -133,8 +143,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     }
     private void OnLanding()=>ShakeDirectional(.11f,.065f,Vector2.down,1.5f);
     private void OnFinished(bool hit)
-    { RestorePlayerBody();charged=false;CombatTimeController.ReleaseOwner(counter);if(!hit) ResetPresentation(); }
-    private void OnMiss() { charged=false;CombatTimeController.ReleaseSlow(counter); }
+    { RestorePlayerBody();charged=false;counterLightReady=false;counterLighting?.ResetLight();CombatTimeController.ReleaseOwner(counter);if(!hit) ResetPresentation(); }
+    private void OnMiss() { charged=false;counterLighting?.ResetLight();CombatTimeController.ReleaseSlow(counter); }
     public void Shake(float realSeconds,float strength)
     { ShakeDirectional(realSeconds,strength,new Vector2(1,.35f),3); }
     public void SetCameraFrame(Vector3 position,float size)
@@ -169,7 +179,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         parryInversionAge=visible?parryInversionAge+realSeconds:-1;
     }
     private void ResetParryInversion()
-    { parryInversionAge=-1;parryInversionDuration=0;VideoParryInversionFeature.SetVisible(captureCamera,false);backlight?.ResetLight(); }
+    { parryInversionAge=-1;parryInversionDuration=0;VideoParryInversionFeature.SetVisible(captureCamera,false);backlight?.ResetLight();counterLighting?.ResetLight();counterLightReady=false; }
     public void ShakeDirectional(float realSeconds,float strength,Vector2 direction,float cycles=3)
     {
         if(realSeconds<=0||strength<=0) return;
@@ -220,6 +230,9 @@ public sealed class VideoCombatPresentation : MonoBehaviour
             if(eyeTrailTimer>=.1f) { eyeTrailTimer%=.1f;vfx.EmitEyeTrail(playerVisual,counter.GetComponent<PlayerMotor2D>().FacingSign); }
         }
         else eyeTrailTimer=0;
+        float chargeSeconds=Mathf.Max(CombatTimeController.StepSeconds,(counter.ChargeReleaseFrame-counter.ChargeFrame)*CombatTimeController.StepSeconds/chargeScale);
+        if(counter.SelectedTarget==null||!counter.SelectedTarget.gameObject.activeInHierarchy)counterLightReady=false;
+        counterLighting?.Sample(realSeconds,counterLightReady&&counterLightingEnabled&&vfx.HybridGlow,charged,ChargeRealElapsed/chargeSeconds,counter.SelectedTarget,counter.KickFacingSign);
     }
     private void EnsureDimmer()
     {
@@ -300,5 +313,6 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         if(subjectLiftMaterial!=null) Destroy(subjectLiftMaterial);
         if(heroFocus!=null) Destroy(heroFocus);
         if(backlight!=null)Destroy(backlight);
+        if(counterLighting!=null)Destroy(counterLighting);
     }
 }

@@ -82,6 +82,7 @@ public static class CombatVideoSceneBuilder
         Set(presentation,"captureCamera",camera);Set(presentation,"counter",counter);Set(presentation,"vfx",fx);
         Set(presentation,"playerVisual",render);Set(presentation,"library",library);
         Set(presentation,"parryBacklightMaterial",AssetDatabase.LoadAssetAtPath<Material>("Assets/Settings/VideoParryBacklight.mat"));
+        Set(presentation,"counterLightingMaterial",AssetDatabase.LoadAssetAtPath<Material>("Assets/Settings/VideoCounterLighting.mat"));
         var director = new GameObject("CaptureDirector").AddComponent<CombatVideoDirector>();
         Set(director,"player", actor.GetComponent<PlayerStateMachine>());
         Set(director,"frontEnemy",a); Set(director,"rearEnemy",b);

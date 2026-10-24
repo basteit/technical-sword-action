@@ -406,6 +406,90 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Call(director,"ResetTake",2);
             }
         }
+        [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
+        [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
+        public void CounterLightingChangesInRealTimeWhileAuthoredContactAndCombatStayFrozen(int fps,bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            var victim=(Component)Get<object>(director,"RearEnemy");float strongestCharge=0;
+            var light=Camera.main.GetComponent(Type.GetType("VideoCounterLighting, Assembly-CSharp",true));
+            for(int i=0;i<fps*6&&Get<int>(victim,"HitCount")==0;i++)
+            {
+                Call(director,"StepCapture",1d/fps);
+                if(Get<string>(light,"Phase")=="Charge")strongestCharge=Mathf.Max(strongestCharge,Get<float>(light,"ChargeProgress"));
+            }
+            Assert.That(strongestCharge,Is.GreaterThan(.8f));
+            Assert.That(Get<string>(light,"Phase"),Is.EqualTo("Flash"));Assert.That(Get<int>(light,"ImpactFrame"),Is.Zero);
+            Assert.That(Get<object>(light,"Target"),Is.SameAs(victim));
+            var visual=state.GetComponent<SpriteRenderer>();var pose=visual.sprite;var point=victim.transform.position;
+            long tick=(long)clockType.GetProperty("TickCount").GetValue(null);
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
+            for(int i=0;i<fps;i++)Call(director,"StepCapture",1d/fps);
+            Assert.That(Get<int>(light,"ImpactFrame"),Is.Zero);
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
+            int exposed=0;bool discharge=false,read=false;
+            while(Get<bool>(light,"IsVisible")&&exposed<fps)
+            {
+                discharge|=Get<string>(light,"Phase")=="Discharge";read|=Get<string>(light,"Phase")=="Read";
+                Assert.That(visual.sprite,Is.SameAs(pose));Assert.That(victim.transform.position,Is.EqualTo(point));
+                Assert.That((long)clockType.GetProperty("TickCount").GetValue(null),Is.EqualTo(tick));
+                exposed++;Call(director,"StepCapture",1d/fps);
+            }
+            Assert.That(discharge&&read,Is.True);Assert.That(exposed/(float)fps,Is.EqualTo(16/60f).Within(.0001f));
+            Assert.That(Get<object>(light,"Target"),Is.Null);Assert.That(Get<int>(victim,"HitCount"),Is.EqualTo(1));
+        }
+        [TestCase("Reset",false)] [TestCase("Disable",false)] [TestCase("SessionReset",false)] [TestCase("TargetLost",false)]
+        [TestCase("Reset",true)] [TestCase("Disable",true)] [TestCase("SessionReset",true)] [TestCase("TargetLost",true)]
+        public void CounterLightingClearsOnInterruptionsAndDoesNotResurrect(string interruption,bool impact)
+        {
+            Call(director,"StartTake",2,true);
+            string wanted=impact?"Flash":"Charge";
+            for(int i=0;i<360&&Get<string>(presentation,"CounterLightPhase")!=wanted;i++)Step();
+            Assert.That(Get<string>(presentation,"CounterLightPhase"),Is.EqualTo(wanted));
+            var light=Camera.main.GetComponent(Type.GetType("VideoCounterLighting, Assembly-CSharp",true));
+            var victim=(Component)Get<object>(light,"Target");
+            if(interruption=="Disable")((Behaviour)presentation).enabled=false;
+            else if(interruption=="SessionReset")clockType.GetMethod("ResetSession").Invoke(null,null);
+            else if(interruption=="TargetLost"){victim.gameObject.SetActive(false);Step();victim.gameObject.SetActive(true);}
+            else Call(director,"ResetTake",2);
+            Assert.That(Get<bool>(light,"IsVisible"),Is.False);
+            Call(presentation,"AdvanceVisuals",1/60f);
+            Assert.That(Get<bool>(light,"IsVisible"),Is.False);Assert.That(Get<object>(light,"Target"),Is.Null);
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void CounterLightingUsesBlueLightOnItsOwnCameraAndKeepsOriginalPixelsOnOtherCameras(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            for(int i=0;i<360&&Get<string>(presentation,"CounterLightPhase")!="Flash";i++)Step();
+            Assert.That(Get<string>(presentation,"CounterLightPhase"),Is.EqualTo("Flash"));
+            var camera=Camera.main;var light=camera.GetComponent(Type.GetType("VideoCounterLighting, Assembly-CSharp",true));
+            var other=new GameObject("CounterUnaffectedCamera").AddComponent<Camera>();other.CopyFrom(camera);other.enabled=false;
+            other.transform.SetPositionAndRotation(camera.transform.position,camera.transform.rotation);
+            try
+            {
+                var lit=RenderParryPixels(camera);var unaffected=RenderParryPixels(other);
+                Call(light,"ResetLight");var normal=RenderParryPixels(camera);
+                Assert.That(lit[0].r+lit[0].g+lit[0].b,Is.LessThan(110));
+                int bluer=0;
+                for(int i=0;i<normal.Length;i++)
+                {
+                    Assert.That(unaffected[i],Is.EqualTo(normal[i]));
+                    if(lit[i].b>80&&lit[i].b-lit[i].r>normal[i].b-normal[i].r+20)bluer++;
+                }
+                Assert.That(bluer,Is.GreaterThan(30),"The blue light must be visible beyond the existing palette.");
+            }
+            finally {Object.DestroyImmediate(other.gameObject);Call(director,"ResetTake",2);}
+        }
+        [TestCase(false,true)] [TestCase(true,false)]
+        public void PurePixelAndComparisonSwitchCanKeepCounterLightingOff(bool hybrid,bool enabled)
+        {
+            presentation.GetType().GetField("counterLightingEnabled",Flags).SetValue(presentation,enabled);
+            Call(director,"StartTake",2,hybrid);
+            for(int i=0;i<360&&!Get<bool>(director,"Completed");i++)
+            {Step();Assert.That(Get<bool>(presentation,"IsCounterLightVisible"),Is.False);}
+            Assert.That(Get<bool>(director,"Completed"),Is.True);
+        }
+
         private static Color32[] RenderParryPixels(Camera camera)
         {
             var requestType=Type.GetType("UnityEngine.Rendering.Universal.UniversalRenderPipeline+SingleCameraRequest, Unity.RenderPipelines.Universal.Runtime",true);
@@ -1265,7 +1349,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(firstDistance,Is.EqualTo(.8f).Within(.001f));
                 Assert.That(secondDistance,Is.EqualTo(firstDistance*2).Within(.001f));
                 Assert.That(Get<int>(enemies[0],"HitCount"),Is.EqualTo(2));Assert.That(Get<int>(enemies[1],"HitCount"),Is.EqualTo(1));
-                Assert.That(Get<bool>(presentation,"IsParryImpactVisible"),Is.False);Assert.That(Get<object>(presentation,"BacklitEnemy"),Is.Null);
+                Assert.That(Get<bool>(presentation,"IsParryImpactVisible"),Is.False);Assert.That(Get<object>(presentation,"BacklitEnemy"),Is.Null);Assert.That(Get<bool>(presentation,"IsCounterLightVisible"),Is.False);
                 Assert.That(Get<string>(Marks().Single(m=>Get<string>(m,"kind")=="Kick"),"target"),Is.EqualTo(Get<string>(enemies[1],"IndividualId")));
                 Assert.That(Get<float>(presentation,"Zoom"),Is.Zero);Assert.That(Get<float>(presentation,"ImpactZoom"),Is.Zero);
                 Call(director,"ResetTake",2);

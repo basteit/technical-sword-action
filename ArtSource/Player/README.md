@@ -2,6 +2,8 @@
 
 [素材一覧を開く](INDEX.md)
 
+2026-10-25移行更新：`counter_transfer` の2版目（64px/8×100ms、後ろ髪を含む）をCurrent/Historyへ登録し、共有PNG8枚へ反映。ゲーム用12tick/ピボット/全Clip/Controllerを保持し、個別更新メニューを追加しました。動画は関連PlayMode、本編は共有SpriteとClipのEditMode確認を行い、使用版を別々に記録します。[演出比較・素材・検証](../../docs/video/counter-lighting-20261025.md)。原稿の仮提出区分と、動画全体の最終受入は維持して区別します。
+
 2026-10-25素材更新：パリィ待機2版目と成功軽3版目（後ろ髪を含む）を受領し、Current/Historyへ登録、動画/Studioの共有PNGへ反映しました。キャンバス・32PPU・ピボット・コマ時間・判定を保持。白黒反転は2→4動画Fへ延長。本編は共有PNG/Clipの参照確認までとし、動画のPlayMode受入と区別しています。[変更・動画・限定検証](../../docs/video/parry-update-invert4-20261025.md)。
 
 2026-10-25パリィ追加調整：[停止9F・カウンター16F維持](../../docs/video/parry-stop9-20261025.md)。同じ原稿でパリィ3コマ目を10動画F表示します。新しい原稿版やPNG/Clipの変更はありません。
