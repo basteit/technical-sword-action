@@ -1,0 +1,291 @@
+{
+  "date": "2026-10-25",
+  "trial": "counter-shader-lighting-and-transfer-revision-2",
+  "counterLightPhaseFrames": {
+    "Charge": [
+      159,
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198,
+      199,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218
+    ],
+    "Flash": [
+      220,
+      221,
+      222
+    ],
+    "Discharge": [
+      223,
+      224,
+      225,
+      226,
+      227
+    ],
+    "Read": [
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      234,
+      235
+    ]
+  },
+  "counterLightRealSeconds": {
+    "charge": 1,
+    "flash": 0.05,
+    "discharge": 0.08333333333333333,
+    "read": 0.13333333333333333
+  },
+  "artworkUnchangedExceptSubmittedTransfer": true,
+  "newPixelEffectArtCreated": false,
+  "purePixelModeDisablesAddedLighting": true,
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "shaderDiagnostics": "{ playing = False, scene = Assets/Scenes/CombatVideo.unity, dirty = False, messages =  }",
+  "playModeRuns": [
+    {
+      "Success": true,
+      "Message": "Test execution completed with status: Passed",
+      "CompletedAt": "2026-10-24T22:34:17.6435020Z",
+      "TestCount": 18,
+      "PassedCount": 18,
+      "FailedCount": 0,
+      "SkippedCount": 0,
+      "XmlPath": null
+    },
+    {
+      "Success": true,
+      "Message": "Test execution completed with status: Passed",
+      "CompletedAt": "2026-10-24T22:35:38.5544063Z",
+      "TestCount": 35,
+      "PassedCount": 35,
+      "FailedCount": 0,
+      "SkippedCount": 0,
+      "XmlPath": null
+    },
+    {
+      "Success": true,
+      "Message": "Test execution completed with status: Passed",
+      "CompletedAt": "2026-10-24T22:36:36.6556299Z",
+      "TestCount": 4,
+      "PassedCount": 4,
+      "FailedCount": 0,
+      "SkippedCount": 0,
+      "XmlPath": null
+    }
+  ],
+  "uniquePlayModeCasesPassed": 57,
+  "editMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T22:37:26.0779031Z",
+    "TestCount": 2,
+    "PassedCount": 2,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "prototypeValidationScope": "Shared Sprite/snapshot/clip references and timing only; no gameplay acceptance claim.",
+  "mirroredTenResetRunsPassed": 20,
+  "fullSuiteRerun": false,
+  "legacyEightyResetSweepRerun": false,
+  "sourceUpdate": {
+    "id": "counter_transfer",
+    "revision": 2,
+    "sha256": "460ccce461d0640ffacc70f964f9c36c676fd8b8bc726be0aeeec84f9ae3ec07",
+    "nativeFrames": 8,
+    "canvas": [
+      64,
+      64
+    ],
+    "nativeDurationMs": 800,
+    "gameTicks": 12,
+    "oldRevisionRetained": true,
+    "downloadCurrentHistoryAndDatedCopyIdentical": true,
+    "allBodyAndEyePngsMatchAsepriteExport": true,
+    "editableReviewCopyReopened": true,
+    "sourceLayerVisibilityAndEyeOpacityPreserved": true,
+    "existingClipAndControllerUnchanged": true,
+    "usesRecordedAfterValidation": [
+      "video",
+      "prototype"
+    ]
+  },
+  "sourceLibraryValid": true,
+  "pendingSourceUpdates": [],
+  "eventsAndNormalizedTraceUnchangedAgainstBothComparisonAndPreviousTake": true,
+  "cameraAndShakeAndGameplayTimingUnchanged": true,
+  "hitstop": {
+    "parry": 9,
+    "just": 10,
+    "counter": 16,
+    "kickContactCelVideoFrames": 17
+  },
+  "captureConsole": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 20,
+    "SearchText": "",
+    "IncludeStackTrace": true,
+    "Logs": []
+  },
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 20,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "originalValidationSceneByteUnchanged": true,
+  "movies": [
+    {
+      "variant": "after",
+      "path": "docs/video/previews/combat-2stage-hybrid-counter-lighting-after-20261025.mp4",
+      "sha256": "5402ca564480a01ed251ebb5c2f2d90eea8f41977d924678e189ba5c12c159b5",
+      "decodedFrames": 275,
+      "durationSeconds": 4.583333333333333,
+      "fps": 60,
+      "width": 1920,
+      "height": 1080,
+      "audioStreams": 0
+    },
+    {
+      "variant": "before",
+      "path": "docs/video/previews/combat-2stage-hybrid-counter-lighting-before-20261025.mp4",
+      "sha256": "dcb9caaa1c15d85aaee82821903b7307ef64a7689ec91480a6871b935ff64220",
+      "decodedFrames": 275,
+      "durationSeconds": 4.583333333333333,
+      "fps": 60,
+      "width": 1920,
+      "height": 1080,
+      "audioStreams": 0
+    }
+  ],
+  "previews": [
+    {
+      "variant": "after",
+      "path": "C:\\Users\\hirot\\.codex\\visualizations\\2026\\10\\12\\01a12de9-62c0-72d1-8001-9b40d2eb7a55\\counter-lighting-after-20261025.html",
+      "bytes": 972376,
+      "crf": 22,
+      "decodedFrames": 275,
+      "nativeVideoControls": true
+    },
+    {
+      "variant": "before",
+      "path": "C:\\Users\\hirot\\.codex\\visualizations\\2026\\10\\12\\01a12de9-62c0-72d1-8001-9b40d2eb7a55\\counter-lighting-before-20261025.html",
+      "bytes": 899795,
+      "crf": 22,
+      "decodedFrames": 275,
+      "nativeVideoControls": true
+    }
+  ],
+  "endState": {
+    "bothEnemiesHidden": true,
+    "vfxActive": 0,
+    "hitstop": 0,
+    "slowScale": 1,
+    "cameraSize": 3.375,
+    "shake": [
+      0,
+      0
+    ],
+    "parryBacklight": false,
+    "counterLighting": false,
+    "player": "submitted idle"
+  },
+  "baselineAudit": {
+    "files": 2450,
+    "unchanged": 2430,
+    "intentionalChanges": [
+      "ArtSource/Player/Current/Player_counter_transfer.aseprite",
+      "ArtSource/Player/INDEX.md",
+      "ArtSource/Player/README.md",
+      "ArtSource/Player/catalog.json",
+      "Assets/Art/Player/VideoSubmitted/CounterTransfer_01.png",
+      "Assets/Art/Player/VideoSubmitted/CounterTransfer_02.png",
+      "Assets/Art/Player/VideoSubmitted/CounterTransfer_03.png",
+      "Assets/Art/Player/VideoSubmitted/CounterTransfer_04.png",
+      "Assets/Art/Player/VideoSubmitted/CounterTransfer_05.png",
+      "Assets/Art/Player/VideoSubmitted/CounterTransfer_06.png",
+      "Assets/Art/Player/VideoSubmitted/CounterTransfer_07.png",
+      "Assets/Art/Player/VideoSubmitted/CounterTransfer_08.png",
+      "Assets/Editor/CombatVideoArtBuilder.cs",
+      "Assets/Editor/CombatVideoSceneBuilder.cs",
+      "Assets/Scenes/CombatVideo.unity",
+      "Assets/Scenes/CombatVideoDefenseCancel.unity",
+      "Assets/Scenes/CombatVideoStudio.unity",
+      "Assets/Scripts/Video/VideoCombatPresentation.cs",
+      "Assets/Tests/PlayMode/PlayerState/CombatVideoIntegrationTests.cs",
+      "docs/video/capture-guide.md"
+    ],
+    "existingUncommittedChangesPreserved": true
+  },
+  "overallVideoAccepted": false
+}

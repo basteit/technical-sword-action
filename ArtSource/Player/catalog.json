@@ -1,0 +1,2410 @@
+{
+  "schema_version": 1,
+  "motions": {
+    "idle": {
+      "name": "待機",
+      "status": "received",
+      "notes": "現在の64px待機。ゲーム用は6コマ×100ms。旧48px待機サンプルと区別。",
+      "current": "Current/Player_idle.aseprite",
+      "current_sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
+      "revisions": [
+        {
+          "sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
+          "file": "History/idle/a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076.aseprite",
+          "original_name": "Player_idle.aseprite",
+          "registered_at": "2026-10-18T09:06:49+00:00",
+          "received_on": null,
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              }
+            ],
+            "height": 64,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 64
+          },
+          "original_project_path": "Assets/Art/Player/Player_idle.aseprite"
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "video",
+          "motion": "IdleReference",
+          "source_sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
+          "references": [
+            "Assets/Art/Player/VideoRough/IdleReference_01.png",
+            "Assets/Settings/CombatVideoArt.asset"
+          ],
+          "evidence": "docs/video/counter-submissions-20261018.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "Idle",
+          "source_sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+        }
+      ]
+    },
+    "walk": {
+      "name": "歩行",
+      "status": "received",
+      "notes": "標準の歩行で使用。原稿の表示時間とゲーム内の移動速度は別に管理。",
+      "current": "Current/Player_walk.aseprite",
+      "current_sha256": "92fc9e07636331d2d6b5aac363dc3ac6a53e030608db1533d9cae1505ae5f107",
+      "revisions": [
+        {
+          "sha256": "92fc9e07636331d2d6b5aac363dc3ac6a53e030608db1533d9cae1505ae5f107",
+          "file": "History/walk/92fc9e07636331d2d6b5aac363dc3ac6a53e030608db1533d9cae1505ae5f107.aseprite",
+          "original_name": "Player_walk.aseprite",
+          "registered_at": "2026-10-18T09:09:22+00:00",
+          "received_on": null,
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 80,
+                "frame": 1
+              },
+              {
+                "duration_ms": 80,
+                "frame": 2
+              },
+              {
+                "duration_ms": 80,
+                "frame": 3
+              },
+              {
+                "duration_ms": 80,
+                "frame": 4
+              },
+              {
+                "duration_ms": 80,
+                "frame": 5
+              },
+              {
+                "duration_ms": 80,
+                "frame": 6
+              },
+              {
+                "duration_ms": 80,
+                "frame": 7
+              },
+              {
+                "duration_ms": 80,
+                "frame": 8
+              }
+            ],
+            "height": 64,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 64
+          },
+          "original_project_path": "Assets/Art/Player/Player_walk.aseprite"
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "video",
+          "motion": "WalkReference",
+          "source_sha256": "92fc9e07636331d2d6b5aac363dc3ac6a53e030608db1533d9cae1505ae5f107",
+          "references": [
+            "Assets/Art/Player/VideoRough/WalkReference_01.png",
+            "Assets/Settings/CombatVideoArt.asset"
+          ],
+          "evidence": "docs/video/counter-submissions-20261018.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "Move",
+          "source_sha256": "92fc9e07636331d2d6b5aac363dc3ac6a53e030608db1533d9cae1505ae5f107",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+        }
+      ]
+    },
+    "attack_1": {
+      "name": "攻撃1段目",
+      "status": "provisional",
+      "notes": "縦斬り2版目。後ろ髪を含む9コマ×70ms。動画は復帰を省略。128pxの余白を含め原本保持。",
+      "current": "Current/Player_attack_1.aseprite",
+      "current_sha256": "8348fe7f2045eadfbd259dba18cb9ffb2c3e50357312c8e169c54b4620fd814e",
+      "revisions": [
+        {
+          "sha256": "d994e5fdba1d091018c8ba1b2e4029068aa2a1f6351485aade2124be80bf2650",
+          "file": "History/attack_1/d994e5fdba1d091018c8ba1b2e4029068aa2a1f6351485aade2124be80bf2650.aseprite",
+          "original_name": "Player_attack_1.aseprite",
+          "registered_at": "2026-10-18T09:09:22+00:00",
+          "received_on": "2026-10-16",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 70,
+                "frame": 1
+              },
+              {
+                "duration_ms": 70,
+                "frame": 2
+              },
+              {
+                "duration_ms": 70,
+                "frame": 3
+              },
+              {
+                "duration_ms": 70,
+                "frame": 4
+              },
+              {
+                "duration_ms": 70,
+                "frame": 5
+              },
+              {
+                "duration_ms": 70,
+                "frame": 6
+              },
+              {
+                "duration_ms": 70,
+                "frame": 7
+              },
+              {
+                "duration_ms": 70,
+                "frame": 8
+              },
+              {
+                "duration_ms": 70,
+                "frame": 9
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 128,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          },
+          "original_project_path": "Assets/Art/Player/VideoSubmitted/20261016/Player_attack_1.aseprite"
+        },
+        {
+          "sha256": "8348fe7f2045eadfbd259dba18cb9ffb2c3e50357312c8e169c54b4620fd814e",
+          "file": "History/attack_1/8348fe7f2045eadfbd259dba18cb9ffb2c3e50357312c8e169c54b4620fd814e.aseprite",
+          "original_name": "Player_attack_1.aseprite",
+          "registered_at": "2026-10-24T23:07:56+00:00",
+          "received_on": "2026-10-25",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 70,
+                "frame": 1
+              },
+              {
+                "duration_ms": 70,
+                "frame": 2
+              },
+              {
+                "duration_ms": 70,
+                "frame": 3
+              },
+              {
+                "duration_ms": 70,
+                "frame": 4
+              },
+              {
+                "duration_ms": 70,
+                "frame": 5
+              },
+              {
+                "duration_ms": 70,
+                "frame": 6
+              },
+              {
+                "duration_ms": 70,
+                "frame": 7
+              },
+              {
+                "duration_ms": 70,
+                "frame": 8
+              },
+              {
+                "duration_ms": 70,
+                "frame": 9
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 128,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "video",
+          "motion": "VerticalSlash",
+          "source_sha256": "8348fe7f2045eadfbd259dba18cb9ffb2c3e50357312c8e169c54b4620fd814e",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/VerticalSlash_01.png",
+            "Assets/Settings/CombatVideoArt.asset"
+          ],
+          "evidence": "docs/video/counter-pulse-attack1-20261025.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "Attack_1",
+          "source_sha256": "8348fe7f2045eadfbd259dba18cb9ffb2c3e50357312c8e169c54b4620fd814e",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/video/counter-pulse-attack1-20261025.md"
+        }
+      ]
+    },
+    "attack_2": {
+      "name": "攻撃2段目",
+      "status": "provisional",
+      "notes": "1段目から逆側へ返す斬撃。現在の動画はこの2段目で撃破。",
+      "current": "Current/Player_attack_2.aseprite",
+      "current_sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
+      "revisions": [
+        {
+          "sha256": "ccdb5da3908f8dc0fd730291036964c5b6c2380991cf1def238e13a5fa5ce781",
+          "file": "History/attack_2/ccdb5da3908f8dc0fd730291036964c5b6c2380991cf1def238e13a5fa5ce781.aseprite",
+          "original_name": "Player_attack_2.aseprite",
+          "registered_at": "2026-10-18T09:09:22+00:00",
+          "received_on": "2026-10-17",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 70,
+                "frame": 1
+              },
+              {
+                "duration_ms": 70,
+                "frame": 2
+              },
+              {
+                "duration_ms": 70,
+                "frame": 3
+              },
+              {
+                "duration_ms": 70,
+                "frame": 4
+              },
+              {
+                "duration_ms": 70,
+                "frame": 5
+              },
+              {
+                "duration_ms": 70,
+                "frame": 6
+              },
+              {
+                "duration_ms": 70,
+                "frame": 7
+              },
+              {
+                "duration_ms": 70,
+                "frame": 8
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 102,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          },
+          "original_project_path": "Assets/Art/Player/VideoSubmitted/20261017/Player_attack_2.aseprite"
+        },
+        {
+          "sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
+          "file": "History/attack_2/91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa.aseprite",
+          "original_name": "Player_attack_2.aseprite",
+          "registered_at": "2026-10-24T23:44:26+00:00",
+          "received_on": "2026-10-25",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 70,
+                "frame": 1
+              },
+              {
+                "duration_ms": 70,
+                "frame": 2
+              },
+              {
+                "duration_ms": 70,
+                "frame": 3
+              },
+              {
+                "duration_ms": 70,
+                "frame": 4
+              },
+              {
+                "duration_ms": 70,
+                "frame": 5
+              },
+              {
+                "duration_ms": 70,
+                "frame": 6
+              },
+              {
+                "duration_ms": 70,
+                "frame": 7
+              },
+              {
+                "duration_ms": 70,
+                "frame": 8
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 102,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "video",
+          "motion": "HorizontalSlash",
+          "source_sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/HorizontalSlash_01.png",
+            "Assets/Settings/CombatVideoArt.asset"
+          ],
+          "evidence": "docs/video/kick-shake-attack2-20261025.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "Attack_2",
+          "source_sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/video/kick-shake-attack2-20261025.md"
+        }
+      ]
+    },
+    "parry_wait": {
+      "name": "パリィ待機",
+      "status": "received",
+      "notes": "入力時の構え。成功軽・成功重とは別素材。",
+      "current": "Current/Player_parry_wait.aseprite",
+      "current_sha256": "c5dffc39dd22ed44d1a6e812386bb619b6c2c5efbf89bed5e8918e4dcb1a96d0",
+      "revisions": [
+        {
+          "sha256": "01adf3b9dfcc81dff09749a7362b77971ddef73afcd5077468526f5327411d1d",
+          "file": "History/parry_wait/01adf3b9dfcc81dff09749a7362b77971ddef73afcd5077468526f5327411d1d.aseprite",
+          "original_name": "Player_parry_wait.aseprite",
+          "registered_at": "2026-10-18T09:09:22+00:00",
+          "received_on": "2026-10-17",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              }
+            ],
+            "height": 64,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 112,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 64
+          },
+          "original_project_path": "Assets/Art/Player/VideoSubmitted/20261017/Player_parry_wait.aseprite"
+        },
+        {
+          "sha256": "c5dffc39dd22ed44d1a6e812386bb619b6c2c5efbf89bed5e8918e4dcb1a96d0",
+          "file": "History/parry_wait/c5dffc39dd22ed44d1a6e812386bb619b6c2c5efbf89bed5e8918e4dcb1a96d0.aseprite",
+          "original_name": "Player_parry_wait.aseprite",
+          "registered_at": "2026-10-24T20:56:29+00:00",
+          "received_on": "2026-10-25",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              }
+            ],
+            "height": 64,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 112,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 64
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "video",
+          "motion": "ParryReady",
+          "source_sha256": "c5dffc39dd22ed44d1a6e812386bb619b6c2c5efbf89bed5e8918e4dcb1a96d0",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/ParryReady_01.png",
+            "Assets/Settings/CombatVideoArt.asset"
+          ],
+          "evidence": "docs/video/parry-update-invert4-20261025.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "Parry",
+          "source_sha256": "c5dffc39dd22ed44d1a6e812386bb619b6c2c5efbf89bed5e8918e4dcb1a96d0",
+          "references": [
+            "Assets/Animations/Player/Submitted/PlayerPrototype_Parry.anim",
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset"
+          ],
+          "evidence": "docs/video/parry-update-invert4-20261025.md"
+        }
+      ]
+    },
+    "parry_light": {
+      "name": "パリィ成功（軽）",
+      "status": "provisional",
+      "notes": "軽く弾く反応の仮提出。成功重の専用作画は未受領。",
+      "current": "Current/Player_parry_light.aseprite",
+      "current_sha256": "d038a1c76e432c7803be090daa73cd3e6d2062cf1d1347c774d4262d378b1637",
+      "revisions": [
+        {
+          "sha256": "cc31cbbf9b40901cc230f9985a24043fd58b8e46330cacb4d8db0aa9cafd3366",
+          "file": "History/parry_light/cc31cbbf9b40901cc230f9985a24043fd58b8e46330cacb4d8db0aa9cafd3366.aseprite",
+          "original_name": "Player_parry_light.aseprite",
+          "registered_at": "2026-10-18T09:09:22+00:00",
+          "received_on": "2026-10-18",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              }
+            ],
+            "height": 64,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 97,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 64
+          },
+          "original_project_path": "Assets/Art/Player/VideoSubmitted/20261018/Player_parry_light.aseprite"
+        },
+        {
+          "sha256": "115ab7f81eb0016932a93ca36d8eb0c9f667beec19dfb392c4943d9916628996",
+          "file": "History/parry_light/115ab7f81eb0016932a93ca36d8eb0c9f667beec19dfb392c4943d9916628996.aseprite",
+          "original_name": "Player_parry_light.aseprite",
+          "registered_at": "2026-10-24T13:36:31+00:00",
+          "received_on": null,
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 80,
+                "frame": 1
+              },
+              {
+                "duration_ms": 80,
+                "frame": 2
+              },
+              {
+                "duration_ms": 80,
+                "frame": 3
+              },
+              {
+                "duration_ms": 80,
+                "frame": 4
+              },
+              {
+                "duration_ms": 80,
+                "frame": 5
+              },
+              {
+                "duration_ms": 80,
+                "frame": 6
+              },
+              {
+                "duration_ms": 80,
+                "frame": 7
+              },
+              {
+                "duration_ms": 80,
+                "frame": 8
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 102,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
+        },
+        {
+          "sha256": "d038a1c76e432c7803be090daa73cd3e6d2062cf1d1347c774d4262d378b1637",
+          "file": "History/parry_light/d038a1c76e432c7803be090daa73cd3e6d2062cf1d1347c774d4262d378b1637.aseprite",
+          "original_name": "Player_parry_light.aseprite",
+          "registered_at": "2026-10-24T20:56:29+00:00",
+          "received_on": "2026-10-25",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 80,
+                "frame": 1
+              },
+              {
+                "duration_ms": 80,
+                "frame": 2
+              },
+              {
+                "duration_ms": 80,
+                "frame": 3
+              },
+              {
+                "duration_ms": 80,
+                "frame": 4
+              },
+              {
+                "duration_ms": 80,
+                "frame": 5
+              },
+              {
+                "duration_ms": 80,
+                "frame": 6
+              },
+              {
+                "duration_ms": 80,
+                "frame": 7
+              },
+              {
+                "duration_ms": 80,
+                "frame": 8
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 102,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "video",
+          "motion": "ParrySuccessLight",
+          "source_sha256": "d038a1c76e432c7803be090daa73cd3e6d2062cf1d1347c774d4262d378b1637",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_01.png",
+            "Assets/Settings/CombatVideoArt.asset",
+            "Assets/Animations/Video/PlayerVideo_ParrySuccessLight.anim"
+          ],
+          "evidence": "docs/video/parry-update-invert4-20261025.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "ParrySuccess",
+          "source_sha256": "d038a1c76e432c7803be090daa73cd3e6d2062cf1d1347c774d4262d378b1637",
+          "references": [
+            "Assets/Animations/Player/Submitted/PlayerPrototype_ParrySuccess.anim",
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset"
+          ],
+          "evidence": "docs/video/parry-update-invert4-20261025.md"
+        }
+      ]
+    },
+    "counter_transfer": {
+      "name": "反撃への移行",
+      "status": "provisional",
+      "notes": "原稿のEffect/Eyeの表示と不透明度を保持。移動・暗転・残光は使用先で調整。",
+      "current": "Current/Player_counter_transfer.aseprite",
+      "current_sha256": "460ccce461d0640ffacc70f964f9c36c676fd8b8bc726be0aeeec84f9ae3ec07",
+      "revisions": [
+        {
+          "sha256": "299dc68428aa7653ea56bfad548cbde0f737bbd5a36f10afe964b93261a41b2b",
+          "file": "History/counter_transfer/299dc68428aa7653ea56bfad548cbde0f737bbd5a36f10afe964b93261a41b2b.aseprite",
+          "original_name": "Player_counter_transfer.aseprite",
+          "registered_at": "2026-10-18T09:09:22+00:00",
+          "received_on": "2026-10-18",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              }
+            ],
+            "height": 64,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
+                "opacity": 128,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 0,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 64
+          },
+          "original_project_path": "Assets/Art/Player/VideoSubmitted/20261018/Player_counter_transfer.aseprite"
+        },
+        {
+          "sha256": "460ccce461d0640ffacc70f964f9c36c676fd8b8bc726be0aeeec84f9ae3ec07",
+          "file": "History/counter_transfer/460ccce461d0640ffacc70f964f9c36c676fd8b8bc726be0aeeec84f9ae3ec07.aseprite",
+          "original_name": "Player_counter_transfer.aseprite",
+          "registered_at": "2026-10-24T22:20:48+00:00",
+          "received_on": "2026-10-25",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              }
+            ],
+            "height": 64,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
+                "opacity": 128,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 0,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 64
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "video",
+          "motion": "CounterTransfer",
+          "source_sha256": "460ccce461d0640ffacc70f964f9c36c676fd8b8bc726be0aeeec84f9ae3ec07",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/CounterTransfer_01.png",
+            "Assets/Settings/CombatVideoArt.asset"
+          ],
+          "evidence": "docs/video/counter-lighting-20261025.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "ParryCounter",
+          "source_sha256": "460ccce461d0640ffacc70f964f9c36c676fd8b8bc726be0aeeec84f9ae3ec07",
+          "references": [
+            "Assets/Settings/PrototypeCombat/CounterCinematicArt.asset",
+            "Assets/Settings/PrototypeCombat/CounterCinematic.asset",
+            "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim"
+          ],
+          "evidence": "docs/video/counter-lighting-20261025.md"
+        }
+      ]
+    },
+    "counter_kick": {
+      "name": "反撃キック",
+      "status": "received",
+      "notes": "細部を修正した人物キックの更新原稿。独立VFXと再同期し、近め/ゲームに近い比較撮影へ反映予定。",
+      "current": "Current/Player_counter_kick.aseprite",
+      "current_sha256": "170a5732e08d1cd3fe7626451c0ed85e7ebbdc07ca6803230466fcebdac4d4c5",
+      "revisions": [
+        {
+          "sha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db",
+          "file": "History/counter_kick/705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db.aseprite",
+          "original_name": "Player_counter_kick.aseprite",
+          "registered_at": "2026-10-18T09:09:23+00:00",
+          "received_on": "2026-10-18",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 80,
+                "frame": 1
+              },
+              {
+                "duration_ms": 80,
+                "frame": 2
+              },
+              {
+                "duration_ms": 80,
+                "frame": 3
+              },
+              {
+                "duration_ms": 150,
+                "frame": 4
+              },
+              {
+                "duration_ms": 150,
+                "frame": 5
+              },
+              {
+                "duration_ms": 150,
+                "frame": 6
+              },
+              {
+                "duration_ms": 150,
+                "frame": 7
+              },
+              {
+                "duration_ms": 80,
+                "frame": 8
+              },
+              {
+                "duration_ms": 80,
+                "frame": 9
+              },
+              {
+                "duration_ms": 80,
+                "frame": 10
+              },
+              {
+                "duration_ms": 80,
+                "frame": 11
+              },
+              {
+                "duration_ms": 80,
+                "frame": 12
+              },
+              {
+                "duration_ms": 80,
+                "frame": 13
+              },
+              {
+                "duration_ms": 80,
+                "frame": 14
+              },
+              {
+                "duration_ms": 80,
+                "frame": 15
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 255,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 128
+          },
+          "original_project_path": "Assets/Art/Player/VideoSubmitted/20261018/Player_counter_kick.aseprite"
+        },
+        {
+          "sha256": "a763a95f3ff125bb379c8edee7f2b15c360c8afe6810edc710b1cdfae7898862",
+          "file": "History/counter_kick/a763a95f3ff125bb379c8edee7f2b15c360c8afe6810edc710b1cdfae7898862.aseprite",
+          "original_name": "Player_counter_kick.aseprite",
+          "registered_at": "2026-10-18T18:51:41+00:00",
+          "received_on": "2026-10-19",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              },
+              {
+                "duration_ms": 100,
+                "frame": 9
+              },
+              {
+                "duration_ms": 100,
+                "frame": 10
+              },
+              {
+                "duration_ms": 60,
+                "frame": 11
+              },
+              {
+                "duration_ms": 60,
+                "frame": 12
+              },
+              {
+                "duration_ms": 60,
+                "frame": 13
+              },
+              {
+                "duration_ms": 60,
+                "frame": 14
+              },
+              {
+                "duration_ms": 60,
+                "frame": 15
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 105,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
+        },
+        {
+          "sha256": "cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5",
+          "file": "History/counter_kick/cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5.aseprite",
+          "original_name": "Player_counter_kick.aseprite",
+          "registered_at": "2026-10-18T19:31:49+00:00",
+          "received_on": "2026-10-19",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              },
+              {
+                "duration_ms": 100,
+                "frame": 9
+              },
+              {
+                "duration_ms": 100,
+                "frame": 10
+              },
+              {
+                "duration_ms": 60,
+                "frame": 11
+              },
+              {
+                "duration_ms": 60,
+                "frame": 12
+              },
+              {
+                "duration_ms": 60,
+                "frame": 13
+              },
+              {
+                "duration_ms": 60,
+                "frame": 14
+              },
+              {
+                "duration_ms": 60,
+                "frame": 15
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 105,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
+        },
+        {
+          "sha256": "10061865424f45625e064e07cf0bca00ab188fce995263e12b6ba8ae807894dd",
+          "file": "History/counter_kick/10061865424f45625e064e07cf0bca00ab188fce995263e12b6ba8ae807894dd.aseprite",
+          "original_name": "Player_counter_kick.aseprite",
+          "registered_at": "2026-10-23T23:08:39+00:00",
+          "received_on": "2026-10-24",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              },
+              {
+                "duration_ms": 100,
+                "frame": 9
+              },
+              {
+                "duration_ms": 100,
+                "frame": 10
+              },
+              {
+                "duration_ms": 60,
+                "frame": 11
+              },
+              {
+                "duration_ms": 60,
+                "frame": 12
+              },
+              {
+                "duration_ms": 60,
+                "frame": 13
+              },
+              {
+                "duration_ms": 60,
+                "frame": 14
+              },
+              {
+                "duration_ms": 60,
+                "frame": 15
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 105,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
+        },
+        {
+          "sha256": "170a5732e08d1cd3fe7626451c0ed85e7ebbdc07ca6803230466fcebdac4d4c5",
+          "file": "History/counter_kick/170a5732e08d1cd3fe7626451c0ed85e7ebbdc07ca6803230466fcebdac4d4c5.aseprite",
+          "original_name": "Player_counter_kick.aseprite",
+          "registered_at": "2026-10-24T00:41:19+00:00",
+          "received_on": "2026-10-24",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              },
+              {
+                "duration_ms": 100,
+                "frame": 9
+              },
+              {
+                "duration_ms": 100,
+                "frame": 10
+              },
+              {
+                "duration_ms": 60,
+                "frame": 11
+              },
+              {
+                "duration_ms": 60,
+                "frame": 12
+              },
+              {
+                "duration_ms": 60,
+                "frame": 13
+              },
+              {
+                "duration_ms": 60,
+                "frame": 14
+              },
+              {
+                "duration_ms": 60,
+                "frame": 15
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 105,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "video",
+          "motion": "CounterKick",
+          "source_sha256": "170a5732e08d1cd3fe7626451c0ed85e7ebbdc07ca6803230466fcebdac4d4c5",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/timing-manifest.json",
+            "Assets/Settings/CombatVideoArt.asset"
+          ],
+          "evidence": "docs/video/counter-revision-and-camera-comparison-20261024.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "ParryCounter",
+          "source_sha256": "170a5732e08d1cd3fe7626451c0ed85e7ebbdc07ca6803230466fcebdac4d4c5",
+          "references": [
+            "Assets/Settings/PrototypeCombat/CounterCinematicArt.asset",
+            "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim"
+          ],
+          "evidence": "docs/video/counter-revision-and-camera-comparison-20261024.md"
+        }
+      ]
+    },
+    "jump_start": {
+      "name": "ジャンプ開始サンプル",
+      "status": "sample",
+      "notes": "既存の48pxサンプル。サイズや接地位置をこの整理で描き直さない。",
+      "current": "Current/Player_jamp_start_sample.aseprite",
+      "current_sha256": "6cda4621e97cd420d8999513bd3cbdf384dbdfb57e0e3779b74173196aaa33c0",
+      "revisions": [
+        {
+          "sha256": "6cda4621e97cd420d8999513bd3cbdf384dbdfb57e0e3779b74173196aaa33c0",
+          "file": "History/jump_start/6cda4621e97cd420d8999513bd3cbdf384dbdfb57e0e3779b74173196aaa33c0.aseprite",
+          "original_name": "Player_jamp_start_sample.aseprite",
+          "registered_at": "2026-10-18T09:09:23+00:00",
+          "received_on": null,
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              }
+            ],
+            "height": 48,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Weapon",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 48
+          },
+          "original_project_path": "Assets/Art/Player_jamp_start_sample.aseprite"
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "prototype",
+          "motion": "Jump",
+          "source_sha256": "6cda4621e97cd420d8999513bd3cbdf384dbdfb57e0e3779b74173196aaa33c0",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+        }
+      ]
+    },
+    "jump_up": {
+      "name": "ジャンプ上昇サンプル",
+      "status": "sample",
+      "notes": "既存の48px・1コマ。落下専用の完成原画とは区別。",
+      "current": "Current/Player_jamp_up_sample.aseprite",
+      "current_sha256": "c88edc2b0c0b9cd52195efd8edfd09f959856059f11213e572c3e28b1d94f063",
+      "revisions": [
+        {
+          "sha256": "c88edc2b0c0b9cd52195efd8edfd09f959856059f11213e572c3e28b1d94f063",
+          "file": "History/jump_up/c88edc2b0c0b9cd52195efd8edfd09f959856059f11213e572c3e28b1d94f063.aseprite",
+          "original_name": "Player_jamp_up_sample.aseprite",
+          "registered_at": "2026-10-18T09:09:23+00:00",
+          "received_on": null,
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              }
+            ],
+            "height": 48,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Weapon",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 48
+          },
+          "original_project_path": "Assets/Art/Player_jamp_up_sample.aseprite"
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "prototype",
+          "motion": "Jump/Fall/DropThrough/AirRecovery",
+          "source_sha256": "c88edc2b0c0b9cd52195efd8edfd09f959856059f11213e572c3e28b1d94f063",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Scenes/PrototypeCombatValidation.unity"
+          ],
+          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+        }
+      ]
+    },
+    "idle_legacy_48": {
+      "name": "旧待機サンプル（参考）",
+      "status": "reference",
+      "notes": "旧48px版。現在使用している64px待機とは別の参考原稿。",
+      "current": "Current/Player_idle_sample.aseprite",
+      "current_sha256": "4c0ac058934cd5f18dc9758aa70b7b47e4dfa80c685c84bd4c4a57ececaa3e01",
+      "revisions": [
+        {
+          "sha256": "4c0ac058934cd5f18dc9758aa70b7b47e4dfa80c685c84bd4c4a57ececaa3e01",
+          "file": "History/idle_legacy_48/4c0ac058934cd5f18dc9758aa70b7b47e4dfa80c685c84bd4c4a57ececaa3e01.aseprite",
+          "original_name": "Player_idle_sample.aseprite",
+          "registered_at": "2026-10-18T09:09:23+00:00",
+          "received_on": null,
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 200,
+                "frame": 1
+              },
+              {
+                "duration_ms": 200,
+                "frame": 2
+              },
+              {
+                "duration_ms": 200,
+                "frame": 3
+              },
+              {
+                "duration_ms": 200,
+                "frame": 4
+              }
+            ],
+            "height": 48,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Grid",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "weapon",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 48
+          },
+          "original_project_path": "Assets/Art/Player_idle_sample.aseprite"
+        }
+      ],
+      "uses": []
+    },
+    "counter_kick_effect": {
+      "name": "反撃キック・独立エフェクト",
+      "status": "received",
+      "notes": "細部修正した独立電撃の更新原稿。人物との位置とコマを再確認して反映予定。",
+      "current": "Current/Player_counter_kick_effect.aseprite",
+      "current_sha256": "e1b72bf36cca4c8decfb18725e2db3b367f336be5fee481ca1af74d57fc6dfd8",
+      "revisions": [
+        {
+          "sha256": "ba044fd315c892a65dfeae2e138d825407f04f4bb7b99b7ec8d994314be1ec1e",
+          "file": "History/counter_kick_effect/ba044fd315c892a65dfeae2e138d825407f04f4bb7b99b7ec8d994314be1ec1e.aseprite",
+          "original_name": "Player_counter_kick_effect.aseprite",
+          "registered_at": "2026-10-23T23:08:39+00:00",
+          "received_on": "2026-10-24",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              },
+              {
+                "duration_ms": 100,
+                "frame": 9
+              },
+              {
+                "duration_ms": 100,
+                "frame": 10
+              },
+              {
+                "duration_ms": 100,
+                "frame": 11
+              },
+              {
+                "duration_ms": 100,
+                "frame": 12
+              },
+              {
+                "duration_ms": 100,
+                "frame": 13
+              },
+              {
+                "duration_ms": 100,
+                "frame": 14
+              },
+              {
+                "duration_ms": 100,
+                "frame": 15
+              }
+            ],
+            "height": 256,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect2",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
+                "opacity": 255,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 256
+          }
+        },
+        {
+          "sha256": "e1b72bf36cca4c8decfb18725e2db3b367f336be5fee481ca1af74d57fc6dfd8",
+          "file": "History/counter_kick_effect/e1b72bf36cca4c8decfb18725e2db3b367f336be5fee481ca1af74d57fc6dfd8.aseprite",
+          "original_name": "Player_counter_kick_effect.aseprite",
+          "registered_at": "2026-10-24T00:41:20+00:00",
+          "received_on": "2026-10-24",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              },
+              {
+                "duration_ms": 100,
+                "frame": 9
+              },
+              {
+                "duration_ms": 100,
+                "frame": 10
+              },
+              {
+                "duration_ms": 100,
+                "frame": 11
+              },
+              {
+                "duration_ms": 100,
+                "frame": 12
+              },
+              {
+                "duration_ms": 100,
+                "frame": 13
+              },
+              {
+                "duration_ms": 100,
+                "frame": 14
+              },
+              {
+                "duration_ms": 100,
+                "frame": 15
+              }
+            ],
+            "height": 256,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect2",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
+                "opacity": 255,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 256
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "video",
+          "motion": "CounterKickEffect",
+          "source_sha256": "e1b72bf36cca4c8decfb18725e2db3b367f336be5fee481ca1af74d57fc6dfd8",
+          "references": [
+            "Assets/Art/Video/Submitted/20261024/timing-manifest.json",
+            "Assets/Settings/CombatVideoArt.asset"
+          ],
+          "evidence": "docs/video/counter-revision-and-camera-comparison-20261024.md"
+        },
+        {
+          "consumer": "prototype",
+          "motion": "CounterKickEffect",
+          "source_sha256": "e1b72bf36cca4c8decfb18725e2db3b367f336be5fee481ca1af74d57fc6dfd8",
+          "references": [
+            "Assets/Settings/PrototypeCombat/CounterCinematicArt.asset"
+          ],
+          "evidence": "docs/video/counter-revision-and-camera-comparison-20261024.md"
+        }
+      ]
+    }
+  },
+  "references": [
+    {
+      "name": "初期アクション・復帰ラフ",
+      "path": "Assets/Art/Player/VideoRough/Player_actions_rough.aseprite",
+      "notes": "Codex製の編集可能ラフ。受領原稿とは別。"
+    },
+    {
+      "name": "移動アクションのラフ",
+      "path": "Assets/Art/Player/VideoShowcase/Player_mobility_rough.aseprite",
+      "notes": "Codex製のジャンプ/移動等の動作確認用。"
+    },
+    {
+      "name": "旧かかと落としラフ",
+      "path": "Assets/Art/Player/VideoHeelDrop/Player_heel_drop_rough.aseprite",
+      "notes": "提出キック以前の案。現在版のキックと区別。"
+    },
+    {
+      "name": "動画向けPNG・提出レビュー",
+      "path": "Assets/Art/Player/VideoSubmitted",
+      "notes": "Unityで使う書き出し、日付別の旧保存先とタグ付きレビュー。"
+    },
+    {
+      "name": "原稿とUnityの追加・更新ガイド",
+      "path": "docs/video/player-cleanup-handoff.md",
+      "notes": "動画の提出・差し替えと残る作画の記録。"
+    },
+    {
+      "name": "本編の検証ステージ",
+      "path": "docs/prototype-action-stage.md",
+      "notes": "本編の素材使用版は、各接続作業の反映・検証後に台帳へ記録する。"
+    }
+  ]
+}

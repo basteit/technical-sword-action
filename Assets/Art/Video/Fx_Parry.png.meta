@@ -1,0 +1,832 @@
+fileFormatVersion: 2
+guid: baefe159476b2d44db86dfc6ef5c20dc
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2718792575454825688
+    second: Fx_Parry_0
+  - first:
+      213: 4167017154348118850
+    second: Fx_Parry_1
+  - first:
+      213: -6866952137229318779
+    second: Fx_Parry_2
+  - first:
+      213: -7803158780473980212
+    second: Fx_Parry_3
+  - first:
+      213: -2064794317227691596
+    second: Fx_Parry_4
+  - first:
+      213: 3791623196511004138
+    second: Fx_Parry_5
+  - first:
+      213: 1112766140328508366
+    second: Fx_Parry_6
+  - first:
+      213: 2135776963940540862
+    second: Fx_Parry_7
+  - first:
+      213: 2487160653175150178
+    second: Fx_Parry_8
+  - first:
+      213: -8152375875666303123
+    second: Fx_Parry_9
+  - first:
+      213: 6033345032061230385
+    second: Fx_Parry_10
+  - first:
+      213: -9044462454491219026
+    second: Fx_Parry_11
+  - first:
+      213: 6346482299982831534
+    second: Fx_Parry_12
+  - first:
+      213: -92392626489568227
+    second: Fx_Parry_13
+  - first:
+      213: -4351877446494084067
+    second: Fx_Parry_14
+  - first:
+      213: -1889964874668073739
+    second: Fx_Parry_15
+  - first:
+      213: -4889725624324519519
+    second: Fx_Parry_16
+  - first:
+      213: -7670152233545318890
+    second: Fx_Parry_17
+  - first:
+      213: 420879331678116380
+    second: Fx_Parry_18
+  - first:
+      213: -4390434938210929588
+    second: Fx_Parry_19
+  - first:
+      213: -7244499664576069884
+    second: Fx_Parry_20
+  - first:
+      213: -6860760838633530454
+    second: Fx_Parry_21
+  - first:
+      213: 6040356647515650233
+    second: Fx_Parry_22
+  - first:
+      213: -6852040903699990574
+    second: Fx_Parry_23
+  - first:
+      213: -6449350864991649826
+    second: Fx_Parry_24
+  - first:
+      213: -6279949175555638900
+    second: Fx_Parry_25
+  - first:
+      213: 5019304140430628841
+    second: Fx_Parry_26
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Fx_Parry_0
+      rect:
+        serializedVersion: 2
+        x: 582
+        y: 73
+        width: 23
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 823bb02be88e44ad0800000000000000
+      internalID: -2718792575454825688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_1
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 70
+        width: 23
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 243f0e9260834d930800000000000000
+      internalID: 4167017154348118850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_2
+      rect:
+        serializedVersion: 2
+        x: 711
+        y: 74
+        width: 25
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58546d2f96fa3b0a0800000000000000
+      internalID: -6866952137229318779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_3
+      rect:
+        serializedVersion: 2
+        x: 796
+        y: 71
+        width: 24
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccac0eb9e6c95b390800000000000000
+      internalID: -7803158780473980212
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_4
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 76
+        width: 27
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b1f56b12806853e0800000000000000
+      internalID: -2064794317227691596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_5
+      rect:
+        serializedVersion: 2
+        x: 940
+        y: 90
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae56b26553d8e9430800000000000000
+      internalID: 3791623196511004138
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_6
+      rect:
+        serializedVersion: 2
+        x: 968
+        y: 93
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ecbfc50b8e6517f00800000000000000
+      internalID: 1112766140328508366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_7
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 44
+        width: 51
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb1632735ddc3ad10800000000000000
+      internalID: 2135776963940540862
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_8
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 42
+        width: 57
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26655dfbf6b248220800000000000000
+      internalID: 2487160653175150178
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_9
+      rect:
+        serializedVersion: 2
+        x: 286
+        y: 39
+        width: 63
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d67227f8551fcde80800000000000000
+      internalID: -8152375875666303123
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_10
+      rect:
+        serializedVersion: 2
+        x: 421
+        y: 68
+        width: 20
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 13d9063375fbab350800000000000000
+      internalID: 6033345032061230385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_11
+      rect:
+        serializedVersion: 2
+        x: 453
+        y: 71
+        width: 22
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eab71b7315d9b7280800000000000000
+      internalID: -9044462454491219026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_12
+      rect:
+        serializedVersion: 2
+        x: 546
+        y: 69
+        width: 21
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eafd7c7d60c331850800000000000000
+      internalID: 6346482299982831534
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_13
+      rect:
+        serializedVersion: 2
+        x: 921
+        y: 71
+        width: 10
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d14593e4561c7bef0800000000000000
+      internalID: -92392626489568227
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_14
+      rect:
+        serializedVersion: 2
+        x: 987
+        y: 77
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d14afa705860b93c0800000000000000
+      internalID: -4351877446494084067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_15
+      rect:
+        serializedVersion: 2
+        x: 422
+        y: 36
+        width: 22
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5fc917fb5fe75c5e0800000000000000
+      internalID: -1889964874668073739
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_16
+      rect:
+        serializedVersion: 2
+        x: 456
+        y: 37
+        width: 20
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a903099374342cb0800000000000000
+      internalID: -4889725624324519519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_17
+      rect:
+        serializedVersion: 2
+        x: 548
+        y: 33
+        width: 23
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61ebc5a8e252e8590800000000000000
+      internalID: -7670152233545318890
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_18
+      rect:
+        serializedVersion: 2
+        x: 586
+        y: 35
+        width: 21
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1a5af1b58347d500800000000000000
+      internalID: 420879331678116380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_19
+      rect:
+        serializedVersion: 2
+        x: 673
+        y: 30
+        width: 25
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c44397a6faa0213c0800000000000000
+      internalID: -4390434938210929588
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_20
+      rect:
+        serializedVersion: 2
+        x: 715
+        y: 32
+        width: 23
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40fb18520fd567b90800000000000000
+      internalID: -7244499664576069884
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_21
+      rect:
+        serializedVersion: 2
+        x: 798
+        y: 27
+        width: 27
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aab565cfd5ea9c0a0800000000000000
+      internalID: -6860760838633530454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_22
+      rect:
+        serializedVersion: 2
+        x: 845
+        y: 29
+        width: 24
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b8f6d32e58a3d350800000000000000
+      internalID: 6040356647515650233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_23
+      rect:
+        serializedVersion: 2
+        x: 924
+        y: 43
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d7f38c0a19a8e0a0800000000000000
+      internalID: -6852040903699990574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_24
+      rect:
+        serializedVersion: 2
+        x: 990
+        y: 50
+        width: 10
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: edf7054fe8d4f76a0800000000000000
+      internalID: -6449350864991649826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_25
+      rect:
+        serializedVersion: 2
+        x: 947
+        y: 24
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c89bf775f7329d8a0800000000000000
+      internalID: -6279949175555638900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Parry_26
+      rect:
+        serializedVersion: 2
+        x: 974
+        y: 27
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e7d306b58628a540800000000000000
+      internalID: 5019304140430628841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Fx_Parry_0: -2718792575454825688
+      Fx_Parry_1: 4167017154348118850
+      Fx_Parry_10: 6033345032061230385
+      Fx_Parry_11: -9044462454491219026
+      Fx_Parry_12: 6346482299982831534
+      Fx_Parry_13: -92392626489568227
+      Fx_Parry_14: -4351877446494084067
+      Fx_Parry_15: -1889964874668073739
+      Fx_Parry_16: -4889725624324519519
+      Fx_Parry_17: -7670152233545318890
+      Fx_Parry_18: 420879331678116380
+      Fx_Parry_19: -4390434938210929588
+      Fx_Parry_2: -6866952137229318779
+      Fx_Parry_20: -7244499664576069884
+      Fx_Parry_21: -6860760838633530454
+      Fx_Parry_22: 6040356647515650233
+      Fx_Parry_23: -6852040903699990574
+      Fx_Parry_24: -6449350864991649826
+      Fx_Parry_25: -6279949175555638900
+      Fx_Parry_26: 5019304140430628841
+      Fx_Parry_3: -7803158780473980212
+      Fx_Parry_4: -2064794317227691596
+      Fx_Parry_5: 3791623196511004138
+      Fx_Parry_6: 1112766140328508366
+      Fx_Parry_7: 2135776963940540862
+      Fx_Parry_8: 2487160653175150178
+      Fx_Parry_9: -8152375875666303123
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,42 @@
+{
+  "dateJst": "2026-10-18",
+  "issue": 49,
+  "branch": "issue/33-52-38-combat-polish",
+  "validatedImplementationCommit": "ca879eb741b2b9f30a68d925bc45506d83894703",
+  "startedAtUtc": "2026-10-17T22:04:28.0450709Z",
+  "completedAtUtc": "2026-10-17T22:05:56.7889308Z",
+  "unity": "6000.3.9f1",
+  "uloop": "2.1.3",
+  "compile": { "success": true, "errors": 0, "warnings": 0 },
+  "assetValidation": { "success": true },
+  "editMode": { "success": true, "tests": 186, "passed": 186, "failed": 0, "skipped": 0 },
+  "playMode": { "success": true, "tests": 361, "passed": 361, "failed": 0, "skipped": 0 },
+  "newActionStageTests": 7,
+  "consoleAfterTests": { "errors": 0, "warnings": 0 },
+  "consoleAfterGameViewSmoke": { "errors": 0, "warnings": 0 },
+  "scene": {
+    "path": "Assets/Scenes/PrototypeCombatValidation.unity",
+    "backgroundSource": "Assets/Scenes/CombatVideoStudio.unity:01_Stage/WhiteGrid",
+    "floorSource": "Assets/Scenes/CombatVideoStudio.unity:01_Stage/SolidFloor",
+    "newBackgroundArtCreated": false,
+    "initialActiveEnemies": 0,
+    "resetActiveEnemies": 0,
+    "retainedOptionalEnemies": 3,
+    "solidPlatforms": 1,
+    "oneWayPlatforms": 2,
+    "installerSecondRunChangedFile": false,
+    "sha256AfterRepeatedInstall": "52AD4E19EA515713D7128332C038C89FB7D3D0DD31368E1ACAA3814209E18BFD"
+  },
+  "localEvidence": {
+    "fullReport": ".uloop/outputs/PrototypeValidation/20261018-070428.json",
+    "gameView": ".uloop/outputs/Screenshots/Rendering_20261018_070322_613.png",
+    "gameViewResolution": "1920x1080"
+  },
+  "preExistingUncommittedChangesPreserved": true,
+  "cleanCheckoutValidated": false,
+  "humanAcceptanceCompleted": false,
+  "humanChecklist": "docs/prototype-action-stage.md",
+  "notValidated": ["15-minute human game-feel check", "Physical gamepad acceptance", "Windows Development Build acceptance", "Enemy placement and combat acceptance"],
+  "draftPullRequest": "https://github.com/basteit/technical-sword-action/pull/78",
+  "merged": false
+}

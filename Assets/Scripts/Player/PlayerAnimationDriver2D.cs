@@ -26,10 +26,18 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
     private PlayerState lastDrivenState = (PlayerState)(-1);
     private int observedParryCount;
     private float parrySuccessTimer;
+    private PlayerVisualRecovery2D recovery;
+    private PlayerAttack2D attack;
+    private PlayerParry2D parry;
+    private TechnicalSwordAction.PlayerState.PlayerActionState lastExtendedAction;
 
     private void Awake()
     {
         ResolveReferences();
+        attack = GetComponent<PlayerAttack2D>();
+        parry = GetComponent<PlayerParry2D>();
+        recovery=GetComponent<PlayerVisualRecovery2D>();
+        if(recovery==null) recovery=gameObject.AddComponent<PlayerVisualRecovery2D>();
     }
 
     private void OnEnable()
@@ -40,6 +48,7 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
         observedParryCount = damageReceiver != null ? damageReceiver.BlockedByParry : 0;
         parrySuccessTimer = 0f;
         lastDrivenState = (PlayerState)(-1);
+        lastExtendedAction = TechnicalSwordAction.PlayerState.PlayerActionState.Neutral;
     }
 
     public int CombatTickOrder => 300;
@@ -51,8 +60,38 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
             return;
         }
 
+        if (stateMachine.LifeState == TechnicalSwordAction.PlayerState.PlayerLifeState.Dead)
+        {
+            int death = Animator.StringToHash("PlayerPrototype_Death");
+            if (!animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerPrototype_Death")) animator.Play(death, 0, 0);
+            lastDrivenState = (PlayerState)(-1);
+            return;
+        }
+        var extended = stateMachine.ActionState;
+        // Observe a deflection even when a buffered counter has already taken
+        // over. Its success pose must never be deferred until after the counter.
         if (TryPlayNewParrySuccess())
         {
+            return;
+        }
+        if (extended == TechnicalSwordAction.PlayerState.PlayerActionState.Heal ||
+            extended == TechnicalSwordAction.PlayerState.PlayerActionState.ParryCounter)
+        {
+            parrySuccessTimer = 0f;
+            if (lastExtendedAction != extended)
+                animator.Play(extended == TechnicalSwordAction.PlayerState.PlayerActionState.Heal ? "PlayerPrototype_Heal" : "PlayerPrototype_ParryCounter", 0, 0);
+            lastExtendedAction = extended;
+            lastDrivenState = (PlayerState)(-1);
+            return;
+        }
+        lastExtendedAction = extended;
+        if (attack != null && attack.IsRecovering) return;
+
+        if (extended == TechnicalSwordAction.PlayerState.PlayerActionState.ParrySuccess)
+        {
+            // The legacy state maps both ready and success to Parry. Do not
+            // overwrite a successful deflection with the ready pose next tick.
+            lastDrivenState = PlayerState.Parry;
             return;
         }
 
@@ -65,7 +104,20 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
             return;
         }
 
-        if (parrySuccessTimer > 0f && (state == PlayerState.Idle || state == PlayerState.Move))
+        if(state==PlayerState.Idle&&recovery!=null)
+        {
+            if(recovery.IsPlaying) return;
+            if(animator.runtimeAnimatorController!=null&&lastDrivenState!=PlayerState.Idle&&(int)lastDrivenState>=0)
+            {
+                string recoveryName="PlayerPrototype_Recovery_"+lastDrivenState;
+                var clip=System.Array.Find(animator.runtimeAnimatorController.animationClips,c=>c.name=="PlayerPrototype_Recovery_"+lastDrivenState);
+                if(clip!=null&&recovery.TryPlay(recoveryName,Mathf.RoundToInt(clip.length*60)))
+                { lastDrivenState=(PlayerState)(-1);return; }
+            }
+        }
+        else recovery?.Cancel();
+
+        if (parrySuccessTimer > 0f && state == PlayerState.Idle)
         {
             parrySuccessTimer = Mathf.Max(0f, parrySuccessTimer - CombatTimeController.StepSeconds);
             return;
@@ -95,8 +147,16 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
         }
 
         observedParryCount = parryCount;
+        if (stateMachine.ActionState != TechnicalSwordAction.PlayerState.PlayerActionState.ParrySuccess)
+        {
+            parrySuccessTimer = 0f;
+            return false;
+        }
         parrySuccessTimer = parrySuccessPoseDuration;
-        animator.Play(ParrySuccessState, 0, 0f);
+        string reaction = parry != null && parry.LastReactionWeight == ParryReactionWeight.Heavy ? "Heavy" : "Light";
+        int success = Animator.StringToHash("PlayerPrototype_ParrySuccess" + reaction);
+        if (!animator.HasState(0, success)) success = Animator.StringToHash("PlayerPrototype_ParrySuccessLight");
+        animator.Play(animator.HasState(0, success) ? success : ParrySuccessState, 0, 0f);
         lastDrivenState = (PlayerState)(-1);
         return true;
     }
@@ -142,6 +202,7 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
 
     private void OnDisable()
     {
+        recovery?.Cancel();
         CombatTimeController.Unregister(this);
         CombatTimeController.UnregisterAnimator(animator, this);
     }

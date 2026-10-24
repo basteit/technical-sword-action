@@ -1,2 +1,34 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Unity Force Text assets. The driver is configured locally by Tools/Repository/Configure-UnityMerge.ps1.
+*.unity text eol=lf merge=unityyamlmerge
+*.prefab text eol=lf merge=unityyamlmerge
+*.asset text=auto eol=lf merge=unityyamlmerge
+*.anim text eol=lf merge=unityyamlmerge
+*.controller text eol=lf merge=unityyamlmerge
+*.overrideController text eol=lf merge=unityyamlmerge
+*.mat text eol=lf merge=unityyamlmerge
+*.mixer text eol=lf merge=unityyamlmerge
+*.playable text eol=lf merge=unityyamlmerge
+*.renderTexture text eol=lf merge=unityyamlmerge
+*.meta text eol=lf
+*.cs text eol=lf
+*.asmdef text eol=lf
+*.asmref text eol=lf
+
+# Original art is not YAML and must never be text-merged.
+*.aseprite binary
+*.png binary
+*.jpg binary
+*.mp3 binary
+*.wav binary
+
+# Unity serializes empty values with a trailing space. Keep other whitespace checks enabled.
+*.unity whitespace=-blank-at-eol
+*.prefab whitespace=-blank-at-eol
+*.asset whitespace=-blank-at-eol
+*.meta whitespace=-blank-at-eol
+*.anim whitespace=-blank-at-eol
+*.controller whitespace=-blank-at-eol
+*.overrideController whitespace=-blank-at-eol

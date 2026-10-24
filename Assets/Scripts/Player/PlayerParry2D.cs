@@ -11,6 +11,7 @@ public enum ParryResult
 public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     [Header("Parry Window")]
+    [SerializeField] private ParryTimingDefinition timing;
     [SerializeField] private float parryWindowDuration = 0.2f;
     [SerializeField] private float justParryDuration = 0.07f;
     [SerializeField] private float parryCooldown = 0.22f;
@@ -43,6 +44,18 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     private int successCount;
     private int justSuccessCount;
     private int missCount;
+    private PlayerMotor2D motor;
+    private PlayerParryCounter2D counter;
+    private long resolvedTick = -1;
+    public bool LastResolvedAsPrimary { get; private set; }
+    public int ElapsedFrames => Mathf.RoundToInt(parryElapsed * 60);
+    public int AcceptanceStartFrame => timing != null ? timing.startFrame : 0;
+    public int AcceptanceEndFrame => timing != null ? timing.endFrame : Mathf.RoundToInt(parryWindowDuration * 60);
+    [SerializeField, Min(0f)] private float maxParryHeightDifference = 1.25f;
+    public Damageable2D LastParriedEnemy { get; private set; }
+    public ParryReactionWeight LastReactionWeight { get; private set; } = ParryReactionWeight.Light;
+    public event System.Action<Damageable2D, ParryResult> Succeeded;
+    public event System.Action Failed;
 
     public bool IsParryActive => parryActive;
     public bool IsFailLocked => failLockTimer > 0f;
@@ -65,6 +78,8 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
     private void Awake()
     {
+        motor = GetComponent<PlayerMotor2D>();
+        counter = GetComponent<PlayerParryCounter2D>();
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
@@ -109,6 +124,7 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
             failLockTimer = CombatTimeController.AdvanceTimer(failLockTimer);
             if (failLockTimer <= 0f)
             {
+                if (timing != null) cooldownTimer = timing.cooldownFrames / 60f;
                 stateMachine?.CompleteAction(PlayerActionState.ParryFail, "ParryFailComplete");
             }
         }
@@ -118,6 +134,7 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
             successLockTimer = CombatTimeController.AdvanceTimer(successLockTimer);
             if (successLockTimer <= 0f)
             {
+                if (timing != null) cooldownTimer = timing.cooldownFrames / 60f;
                 stateMachine?.CompleteAction(PlayerActionState.ParrySuccess, "ParrySuccessComplete");
             }
         }
@@ -138,7 +155,8 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
             if (!parryResolved)
             {
                 ApplyFailLock();
-                PlayClip(parryMissClip, 0.8f);
+                if (!CombatFeedback2D.IsManaging(gameObject)) PlayClip(parryMissClip, 0.8f);
+                Failed?.Invoke();
                 stateMachine?.ChangeActionPhase(
                     PlayerActionState.Parry,
                     PlayerActionState.ParryFail,
@@ -160,10 +178,13 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
         parryActive = true;
         parryResolved = false;
-        parryTimer = parryWindowDuration;
+        parryTimer = timing != null ? (timing.endFrame + 1) / 60f : parryWindowDuration;
         parryElapsed = 0f;
-        cooldownTimer = parryCooldown;
+        cooldownTimer = timing != null ? 0f : parryCooldown;
+        resolvedTick = -1;
         LastParryResult = ParryResult.None;
+        LastParriedEnemy = null;
+        LastReactionWeight = ParryReactionWeight.Light;
         attemptCount++;
         return true;
     }
@@ -175,37 +196,77 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
     public bool TryResolveParry(Vector2 sourcePosition, out ParryResult result)
     {
-        if (!parryActive)
+        return ResolveParry(sourcePosition, null, true, ParryReactionWeight.Light, out result);
+    }
+
+    public bool TryResolveSourceParry(Vector2 contactPosition, Damageable2D source, bool parryable, out ParryResult result)
+    {
+        return ResolveParry(contactPosition, source, parryable, ParryReactionWeight.Light, out result);
+    }
+
+    public bool TryResolveContextParry(Vector2 contactPosition, CombatHitContext2D context, out ParryResult result)
+    {
+        return ResolveParry(contactPosition, context.Source, context.Parryable, context.ParryReaction, out result);
+    }
+
+    private bool ResolveParry(Vector2 sourcePosition, Damageable2D source, bool parryable, ParryReactionWeight reaction, out ParryResult result)
+    {
+        LastResolvedAsPrimary = false;
+        bool secondary = !parryActive && parryResolved && CombatTimeController.IsExecutingTick && resolvedTick == CombatTimeController.TickCount;
+        if ((!parryActive && !secondary) || !parryable || (source != null && !source.IsAlive) ||
+            (timing != null && !secondary && (ElapsedFrames < timing.startFrame || ElapsedFrames > timing.endFrame)))
         {
             result = ParryResult.None;
             return false;
         }
 
         float dist = Vector2.Distance(transform.position, sourcePosition);
-        if (dist > parrySnapDistance)
+        if (dist > parrySnapDistance || Mathf.Abs(transform.position.y - sourcePosition.y) > maxParryHeightDifference)
         {
             result = ParryResult.None;
             return false;
         }
 
-        result = parryElapsed <= justParryDuration ? ParryResult.Just : ParryResult.Normal;
+        result = secondary ? LastParryResult :
+            (timing != null ? ElapsedFrames <= timing.justEndFrame : parryElapsed <= justParryDuration) ? ParryResult.Just : ParryResult.Normal;
+        if (secondary)
+        {
+            if (counter == null) counter = GetComponent<PlayerParryCounter2D>();
+            counter?.RegisterParriedEnemy(source);
+            return true;
+        }
+        LastResolvedAsPrimary = true;
+        resolvedTick = CombatTimeController.TickCount;
         LastParryResult = result;
+        // Only the primary hit selects the reaction. Secondary same-tick hits
+        // may add counter stock, but never restart the pose or change facing.
+        LastReactionWeight = reaction;
         parryActive = false;
         parryResolved = true;
         parryTimer = 0f;
-        successLockTimer = successLockDuration;
+        successLockTimer = timing != null ? (result == ParryResult.Just ? timing.justSuccessFrames : timing.successFrames) / 60f : successLockDuration;
 
         if (result == ParryResult.Just)
         {
             justSuccessCount++;
-            PlayClip(justParryClip, 1f);
+            if (!CombatFeedback2D.IsManaging(gameObject)) PlayClip(justParryClip, 1f);
         }
         else
         {
-            PlayClip(normalParryClip, 0.95f);
+            if (!CombatFeedback2D.IsManaging(gameObject)) PlayClip(normalParryClip, 0.95f);
         }
 
         successCount++;
+        LastParriedEnemy = source;
+        if (source != null)
+        {
+            float dx = source.transform.position.x - transform.position.x;
+            if (Mathf.Abs(dx) > .001f) motor?.SetFacing(dx > 0 ? 1 : -1);
+            source.ApplyParryStun(result);
+            if (counter == null) counter = GetComponent<PlayerParryCounter2D>();
+            counter?.RegisterParriedEnemy(source);
+        }
+        Succeeded?.Invoke(source, result);
         stateMachine?.ChangeActionPhase(
             PlayerActionState.Parry,
             PlayerActionState.ParrySuccess,
@@ -221,6 +282,8 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
     public void CancelParryFromStateMachine(bool clearCooldown = false)
     {
+        if (timing != null && (parryActive || successLockTimer > 0 || failLockTimer > 0) && !clearCooldown)
+            cooldownTimer = Mathf.Max(cooldownTimer, timing.cooldownFrames / 60f);
         parryActive = false;
         parryResolved = false;
         parryTimer = 0f;
@@ -228,6 +291,8 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         failLockTimer = 0f;
         successLockTimer = 0f;
         LastParryResult = ParryResult.None;
+        LastParriedEnemy = null;
+        LastReactionWeight = ParryReactionWeight.Light;
 
         if (clearCooldown)
         {
@@ -237,7 +302,7 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
     private void ApplyFailLock()
     {
-        failLockTimer = Mathf.Max(0f, failLockDuration);
+        failLockTimer = timing != null ? Mathf.Max(0, timing.failEndFrame + 1 - ElapsedFrames) / 60f : Mathf.Max(0f, failLockDuration);
         missCount++;
     }
 

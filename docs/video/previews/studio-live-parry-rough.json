@@ -1,0 +1,15 @@
+{
+  "output": "docs/video/previews/studio-live-parry-rough.mp4",
+  "preset": "パリィ",
+  "error": "",
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "frames": 360,
+  "repeatedFrames": 42,
+  "scheduledFrames": 360,
+  "durationSeconds": 6.0,
+  "observedSeconds": 6.0,
+  "silent": true,
+  "playerArtworkIsRough": true
+}

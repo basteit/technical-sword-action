@@ -1,0 +1,83 @@
+{
+  "contact": {
+    "frame": 9,
+    "x": 73,
+    "y": 86
+  },
+  "gameFrames": 28,
+  "guideHidden": true,
+  "kind": "kick",
+  "nativeFrames": [
+    {
+      "durationMs": 80,
+      "frame": 1
+    },
+    {
+      "durationMs": 80,
+      "frame": 2
+    },
+    {
+      "durationMs": 80,
+      "frame": 3
+    },
+    {
+      "durationMs": 150,
+      "frame": 4
+    },
+    {
+      "durationMs": 150,
+      "frame": 5
+    },
+    {
+      "durationMs": 150,
+      "frame": 6
+    },
+    {
+      "durationMs": 150,
+      "frame": 7
+    },
+    {
+      "durationMs": 80,
+      "frame": 8
+    },
+    {
+      "durationMs": 80,
+      "frame": 9
+    },
+    {
+      "durationMs": 80,
+      "frame": 10
+    },
+    {
+      "durationMs": 80,
+      "frame": 11
+    },
+    {
+      "durationMs": 80,
+      "frame": 12
+    },
+    {
+      "durationMs": 80,
+      "frame": 13
+    },
+    {
+      "durationMs": 80,
+      "frame": 14
+    },
+    {
+      "durationMs": 80,
+      "frame": 15
+    }
+  ],
+  "pivot": {
+    "x": 32,
+    "y": 38
+  },
+  "removedIsolatedGuidePixels": 7,
+  "reviewCopyReopened": true,
+  "silhouetteSampleOnly": true,
+  "sourceUnmodified": true,
+  "source": "C:\\Users\\hirot\\Downloads\\e\\Player_counter_kick.aseprite",
+  "sourceSha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db",
+  "archiveSha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db"
+}

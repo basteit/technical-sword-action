@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 000cbc3841e7b174db26e5a7d6b215aa, type: 3}
+  m_Name: CounterCinematic
+  m_EditorClassIdentifier: Assembly-CSharp::CounterCinematicProfile
+  art: {fileID: 11400000, guid: ab36d370549d43d468f63601f86bc147, type: 2}
+  glowMaterial: {fileID: 2100000, guid: d69bc0a8e01c76344849c87d7ec93600, type: 2}
+  subjectLiftShader: {fileID: 4800000, guid: 3eaf4efdd36a6364d92474733d96ce4f, type: 3}
+  blinkStartFrame: 10
+  blinkTravelFrames: 2
+  chargeFrame: 12
+  releaseFrame: 20
+  hitFrame: 21
+  endFrame: 45
+  contactOffset: {x: 1.59375, y: 0.325}
+  hoverHeight: 0.125
+  impactHeight: 0.0625
+  targetHeadOffsetX: 0.21875
+  hitRadius: 0.5
+  chargeScale: 0.15
+  chargeRealSeconds: 0.95
+  hitstopFrames: 8
+  dimStrength: 0.965
+  heroLiftStrength: 0.6
+  dimFadeSeconds: 0.05
+  cameraOrthographicSize: 3.75
+  cameraFocusOffset: {x: 0.45, y: 0.4}
+  cameraBlendSeconds: 0.1
+  launchDistance: 3.2
+  launchHeight: 0.65
+  launchFrames: 22

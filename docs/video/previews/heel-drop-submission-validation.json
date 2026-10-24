@@ -1,0 +1,837 @@
+{
+  "revision": "submitted-attack1-overhead-heel-drop",
+  "compile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "editMode": {
+    "passed": 187,
+    "total": 187,
+    "completedAt": "2026-10-15T21:36:06.4656142Z"
+  },
+  "playMode": {
+    "passed": 196,
+    "total": 196,
+    "completedAt": "2026-10-15T21:37:05.9221726Z"
+  },
+  "newPlayModeCases": 11,
+  "console": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "art": {
+    "submission": {
+      "name": "VerticalSlash",
+      "provisional": true,
+      "canvasWidth": 128,
+      "canvasHeight": 128,
+      "pivotX": 32,
+      "pivotY": 38,
+      "count": 9,
+      "totalFrames": 38,
+      "hitFrame": 17,
+      "branchFrame": 34,
+      "recoveryFrame": 34,
+      "frames": [
+        {
+          "frames": 4,
+          "start": 0
+        },
+        {
+          "frames": 4,
+          "start": 4
+        },
+        {
+          "frames": 5,
+          "start": 8
+        },
+        {
+          "frames": 4,
+          "start": 13
+        },
+        {
+          "frames": 4,
+          "start": 17
+        },
+        {
+          "frames": 4,
+          "start": 21
+        },
+        {
+          "frames": 4,
+          "start": 25
+        },
+        {
+          "frames": 5,
+          "start": 29
+        },
+        {
+          "frames": 4,
+          "start": 34
+        }
+      ]
+    },
+    "heelEditable": {
+      "reopened": true,
+      "tagRangesChecked": true,
+      "layers": 8,
+      "tags": 2,
+      "frames": 26,
+      "sourceFilesModified": false,
+      "actionPixelsRedrawn": true,
+      "referencePixelsOnlyInHiddenReference": true
+    },
+    "eyeMasksChecked": 26,
+    "allSlowPosesHaveEyeMasks": true,
+    "hashes": {
+      "Assets/Art/Player/VideoSubmitted/20261016/Player_attack_1.aseprite": "D994E5FDBA1D091018C8BA1B2E4029068AA2A1F6351485AADE2124BE80BF2650",
+      "Assets/Art/Player/Player_idle.aseprite": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
+      "Assets/Art/Player/Player_walk.aseprite": "92FC9E07636331D2D6B5AAC363DC3AC6A53E030608DB1533D9CAE1505AE5F107",
+      "Assets/Art/Player/VideoRough/Player_actions_rough.aseprite": "D9890E846903CC024CB6F2B56459A163D2CB2E036AA2B77ACFB2E1334A29D7C3"
+    }
+  },
+  "sourceSubmissionSHA256": "D994E5FDBA1D091018C8BA1B2E4029068AA2A1F6351485AADE2124BE80BF2650",
+  "nativePixelComparison": {
+    "frames": 9,
+    "onlyConstructionGuideRemoved": true,
+    "removedGuidePixels": 2119
+  },
+  "sequentialResets": {
+    "runsPassed": 40,
+    "runs": [
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.099999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.116666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      }
+    ]
+  },
+  "defenseCancelResets": {
+    "runsPassed": 40,
+    "runs": [
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.0666666666666575,
+        "frontHits": 3,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.033333333333321,
+        "frontHits": 5,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      }
+    ]
+  },
+  "media": [
+    {
+      "file": "combat-2stage-hybrid-heel-drop-submitted-attack1.mp4",
+      "framesDecoded": 246,
+      "duration": 4.1,
+      "width": 1920,
+      "height": 1080,
+      "fps": 60,
+      "audioStreams": 0,
+      "counterAction": "OverheadHeelDrop",
+      "provisionalActions": [
+        "VerticalSlash"
+      ],
+      "sha256": "AB2FFB866BDAFEEAAC37C3F2088E882647CEA4D9A0DCABF74C08AC848B233EE6"
+    },
+    {
+      "file": "combat-4stage-hybrid-heel-drop-submitted-attack1.mp4",
+      "framesDecoded": 307,
+      "duration": 5.116666666666666,
+      "width": 1920,
+      "height": 1080,
+      "fps": 60,
+      "audioStreams": 0,
+      "counterAction": "OverheadHeelDrop",
+      "provisionalActions": [
+        "VerticalSlash"
+      ],
+      "sha256": "1B6A243B41BE6C8681D945A4B64FD350F518FED7763667FCA6B0F4F7E7FB8B16"
+    },
+    {
+      "file": "combat-4stage-pixel-heel-drop-submitted-attack1.mp4",
+      "framesDecoded": 307,
+      "duration": 5.116666666666666,
+      "width": 1920,
+      "height": 1080,
+      "fps": 60,
+      "audioStreams": 0,
+      "counterAction": "OverheadHeelDrop",
+      "provisionalActions": [
+        "VerticalSlash"
+      ],
+      "sha256": "FD62A8CCA51796E32A5517FDCB734B530DF5F38017B05E319419ECD0B15B3BB5"
+    },
+    {
+      "file": "combat-defense-cancel-2stage-hybrid-heel-drop-submitted-attack1.mp4",
+      "framesDecoded": 244,
+      "duration": 4.066666666666666,
+      "width": 1920,
+      "height": 1080,
+      "fps": 60,
+      "audioStreams": 0,
+      "counterAction": "OverheadHeelDrop",
+      "provisionalActions": [
+        "VerticalSlash"
+      ],
+      "sha256": "31767DE672CC2DBB4809AB77BFAAB90866E8706F753976AA7218FED75D548C71"
+    },
+    {
+      "file": "combat-defense-cancel-4stage-hybrid-heel-drop-submitted-attack1.mp4",
+      "framesDecoded": 302,
+      "duration": 5.033333333333333,
+      "width": 1920,
+      "height": 1080,
+      "fps": 60,
+      "audioStreams": 0,
+      "counterAction": "OverheadHeelDrop",
+      "provisionalActions": [
+        "VerticalSlash"
+      ],
+      "sha256": "38595D97F3F1E01B83AC5FABB9226060AAC6DB33683F4F12854C8DCEEFC6D781"
+    }
+  ],
+  "oldCombatPreviewsByteIdentical": 5,
+  "standardWalkPreviewByteIdentical": true,
+  "visualQA": [
+    "native slash and ground registration",
+    "raised heel / slow eye light / framing",
+    "release and downward foot path",
+    "heel / recoiled head / lightning contact",
+    "contact held through hitstop",
+    "fast landing / freely cancelable standing return"
+  ],
+  "acceptance": {
+    "provisionalAttack1Integrated": true,
+    "otherPlayerActionsRough": true,
+    "firstAttackHairAndRecoveryDeferredByUser": true,
+    "parent69Complete": false
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "date": "2026-10-25",
+  "trial": "monochrome-negative-parry-impact",
+  "inversion": {
+    "realVideoFrames": 4,
+    "realSeconds": 0.06666666666666667,
+    "previousRealVideoFrames": 2,
+    "captureFramesOneBased": [
+      132,
+      133,
+      134,
+      135
+    ],
+    "ptsSeconds": [
+      2.183333333333333,
+      2.2,
+      2.216666666666667,
+      2.2333333333333334
+    ],
+    "replacesTranslucentDarkFlash": true,
+    "allOtherFramesKeepTheirPalette": true,
+    "renderedPixelTestPassed": true,
+    "cameraScopePauseResetSessionResetDisableAndDestroyedCameraPassed": true
+  },
+  "hitstop": {
+    "parry": 9,
+    "just": 10,
+    "counter": 16,
+    "parryThirdCelVideoFrames": 10,
+    "kickContactCelVideoFrames": 17,
+    "unchanged": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T21:02:47.8313688Z",
+    "TestCount": 30,
+    "PassedCount": 30,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "uniquePlayModeCasesPassed": 30,
+  "mirroredTenResetRunsPassed": 20,
+  "fullSuiteRerun": false,
+  "legacyEightyResetSweepRerun": false,
+  "sourceUpdates": [
+    {
+      "id": "parry_wait",
+      "revision": 2,
+      "sha256": "c5dffc39dd22ed44d1a6e812386bb619b6c2c5efbf89bed5e8918e4dcb1a96d0",
+      "nativeFrames": 8,
+      "width": 64,
+      "nativeDurationMs": 800,
+      "downloadCurrentHistoryAndDatedCopyIdentical": true,
+      "allBodyAndEyePngsMatchAsepriteExport": true,
+      "editableReviewCopyReopened": true,
+      "videoAndPrototypeUseRecordsUpdatedAfterValidation": true,
+      "prototypeCheckScope": "shared PNG/Clip references and EditMode only"
+    },
+    {
+      "id": "parry_light",
+      "revision": 3,
+      "sha256": "d038a1c76e432c7803be090daa73cd3e6d2062cf1d1347c774d4262d378b1637",
+      "nativeFrames": 8,
+      "width": 128,
+      "nativeDurationMs": 640,
+      "downloadCurrentHistoryAndDatedCopyIdentical": true,
+      "allBodyAndEyePngsMatchAsepriteExport": true,
+      "editableReviewCopyReopened": true,
+      "videoAndPrototypeUseRecordsUpdatedAfterValidation": true,
+      "prototypeCheckScope": "shared PNG/Clip references and EditMode only"
+    }
+  ],
+  "editMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T21:01:42.0852895Z",
+    "TestCount": 2,
+    "PassedCount": 2,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "sourceLibraryValid": true,
+  "sourceLibraryPendingUpdates": [],
+  "eventsAndNormalizedTraceUnchanged": true,
+  "absoluteSessionClockTickOffset": 960,
+  "counterCelVideoFrames": {
+    "CounterKick_01": 14,
+    "CounterKick_02": 6,
+    "CounterKick_03": 7,
+    "CounterKick_04": 7,
+    "CounterKick_05": 6,
+    "CounterKick_06": 7,
+    "CounterKick_07": 7,
+    "CounterKick_08": 7,
+    "CounterKick_09": 17,
+    "CounterKick_10": 4,
+    "CounterKick_11": 4,
+    "CounterKick_12": 4,
+    "CounterKick_13": 4,
+    "CounterKick_14": 4,
+    "CounterKick_15": 4
+  },
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 10,
+    "SearchText": "",
+    "IncludeStackTrace": true,
+    "Logs": []
+  },
+  "captureConsole": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 10,
+    "SearchText": "",
+    "IncludeStackTrace": true,
+    "Logs": []
+  },
+  "shaderUnchanged": true,
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-parry-update-invert4-20261025.mp4",
+    "sha256": "7b01f9ed78b7bc6fdd57babc66b155d4ecef7d6dbbb73ff7adeee8b59c3165fb",
+    "decodedFrames": 275,
+    "durationSeconds": 4.583333333333333,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "bothEnemiesHiddenAtEnd": true,
+    "vfxActiveAtEnd": 0,
+    "inversionActiveAtEnd": false
+  },
+  "preview": {
+    "crf": 22,
+    "bytes": 881434,
+    "nativeVideoControls": true
+  },
+  "overallVideoAccepted": false,
+  "preservation": {
+    "baselineFiles": 2413,
+    "changedIntentionally": 25,
+    "byteIdentical": 2388,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 49,
+    "originalDirtyChangesKept": true,
+    "oldSourceHistoryAndOtherCatalogMotionsUnchanged": true,
+    "allClipsControllersSharedLibrarySettingsAndScenesUnchanged": true,
+    "spriteGuidsNativeDurationsAndPivotsUnchanged": true,
+    "prototypeCinematicProfileUnchanged": true,
+    "existingUrpRendererFeatureAndShaderUnchanged": true,
+    "counterSettingsUnchanged": true
+  },
+  "repositoryStagedAudit": {
+    "branch": "issue/33-52-38-combat-polish",
+    "base": "",
+    "staged": true,
+    "changedFiles": 49,
+    "attributes": [
+      "Assets/Scenes/PrototypeCombatValidation.unity: merge: unityyamlmerge",
+      "Assets/Art/test.aseprite: merge: unset"
+    ],
+    "problems": [],
+    "success": true
+  }
+}
