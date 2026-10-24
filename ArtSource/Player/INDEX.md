@@ -13,11 +13,11 @@
 | パリィ待機 (`parry_wait`) | [Player_parry_wait.aseprite](Current/Player_parry_wait.aseprite) | 受領済み | 64×64 / 8コマ / 800ms | video：登録版一致, prototype：登録版一致 | [1版](History/parry_wait/) |
 | パリィ成功（軽） (`parry_light`) | [Player_parry_light.aseprite](Current/Player_parry_light.aseprite) | 仮提出 | 64×64 / 7コマ / 700ms | video：登録版一致, prototype：登録版一致 | [1版](History/parry_light/) |
 | 反撃への移行 (`counter_transfer`) | [Player_counter_transfer.aseprite](Current/Player_counter_transfer.aseprite) | 仮提出 | 64×64 / 8コマ / 800ms | video：登録版一致, prototype：登録版一致 | [1版](History/counter_transfer/) |
-| 反撃キック (`counter_kick`) | [Player_counter_kick.aseprite](Current/Player_counter_kick.aseprite) | 受領済み | 128×128 / 15コマ / 1300ms | video：登録版一致, prototype：登録版一致 | [4版](History/counter_kick/) |
+| 反撃キック (`counter_kick`) | [Player_counter_kick.aseprite](Current/Player_counter_kick.aseprite) | 受領済み | 128×128 / 15コマ / 1300ms | video：登録版一致, prototype：登録版一致 | [5版](History/counter_kick/) |
 | ジャンプ開始サンプル (`jump_start`) | [Player_jamp_start_sample.aseprite](Current/Player_jamp_start_sample.aseprite) | 既存サンプル | 48×48 / 5コマ / 500ms | prototype：登録版一致 | [1版](History/jump_start/) |
 | ジャンプ上昇サンプル (`jump_up`) | [Player_jamp_up_sample.aseprite](Current/Player_jamp_up_sample.aseprite) | 既存サンプル | 48×48 / 1コマ / 100ms | prototype：登録版一致 | [1版](History/jump_up/) |
 | 旧待機サンプル（参考） (`idle_legacy_48`) | [Player_idle_sample.aseprite](Current/Player_idle_sample.aseprite) | 参考 | 48×48 / 4コマ / 800ms | 使用記録なし | [1版](History/idle_legacy_48/) |
-| 反撃キック・独立エフェクト (`counter_kick_effect`) | [Player_counter_kick_effect.aseprite](Current/Player_counter_kick_effect.aseprite) | 受領済み | 256×256 / 15コマ / 1500ms | video：登録版一致, prototype：登録版一致 | [1版](History/counter_kick_effect/) |
+| 反撃キック・独立エフェクト (`counter_kick_effect`) | [Player_counter_kick_effect.aseprite](Current/Player_counter_kick_effect.aseprite) | 受領済み | 256×256 / 15コマ / 1500ms | video：登録版一致, prototype：登録版一致 | [2版](History/counter_kick_effect/) |
 
 ## 素材ごとの注意
 
@@ -28,11 +28,11 @@
 - **パリィ待機**：入力時の構え。成功軽・成功重とは別素材。
 - **パリィ成功（軽）**：軽く弾く反応の仮提出。成功重の専用作画は未受領。
 - **反撃への移行**：原稿のEffect/Eyeの表示と不透明度を保持。移動・暗転・残光は使用先で調整。
-- **反撃キック**：2026-10-24受領。後ろ髪を更新した人物原稿。独立VFX原稿counter_kick_effectと同期接続する。登録とUnity反映・検証は別記録。
+- **反撃キック**：細部を修正した人物キックの更新原稿。独立VFXと再同期し、近め/ゲームに近い比較撮影へ反映予定。
 - **ジャンプ開始サンプル**：既存の48pxサンプル。サイズや接地位置をこの整理で描き直さない。
 - **ジャンプ上昇サンプル**：既存の48px・1コマ。落下専用の完成原画とは区別。
 - **旧待機サンプル（参考）**：旧48px版。現在使用している64px待機とは別の参考原稿。
-- **反撃キック・独立エフェクト**：2026-10-24受領。人物と別キャンバスの独立VFX。counter_kickと同期して接続。登録だけでは使用済みにしない。
+- **反撃キック・独立エフェクト**：細部修正した独立電撃の更新原稿。人物との位置とコマを再確認して反映予定。
 
 ## Codex製ラフ・既存の書き出し
 

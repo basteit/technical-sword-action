@@ -2,7 +2,7 @@
 
 [素材一覧を開く](INDEX.md)
 
-2026-10-24最新：`counter_kick` の4版目で後ろ髪を反映し、別原稿 `counter_kick_effect` の256px電撃を同じ15コマへ同期しました。人物とエフェクトの原本を別々にCurrent/Historyへ保持し、動画用と本編用を検証済みです。タメ0.9秒と蹴った後の長さは維持。[最新の素材・位置・再出力手順・動画と検証](../../docs/video/counter-split-20261024.md)を参照してください。[前版の時間配分](../../docs/video/counter-follow-through-20261019.md)、[人物版の初回統合](../../docs/video/submitted-kick-20261019.md)と初回Sampleの説明は履歴です。
+2026-10-24最新：`counter_kick` は細部修正の5版目、`counter_kick_effect` は2版目を使用します。人物128px/電撃256pxの各15コマを同期し、現在版をCurrentへ、旧版をHistoryへ保持。動画用と本編用を検証し、従来の撮影距離とゲーム画面に近い距離で比較撮影しました。[最新の素材・比較動画・検証](../../docs/video/counter-revision-and-camera-comparison-20261024.md)／[位置合わせ・再出力手順](../../docs/video/counter-split-20261024.md)。タメ0.9秒と蹴った後の長さは維持しています。[前版の時間配分](../../docs/video/counter-follow-through-20261019.md)と初回Sample等は履歴です。
 
 これまで受領したAsepriteを、動画用・本編用に共通して探せる場所です。現在の編集用原本を `Current/` に集め、登録したすべての版を `History/<動作ID>/` に保持します。Asepriteのレイヤー・表示状態・タグ・コマ・表示時間は変えません。
 

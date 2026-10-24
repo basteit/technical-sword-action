@@ -2,6 +2,8 @@
 
 自由操作で敵・足場・アクションを試し、SNS用の静止画／動画を撮る場合は[撮影スタジオの使い方](studio-guide.md)へ。以下は決まったシナリオを全フレーム収録する手順。
 
+2026-10-24最新：[細部修正したキック/独立電撃とカメラ距離の比較](counter-revision-and-camera-comparison-20261024.md)。`VideoCaptureUtility.CaptureAtDistance(4.21875f,3.375f)` で、ゲームに近い通常距離と引いたカウンターを一時設定して収録できる。終了時に元の距離へ戻り、広角で見える背景/床の端も収録中だけ同じグリッド/単色で補完する。下記の初期ラフの枚数/時間表より最新記録を優先する。
+
 作業場所は `C:\Users\hirot\GitHub\technical-sword-action`。Unity 6000.3.9f1、uloop CLI 2.1.3、Aseprite 1.3.18.6で確認した。音声は録画・書き出しに含めない。
 
 ## 素材とScene

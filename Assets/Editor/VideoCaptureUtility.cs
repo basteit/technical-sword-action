@@ -82,11 +82,31 @@ public static class VideoCaptureUtility
 
     public static string CapturePreview(int stages=2,bool hybrid=true)=>Capture(stages,hybrid,false);
     public static string CaptureDefenseCancelPreview(int stages=2,bool hybrid=true)=>Capture(stages,hybrid,true);
+    public static string CaptureAtDistance(float normalSize,float closeSize,int stages=2,bool hybrid=true)
+    {
+        Check(Application.isPlaying,"PlayMode required.");
+        Check(float.IsFinite(normalSize)&&float.IsFinite(closeSize)&&closeSize>0&&normalSize>=closeSize,"Invalid camera distances.");
+        var presentation=UnityEngine.Object.FindFirstObjectByType<VideoCombatPresentation>();
+        var settings=new SerializedObject(presentation);
+        float savedNormal=settings.FindProperty("normalSize").floatValue,savedClose=settings.FindProperty("closeSize").floatValue;
+        try
+        {
+            settings.FindProperty("normalSize").floatValue=normalSize;settings.FindProperty("closeSize").floatValue=closeSize;
+            settings.ApplyModifiedPropertiesWithoutUndo();
+            return Capture(stages,hybrid,false);
+        }
+        finally
+        {
+            settings.Update();settings.FindProperty("normalSize").floatValue=savedNormal;settings.FindProperty("closeSize").floatValue=savedClose;
+            settings.ApplyModifiedPropertiesWithoutUndo();presentation.ResetPresentation();
+        }
+    }
     private static string Capture(int stages,bool hybrid,bool defenseCancel)
     {
         Check(Application.isPlaying,"PlayMode required.");
         var director=UnityEngine.Object.FindFirstObjectByType<CombatVideoDirector>();var clock=UnityEngine.Object.FindFirstObjectByType<CombatTimeController>();
         Check(director.DefenseCancelTake==defenseCancel,"Open the matching scene; original previews must be preserved.");
+        using var backdrop=CaptureBackdrop.Create();
         string folder=Path.GetFullPath($".uloop/outputs/video/{(defenseCancel?"defense-cancel-":"")}{stages}stage-{(hybrid?"hybrid":"pixel")}");Directory.CreateDirectory(folder);
         bool previous=clock.ManualAdvanceOnly;clock.ManualAdvanceOnly=true;
         director.MirrorLayout=false;director.StartTake(stages,hybrid);
@@ -107,7 +127,8 @@ public static class VideoCaptureUtility
             Check(director.Completed,"Capture did not complete.");
             var art=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(CombatVideoArtBuilder.LibraryPath);
             var counter=director.Player.GetComponent<PlayerParryCounter2D>();
-            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,playerArtworkIsRough=defenseCancel||(stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough),takeKind=defenseCancel?"defense-cancel":"sequential",counterAction=counter.AttacksFromBehind?"RearSubmittedKick":counter.IsOverheadHeelDrop?"OverheadHeelDrop":"AirRoundhouse",provisionalActions=art.motions.Where(m=>m.provisional).Select(m=>m.name).ToArray(),skipAttackRecovery=director.Player.GetComponent<VideoPlayerAnimationDriver>().SkipAttackRecovery,spacingApproaches=director.UsesSpacingApproaches,rearEntrance=director.UsesRearEntrance,initialPlayerPosition=initialPlayerPosition,initialFrontPosition=initialFrontPosition,initialRearPosition=initialRearPosition,events=director.Marks.ToArray()},true));
+            var cameraSettings=new SerializedObject(UnityEngine.Object.FindFirstObjectByType<VideoCombatPresentation>());
+            File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(new CaptureReport{frameCount=frame,fps=60,duration=frame/60d,normalCameraSize=cameraSettings.FindProperty("normalSize").floatValue,closeCameraSize=cameraSettings.FindProperty("closeSize").floatValue,playerArtworkIsRough=defenseCancel||(stages==4?art.fourStageArtworkIsRough:art.playerArtworkIsRough),takeKind=defenseCancel?"defense-cancel":"sequential",counterAction=counter.AttacksFromBehind?"RearSubmittedKick":counter.IsOverheadHeelDrop?"OverheadHeelDrop":"AirRoundhouse",provisionalActions=art.motions.Where(m=>m.provisional).Select(m=>m.name).ToArray(),skipAttackRecovery=director.Player.GetComponent<VideoPlayerAnimationDriver>().SkipAttackRecovery,spacingApproaches=director.UsesSpacingApproaches,rearEntrance=director.UsesRearEntrance,initialPlayerPosition=initialPlayerPosition,initialFrontPosition=initialFrontPosition,initialRearPosition=initialRearPosition,events=director.Marks.ToArray()},true));
             return folder;
         }
         finally
@@ -116,5 +137,46 @@ public static class VideoCaptureUtility
             director.ResetTake(stages);clock.ManualAdvanceOnly=previous;
         }
     }
-    [Serializable] private sealed class CaptureReport { public int frameCount,fps;public double duration;public bool playerArtworkIsRough,skipAttackRecovery,spacingApproaches,rearEntrance;public Vector3 initialPlayerPosition,initialFrontPosition,initialRearPosition;public string takeKind,counterAction;public string[] provisionalActions;public CombatVideoDirector.Mark[] events; }
+    // Extend the original pixels at their existing pitch. A wide comparison must
+    // not expose the finite backdrop's edges or stretch its grid to fill the frame.
+    private sealed class CaptureBackdrop : IDisposable
+    {
+        private GameObject root;
+        private Sprite grid, floor;
+        public static CaptureBackdrop Create()
+        {
+            var original=GameObject.Find("TrainingGrid")?.GetComponent<SpriteRenderer>();
+            if(original==null||original.sprite==null)return null;
+            var result=new CaptureBackdrop();
+            try {result.Build(original);return result;}
+            catch {result.Dispose();throw;}
+        }
+        private void Build(SpriteRenderer original)
+        {
+            var source=original.sprite;var rect=source.rect;
+            Check(rect.width>=64&&rect.height>=124,"Unexpected training backdrop layout.");
+            grid=Sprite.Create(source.texture,new Rect(rect.x,rect.y+60,64,64),Vector2.one*.5f,source.pixelsPerUnit,0,SpriteMeshType.FullRect);
+            floor=Sprite.Create(source.texture,new Rect(rect.x+1,rect.y+1,1,1),Vector2.one*.5f,1,0,SpriteMeshType.FullRect);
+            grid.hideFlags=floor.hideFlags=HideFlags.DontSave;
+            root=new GameObject("CaptureBackdropExtension"){hideFlags=HideFlags.DontSave};
+            root.transform.SetParent(original.transform,false);
+            float ground=(60-source.pivot.y)/source.pixelsPerUnit;
+            var gridObject=new GameObject("ExtendedGrid");gridObject.transform.SetParent(root.transform,false);
+            gridObject.transform.localPosition=new Vector3(0,ground+16,0);
+            var gridRenderer=gridObject.AddComponent<SpriteRenderer>();
+            gridRenderer.sprite=grid;gridRenderer.drawMode=SpriteDrawMode.Tiled;gridRenderer.size=new Vector2(48,32);
+            gridRenderer.sharedMaterial=original.sharedMaterial;gridRenderer.sortingLayerID=original.sortingLayerID;gridRenderer.sortingOrder=original.sortingOrder-1;
+            var floorObject=new GameObject("ExtendedSolidFloor");floorObject.transform.SetParent(root.transform,false);
+            floorObject.transform.localPosition=new Vector3(0,ground-16,0);floorObject.transform.localScale=new Vector3(48,32,1);
+            var floorRenderer=floorObject.AddComponent<SpriteRenderer>();floorRenderer.sprite=floor;
+            floorRenderer.sharedMaterial=original.sharedMaterial;floorRenderer.sortingLayerID=original.sortingLayerID;floorRenderer.sortingOrder=original.sortingOrder-1;
+        }
+        public void Dispose()
+        {
+            if(root!=null)UnityEngine.Object.DestroyImmediate(root);
+            if(grid!=null)UnityEngine.Object.DestroyImmediate(grid);
+            if(floor!=null)UnityEngine.Object.DestroyImmediate(floor);
+        }
+    }
+    [Serializable] private sealed class CaptureReport { public int frameCount,fps;public float normalCameraSize,closeCameraSize;public double duration;public bool playerArtworkIsRough,skipAttackRecovery,spacingApproaches,rearEntrance;public Vector3 initialPlayerPosition,initialFrontPosition,initialRearPosition;public string takeKind,counterAction;public string[] provisionalActions;public CombatVideoDirector.Mark[] events; }
 }
