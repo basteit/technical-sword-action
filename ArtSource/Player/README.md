@@ -2,6 +2,8 @@
 
 [素材一覧を開く](INDEX.md)
 
+2026-10-25攻撃2更新：`attack_2` の2版目（128px/8×70ms、後ろ髪を含む）を登録・共有PNG8枚へ反映。全34tick/命中13tick/判定と全Clip/Controllerを保持し、Attack 2個別更新メニューを追加しました。動画の関連PlayModeと本編の参照/ClipのEditMode確認後に使用版を記録。[原稿・揺れ・動画・検証](../../docs/video/kick-shake-attack2-20261025.md)。
+
 2026-10-25攻撃1更新：`attack_1` の2版目（128px/9×70ms、後ろ髪を含む）を登録・共有PNG9枚へ反映しました。命中17tick/次段29tick/全38tickとリーチ、全Clip/Controllerを保持。個別のAttack 1更新メニューを追加し、動画はPlayMode、本編は参照/ClipのEditMode確認後に使用版を記録します。[原稿・動画・照明の調整](../../docs/video/counter-pulse-attack1-20261025.md)。
 
 2026-10-25移行更新：`counter_transfer` の2版目（64px/8×100ms、後ろ髪を含む）をCurrent/Historyへ登録し、共有PNG8枚へ反映。ゲーム用12tick/ピボット/全Clip/Controllerを保持し、個別更新メニューを追加しました。動画は関連PlayMode、本編は共有SpriteとClipのEditMode確認を行い、使用版を別々に記録します。[演出比較・素材・検証](../../docs/video/counter-lighting-20261025.md)。原稿の仮提出区分と、動画全体の最終受入は維持して区別します。

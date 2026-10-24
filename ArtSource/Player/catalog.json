@@ -422,7 +422,7 @@
       "status": "provisional",
       "notes": "1段目から逆側へ返す斬撃。現在の動画はこの2段目で撃破。",
       "current": "Current/Player_attack_2.aseprite",
-      "current_sha256": "ccdb5da3908f8dc0fd730291036964c5b6c2380991cf1def238e13a5fa5ce781",
+      "current_sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
       "revisions": [
         {
           "sha256": "ccdb5da3908f8dc0fd730291036964c5b6c2380991cf1def238e13a5fa5ce781",
@@ -510,28 +510,114 @@
             "width": 128
           },
           "original_project_path": "Assets/Art/Player/VideoSubmitted/20261017/Player_attack_2.aseprite"
+        },
+        {
+          "sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
+          "file": "History/attack_2/91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa.aseprite",
+          "original_name": "Player_attack_2.aseprite",
+          "registered_at": "2026-10-24T23:44:26+00:00",
+          "received_on": "2026-10-25",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 70,
+                "frame": 1
+              },
+              {
+                "duration_ms": 70,
+                "frame": 2
+              },
+              {
+                "duration_ms": 70,
+                "frame": 3
+              },
+              {
+                "duration_ms": 70,
+                "frame": 4
+              },
+              {
+                "duration_ms": 70,
+                "frame": 5
+              },
+              {
+                "duration_ms": 70,
+                "frame": 6
+              },
+              {
+                "duration_ms": 70,
+                "frame": 7
+              },
+              {
+                "duration_ms": 70,
+                "frame": 8
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 102,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
         }
       ],
       "uses": [
         {
           "consumer": "video",
           "motion": "HorizontalSlash",
-          "source_sha256": "ccdb5da3908f8dc0fd730291036964c5b6c2380991cf1def238e13a5fa5ce781",
+          "source_sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
           "references": [
             "Assets/Art/Player/VideoSubmitted/HorizontalSlash_01.png",
             "Assets/Settings/CombatVideoArt.asset"
           ],
-          "evidence": "docs/video/counter-submissions-20261018.md"
+          "evidence": "docs/video/kick-shake-attack2-20261025.md"
         },
         {
           "consumer": "prototype",
           "motion": "Attack_2",
-          "source_sha256": "ccdb5da3908f8dc0fd730291036964c5b6c2380991cf1def238e13a5fa5ce781",
+          "source_sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
           "references": [
             "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
             "Assets/Scenes/PrototypeCombatValidation.unity"
           ],
-          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+          "evidence": "docs/video/kick-shake-attack2-20261025.md"
         }
       ]
     },

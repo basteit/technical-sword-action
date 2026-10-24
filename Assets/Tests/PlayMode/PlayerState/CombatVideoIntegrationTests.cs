@@ -1409,14 +1409,18 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
             var target=(Component)Get<object>(director,"RearEnemy");bool parried=false;
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
             for(int i=0;i<fps*5&&Get<int>(target,"HitCount")==0;i++)
             {
                 Call(director,"StepCapture",1d/fps);
-                if(!parried&&Marks().Any(m=>Get<string>(m,"kind")=="Parry"))
-                {parried=true;Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.GreaterThan(.18f));}
+                // The authored third cel carries the impact after the success event.
+                if(!parried&&Get<int>(driver,"ParryImpactCount")>0)
+                {parried=true;Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.InRange(.18f,.23f));}
             }
             Assert.That(parried,Is.True);Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));
-            Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.GreaterThan(.3f));
+            // Preserve the stronger kick at every capture rate and in both layouts.
+            Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.GreaterThan(.42f));
+            Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.LessThanOrEqualTo(.52f));
             for(int i=0;i<Mathf.CeilToInt(fps*2/60f);i++)Call(director,"StepCapture",1d/fps);
             Assert.That(Camera.main.orthographicSize,Is.LessThan(2.75f));
             Assert.That(Get<float>(presentation,"ImpactZoom"),Is.EqualTo(1).Within(.001f));

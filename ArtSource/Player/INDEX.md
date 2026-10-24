@@ -9,7 +9,7 @@
 | 待機 (`idle`) | [Player_idle.aseprite](Current/Player_idle.aseprite) | 受領済み | 64×64 / 6コマ / 600ms | video：登録版一致, prototype：登録版一致 | [1版](History/idle/) |
 | 歩行 (`walk`) | [Player_walk.aseprite](Current/Player_walk.aseprite) | 受領済み | 64×64 / 8コマ / 640ms | video：登録版一致, prototype：登録版一致 | [1版](History/walk/) |
 | 攻撃1段目 (`attack_1`) | [Player_attack_1.aseprite](Current/Player_attack_1.aseprite) | 仮提出 | 128×128 / 9コマ / 630ms | video：登録版一致, prototype：登録版一致 | [2版](History/attack_1/) |
-| 攻撃2段目 (`attack_2`) | [Player_attack_2.aseprite](Current/Player_attack_2.aseprite) | 仮提出 | 128×128 / 8コマ / 560ms | video：登録版一致, prototype：登録版一致 | [1版](History/attack_2/) |
+| 攻撃2段目 (`attack_2`) | [Player_attack_2.aseprite](Current/Player_attack_2.aseprite) | 仮提出 | 128×128 / 8コマ / 560ms | video：登録版一致, prototype：登録版一致 | [2版](History/attack_2/) |
 | パリィ待機 (`parry_wait`) | [Player_parry_wait.aseprite](Current/Player_parry_wait.aseprite) | 受領済み | 64×64 / 8コマ / 800ms | video：登録版一致, prototype：登録版一致 | [2版](History/parry_wait/) |
 | パリィ成功（軽） (`parry_light`) | [Player_parry_light.aseprite](Current/Player_parry_light.aseprite) | 仮提出 | 128×128 / 8コマ / 640ms | video：登録版一致, prototype：登録版一致 | [3版](History/parry_light/) |
 | 反撃への移行 (`counter_transfer`) | [Player_counter_transfer.aseprite](Current/Player_counter_transfer.aseprite) | 仮提出 | 64×64 / 8コマ / 800ms | video：登録版一致, prototype：登録版一致 | [2版](History/counter_transfer/) |

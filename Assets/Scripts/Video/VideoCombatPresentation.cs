@@ -136,7 +136,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         CombatTimeController.RequestHitstop(counter,kickHitstopFrames*CombatTimeController.StepSeconds);
         if(counterLightReady&&counterLightingEnabled&&vfx.HybridGlow)counterLighting?.BeginImpact(enemy,foot,counter.KickFacingSign);
         impactZoomAge=0;impactZoom=0;
-        ShakeDirectional(.30f,vfx.ReadableImpacts?.38f:.36f,counter.AttacksFromBehind?new Vector2(counter.KickFacingSign,-.25f):new Vector2(counter.KickFacingSign*.35f,-1),vfx.ReadableImpacts?1.75f:2.25f);
+        ShakeDirectional(.30f,vfx.ReadableImpacts?.48f:.46f,counter.AttacksFromBehind?new Vector2(counter.KickFacingSign,-.25f):new Vector2(counter.KickFacingSign*.35f,-1),vfx.ReadableImpacts?1.75f:2.25f);
         flashRemaining=flashDuration=(vfx.ReadableImpacts?2:3)/60f;flashStrength=vfx.ReadableImpacts?.20f:.12f;flashTint=Color.white;
         bool authored=library!=null&&library.Find("CounterKick")?.includesCounterTrail==true;
         vfx.Emit(counter.IsOverheadHeelDrop?"HeelLightning":authored?"ElectricKick":"Kick",foot,counter.IsOverheadHeelDrop?1f:authored?1.15f:1.55f,counter.KickFacingSign);
@@ -206,7 +206,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
             shakeOffset+=impulse.direction*impulse.strength*(1-t)*(1-t)*Mathf.Cos(t*Mathf.PI*2*impulse.cycles);
             impulse.age+=realSeconds;if(impulse.age>=impulse.duration) impulses.RemoveAt(i);
         }
-        shakeOffset=Vector2.ClampMagnitude(shakeOffset,.42f);position+=(Vector3)shakeOffset;
+        shakeOffset=Vector2.ClampMagnitude(shakeOffset,.52f);position+=(Vector3)shakeOffset;
         position.x=Mathf.Round(position.x*32)/32;position.y=Mathf.Round(position.y*32)/32;
         captureCamera.transform.position=position;
         captureCamera.orthographicSize=Mathf.Lerp(Mathf.Lerp(normalSize,closeSize,zoom),closeSize*(1-impactZoomAmount),impactZoom);
