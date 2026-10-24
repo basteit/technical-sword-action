@@ -408,7 +408,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
         [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
-        public void CounterLightingChangesInRealTimeWhileAuthoredContactAndCombatStayFrozen(int fps,bool mirrored)
+        public void CounterLightingFadesInRealTimeAcrossHitstopAndLaunch(int fps,bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
             var victim=(Component)Get<object>(director,"RearEnemy");float strongestCharge=0;
@@ -427,16 +427,55 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for(int i=0;i<fps;i++)Call(director,"StepCapture",1d/fps);
             Assert.That(Get<int>(light,"ImpactFrame"),Is.Zero);
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
-            int exposed=0;bool discharge=false,read=false;
+            int exposed=0;bool faded=false,launched=false;float previousWeight=1;
             while(Get<bool>(light,"IsVisible")&&exposed<fps)
             {
-                discharge|=Get<string>(light,"Phase")=="Discharge";read|=Get<string>(light,"Phase")=="Read";
-                Assert.That(visual.sprite,Is.SameAs(pose));Assert.That(victim.transform.position,Is.EqualTo(point));
-                Assert.That((long)clockType.GetProperty("TickCount").GetValue(null),Is.EqualTo(tick));
+                faded|=Get<string>(light,"Phase")=="Fade";
+                float weight=Get<float>(light,"ImpactWeight");Assert.That(weight,Is.LessThanOrEqualTo(previousWeight+.0001f));previousWeight=weight;
+                if((bool)clockType.GetProperty("IsHitStopped").GetValue(null))
+                {Assert.That(visual.sprite,Is.SameAs(pose));Assert.That(victim.transform.position,Is.EqualTo(point));Assert.That((long)clockType.GetProperty("TickCount").GetValue(null),Is.EqualTo(tick));}
+                else if(victim.transform.position!=point)launched=true;
                 exposed++;Call(director,"StepCapture",1d/fps);
             }
-            Assert.That(discharge&&read,Is.True);Assert.That(exposed/(float)fps,Is.EqualTo(16/60f).Within(.0001f));
+            Assert.That(faded&&launched,Is.True);Assert.That(exposed/(float)fps,Is.EqualTo(24/60f).Within(.0001f));
             Assert.That(Get<object>(light,"Target"),Is.Null);Assert.That(Get<int>(victim,"HitCount"),Is.EqualTo(1));
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void CounterRimBreathesSlowlyWhileFootLightHasNoProceduralRays(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            for(int i=0;i<360&&Get<string>(presentation,"CounterLightPhase")!="Charge";i++)Step();
+            var camera=Camera.main;var light=camera.GetComponent(Type.GetType("VideoCounterLighting, Assembly-CSharp",true));
+            var target=(Component)Get<object>(director,"RearEnemy");
+            var playerVisual=state.GetComponent<SpriteRenderer>();var enemyVisual=target.GetComponentInChildren<SpriteRenderer>();
+            int facing=Get<int>(counter,"KickFacingSign");
+            try
+            {
+                Call(light,"ResetLight");Call(light,"Sample",.2f,true,true,1f,target,facing);
+                Assert.That(Get<float>(light,"RimPulse"),Is.EqualTo(1).Within(.001f));var peak=RenderParryPixels(camera);
+                Call(light,"Sample",.4f,true,true,1f,target,facing);
+                Assert.That(Get<float>(light,"RimPulse"),Is.EqualTo(.15f).Within(.001f));var dim=RenderParryPixels(camera);
+                Call(light,"Sample",.4f,true,true,1f,target,facing);var nextPeak=RenderParryPixels(camera);
+                int changed=0;
+                for(int i=0;i<peak.Length;i++)
+                {
+                    if(Math.Abs(peak[i].r-dim[i].r)+Math.Abs(peak[i].g-dim[i].g)+Math.Abs(peak[i].b-dim[i].b)>3)changed++;
+                    Assert.That(nextPeak[i],Is.EqualTo(peak[i]),"The rim returns to the same brightness after one 0.8-second cycle.");
+                }
+                Assert.That(changed,Is.GreaterThan(20));
+                playerVisual.enabled=enemyVisual.enabled=false;
+                var foot=RenderParryPixels(camera);var center=(Vector2)light.GetType().GetField("contact",Flags).GetValue(light);
+                Call(light,"ResetLight");var normal=RenderParryPixels(camera);int localLight=0;
+                for(int y=0;y<180;y++)for(int x=0;x<320;x++)
+                {
+                    int i=y*320+x;int delta=Math.Abs(foot[i].r-normal[i].r)+Math.Abs(foot[i].g-normal[i].g)+Math.Abs(foot[i].b-normal[i].b);
+                    var world=camera.ViewportToWorldPoint(new Vector3((x+.5f)/320,(y+.5f)/180,1));
+                    if(Vector2.Distance(world,center)>1.1f)Assert.That(delta,Is.LessThanOrEqualTo(3),"No converging or outward lines may appear outside the local foot light.");
+                    else if(delta>3)localLight++;
+                }
+                Assert.That(localLight,Is.GreaterThan(5),"The original soft auxiliary foot light stays visible.");
+            }
+            finally{playerVisual.enabled=enemyVisual.enabled=true;Call(director,"ResetTake",2);}
         }
         [TestCase("Reset",false)] [TestCase("Disable",false)] [TestCase("SessionReset",false)] [TestCase("TargetLost",false)]
         [TestCase("Reset",true)] [TestCase("Disable",true)] [TestCase("SessionReset",true)] [TestCase("TargetLost",true)]

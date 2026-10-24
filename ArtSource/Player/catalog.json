@@ -208,9 +208,9 @@
     "attack_1": {
       "name": "攻撃1段目",
       "status": "provisional",
-      "notes": "縦斬りの仮提出。後ろ髪・復帰の追加前。128pxの余白を含め原本保持。",
+      "notes": "縦斬り2版目。後ろ髪を含む9コマ×70ms。動画は復帰を省略。128pxの余白を含め原本保持。",
       "current": "Current/Player_attack_1.aseprite",
-      "current_sha256": "d994e5fdba1d091018c8ba1b2e4029068aa2a1f6351485aade2124be80bf2650",
+      "current_sha256": "8348fe7f2045eadfbd259dba18cb9ffb2c3e50357312c8e169c54b4620fd814e",
       "revisions": [
         {
           "sha256": "d994e5fdba1d091018c8ba1b2e4029068aa2a1f6351485aade2124be80bf2650",
@@ -302,28 +302,118 @@
             "width": 128
           },
           "original_project_path": "Assets/Art/Player/VideoSubmitted/20261016/Player_attack_1.aseprite"
+        },
+        {
+          "sha256": "8348fe7f2045eadfbd259dba18cb9ffb2c3e50357312c8e169c54b4620fd814e",
+          "file": "History/attack_1/8348fe7f2045eadfbd259dba18cb9ffb2c3e50357312c8e169c54b4620fd814e.aseprite",
+          "original_name": "Player_attack_1.aseprite",
+          "registered_at": "2026-10-24T23:07:56+00:00",
+          "received_on": "2026-10-25",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 70,
+                "frame": 1
+              },
+              {
+                "duration_ms": 70,
+                "frame": 2
+              },
+              {
+                "duration_ms": 70,
+                "frame": 3
+              },
+              {
+                "duration_ms": 70,
+                "frame": 4
+              },
+              {
+                "duration_ms": 70,
+                "frame": 5
+              },
+              {
+                "duration_ms": 70,
+                "frame": 6
+              },
+              {
+                "duration_ms": 70,
+                "frame": 7
+              },
+              {
+                "duration_ms": 70,
+                "frame": 8
+              },
+              {
+                "duration_ms": 70,
+                "frame": 9
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 128,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
         }
       ],
       "uses": [
         {
           "consumer": "video",
           "motion": "VerticalSlash",
-          "source_sha256": "d994e5fdba1d091018c8ba1b2e4029068aa2a1f6351485aade2124be80bf2650",
+          "source_sha256": "8348fe7f2045eadfbd259dba18cb9ffb2c3e50357312c8e169c54b4620fd814e",
           "references": [
             "Assets/Art/Player/VideoSubmitted/VerticalSlash_01.png",
             "Assets/Settings/CombatVideoArt.asset"
           ],
-          "evidence": "docs/video/counter-submissions-20261018.md"
+          "evidence": "docs/video/counter-pulse-attack1-20261025.md"
         },
         {
           "consumer": "prototype",
           "motion": "Attack_1",
-          "source_sha256": "d994e5fdba1d091018c8ba1b2e4029068aa2a1f6351485aade2124be80bf2650",
+          "source_sha256": "8348fe7f2045eadfbd259dba18cb9ffb2c3e50357312c8e169c54b4620fd814e",
           "references": [
             "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
             "Assets/Scenes/PrototypeCombatValidation.unity"
           ],
-          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+          "evidence": "docs/video/counter-pulse-attack1-20261025.md"
         }
       ]
     },

@@ -4,7 +4,9 @@ using UnityEngine.Rendering;
 /// <summary>Optional shader-only counter lighting, sampled in real time without advancing combat or authored cels.</summary>
 public sealed class VideoCounterLighting : MonoBehaviour
 {
-    private const float ImpactDuration=16/60f;
+    public const int FlashFrames=4,FadeFrames=20;
+    public const float RimPulsePeriod=.8f;
+    private const float ImpactDuration=(FlashFrames+FadeFrames)/60f;
     private Camera captureCamera;
     private SpriteRenderer player,enemy,litPlayer,litEnemy,field,backdrop;
     private Damageable2D target;
@@ -18,7 +20,9 @@ public sealed class VideoCounterLighting : MonoBehaviour
     public bool IsVisible {get;private set;}
     public float ChargeProgress=>charging?progress:0;
     public int ImpactFrame=>impactAge>=0?Mathf.FloorToInt(impactAge*60+.0001f):-1;
-    public string Phase=>!IsVisible?"None":charging?"Charge":ImpactFrame<3?"Flash":ImpactFrame<8?"Discharge":"Read";
+    public string Phase=>!IsVisible?"None":charging?"Charge":ImpactFrame<FlashFrames?"Flash":"Fade";
+    public float RimPulse=>.15f+.85f*(.5f+.5f*Mathf.Cos((visualAge-.2f)*2*Mathf.PI/RimPulsePeriod));
+    public float ImpactWeight=>charging||impactAge<0?0:impactAge*60<FlashFrames?1:1-Mathf.SmoothStep(0,1,(impactAge*60-FlashFrames+1)/FadeFrames);
     public Damageable2D Target=>IsVisible?target:null;
     private void Awake()=>properties=new MaterialPropertyBlock();
     public void Configure(Camera camera,SpriteRenderer source,Material shared)
@@ -70,6 +74,7 @@ public sealed class VideoCounterLighting : MonoBehaviour
     {
         properties.Clear();properties.SetFloat("_Actor",actor?1:0);properties.SetFloat("_Charge",charging?progress:0);
         properties.SetFloat("_ImpactFrame",charging?-1:ImpactFrame);properties.SetFloat("_Age",visualAge);
+        properties.SetFloat("_RimPulse",RimPulse);properties.SetFloat("_ImpactWeight",ImpactWeight);
         properties.SetFloat("_Facing",facing);properties.SetVector("_LightWorld",new Vector4(contact.x,contact.y,0,0));renderer.SetPropertyBlock(properties);
     }
     private void UpdatePoses()
@@ -77,7 +82,7 @@ public sealed class VideoCounterLighting : MonoBehaviour
         float height=captureCamera.orthographicSize*2;
         backdrop.transform.localPosition=new Vector3(0,0,captureCamera.nearClipPlane+.015f);
         backdrop.transform.localScale=new Vector3(height*Mathf.Max(captureCamera.aspect,16/9f),height,1);
-        int frame=ImpactFrame;float darkness=charging?0:frame<3?.99f:frame<8?.35f*(8-frame)/5f:0;
+        float darkness=.99f*ImpactWeight;
         backdrop.color=new Color(0,.001f,.004f,darkness);
         field.transform.position=new Vector3(contact.x,contact.y,0);field.transform.rotation=Quaternion.identity;
         field.transform.localScale=new Vector3(8,6,1);ApplyProperties(field,false);
@@ -91,7 +96,7 @@ public sealed class VideoCounterLighting : MonoBehaviour
     }
     private void SetRenderers(bool visible)
     {
-        if(backdrop!=null)backdrop.enabled=visible&&!charging&&ImpactFrame<8;
+        if(backdrop!=null)backdrop.enabled=visible&&!charging&&ImpactWeight>0;
         if(field!=null)field.enabled=visible;
         if(litPlayer!=null)litPlayer.enabled=visible&&player!=null&&player.enabled;
         if(litEnemy!=null)litEnemy.enabled=visible&&enemy!=null&&enemy.enabled;

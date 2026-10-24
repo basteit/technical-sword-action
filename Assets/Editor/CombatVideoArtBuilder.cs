@@ -177,6 +177,8 @@ public static class CombatVideoArtBuilder
     public static void RefreshSubmittedParryReady()=>RefreshSubmittedParry("ParryReady");
     [MenuItem("Tools/Technical Sword Action/Video/Refresh Submitted Counter Transfer")]
     public static void RefreshSubmittedCounterTransfer()=>RefreshSubmittedParry("CounterTransfer");
+    [MenuItem("Tools/Technical Sword Action/Video/Refresh Submitted Attack 1")]
+    public static void RefreshSubmittedAttack1()=>RefreshSubmittedParry("VerticalSlash");
     private static void RefreshSubmittedParry(string actionName)
     {
         if(Application.isPlaying)throw new InvalidOperationException("Exit PlayMode before updating artwork.");
@@ -185,6 +187,9 @@ public static class CombatVideoArtBuilder
         var action=JsonUtility.FromJson<Manifest>(File.ReadAllText(folder+"/timing-manifest.json")).actions.Single(a=>a.name==actionName);
         var library=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(LibraryPath);
         var motion=library.Find(action.name);
+        if((actionName=="CounterTransfer"||actionName=="VerticalSlash")&&
+            (motion.frames.Length!=action.frames.Length||!motion.durations.SequenceEqual(action.frames.Select(f=>f.frames))))
+            throw new InvalidOperationException("Submitted timing changed; review the existing clip before applying the new artwork.");
         var eyes=JsonUtility.FromJson<EyeManifest>(File.ReadAllText(folder+"/eye-mask-manifest.json")).frames.ToDictionary(f=>f.file,f=>f.pixels);
         Sprite Import(string path)
         {
@@ -214,7 +219,7 @@ public static class CombatVideoArtBuilder
         // Refresh only the selected clips; preserve the existing controller and all other artwork.
         // Transfer reuses the eight Sprite GUIDs and the existing twelve-tick keys.
         // Keep its already-edited clip/controller intact when replacing only the artwork.
-        string[] clips=actionName=="CounterTransfer"?Array.Empty<string>():actionName=="ParryReady"?new[]{"Parry"}:new[]{"ParrySuccessLight","ParrySuccess"};
+        string[] clips=actionName=="CounterTransfer"||actionName=="VerticalSlash"?Array.Empty<string>():actionName=="ParryReady"?new[]{"Parry"}:new[]{"ParrySuccessLight","ParrySuccess"};
         foreach(string name in clips)
         {
             Clip(name,motion,false);
