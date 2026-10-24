@@ -1215,7 +1215,7 @@ MonoBehaviour:
     - {fileID: 0}
     - {fileID: 0}
     durations: 0200000001000000010000000100000001000000010000000100000002000000
-    hitFrame: 0
+    hitFrame: 3
     branchFrame: 0
     chargeFrame: 0
     releaseFrame: 0

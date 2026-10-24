@@ -274,12 +274,36 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(parry,"SuccessCount"),Is.EqualTo(1));
             var visual=state.GetComponent<SpriteRenderer>();
             Assert.That(visual.sprite.name,Is.EqualTo("ParrySuccessLight_01"));
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            var enemy=((Component)Get<object>(director,"RearEnemy")).GetComponentInChildren<SpriteRenderer>();
+            var incoming=enemy.sprite;
+            Assert.That(incoming.name,Is.Not.EqualTo("EnemySample_down_01"));
+            Assert.That((bool)clockType.GetProperty("IsHitStopped").GetValue(null),Is.False);
+            Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero);
+            Assert.That(Get<Vector2>(presentation,"ShakeOffset"),Is.EqualTo(Vector2.zero));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
+            for(int i=0;i<fps;i++)Call(director,"StepCapture",1d/fps);
+            Assert.That(Get<int>(driver,"ParryImpactCount"),Is.Zero);
+            Assert.That(enemy.sprite,Is.SameAs(incoming));
+            Assert.That(visual.sprite.name,Is.EqualTo("ParrySuccessLight_01"));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
+            for(int i=0;i<fps&&Get<int>(driver,"ParryImpactCount")==0;i++)
+            {
+                Call(director,"StepCapture",1d/fps);
+                if(Get<int>(driver,"ParryImpactCount")==0)Assert.That(enemy.sprite,Is.SameAs(incoming));
+            }
+            Assert.That(Get<int>(driver,"ParryImpactCount"),Is.EqualTo(1));
+            Assert.That(visual.sprite.name,Is.EqualTo("ParrySuccessLight_03"));
+            Assert.That(enemy.sprite.name,Is.EqualTo("EnemySample_down_01"));
+            Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.EqualTo(.22f).Within(.00001f),"The impulse peaks on cel 3.");
+            var success=Marks().Single(m=>Get<string>(m,"kind")=="Parry");
+            var impact=Marks().Single(m=>Get<string>(m,"kind")=="ParryImpact");
+            Assert.That(Get<long>(impact,"tick")-Get<long>(success,"tick"),Is.EqualTo(3));
             var vfx=Find("VideoVfxRenderer");
             Assert.That(vfx.GetComponentsInChildren<SpriteRenderer>().Any(r=>r.sprite!=null&&r.sprite.name.StartsWith("Fx_Parry")),Is.False);
             Assert.That(Get<int>(vfx,"ActiveCount"),Is.Zero,"The parry spark comes from the submitted cels, without legacy sprite/glow/particles.");
             int facing=mirrored?1:-1;
             Vector3 contact=state.transform.position+new Vector3(facing*45/32f,6/32f,0);
-            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
             Assert.That(Vector2.Distance(Get<Vector2>(driver,"ParryContactPoint"),contact),Is.LessThan(.001f));
             Assert.That(visual.sprite.rect.size,Is.EqualTo(new Vector2(128,128)));
             var flash=GameObject.Find("VideoImpactFlash").GetComponent<SpriteRenderer>();
@@ -288,7 +312,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var position=Camera.main.transform.position;float alpha=Get<float>(presentation,"FlashAlpha");
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
             for(int i=0;i<fps;i++) Call(director,"StepCapture",1d/fps);
-            Assert.That(visual.sprite.name,Is.EqualTo("ParrySuccessLight_01"));
+            Assert.That(visual.sprite.name,Is.EqualTo("ParrySuccessLight_03"));
             Assert.That(Camera.main.transform.position,Is.EqualTo(position));
             Assert.That(Get<float>(presentation,"FlashAlpha"),Is.EqualTo(alpha));
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
@@ -297,17 +321,75 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(presentation,"ActiveShakeCount"),Is.Zero);
             Assert.That(Get<int>(Find("VideoVfxRenderer"),"ActiveCount"),Is.Zero);
         }
+        [TestCase("Reset")] [TestCase("Disable")] [TestCase("SessionReset")] [TestCase("ForcedHit")] [TestCase("TargetLost")]
+        public void PendingThirdCelImpactCannotLeakAfterInterruption(string interruption)
+        {
+            Call(director,"StartTake",2,true);
+            var parry=state.GetComponent(Type.GetType("PlayerParry2D, Assembly-CSharp",true));
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            for(int i=0;i<200&&Get<int>(parry,"SuccessCount")==0;i++)Step();
+            Assert.That(Get<bool>(driver,"IsParryImpactPending"),Is.True);
+            try
+            {
+                if(interruption=="Reset")Call(director,"ResetTake",2);
+                if(interruption=="Disable")((Behaviour)driver).enabled=false;
+                if(interruption=="SessionReset")clockType.GetMethod("ResetSession").Invoke(null,null);
+                if(interruption=="ForcedHit")Call(state,"ForceHit","PendingImpactTest");
+                if(interruption=="TargetLost")((Component)Get<object>(director,"RearEnemy")).gameObject.SetActive(false);
+                for(int i=0;i<16;i++)Step();
+                Assert.That(Get<bool>(driver,"IsParryImpactPending"),Is.False);
+                Assert.That(Get<int>(driver,"ParryImpactCount"),Is.Zero);
+                Assert.That((int)clockType.GetProperty("HitstopOwnerCount").GetValue(null),Is.Zero);
+                Assert.That(Get<int>(presentation,"ActiveShakeCount"),Is.Zero);
+                Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero);
+            }
+            finally {((Behaviour)driver).enabled=true;Call(director,"ResetTake",2);}
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void JustParryKeepsItsFiveTickStopWithAndWithoutTheVideoPresenter(bool presented)
+        {
+            Call(director,"ResetTake",2);
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            ((Behaviour)driver).enabled=presented;
+            try
+            {
+                var source=(Component)Get<object>(director,"RearEnemy");
+                source.transform.position=state.transform.position-Vector3.right*1.6f;Physics2D.SyncTransforms();
+                Assert.That(Call(state,"RequestAction",PlayerActionRequest.Parry),Is.True);
+                Step();
+                var parry=state.GetComponent(Type.GetType("PlayerParry2D, Assembly-CSharp",true));
+                Assert.That(Get<bool>(parry,"IsParryActive"),Is.True,"Apply the queued input on a combat tick before injecting contact.");
+                for(int i=0;i<12&&Get<int>(parry,"ElapsedFrames")<Get<int>(parry,"AcceptanceStartFrame");i++)Step();
+                var context=Activator.CreateInstance(Type.GetType("CombatHitContext2D, Assembly-CSharp",true),source,975L,true);
+                Call(health,"TryReceiveContextHit",1,(Vector2)source.transform.position,0f,context);
+                Assert.That(Get<object>(health,"LastParryResult").ToString(),Is.EqualTo("Just"));
+                int Remaining()=>(int)clockType.GetProperty("HitstopRemainingTicks").GetValue(null);
+                Assert.That(Remaining(),Is.EqualTo(presented?0:5));
+                if(presented)
+                {
+                    for(int i=0;i<12&&Get<int>(driver,"ParryImpactCount")==0;i++)Step();
+                    Assert.That(Get<int>(driver,"ParryImpactCount"),Is.EqualTo(1));
+                    Assert.That(state.GetComponent<SpriteRenderer>().sprite.name,Is.EqualTo("ParrySuccessLight_03"));
+                    Assert.That(Remaining(),Is.EqualTo(5));
+                }
+            }
+            finally {((Behaviour)driver).enabled=true;Call(director,"ResetTake",2);}
+        }
         [TestCase(false)] [TestCase(true)]
         public void HeavierParryAndKickStopsHoldContactForFourAndTenSlotsAndResume(bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
             var parry=state.GetComponent(Type.GetType("PlayerParry2D, Assembly-CSharp",true));
+            var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
             long Tick()=>(long)clockType.GetProperty("TickCount").GetValue(null);
             int Remaining()=>(int)clockType.GetProperty("HitstopRemainingTicks").GetValue(null);
             for(int i=0;i<240&&Get<int>(parry,"SuccessCount")==0;i++)Step();
-            Assert.That(Get<int>(parry,"SuccessCount"),Is.EqualTo(1));Assert.That(Remaining(),Is.EqualTo(4));
+            Assert.That(Get<int>(parry,"SuccessCount"),Is.EqualTo(1));Assert.That(Remaining(),Is.Zero);
+            for(int i=0;i<12&&Get<int>(driver,"ParryImpactCount")==0;i++)Step();
+            Assert.That(Get<int>(driver,"ParryImpactCount"),Is.EqualTo(1));
+            Assert.That(Remaining(),Is.EqualTo(4));
             var visual=state.GetComponent<SpriteRenderer>();var blade=visual.sprite;long tick=Tick();
-            Assert.That(blade.name,Is.EqualTo("ParrySuccessLight_01"));
+            Assert.That(blade.name,Is.EqualTo("ParrySuccessLight_03"));
             for(int i=0;i<4;i++){Step();Assert.That(Tick(),Is.EqualTo(tick));Assert.That(visual.sprite,Is.SameAs(blade));}
             Assert.That(Remaining(),Is.Zero);Step();Assert.That(Tick(),Is.EqualTo(tick+1));
             var target=(Component)Get<object>(director,"RearEnemy");
@@ -411,6 +493,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var parry=state.GetComponent(Type.GetType("PlayerParry2D, Assembly-CSharp",true));
             Vector3 rest=visual.transform.localPosition;
             for(int i=0;i<220&&Get<int>(parry,"SuccessCount")==0;i++)Step();
+            var animation=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            for(int i=0;i<12&&Get<int>(animation,"ParryImpactCount")==0;i++)Step();
+            Assert.That(Get<int>(animation,"ParryImpactCount"),Is.EqualTo(1));
             Vector3 root=enemy.transform.position;Sprite stagger=visual.sprite;int held=0;
             Assert.That(stagger.name,Is.EqualTo("EnemySample_down_01"));
             while(held<180&&Get<int>(enemy,"HitCount")==0)

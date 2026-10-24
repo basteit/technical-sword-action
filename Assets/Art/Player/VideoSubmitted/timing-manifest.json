@@ -203,7 +203,7 @@
         }
       ],
       "hasParryContact": true,
-      "hitFrame": 0,
+      "hitFrame": 3,
       "includesParryEffect": true,
       "name": "ParrySuccessLight",
       "parryContactOffset": {

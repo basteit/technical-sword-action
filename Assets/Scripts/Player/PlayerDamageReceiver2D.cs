@@ -273,10 +273,18 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IContextDamageReceiver2D, I
         return true;
     }
 
+    // An optional animation presenter can place feedback on its authored contact cel.
+    // Without a subscriber, the normal gameplay feedback remains immediate.
+    public event System.Action<ParryResult,float> ParryFeedbackRequested;
     private void ApplyParryEffects(ParryResult result)
     {
         if (CombatFeedback2D.IsManaging(gameObject)) return;
         float stop = result == ParryResult.Just ? justParryHitStop : normalParryHitStop;
+        if (ParryFeedbackRequested != null)
+        {
+            ParryFeedbackRequested.Invoke(result, stop);
+            return;
+        }
         if (stop > 0f)
         {
             CombatTimeController.RequestHitstop(this, stop);

@@ -33,6 +33,7 @@ public sealed class CombatVideoStudio : MonoBehaviour, ICombatTickListener
     [SerializeField] private int nextEnemyId = 1;
     private bool comboPreview, counterPreview, subscribed, previousRunInBackground;
     private StudioEnemyActor parryPreview;
+    private VideoPlayerAnimationDriver animationDriver;
     private long previewStartTick, parriedTick = -1;
 
     public PlayerStateMachine Player => player;
@@ -64,6 +65,7 @@ public sealed class CombatVideoStudio : MonoBehaviour, ICombatTickListener
         attack=player.GetComponent<PlayerAttack2D>(); parry=player.GetComponent<PlayerParry2D>();
         counter=player.GetComponent<PlayerParryCounter2D>(); motor=player.GetComponent<PlayerMotor2D>();
         attack.HitConfirmed+=OnSlash; parry.Succeeded+=OnParry; counter.HitConfirmed+=OnKick;
+        animationDriver=player.GetComponent<VideoPlayerAnimationDriver>();animationDriver.ParryImpact+=OnParryImpact;
         foreach (var enemy in enemies) if (enemy != null) enemy.Health.Died+=OnDeath;
         subscribed=true; CombatTimeController.Register(this);
     }
@@ -295,8 +297,12 @@ public sealed class CombatVideoStudio : MonoBehaviour, ICombatTickListener
     private void OnParry(Damageable2D target,ParryResult result)
     {
         if (parryPreview != null && parryPreview.Health==target) parriedTick=CombatTimeController.TickCount;
+        LastEvent="パリィ: "+target.IndividualId+" / "+result;
+    }
+    private void OnParryImpact(Damageable2D target,ParryResult result)
+    {
         vfx.EmitParry(player.GetComponent<VideoPlayerAnimationDriver>().ParryContactPoint,motor.FacingSign,parry.LastReactionWeight);
-        presentation.PresentLightParry(motor.FacingSign); LastEvent="パリィ: "+target.IndividualId+" / "+result;
+        presentation.PresentLightParry(motor.FacingSign);
     }
     private void OnKick(Damageable2D target,Vector2 point)
     {
@@ -346,6 +352,7 @@ public sealed class CombatVideoStudio : MonoBehaviour, ICombatTickListener
         CombatTimeController.Unregister(this);
         if (!subscribed) return;
         attack.HitConfirmed-=OnSlash; parry.Succeeded-=OnParry; counter.HitConfirmed-=OnKick;
+        if(animationDriver!=null)animationDriver.ParryImpact-=OnParryImpact;
         foreach (var enemy in enemies) if (enemy != null) enemy.Health.Died-=OnDeath;
         subscribed=false;
         Application.runInBackground=previousRunInBackground;

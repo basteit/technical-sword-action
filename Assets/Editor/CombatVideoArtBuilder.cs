@@ -202,6 +202,7 @@ public static class CombatVideoArtBuilder
             motion.eyeFrames[i]=eyes.TryGetValue(name,out int pixels)&&pixels>0?eye:null;
         }
         motion.durations=action.frames.Select(f=>f.frames).ToArray();
+        motion.hitFrame=action.hitFrame;
         motion.provisional=action.provisional;motion.includesParryEffect=action.includesParryEffect;
         motion.hasParryContact=action.hasParryContact;motion.parryContactOffset=action.parryContactOffset;
         EditorUtility.SetDirty(library);AssetDatabase.SaveAssetIfDirty(library);

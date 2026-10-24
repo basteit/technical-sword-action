@@ -24,6 +24,10 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     private Vector3 deathContactPosition;
     private Quaternion deathContactRotation;
     private bool deathFacingLeft;
+    private long parryImpactTick=-1;
+    private Sprite preParrySprite;
+    private Vector3 preParryPosition;
+    private bool preParryFacingLeft;
     private const int DefeatFrames=39;
     private const int DefeatKnockbackFrames=18;
     public const float DefaultSwordDefeatDistance=.8f;
@@ -43,6 +47,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
         animator=visual.GetComponent<Animator>();CombatTimeController.RegisterAnimator(animator,this);
         health.HitReceived+=OnHit;health.Parried+=OnParried;health.Died+=OnDeath;health.ResetPerformed+=OnReset;
         ai.AttackStarted+=OnAttack;CombatTimeController.Register(this);
+        CombatTimeController.SessionReset+=ClearPendingParry;
         OnReset(health);
     }
     private void Play(string name)
@@ -59,13 +64,22 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
         return name=="Windup"&&clip!=null&&ai!=null&&ai.WindupDuration>0?
             clip.TotalFrames*CombatTimeController.StepSeconds/ai.WindupDuration:1f;
     }
-    private void OnHit(Damageable2D source,int damage,Vector2 direction) { if(source.IsAlive) Play("Hit"); }
+    private void OnHit(Damageable2D source,int damage,Vector2 direction) { if(source.IsAlive) {ClearPendingParry();Play("Hit");} }
     private void OnParried(Damageable2D source,ParryResult result)
     {
-        Play("Parried");
+        var animation=player!=null?player.GetComponent<VideoPlayerAnimationDriver>():null;
+        int delay=animation!=null?animation.ParryImpactDelayFrames:0;
+        if(delay<=0){ClearPendingParry();Play("Parried");return;}
+        // Combat stun already interrupted the attack. Hold only its drawing until contact.
+        parryImpactTick=CombatTimeController.TickCount+delay;
+        preParrySprite=visual.sprite;preParryPosition=visual.transform.localPosition;preParryFacingLeft=visual.flipX;
+        if(animator!=null)animator.speed=0;
+        Show();
     }
+    private void ClearPendingParry() {parryImpactTick=-1;preParrySprite=null;}
     private void OnDeath(Damageable2D source,Vector2 direction)
     {
+        ClearPendingParry();
         // Use the same authored reaction from contact onward. Animator evaluation may
         // temporarily restore its old cel before this event, so do not capture that cel.
         deathContactSprite=library?.Find("Enemy_Death")?.At(0)??visual.sprite;
@@ -78,6 +92,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     private void OnAttack()=>Play("Attack");
     private void OnReset(Damageable2D source)
     {
+        ClearPendingParry();
         hitbackFrame=hitbackFrames=0;hitbackStartTick=-1;LastHitbackDistance=launchHeight=LastLaunchHeight=0;
         deathContactSprite=null;deathContactTick=-1;deathFacingLeft=false;
         visual.sortingOrder=restSortingOrder;
@@ -86,6 +101,11 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     }
     public void CombatTick()
     {
+        if(parryImpactTick>=0)
+        {
+            if(CombatTimeController.TickCount<parryImpactTick){Show();return;}
+            ClearPendingParry();Play("Parried");
+        }
         AdvanceHitback();
         if (health.IsAlive)
         {
@@ -120,7 +140,7 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     public void CombatTickTimers()
     {
         // Animator evaluation runs after CombatTick; keep both reactions on the down cel.
-        if(motion=="Parried"||motion=="Death") Show();
+        if(parryImpactTick>=0||motion=="Parried"||motion=="Death") Show();
         if(deathContactSprite==null) return;
         if(CombatTimeController.TickCount==deathContactTick) RestoreDeathContact();
         else { deathContactSprite=null;deathContactTick=-1; }
@@ -157,6 +177,11 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     private void Show()
     {
         if(library==null || visual==null) return;
+        if(parryImpactTick>=0)
+        {
+            visual.sprite=preParrySprite;visual.transform.localPosition=preParryPosition;
+            visual.flipX=preParryFacingLeft;return;
+        }
         bool heldReaction=motion=="Parried"||motion=="Death";
         var clip=library.Find("Enemy_"+(heldReaction?"Death":motion));
         if(clip!=null&&(heldReaction||animator==null||animator.runtimeAnimatorController==null))
@@ -181,6 +206,8 @@ public sealed class VideoEnemyAnimationDriver : MonoBehaviour, ICombatTickListen
     }
     private void OnDisable()
     {
+        CombatTimeController.SessionReset-=ClearPendingParry;
+        ClearPendingParry();
         if(animator!=null)animator.speed=1;
         hitbackFrame=hitbackFrames=0;hitbackStartTick=-1;launchHeight=0;
         if(visual!=null){visual.transform.localRotation=Quaternion.identity;visual.transform.localPosition=restPosition;visual.sortingOrder=restSortingOrder;}

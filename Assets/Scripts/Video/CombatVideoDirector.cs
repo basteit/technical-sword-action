@@ -26,6 +26,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     private CombatTimeController clock;
     private PlayerAttack2D attack;
     private PlayerParry2D parry;
+    private VideoPlayerAnimationDriver animationDriver;
     private PlayerParryCounter2D counter;
     private PlayerVisualRecovery2D recovery;
     private long startTick, rearWindupTick, successTick;
@@ -72,6 +73,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     {
         clock=FindFirstObjectByType<CombatTimeController>();
         attack.HitConfirmed+=OnSlash;parry.Succeeded+=OnParry;
+        animationDriver=player.GetComponent<VideoPlayerAnimationDriver>();animationDriver.ParryImpact+=OnParryImpact;
         frontEnemy.Died+=OnDeath;rearEnemy.Died+=OnDeath;counter.HitConfirmed+=OnKick;counter.Finished+=OnCounterFinished;
         counter.ChargeStarted+=OnCharge;counter.ChargeReleased+=OnRelease;counter.Landed+=OnLanding;
         counter.Started+=OnCounterStarted;
@@ -94,6 +96,10 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     private void OnParry(Damageable2D target,ParryResult result)
     {
         successTick=CombatTimeController.TickCount;MarkEvent("Parry",target);
+    }
+    private void OnParryImpact(Damageable2D target,ParryResult result)
+    {
+        MarkEvent("ParryImpact",target);
         int facing=player.GetComponent<PlayerMotor2D>().FacingSign;
         Vector2 contact=player.GetComponent<VideoPlayerAnimationDriver>().ParryContactPoint;
         if(target!=null) vfx.EmitParry(contact,facing,parry.LastReactionWeight);
@@ -278,6 +284,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         }
         Running=false;CombatTimeController.Unregister(this);
         if(attack!=null) attack.HitConfirmed-=OnSlash;if(parry!=null) parry.Succeeded-=OnParry;
+        if(animationDriver!=null)animationDriver.ParryImpact-=OnParryImpact;
         if(frontEnemy!=null) frontEnemy.Died-=OnDeath;if(rearEnemy!=null) rearEnemy.Died-=OnDeath;
         if(counter!=null) { counter.HitConfirmed-=OnKick;counter.Finished-=OnCounterFinished;counter.Started-=OnCounterStarted;counter.ChargeStarted-=OnCharge;counter.ChargeReleased-=OnRelease;counter.Landed-=OnLanding; }
         if(recovery!=null) { recovery.Started-=OnRecoveryStarted;recovery.Ended-=OnRecoveryEnded; }

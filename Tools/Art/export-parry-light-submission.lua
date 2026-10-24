@@ -45,6 +45,6 @@ assert(#check.frames==count and check.tags[1].name=='ParrySuccessLight' and not 
 for _,f in ipairs(check.frames) do assert(math.floor(f.duration*1000+.5)==(revised and 80 or 100)) end
 check:close()
 local function write(name,value) local f=assert(io.open(out..'/'..name,'w'));f:write(json.encode(value));f:close() end
-write('timing-manifest.json',{actions={{name='ParrySuccessLight',provisional=true,includesParryEffect=revised,canvasWidth=width,canvasHeight=height,pivotX=32,pivotY=38,count=count,totalFrames=start,hitFrame=0,branchFrame=0,hasParryContact=true,parryContactOffset={x=(cx-32)/32,y=(height-38-cy)/32},frames=frames}}})
+write('timing-manifest.json',{actions={{name='ParrySuccessLight',provisional=true,includesParryEffect=revised,canvasWidth=width,canvasHeight=height,pivotX=32,pivotY=38,count=count,totalFrames=start,hitFrame=revised and (ticks[1]+ticks[2]) or 0,branchFrame=0,hasParryContact=true,parryContactOffset={x=(cx-32)/32,y=(height-38-cy)/32},frames=frames}}})
 write('eye-mask-manifest.json',{frames=eyes})
 write('submission-validation.json',{sourceUnmodified=true,reviewCopyReopened=true,guideHidden=true,nativeFrames=native,nativeDurationMs=count*(revised and 80 or 100),gameFrames=start,contactPixel={x=cx,y=cy},authoredParryEffect=revised,acceptanceTimingUnchanged=true})

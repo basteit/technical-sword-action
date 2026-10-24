@@ -19,6 +19,24 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
     private PlayerState lastMotion=PlayerState.Idle;
     private PlayerActionState lastAction = (PlayerActionState)(-1);
     private long parryStartTick;
+    private PlayerDamageReceiver2D damageReceiver;
+    private bool parryImpactPending;
+    private float parryHitstopSeconds;
+    private Damageable2D parrySource;
+    private bool parryHadSource;
+    private ParryResult parryResult;
+    public event System.Action<Damageable2D,ParryResult> ParryImpact;
+    public int ParryImpactCount {get;private set;}
+    public long ParryImpactTick {get;private set;}=-1;
+    public bool IsParryImpactPending=>parryImpactPending;
+    public int ParryImpactDelayFrames
+    {
+        get
+        {
+            var reaction=library!=null?library.FindParrySuccess(parry.LastReactionWeight,out _):null;
+            return isActiveAndEnabled&&reaction!=null&&reaction.includesParryEffect?Mathf.Max(0,reaction.hitFrame):0;
+        }
+    }
     private string parryRecoveryMotion = "ParryDeflect";
     public bool IsRecovering=>recovery!=null&&recovery.IsPlaying;
     public VideoArtLibrary Art=>library;
@@ -49,24 +67,43 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
         animator=GetComponent<Animator>();state=GetComponent<PlayerStateMachine>();parry=GetComponent<PlayerParry2D>();
         attack=GetComponent<PlayerAttack2D>();motor=GetComponent<PlayerMotor2D>();recovery=GetComponent<PlayerVisualRecovery2D>();
         counter=GetComponent<PlayerParryCounter2D>();visual=GetComponent<SpriteRenderer>();
+        damageReceiver=GetComponent<PlayerDamageReceiver2D>();
+        if(damageReceiver!=null) damageReceiver.ParryFeedbackRequested+=OnParryFeedbackRequested;
+        CombatTimeController.SessionReset+=CancelParryImpact;
         CombatTimeController.Register(this);CombatTimeController.RegisterAnimator(animator,this);
         parry.Succeeded+=OnParried;attack.StepStarted+=OnStep;
     }
     private void OnStep(int step) { lastStep=step;driven="Attack_"+step; }
     private void OnParried(Damageable2D source, ParryResult result)
     {
-        recovery?.Cancel();parryStartTick=CombatTimeController.TickCount;
+        CancelParryImpact();recovery?.Cancel();parryStartTick=CombatTimeController.TickCount;
+        parrySource=source;parryHadSource=source!=null;parryResult=result;
         string reaction = SuccessClip();
         Play(reaction);lastAction=PlayerActionState.ParrySuccess;
         parryRecoveryMotion = library != null && library.Find("Recovery_" + reaction) != null ? reaction : "ParryDeflect";
-        // The collision can occur after Animator.Update in this tick.
-        // Freeze the actual blade contact immediately when hitstop begins.
+        // Begin the received reaction immediately; its metadata selects the later impact cel.
         int startFrame = 0;
         var motion=library!=null?library.FindParrySuccess(parry.LastReactionWeight,out startFrame):null;
         if(visual!=null&&motion!=null) visual.sprite=motion.At(startFrame);
     }
     public void ResetVisual()
-    { recovery?.Cancel();lastAction=PlayerActionState.Neutral;lastMotion=PlayerState.Idle;lastStep=1;driven="";animator.Rebind();Play("Idle");animator.Update(0); }
+    { CancelParryImpact();ParryImpactCount=0;ParryImpactTick=-1;recovery?.Cancel();lastAction=PlayerActionState.Neutral;lastMotion=PlayerState.Idle;lastStep=1;driven="";animator.Rebind();Play("Idle");animator.Update(0); }
+    private void OnParryFeedbackRequested(ParryResult result,float hitstopSeconds)
+    {
+        parryHitstopSeconds=hitstopSeconds;parryImpactPending=true;
+        if(ParryImpactDelayFrames==0) PresentParryImpact();
+    }
+    private void PresentParryImpact()
+    {
+        if(!parryImpactPending)return;
+        if(parryHadSource&&(parrySource==null||!parrySource.isActiveAndEnabled||!parrySource.IsAlive))
+        {CancelParryImpact();return;}
+        parryImpactPending=false;ParryImpactCount++;ParryImpactTick=CombatTimeController.TickCount;
+        CombatTimeController.RequestHitstop(this,parryHitstopSeconds);
+        ParryImpact?.Invoke(parrySource,parryResult);
+    }
+    private void CancelParryImpact()
+    { parryImpactPending=false;parryHitstopSeconds=0;parrySource=null;parryHadSource=false;CombatTimeController.ReleaseOwner(this); }
     public void CombatTick()
     {
         var action=state.ActionState;var motion=state.CurrentState;
@@ -127,8 +164,11 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
             var motion=library.FindParrySuccess(parry.LastReactionWeight,out int startFrame);
             if(motion!=null)
                 visual.sprite=motion.At(startFrame+(int)(CombatTimeController.TickCount-parryStartTick));
+            if(parryImpactPending&&CombatTimeController.TickCount-parryStartTick>=ParryImpactDelayFrames)
+                PresentParryImpact();
             return;
         }
+        if(parryImpactPending)CancelParryImpact();
         if(counter!=null&&counter.IsActive&&counter.IsAirborneKick)
         {
             var transfer=library.Find("CounterTransfer");
@@ -150,5 +190,5 @@ public sealed class VideoPlayerAnimationDriver : MonoBehaviour, ICombatTickListe
         }
     }
     private void OnDisable()
-    { recovery?.Cancel();if(parry!=null) parry.Succeeded-=OnParried;if(attack!=null) attack.StepStarted-=OnStep;CombatTimeController.Unregister(this);CombatTimeController.UnregisterAnimator(animator,this); }
+    { CancelParryImpact();CombatTimeController.SessionReset-=CancelParryImpact;if(damageReceiver!=null)damageReceiver.ParryFeedbackRequested-=OnParryFeedbackRequested;recovery?.Cancel();if(parry!=null) parry.Succeeded-=OnParried;if(attack!=null) attack.StepStarted-=OnStep;CombatTimeController.Unregister(this);CombatTimeController.UnregisterAnimator(animator,this); }
 }
