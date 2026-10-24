@@ -8,8 +8,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     // Apparent midpoint of the 6/7px close take and the 4/5px game-distance take.
     public const float DefaultNormalSize=1080f/(2*32*5);
     public const float DefaultCloseSize=1080f/(2*32*6);
-    public const int DefaultParryHitstopFrames=7;
-    public const int DefaultJustParryHitstopFrames=8;
+    public const int DefaultParryHitstopFrames=9;
+    public const int DefaultJustParryHitstopFrames=10;
     public const int DefaultKickHitstopFrames=16;
     [SerializeField] private Camera captureCamera;
     [SerializeField] private PlayerParryCounter2D counter;
