@@ -396,7 +396,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(vfx,"ResetEffects");Assert.That(Get<int>(vfx,"ActiveCount"),Is.Zero);
         }
         [TestCase(false)] [TestCase(true)]
-        public void LightParryRecoilMovesOnlyTheVisualAwayThenResets(bool mirrored)
+        public void ParriedEnemyHoldsItsAuthoredStaggerCelWithoutSlidingOrRotating(bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
             var enemy=(Component)Get<object>(director,"RearEnemy");var visual=enemy.GetComponentInChildren<SpriteRenderer>();
@@ -404,12 +404,16 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var parry=state.GetComponent(Type.GetType("PlayerParry2D, Assembly-CSharp",true));
             Vector3 rest=visual.transform.localPosition;
             for(int i=0;i<220&&Get<int>(parry,"SuccessCount")==0;i++)Step();
-            Vector3 root=enemy.transform.position;int away=mirrored?1:-1;
-            Assert.That(visual.transform.localPosition,Is.EqualTo(rest));
-            for(int i=0;i<8;i++)Step();
-            Assert.That((visual.transform.localPosition.x-rest.x)*away,Is.GreaterThan(.03f));
-            Assert.That(enemy.transform.position,Is.EqualTo(root));
-            Assert.That(Quaternion.Angle(visual.transform.localRotation,Quaternion.identity),Is.GreaterThan(2));
+            Vector3 root=enemy.transform.position;Sprite stagger=visual.sprite;int held=0;
+            Assert.That(stagger.name,Is.EqualTo("EnemySample_chance_01"));
+            while(held<180&&Get<int>(enemy,"HitCount")==0)
+            {
+                Assert.That(visual.sprite,Is.SameAs(stagger));
+                Assert.That(visual.transform.localPosition,Is.EqualTo(rest));
+                Assert.That(visual.transform.localRotation,Is.EqualTo(Quaternion.identity));
+                Assert.That(enemy.transform.position,Is.EqualTo(root));Step();held++;
+            }
+            Assert.That(held,Is.GreaterThan(50));Assert.That(Get<int>(enemy,"HitCount"),Is.EqualTo(1));
             Call(director,"ResetTake",2);Assert.That(visual.transform.localPosition,Is.EqualTo(rest));
             Assert.That(visual.transform.localRotation,Is.EqualTo(Quaternion.identity));
         }
@@ -517,7 +521,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             finally { Object.DestroyImmediate(ceiling); }
         }
         [TestCase(false)] [TestCase(true)]
-        public void EnemyKeepsItsContactPoseThroughKickHitstopThenCollapses(bool mirrored)
+        public void EnemyKeepsContactThroughHitstopThenSlidesInTheGroundedDownCelFacingTheAttacker(bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
             var enemy=(Component)Get<object>(director,"RearEnemy");var renderer=enemy.GetComponentInChildren<SpriteRenderer>();
@@ -525,9 +529,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for(int i=0;i<300&&Get<int>(enemy,"HitCount")==0;i++) { before=renderer.sprite;Step(); }
             Assert.That(Get<int>(enemy,"HitCount"),Is.EqualTo(1));
             Assert.That(renderer.sprite,Is.SameAs(before));
+            Assert.That(renderer.flipX,Is.EqualTo(!mirrored),"The hitstop must already face the attacker.");
             for(int i=0;i<6;i++) { Step();Assert.That(renderer.sprite,Is.SameAs(before)); }
             for(int i=0;i<10;i++) Step();
             Assert.That(renderer.sprite.name,Does.StartWith("EnemySample_down_"));
+            Assert.That(renderer.transform.localPosition,Is.EqualTo(new Vector3(0,-2f/32,0)));
+            Assert.That(renderer.transform.localRotation,Is.EqualTo(Quaternion.identity));
+            Assert.That(renderer.flipX,Is.EqualTo(!mirrored));
         }
         [TestCase("VerticalSlash",9,17,38)] [TestCase("HorizontalSlash",8,13,34)]
         public void SubmittedAttackPreservesItsPixelScaleAndCumulativeNativeTiming(string name,int count,int hit,int total)
@@ -867,7 +875,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 }
             }
             Assert.That(hits,Is.EqualTo(4));Assert.That(Get<int>(rear,"HitCount"),Is.EqualTo(1));
-            Assert.That((enemy.transform.position.x-originX)*(mirrored?-1:1),Is.InRange(1.14f,1.18f));
+            Assert.That((enemy.transform.position.x-originX)*(mirrored?-1:1),Is.InRange(4.2f,4.36f));
         }
         [TestCase(2,false,60)] [TestCase(4,true,60)] [TestCase(4,false,30)] [TestCase(4,true,120)]
         public void AuthoredTransferPrecedesTwoTickRearBlinkAndRevealsTheSubmittedKick(int stages,bool mirrored,int fps)
@@ -966,24 +974,26 @@ namespace TechnicalSwordAction.PlayerState.Tests
             finally { Object.DestroyImmediate(wall); }
         }
         [TestCase(false)] [TestCase(true)]
-        public void KickLaunchesOnlyItsTargetAndPauseFreezesTheTrajectory(bool mirrored)
+        public void KickSlidesOnlyItsTargetAlongTheGroundAndPauseFreezesTheDefeat(bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",4,true);
             var enemy=(Component)Get<object>(director,"RearEnemy");var driver=enemy.GetComponent(Type.GetType("VideoEnemyAnimationDriver, Assembly-CSharp",true));
             Vector3 resetOrigin=enemy.transform.position;
-            for(int i=0;i<330&&!Get<bool>(driver,"IsLaunched");i++) Step();
-            Assert.That(Get<bool>(driver,"IsLaunched"),Is.True);Assert.That(Get<int>(enemy,"DeathCount"),Is.EqualTo(1));
+            for(int i=0;i<330&&!Get<bool>(driver,"IsDefeatSliding");i++) Step();
+            Assert.That(Get<bool>(driver,"IsDefeatSliding"),Is.True);Assert.That(Get<bool>(driver,"IsLaunched"),Is.False);
+            Assert.That(Get<int>(enemy,"DeathCount"),Is.EqualTo(1));
             Vector3 origin=enemy.transform.position;
             for(int i=0;i<16;i++) Step();
-            Vector3 airborne=enemy.transform.position;Quaternion rotation=enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation;
+            Vector3 sliding=enemy.transform.position;var visual=enemy.GetComponentInChildren<SpriteRenderer>();Quaternion rotation=visual.transform.localRotation;
             double real=Get<double>(director,"RealElapsed");
-            Assert.That(airborne.y-origin.y,Is.InRange(.5f,.66f));Assert.That(rotation,Is.Not.EqualTo(Quaternion.identity));
+            Assert.That(sliding.y,Is.EqualTo(origin.y));Assert.That(Mathf.Abs(sliding.x-origin.x),Is.GreaterThan(.4f));
+            Assert.That(rotation,Is.EqualTo(Quaternion.identity));Assert.That(visual.flipX,Is.EqualTo(!mirrored));
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});for(int i=0;i<60;i++) Step();
-            Assert.That(enemy.transform.position,Is.EqualTo(airborne));Assert.That(enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation,Is.EqualTo(rotation));
+            Assert.That(enemy.transform.position,Is.EqualTo(sliding));Assert.That(enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation,Is.EqualTo(rotation));
             Assert.That(Get<double>(director,"RealElapsed"),Is.EqualTo(real));Assert.That(Get<bool>(director,"Completed"),Is.False,"Pause must not end the take between landing and recovery start.");
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
             for(int i=0;i<180&&!Get<bool>(director,"Completed");i++) Step();
-            Assert.That((enemy.transform.position.x-origin.x)*(mirrored?-1:1),Is.EqualTo(3.2f).Within(.02f));
+            Assert.That((enemy.transform.position.x-origin.x)*(mirrored?-1:1),Is.InRange(3.1f,3.21f));
             Assert.That(Get<int>(enemy,"HitCount"),Is.EqualTo(1));
             Call(director,"ResetTake",4);Assert.That(Get<bool>(driver,"IsLaunched"),Is.False);
             Assert.That(enemy.transform.position,Is.EqualTo(resetOrigin));Assert.That(enemy.GetComponentInChildren<SpriteRenderer>().transform.localRotation,Is.EqualTo(Quaternion.identity));
@@ -1002,6 +1012,85 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<bool>(driver,"IsLaunched"),Is.False);
             }
             finally { Object.DestroyImmediate(wall); }
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void BothDefeatedEnemiesKeepMovingThroughTheirFadeAndResetTenTimes(bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);
+            for(int run=0;run<10;run++)
+            {
+                Call(director,"StartTake",2,true);
+                var enemies=new[]{(Component)Get<object>(director,"FrontEnemy"),(Component)Get<object>(director,"RearEnemy")};
+                int[] fadedMoving={0,0};Vector3[] previous=enemies.Select(e=>e.transform.position).ToArray();
+                bool[] began={false,false};float[] floors=enemies.Select(e=>e.transform.position.y).ToArray();
+                for(int i=0;i<360&&!Get<bool>(director,"Completed");i++)
+                {
+                    Step();
+                    for(int n=0;n<enemies.Length;n++)
+                    {
+                        var enemy=enemies[n];var visual=enemy.GetComponentInChildren<SpriteRenderer>();
+                        if(enemy.gameObject.activeSelf&&Get<int>(enemy,"DeathCount")>0&&visual.color.a<.95f&&visual.color.a>.05f)
+                        {
+                            Assert.That((enemy.transform.position.x-previous[n].x)*(mirrored?-1:1),Is.GreaterThan(.015f),"Visible defeat must not stop before disappearing.");
+                        Assert.That(enemy.transform.position.y,Is.EqualTo(floors[n]).Within(1f/32));
+                            Assert.That(visual.transform.localRotation,Is.EqualTo(Quaternion.identity));
+                            Assert.That(visual.sprite.name,Is.EqualTo("EnemySample_down_01"));fadedMoving[n]++;
+                        }
+                        if(Get<int>(enemy,"DeathCount")>0)
+                        {
+                            if(began[n]&&enemy.gameObject.activeSelf)Assert.That(enemy.transform.position.y,Is.EqualTo(previous[n].y));
+                            began[n]=true;
+                        }
+                        previous[n]=enemy.transform.position;
+                    }
+                }
+                Assert.That(Get<bool>(director,"Completed"),Is.True);Assert.That(began,Is.All.True);
+                Assert.That(fadedMoving,Is.All.GreaterThan(5));
+                Assert.That(Get<int>(enemies[0],"HitCount"),Is.EqualTo(2));Assert.That(Get<int>(enemies[1],"HitCount"),Is.EqualTo(1));
+                Assert.That(Get<string>(Marks().Single(m=>Get<string>(m,"kind")=="Kick"),"target"),Is.EqualTo(Get<string>(enemies[1],"IndividualId")));
+                Assert.That(Get<float>(presentation,"Zoom"),Is.Zero);Assert.That(Get<float>(presentation,"ImpactZoom"),Is.Zero);
+                Call(director,"ResetTake",2);
+                foreach(var enemy in enemies)
+                {
+                    var visual=enemy.GetComponentInChildren<SpriteRenderer>();var driver=enemy.GetComponent(Type.GetType("VideoEnemyAnimationDriver, Assembly-CSharp",true));
+                    Assert.That(Get<bool>(driver,"IsDefeatSliding"),Is.False);Assert.That(visual.transform.localPosition,Is.EqualTo(Vector3.zero));
+                    Assert.That(visual.transform.localRotation,Is.EqualTo(Quaternion.identity));Assert.That(visual.color,Is.EqualTo(Color.white));
+                }
+                Assert.That((int)clockType.GetProperty("HitstopOwnerCount").GetValue(null),Is.Zero);
+                Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
+                Assert.That(Get<int>(Find("VideoVfxRenderer"),"ActiveCount"),Is.Zero);
+            }
+        }
+        [TestCase(30,false)] [TestCase(60,false)] [TestCase(120,false)]
+        [TestCase(30,true)] [TestCase(60,true)] [TestCase(120,true)]
+        public void KickImpactBrieflyPushesCloserWithStrongerShakeThenReturnsAndResets(int fps,bool mirrored)
+        {
+            Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
+            var target=(Component)Get<object>(director,"RearEnemy");bool parried=false;
+            for(int i=0;i<fps*5&&Get<int>(target,"HitCount")==0;i++)
+            {
+                Call(director,"StepCapture",1d/fps);
+                if(!parried&&Marks().Any(m=>Get<string>(m,"kind")=="Parry"))
+                {parried=true;Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.GreaterThan(.18f));}
+            }
+            Assert.That(parried,Is.True);Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));
+            Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.GreaterThan(.3f));
+            for(int i=0;i<Mathf.CeilToInt(fps*2/60f);i++)Call(director,"StepCapture",1d/fps);
+            Assert.That(Camera.main.orthographicSize,Is.LessThan(2.75f));
+            Assert.That(Get<float>(presentation,"ImpactZoom"),Is.EqualTo(1).Within(.001f));
+            var position=Camera.main.transform.position;float size=Camera.main.orthographicSize,pulse=Get<float>(presentation,"ImpactZoom");
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
+            for(int i=0;i<fps;i++)Call(director,"StepCapture",1d/fps);
+            Assert.That(Camera.main.transform.position,Is.EqualTo(position));Assert.That(Camera.main.orthographicSize,Is.EqualTo(size));
+            Assert.That(Get<float>(presentation,"ImpactZoom"),Is.EqualTo(pulse));
+            clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
+            for(int i=0;i<fps;i++)Call(director,"StepCapture",1d/fps);
+            Assert.That(Get<float>(presentation,"Zoom"),Is.Zero);Assert.That(Get<float>(presentation,"ImpactZoom"),Is.Zero);
+            Assert.That(Camera.main.orthographicSize,Is.EqualTo(3.375f));Assert.That(Get<int>(presentation,"ActiveShakeCount"),Is.Zero);
+            Call(director,"StartTake",2,true);
+            for(int i=0;i<fps*5&&Get<float>(presentation,"ImpactZoom")==0;i++)Call(director,"StepCapture",1d/fps);
+            Assert.That(Get<float>(presentation,"ImpactZoom"),Is.GreaterThan(0));Call(director,"ResetTake",2);
+            Assert.That(Get<float>(presentation,"ImpactZoom"),Is.Zero);Assert.That(Camera.main.orthographicSize,Is.EqualTo(3.375f));
         }
         [Test] public void ReusedVanishEffectKeepsItsOwnMovingEnemy()
         {

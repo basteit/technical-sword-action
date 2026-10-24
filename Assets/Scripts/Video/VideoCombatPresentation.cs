@@ -17,6 +17,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     // Eight preparation ticks at .15 speed, with a small real-time lease margin.
     [SerializeField, Range(.5f,1f)] private float chargeRealSeconds=.95f;
     [SerializeField,Min(0)] private int kickHitstopFrames=10;
+    [SerializeField,Range(0,.2f)] private float impactZoomAmount=.06f;
     [SerializeField] private float normalSize=DefaultNormalSize;
     [SerializeField] private float closeSize=DefaultCloseSize;
     [SerializeField] private bool adaptiveFocusHeight;
@@ -27,6 +28,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     private Vector3 restPosition;
     private bool charged;
     private float zoom;
+    private float impactZoom,impactZoomAge=-1;
+    private const float ImpactZoomIn=2/60f,ImpactZoomHold=6/60f,ImpactZoomOut=12/60f;
     private sealed class Impulse { public float age,duration,strength,cycles;public Vector2 direction; }
     private readonly List<Impulse> impulses=new();
     private Vector2 shakeOffset;
@@ -46,7 +49,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     private float shadowGroundY;
     private Vector3 focus;
     public bool IsCharged=>charged;
-    public float Zoom=>zoom;
+    public float Zoom=>Mathf.Max(zoom,impactZoom);
+    public float ImpactZoom=>impactZoom;
     public float DimAlpha=>dimAlpha;
     public Vector2 ShakeOffset=>shakeOffset;
     public int ActiveShakeCount=>impulses.Count;
@@ -103,7 +107,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         charged=false;CombatTimeController.ReleaseSlow(counter);
         CombatTimeController.RequestHitstop(counter,kickHitstopFrames*CombatTimeController.StepSeconds);
-        ShakeDirectional(vfx.ReadableImpacts?.22f:.25f,vfx.ReadableImpacts?.26f:.24f,counter.AttacksFromBehind?new Vector2(counter.KickFacingSign,-.25f):new Vector2(counter.KickFacingSign*.35f,-1),vfx.ReadableImpacts?1.75f:2.75f);
+        impactZoomAge=0;impactZoom=0;
+        ShakeDirectional(.30f,vfx.ReadableImpacts?.38f:.36f,counter.AttacksFromBehind?new Vector2(counter.KickFacingSign,-.25f):new Vector2(counter.KickFacingSign*.35f,-1),vfx.ReadableImpacts?1.75f:2.25f);
         flashRemaining=flashDuration=(vfx.ReadableImpacts?2:3)/60f;flashStrength=vfx.ReadableImpacts?.20f:.12f;flashTint=Color.white;
         bool authored=library!=null&&library.Find("CounterKick")?.includesCounterTrail==true;
         vfx.Emit(counter.IsOverheadHeelDrop?"HeelLightning":authored?"ElectricKick":"Kick",foot,counter.IsOverheadHeelDrop?1f:authored?1.15f:1.55f,counter.KickFacingSign);
@@ -117,13 +122,13 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     public void SetCameraFrame(Vector3 position,float size)
     {
         restPosition=position;normalSize=Mathf.Max(.5f,size);closeSize=normalSize*(5f/6f);
-        if(zoom==0&&captureCamera!=null)
+        if(Zoom==0&&captureCamera!=null)
         { captureCamera.transform.position=restPosition;captureCamera.orthographicSize=normalSize; }
     }
     public void PresentLightParry(int facing)
     {
         // A single beat and return carries the impact, while the hero keeps a stable base.
-        ShakeDirectional((vfx.ReadableImpacts?6:7)/60f,vfx.ReadableImpacts?.145f:.135f,new Vector2(-facing,-.3f),vfx.ReadableImpacts?1f:1.25f);
+        ShakeDirectional(9/60f,vfx.ReadableImpacts?.22f:.21f,new Vector2(-facing,-.3f),vfx.ReadableImpacts?1f:1.25f);
         flashRemaining=flashDuration=3/60f;flashStrength=.18f;flashTint=Color.black;
     }
     public void ShakeDirectional(float realSeconds,float strength,Vector2 direction,float cycles=3)
@@ -136,7 +141,14 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         if(CombatTimeController.IsPaused || captureCamera==null) return;
         if(charged && !CombatTimeController.IsHitStopped) ChargeRealElapsed+=realSeconds;
         zoom=Mathf.MoveTowards(zoom,charged ? 1 : 0,realSeconds/(charged ? .1f : .22f));
-        Vector3 position=Vector3.Lerp(restPosition,focus,zoom);
+        if(impactZoomAge>=0)
+        {
+            impactZoomAge+=realSeconds;
+            impactZoom=impactZoomAge<ImpactZoomIn?impactZoomAge/ImpactZoomIn:
+                1-Mathf.Clamp01((impactZoomAge-ImpactZoomIn-ImpactZoomHold)/ImpactZoomOut);
+            if(impactZoomAge>=ImpactZoomIn+ImpactZoomHold+ImpactZoomOut){impactZoomAge=-1;impactZoom=0;}
+        }
+        Vector3 position=Vector3.Lerp(restPosition,focus,Zoom);
         shakeOffset=Vector2.zero;
         for(int i=impulses.Count-1;i>=0;i--)
         {
@@ -144,9 +156,10 @@ public sealed class VideoCombatPresentation : MonoBehaviour
             shakeOffset+=impulse.direction*impulse.strength*(1-t)*(1-t)*Mathf.Cos(t*Mathf.PI*2*impulse.cycles);
             impulse.age+=realSeconds;if(impulse.age>=impulse.duration) impulses.RemoveAt(i);
         }
-        shakeOffset=Vector2.ClampMagnitude(shakeOffset,.28f);position+=(Vector3)shakeOffset;
+        shakeOffset=Vector2.ClampMagnitude(shakeOffset,.42f);position+=(Vector3)shakeOffset;
         position.x=Mathf.Round(position.x*32)/32;position.y=Mathf.Round(position.y*32)/32;
-        captureCamera.transform.position=position;captureCamera.orthographicSize=Mathf.Lerp(normalSize,closeSize,zoom);
+        captureCamera.transform.position=position;
+        captureCamera.orthographicSize=Mathf.Lerp(Mathf.Lerp(normalSize,closeSize,zoom),closeSize*(1-impactZoomAmount),impactZoom);
         bool dimming=charged&&CombatTimeController.SlowScale<1;
         dimBlend=Mathf.MoveTowards(dimBlend,dimming?1:0,
             realSeconds/Mathf.Max(.001f,dimming?dimFadeInSeconds:dimFadeOutSeconds));
@@ -225,6 +238,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         RestorePlayerBody();
         charged=false;zoom=ChargeRealElapsed=dimAlpha=dimBlend=eyeTrailTimer=flashRemaining=flashStrength=flashDuration=0;
+        impactZoom=0;impactZoomAge=-1;
         flashTint=Color.white;
         impulses.Clear();shakeOffset=Vector2.zero;if(flashRenderer!=null) flashRenderer.enabled=false;
         if(captureCamera!=null) { captureCamera.transform.position=restPosition;captureCamera.orthographicSize=normalSize; }

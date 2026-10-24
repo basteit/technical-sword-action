@@ -83,7 +83,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     private void OnSlash(Damageable2D target,int step,Vector2 point)
     {
         int direction=player.GetComponent<PlayerMotor2D>().FacingSign;
-        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyHitback(new[]{.10f,.18f,.30f,.58f}[step-1],6+step,Vector2.right*direction);
+        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplySwordHitback(step,Vector2.right*direction);
         MarkEvent((defenseCancelTake&&!returnAttackSent?"OpeningSlash":"Slash")+step,target);
         var motion=player.GetComponent<VideoPlayerAnimationDriver>().Art.Find(new[]{"VerticalSlash","HorizontalSlash","RapidSheathe","IaiSlash"}[step-1]);
         if(!motion.includesSlashTrail)
@@ -101,7 +101,7 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
     }
     private void OnKick(Damageable2D target,Vector2 point)
     {
-        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyLaunch(counter.AttacksFromBehind?3.2f:counter.IsOverheadHeelDrop?1.4f:defenseCancelTake?1.75f:2.25f,counter.AttacksFromBehind?.65f:counter.IsOverheadHeelDrop?.18f:1.05f,counter.AttacksFromBehind?22:20,Vector2.right*counter.KickFacingSign);
+        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyDefeatSlide(counter.AttacksFromBehind?3.2f:counter.IsOverheadHeelDrop?1.4f:defenseCancelTake?1.75f:2.25f,Vector2.right*counter.KickFacingSign);
         MarkEvent("Kick",target);
     }
     private void OnCharge()=>MarkEvent("ChargeStart",counter.SelectedTarget);

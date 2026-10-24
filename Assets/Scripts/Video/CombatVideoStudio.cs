@@ -286,7 +286,7 @@ public sealed class CombatVideoStudio : MonoBehaviour, ICombatTickListener
     }
     private void OnSlash(Damageable2D target,int step,Vector2 point)
     {
-        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyHitback(new[]{.1f,.18f,.3f,.58f}[step-1],6+step,Vector2.right*motor.FacingSign);
+        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplySwordHitback(step,Vector2.right*motor.FacingSign);
         if(step!=1||!player.GetComponent<VideoPlayerAnimationDriver>().Art.Find("VerticalSlash").provisional)
             vfx.Emit("Slash",point,new[]{.65f,.8f,1f,1.25f}[step-1],motor.FacingSign);
         presentation.ShakeDirectional(.09f+step*.01f,.025f+step*.02f,new Vector2(motor.FacingSign,step==1?-1:.15f));
@@ -300,7 +300,7 @@ public sealed class CombatVideoStudio : MonoBehaviour, ICombatTickListener
     }
     private void OnKick(Damageable2D target,Vector2 point)
     {
-        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyLaunch(counter.AttacksFromBehind?3.2f:counter.IsOverheadHeelDrop?1.4f:1.75f,counter.AttacksFromBehind?.65f:counter.IsOverheadHeelDrop?.18f:1.05f,counter.AttacksFromBehind?22:20,Vector2.right*counter.KickFacingSign);
+        target.GetComponent<VideoEnemyAnimationDriver>()?.ApplyDefeatSlide(counter.AttacksFromBehind?3.2f:counter.IsOverheadHeelDrop?1.4f:1.75f,Vector2.right*counter.KickFacingSign);
         LastEvent="反撃: "+target.IndividualId;
     }
     private void OnDeath(Damageable2D target,Vector2 direction) => vfx.EmitFollowing("Vanish",target.transform,Vector2.down*.2f,.6f,.18f);
