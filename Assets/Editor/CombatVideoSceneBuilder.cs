@@ -119,7 +119,9 @@ public static class CombatVideoSceneBuilder
         Set(attack,"directStatePrefix","PlayerVideo_Attack_");Set(attack,"lightHitstopFrames",2);
         ConfigureAttack(attack,library,!defenseCancel);
         actor.AddComponent<PlayerParry2D>(); actor.AddComponent<PlayerSpecialGauge>();
-        var health=actor.AddComponent<PlayerDamageReceiver2D>();Set(health,"normalParryHitStop",4/60f);Set(health,"justParryHitStop",5/60f);
+        var health=actor.AddComponent<PlayerDamageReceiver2D>();
+        Set(health,"normalParryHitStop",VideoCombatPresentation.DefaultParryHitstopFrames/60f);
+        Set(health,"justParryHitStop",VideoCombatPresentation.DefaultJustParryHitstopFrames/60f);
         var counter=actor.AddComponent<PlayerParryCounter2D>();
         ConfigureCounter(counter,library);Set(counter,"obstacleLayers",1 << ground);
         actor.AddComponent<PlayerStateMachine>();actor.AddComponent<PlayerVisualRecovery2D>();

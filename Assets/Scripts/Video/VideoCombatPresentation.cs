@@ -8,6 +8,9 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     // Apparent midpoint of the 6/7px close take and the 4/5px game-distance take.
     public const float DefaultNormalSize=1080f/(2*32*5);
     public const float DefaultCloseSize=1080f/(2*32*6);
+    public const int DefaultParryHitstopFrames=7;
+    public const int DefaultJustParryHitstopFrames=8;
+    public const int DefaultKickHitstopFrames=16;
     [SerializeField] private Camera captureCamera;
     [SerializeField] private PlayerParryCounter2D counter;
     [SerializeField] private VideoVfxRenderer vfx;
@@ -16,7 +19,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField, Range(.1f,1f)] private float chargeScale=.15f;
     // Nine preparation ticks at .15 speed, including the final tucked cel.
     [SerializeField, Range(.5f,1.5f)] private float chargeRealSeconds=1.1f;
-    [SerializeField,Min(0)] private int kickHitstopFrames=10;
+    [SerializeField,Min(0)] private int kickHitstopFrames=DefaultKickHitstopFrames;
     [SerializeField,Range(0,.2f)] private float impactZoomAmount=.06f;
     [SerializeField] private float normalSize=DefaultNormalSize;
     [SerializeField] private float closeSize=DefaultCloseSize;

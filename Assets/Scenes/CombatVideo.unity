@@ -581,8 +581,8 @@ MonoBehaviour:
   invincibleDuration: 0.45
   hitStopMoveDuration: 0.16
   minKnockbackForce: 5.5
-  normalParryHitStop: 0.06666667
-  justParryHitStop: 0.083333336
+  normalParryHitStop: 0.11666667
+  justParryHitStop: 0.13333334
   ignoreCollisionLayersWhileInvincible:
     serializedVersion: 2
     m_Bits: 0
@@ -1714,7 +1714,7 @@ MonoBehaviour:
   library: {fileID: 11400000, guid: 948efd1e09648894f8c35efd70bbd0fb, type: 2}
   chargeScale: 0.15
   chargeRealSeconds: 1.1
-  kickHitstopFrames: 10
+  kickHitstopFrames: 16
   normalSize: 3.375
   closeSize: 2.8125
   adaptiveFocusHeight: 0

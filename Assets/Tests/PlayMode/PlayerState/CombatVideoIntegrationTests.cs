@@ -346,7 +346,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             finally {((Behaviour)driver).enabled=true;Call(director,"ResetTake",2);}
         }
         [TestCase(false)] [TestCase(true)]
-        public void JustParryKeepsItsFiveTickStopWithAndWithoutTheVideoPresenter(bool presented)
+        public void JustParryUsesEightTickStopWithAndWithoutTheVideoPresenter(bool presented)
         {
             Call(director,"ResetTake",2);
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
@@ -364,19 +364,19 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Call(health,"TryReceiveContextHit",1,(Vector2)source.transform.position,0f,context);
                 Assert.That(Get<object>(health,"LastParryResult").ToString(),Is.EqualTo("Just"));
                 int Remaining()=>(int)clockType.GetProperty("HitstopRemainingTicks").GetValue(null);
-                Assert.That(Remaining(),Is.EqualTo(presented?0:5));
+                Assert.That(Remaining(),Is.EqualTo(presented?0:8));
                 if(presented)
                 {
                     for(int i=0;i<12&&Get<int>(driver,"ParryImpactCount")==0;i++)Step();
                     Assert.That(Get<int>(driver,"ParryImpactCount"),Is.EqualTo(1));
                     Assert.That(state.GetComponent<SpriteRenderer>().sprite.name,Is.EqualTo("ParrySuccessLight_03"));
-                    Assert.That(Remaining(),Is.EqualTo(5));
+                    Assert.That(Remaining(),Is.EqualTo(8));
                 }
             }
             finally {((Behaviour)driver).enabled=true;Call(director,"ResetTake",2);}
         }
         [TestCase(false)] [TestCase(true)]
-        public void HeavierParryAndKickStopsHoldContactForFourAndTenSlotsAndResume(bool mirrored)
+        public void LongerParryAndKickStopsHoldContactForSevenAndSixteenSlotsAndResume(bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
             var parry=state.GetComponent(Type.GetType("PlayerParry2D, Assembly-CSharp",true));
@@ -387,22 +387,22 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(parry,"SuccessCount"),Is.EqualTo(1));Assert.That(Remaining(),Is.Zero);
             for(int i=0;i<12&&Get<int>(driver,"ParryImpactCount")==0;i++)Step();
             Assert.That(Get<int>(driver,"ParryImpactCount"),Is.EqualTo(1));
-            Assert.That(Remaining(),Is.EqualTo(4));
+            Assert.That(Remaining(),Is.EqualTo(7));
             var visual=state.GetComponent<SpriteRenderer>();var blade=visual.sprite;long tick=Tick();
             Assert.That(blade.name,Is.EqualTo("ParrySuccessLight_03"));
-            for(int i=0;i<4;i++){Step();Assert.That(Tick(),Is.EqualTo(tick));Assert.That(visual.sprite,Is.SameAs(blade));}
+            for(int i=0;i<7;i++){Step();Assert.That(Tick(),Is.EqualTo(tick));Assert.That(visual.sprite,Is.SameAs(blade));}
             Assert.That(Remaining(),Is.Zero);Step();Assert.That(Tick(),Is.EqualTo(tick+1));
             var target=(Component)Get<object>(director,"RearEnemy");
             for(int i=0;i<180&&Get<int>(target,"HitCount")==0;i++)Step();
-            Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));Assert.That(Remaining(),Is.EqualTo(10));
+            Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));Assert.That(Remaining(),Is.EqualTo(16));
             var effect=Find("VideoVfxRenderer").GetComponentsInChildren<SpriteRenderer>().Single(r=>r.name=="AuthoredCounterEffect");
             var contact=visual.sprite;var electricity=effect.sprite;var position=target.transform.position;tick=Tick();
             Assert.That(contact.name,Is.EqualTo("CounterKick_09"));
             for(int i=0;i<2;i++)Step();
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});for(int i=0;i<60;i++)Step();
-            Assert.That(Remaining(),Is.EqualTo(8));Assert.That(Tick(),Is.EqualTo(tick));
+            Assert.That(Remaining(),Is.EqualTo(14));Assert.That(Tick(),Is.EqualTo(tick));
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
-            for(int i=0;i<8;i++)
+            for(int i=0;i<14;i++)
             {Step();Assert.That(Tick(),Is.EqualTo(tick));Assert.That(visual.sprite,Is.SameAs(contact));Assert.That(effect.sprite,Is.SameAs(electricity));Assert.That(target.transform.position,Is.EqualTo(position));}
             Assert.That(Remaining(),Is.Zero);Step();Assert.That(Tick(),Is.EqualTo(tick+1));
             Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));
@@ -1146,6 +1146,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     }
                 }
                 Assert.That(Get<bool>(director,"Completed"),Is.True);Assert.That(began,Is.All.True);
+                Assert.That(enemies.All(enemy=>!enemy.gameObject.activeInHierarchy),Is.True,"Do not finish the take before both defeat fades disappear after the longer stops.");
                 Assert.That(stopped,Is.All.True);Assert.That(stoppedFade,Is.All.GreaterThan(5));
                 Assert.That(peakHeight[0],Is.InRange(.17f,.19f));Assert.That(peakHeight[1],Is.InRange(.26f,.28f));
                 float firstDistance=(endpoints[0].x-origins[0].x)*(mirrored?-1:1);

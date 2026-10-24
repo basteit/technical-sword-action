@@ -272,7 +272,10 @@ public sealed class CombatVideoDirector : MonoBehaviour, ICombatTickListener
         if(CombatTimeController.IsPaused) return;
         vfx.AdvanceVisuals(dt);presentation.AdvanceVisuals(dt);
         bool idleVisible=player.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).shortNameHash==Animator.StringToHash("PlayerVideo_Idle");
-        if(Running && deathReal>=0 && RealElapsed-deathReal>=.85d && !counter.IsActive && (recovery==null||!recovery.IsPlaying)&&idleVisible)
+        bool enemiesHidden=(frontEnemy==null||!frontEnemy.gameObject.activeInHierarchy)&&(rearEnemy==null||!rearEnemy.gameObject.activeInHierarchy);
+        // Longer combat hitstop also delays the defeat fade. Finish on the visible result,
+        // rather than cutting off the enemy at a fixed real-time deadline.
+        if(Running && deathReal>=0 && RealElapsed-deathReal>=.85d && !counter.IsActive && (recovery==null||!recovery.IsPlaying)&&idleVisible&&enemiesHidden&&vfx.ActiveCount==0)
         { Running=false;Completed=true;player.GetComponent<PlayerInputRouter>().enabled=true;player.ClearBufferedGameplayInput(); }
     }
     private void OnDisable()

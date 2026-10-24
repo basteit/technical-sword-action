@@ -24,6 +24,9 @@ public static class HeelDropVideoSetup
         {
             var scene=EditorSceneManager.OpenScene(path);
             var player=UnityEngine.Object.FindFirstObjectByType<PlayerParryCounter2D>();
+            CombatVideoSceneBuilder.Set(player.GetComponent<PlayerDamageReceiver2D>(),"normalParryHitStop",VideoCombatPresentation.DefaultParryHitstopFrames/60f);
+            CombatVideoSceneBuilder.Set(player.GetComponent<PlayerDamageReceiver2D>(),"justParryHitStop",VideoCombatPresentation.DefaultJustParryHitstopFrames/60f);
+            CombatVideoSceneBuilder.Set(UnityEngine.Object.FindFirstObjectByType<VideoCombatPresentation>(),"kickHitstopFrames",VideoCombatPresentation.DefaultKickHitstopFrames);
             CombatVideoSceneBuilder.ConfigureCounter(player,library);
             CombatVideoSceneBuilder.Set(UnityEngine.Object.FindFirstObjectByType<VideoCombatPresentation>(),"chargeRealSeconds",1.1f);
             CombatVideoSceneBuilder.ConfigureAttack(player.GetComponent<PlayerAttack2D>(),library,path!=CombatVideoSceneBuilder.DefenseCancelScenePath);
