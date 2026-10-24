@@ -1,0 +1,151 @@
+{
+  "date": "2026-10-25",
+  "trial": "monochrome-negative-parry-impact",
+  "inversion": {
+    "realVideoFrames": 2,
+    "realSeconds": 0.03333333333333333,
+    "captureFramesOneBased": [
+      132,
+      133
+    ],
+    "ptsSeconds": [
+      2.183333333333333,
+      2.2
+    ],
+    "replacesTranslucentDarkFlash": true,
+    "allOtherFramesKeepTheirPalette": true,
+    "renderedPixelTestPassed": true,
+    "cameraScopePauseResetSessionResetDisableAndDestroyedCameraPassed": true
+  },
+  "hitstop": {
+    "parry": 9,
+    "just": 10,
+    "counter": 16,
+    "parryThirdCelVideoFrames": 10,
+    "kickContactCelVideoFrames": 17,
+    "unchanged": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T20:44:30.4780801Z",
+    "TestCount": 26,
+    "PassedCount": 26,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "uniquePlayModeCasesPassed": 26,
+  "mirroredTenResetRunsPassed": 20,
+  "fullSuiteRerun": false,
+  "legacyEightyResetSweepRerun": false,
+  "initialTestAttempt": {
+    "testCount": 25,
+    "passedCount": 24,
+    "failedCount": 1,
+    "failure": "Rendered-pixel test detected missing URP Core shader definitions. Fixed shader include and aligned the comparison camera transform; all related tests passed after correction."
+  },
+  "eventsAndNormalizedTraceUnchanged": true,
+  "absoluteSessionClockTickOffset": -383,
+  "counterCelVideoFrames": {
+    "CounterKick_01": 14,
+    "CounterKick_02": 6,
+    "CounterKick_03": 7,
+    "CounterKick_04": 7,
+    "CounterKick_05": 6,
+    "CounterKick_06": 7,
+    "CounterKick_07": 7,
+    "CounterKick_08": 7,
+    "CounterKick_09": 17,
+    "CounterKick_10": 4,
+    "CounterKick_11": 4,
+    "CounterKick_12": 4,
+    "CounterKick_13": 4,
+    "CounterKick_14": 4,
+    "CounterKick_15": 4
+  },
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 10,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "postTestConsoleBeforeClearingRunnerInfo": {
+    "TotalCount": 2,
+    "DisplayedCount": 2,
+    "LogType": "All",
+    "MaxCount": 10,
+    "SearchText": "",
+    "IncludeStackTrace": true,
+    "Logs": [
+      {
+        "Type": "Log",
+        "Message": "Executing IPostBuildCleanup for: Unity.PerformanceTesting.Editor.TestRunBuilder.",
+        "StackTrace": "UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()"
+      },
+      {
+        "Type": "Log",
+        "Message": "Saving results to: C:/Users/hirot/AppData/LocalLow/DefaultCompany/technical-sword-action\\TestResults.xml",
+        "StackTrace": ""
+      }
+    ]
+  },
+  "shaderMessages": "0 shader messages: ",
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-parry-invert-20261025.mp4",
+    "sha256": "f2da70ff0d2f4b86f66bbe1f9e584e5482c002d9b242bad07ca2b48e9368ebe7",
+    "decodedFrames": 275,
+    "durationSeconds": 4.583333333333333,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "bothEnemiesHiddenAtEnd": true,
+    "vfxActiveAtEnd": 0,
+    "inversionActiveAtEnd": false
+  },
+  "preview": {
+    "crf": 22,
+    "bytes": 867730,
+    "nativeVideoControls": true
+  },
+  "overallVideoAccepted": false,
+  "preservation": {
+    "baselineFiles": 2402,
+    "changedIntentionally": 4,
+    "byteIdentical": 2398,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 15,
+    "originalDirtyChangesKept": true,
+    "allSourcePngClipsControllersSharedArtAndScenesUnchanged": true,
+    "sourceCurrentHistoryAndCatalogUnchanged": true,
+    "prototypeCinematicProfileUnchanged": true,
+    "preexistingDirtyUrpSettingsUnchanged": true,
+    "rendererDiffOnlyNewFeatureAndMap": true,
+    "counterSettingsUnchanged": true
+  },
+  "repositoryStagedAudit": {
+    "branch": "issue/33-52-38-combat-polish",
+    "base": "",
+    "staged": true,
+    "changedFiles": 15,
+    "attributes": [
+      "Assets/Scenes/PrototypeCombatValidation.unity: merge: unityyamlmerge",
+      "Assets/Art/test.aseprite: merge: unset"
+    ],
+    "problems": [],
+    "success": true
+  }
+}

@@ -20,6 +20,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     // Nine preparation ticks at .15 speed, including the final tucked cel.
     [SerializeField, Range(.5f,1.5f)] private float chargeRealSeconds=1.1f;
     [SerializeField,Min(0)] private int kickHitstopFrames=DefaultKickHitstopFrames;
+    [SerializeField,Range(0,4)] private int parryInversionFrames=2;
     [SerializeField,Range(0,.2f)] private float impactZoomAmount=.06f;
     [SerializeField] private float normalSize=DefaultNormalSize;
     [SerializeField] private float closeSize=DefaultCloseSize;
@@ -38,6 +39,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     private Vector2 shakeOffset;
     private float flashRemaining,flashStrength,flashDuration;
     private Color flashTint=Color.white;
+    private float parryInversionAge=-1,parryInversionDuration;
     private SpriteRenderer flashRenderer;
     private float dimAlpha,dimBlend;
     private SpriteRenderer dimRenderer;
@@ -58,6 +60,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     public Vector2 ShakeOffset=>shakeOffset;
     public int ActiveShakeCount=>impulses.Count;
     public float FlashAlpha=>flashRenderer!=null&&flashRenderer.enabled?flashRenderer.color.a:0;
+    public bool IsParryInverted=>VideoParryInversionFeature.IsVisible(captureCamera);
     public bool IsDimVisible=>dimRenderer!=null&&dimRenderer.enabled;
     public bool IsSpotlightVisible=>heroLift!=null&&heroLift.enabled;
     public bool AreEyesVisible=>eyeLight!=null&&eyeLight.enabled;
@@ -71,7 +74,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         EnsureSpotlight();
     }
     private void OnEnable()
-    { counter.Started+=OnCounterStarted;counter.BlinkStarted+=OnBlinkStarted;counter.BlinkArrived+=OnBlinkArrived;counter.ChargeStarted+=OnCharge;counter.ChargeReleased+=OnRelease;counter.HitConfirmed+=OnHit;counter.HitMissed+=OnMiss;counter.Finished+=OnFinished;counter.Landed+=OnLanding; }
+    { CombatTimeController.SessionReset+=ResetParryInversion;counter.Started+=OnCounterStarted;counter.BlinkStarted+=OnBlinkStarted;counter.BlinkArrived+=OnBlinkArrived;counter.ChargeStarted+=OnCharge;counter.ChargeReleased+=OnRelease;counter.HitConfirmed+=OnHit;counter.HitMissed+=OnMiss;counter.Finished+=OnFinished;counter.Landed+=OnLanding; }
     private void OnCounterStarted()
     {
         if(!counter.HasAuthoredTransfer) BeginTransit();
@@ -132,8 +135,28 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         // A single beat and return carries the impact, while the hero keeps a stable base.
         ShakeDirectional(9/60f,vfx.ReadableImpacts?.22f:.21f,new Vector2(-facing,-.3f),vfx.ReadableImpacts?1f:1.25f);
-        flashRemaining=flashDuration=3/60f;flashStrength=.18f;flashTint=Color.black;
+        if(parryInversionFrames>0)
+        {
+            // Replace the old translucent dark flash for this trial. The pulse
+            // expires in real time while combat stays frozen on the contact cel.
+            flashRemaining=0;if(flashRenderer!=null)flashRenderer.enabled=false;
+            parryInversionAge=0;parryInversionDuration=parryInversionFrames/60f;
+            VideoParryInversionFeature.SetVisible(captureCamera,true);
+        }
+        else
+        {
+            ResetParryInversion();
+            flashRemaining=flashDuration=3/60f;flashStrength=.18f;flashTint=Color.black;
+        }
     }
+    private void AdvanceParryInversion(float realSeconds)
+    {
+        bool visible=parryInversionAge>=0&&parryInversionAge<parryInversionDuration-.000001f;
+        VideoParryInversionFeature.SetVisible(captureCamera,visible);
+        parryInversionAge=visible?parryInversionAge+realSeconds:-1;
+    }
+    private void ResetParryInversion()
+    { parryInversionAge=-1;parryInversionDuration=0;VideoParryInversionFeature.SetVisible(captureCamera,false); }
     public void ShakeDirectional(float realSeconds,float strength,Vector2 direction,float cycles=3)
     {
         if(realSeconds<=0||strength<=0) return;
@@ -142,6 +165,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     public void AdvanceVisuals(float realSeconds)
     {
         if(CombatTimeController.IsPaused || captureCamera==null) return;
+        AdvanceParryInversion(realSeconds);
         if(charged && !CombatTimeController.IsHitStopped) ChargeRealElapsed+=realSeconds;
         zoom=Mathf.MoveTowards(zoom,charged ? 1 : 0,realSeconds/(charged ? .1f : .22f));
         if(impactZoomAge>=0)
@@ -241,6 +265,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     }
     public void ResetPresentation()
     {
+        ResetParryInversion();
         RestorePlayerBody();
         charged=false;zoom=ChargeRealElapsed=dimAlpha=dimBlend=eyeTrailTimer=flashRemaining=flashStrength=flashDuration=0;
         impactZoom=0;impactZoomAge=-1;
@@ -252,7 +277,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         CombatTimeController.ReleaseOwner(counter);
     }
     private void OnDisable()
-    { counter.Started-=OnCounterStarted;counter.BlinkStarted-=OnBlinkStarted;counter.BlinkArrived-=OnBlinkArrived;counter.ChargeStarted-=OnCharge;counter.ChargeReleased-=OnRelease;counter.HitConfirmed-=OnHit;counter.HitMissed-=OnMiss;counter.Finished-=OnFinished;counter.Landed-=OnLanding;ResetPresentation(); }
+    { CombatTimeController.SessionReset-=ResetParryInversion;counter.Started-=OnCounterStarted;counter.BlinkStarted-=OnBlinkStarted;counter.BlinkArrived-=OnBlinkArrived;counter.ChargeStarted-=OnCharge;counter.ChargeReleased-=OnRelease;counter.HitConfirmed-=OnHit;counter.HitMissed-=OnMiss;counter.Finished-=OnFinished;counter.Landed-=OnLanding;ResetPresentation(); }
     private void OnDestroy()
     {
         if(dimRenderer!=null) Destroy(dimRenderer.gameObject);

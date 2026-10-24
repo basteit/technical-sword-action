@@ -280,6 +280,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(incoming.name,Is.Not.EqualTo("EnemySample_down_01"));
             Assert.That((bool)clockType.GetProperty("IsHitStopped").GetValue(null),Is.False);
             Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero);
+            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.False);
             Assert.That(Get<Vector2>(presentation,"ShakeOffset"),Is.EqualTo(Vector2.zero));
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
             for(int i=0;i<fps;i++)Call(director,"StepCapture",1d/fps);
@@ -306,20 +307,114 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Vector3 contact=state.transform.position+new Vector3(facing*45/32f,6/32f,0);
             Assert.That(Vector2.Distance(Get<Vector2>(driver,"ParryContactPoint"),contact),Is.LessThan(.001f));
             Assert.That(visual.sprite.rect.size,Is.EqualTo(new Vector2(128,128)));
-            var flash=GameObject.Find("VideoImpactFlash").GetComponent<SpriteRenderer>();
-            Assert.That(flash.color.r+flash.color.g+flash.color.b,Is.Zero);
-            Assert.That(Get<float>(presentation,"FlashAlpha"),Is.GreaterThan(0));
-            var position=Camera.main.transform.position;float alpha=Get<float>(presentation,"FlashAlpha");
+            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.True);
+            Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero,"The negative replaces the old translucent dark pulse.");
+            var position=Camera.main.transform.position;
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{true});
             for(int i=0;i<fps;i++) Call(director,"StepCapture",1d/fps);
             Assert.That(visual.sprite.name,Is.EqualTo("ParrySuccessLight_03"));
             Assert.That(Camera.main.transform.position,Is.EqualTo(position));
-            Assert.That(Get<float>(presentation,"FlashAlpha"),Is.EqualTo(alpha));
+            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.True);
             clockType.GetMethod("SetPaused").Invoke(null,new object[]{false});
             Call(director,"ResetTake",4);
             Assert.That(Get<float>(presentation,"FlashAlpha"),Is.Zero);
+            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.False);
             Assert.That(Get<int>(presentation,"ActiveShakeCount"),Is.Zero);
             Assert.That(Get<int>(Find("VideoVfxRenderer"),"ActiveCount"),Is.Zero);
+        }
+        [TestCase(30)] [TestCase(60)] [TestCase(120)]
+        public void ParryNegativeLastsTwoRealVideoFramesWhileContactStaysFrozen(int fps)
+        {
+            Call(director,"StartTake",2,true);
+            for(int i=0;i<fps*3&&!Get<bool>(presentation,"IsParryInverted");i++)Call(director,"StepCapture",1d/fps);
+            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.True);
+            long impactTick=(long)clockType.GetProperty("TickCount").GetValue(null);
+            int exposed=0;
+            while(Get<bool>(presentation,"IsParryInverted")&&exposed<fps)
+            {
+                exposed++;Call(director,"StepCapture",1d/fps);
+                Assert.That((long)clockType.GetProperty("TickCount").GetValue(null),Is.EqualTo(impactTick));
+                Assert.That(state.GetComponent<SpriteRenderer>().sprite.name,Is.EqualTo("ParrySuccessLight_03"));
+            }
+            Assert.That(exposed,Is.EqualTo(fps/30),"2/60 seconds, independent of the nine-frame combat stop.");
+            Assert.That((int)clockType.GetProperty("HitstopRemainingTicks").GetValue(null),Is.GreaterThan(0));
+        }
+        [TestCase("Reset")] [TestCase("Disable")] [TestCase("SessionReset")]
+        public void ActiveParryNegativeClearsImmediatelyOnResetOrDisable(string interruption)
+        {
+            Call(director,"StartTake",2,true);
+            for(int i=0;i<180&&!Get<bool>(presentation,"IsParryInverted");i++)Step();
+            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.True);
+            if(interruption=="Disable")((Behaviour)presentation).enabled=false;
+            else if(interruption=="SessionReset")clockType.GetMethod("ResetSession").Invoke(null,null);
+            else Call(director,"ResetTake",2);
+            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.False);
+            Call(presentation,"AdvanceVisuals",1/60f);
+            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.False);
+        }
+        [Test]
+        public void ParryNegativeRendersGrayscaleInvertedPixelsOnlyOnTheCaptureCamera()
+        {
+            Call(director,"StartTake",2,true);
+            for(int i=0;i<180&&!Get<bool>(presentation,"IsParryInverted");i++)Step();
+            Assert.That(Get<bool>(presentation,"IsParryInverted"),Is.True);
+            var camera=Camera.main;
+            var feature=Type.GetType("VideoParryInversionFeature, Assembly-CSharp",true);
+            var setVisible=feature.GetMethod("SetVisible");
+            var other=new GameObject("UnaffectedCamera").AddComponent<Camera>();other.CopyFrom(camera);other.enabled=false;
+            other.transform.SetPositionAndRotation(camera.transform.position,camera.transform.rotation);
+            try
+            {
+                var inverted=RenderParryPixels(camera);
+                setVisible.Invoke(null,new object[]{camera,false});
+                var normal=RenderParryPixels(camera);
+                setVisible.Invoke(null,new object[]{camera,true});
+                var unaffected=RenderParryPixels(other);
+                int checkedPixels=0,changedPixels=0;
+                for(int i=0;i<normal.Length;i+=13)
+                {
+                    var source=normal[i];var negative=inverted[i];
+                    Assert.That(Math.Abs(negative.r-negative.g),Is.LessThanOrEqualTo(1));
+                    Assert.That(Math.Abs(negative.g-negative.b),Is.LessThanOrEqualTo(1));
+                    float expected=255-(source.r*.2126f+source.g*.7152f+source.b*.0722f);
+                    Assert.That((float)negative.r,Is.EqualTo(expected).Within(3),"Negative must invert the rendered composite, including the background.");
+                    Assert.That(unaffected[i],Is.EqualTo(source),"An unregistered camera keeps the original palette.");
+                    if(Math.Abs(negative.r-source.r)>40)changedPixels++;
+                    checkedPixels++;
+                }
+                Assert.That(changedPixels,Is.GreaterThan(checkedPixels/2));
+            }
+            finally
+            {
+                Object.DestroyImmediate(other.gameObject);
+                Call(director,"ResetTake",2);
+            }
+        }
+        private static Color32[] RenderParryPixels(Camera camera)
+        {
+            var requestType=Type.GetType("UnityEngine.Rendering.Universal.UniversalRenderPipeline+SingleCameraRequest, Unity.RenderPipelines.Universal.Runtime",true);
+            var target=RenderTexture.GetTemporary(320,180,24,RenderTextureFormat.ARGB32);
+            var previous=RenderTexture.active;var image=new Texture2D(320,180,TextureFormat.RGB24,false);
+            try
+            {
+                var request=Activator.CreateInstance(requestType);requestType.GetField("destination").SetValue(request,target);
+                typeof(UnityEngine.Rendering.RenderPipeline).GetMethod("SubmitRenderRequest").MakeGenericMethod(requestType).Invoke(null,new object[]{camera,request});
+                RenderTexture.active=target;image.ReadPixels(new Rect(0,0,320,180),0,0);image.Apply(false);
+                return image.GetPixels32();
+            }
+            finally { RenderTexture.active=previous;RenderTexture.ReleaseTemporary(target);Object.DestroyImmediate(image); }
+        }
+        [Test]
+        public void ParryNegativeUnregistersEvenWhenItsCameraWasDestroyedFirst()
+        {
+            var feature=Type.GetType("VideoParryInversionFeature, Assembly-CSharp",true);
+            var setVisible=feature.GetMethod("SetVisible");
+            var camera=new GameObject("DestroyedParryCamera").AddComponent<Camera>();
+            setVisible.Invoke(null,new object[]{camera,true});
+            Object.DestroyImmediate(camera.gameObject);
+            setVisible.Invoke(null,new object[]{camera,false});
+            var cameras=(System.Collections.IEnumerable)feature.GetField("activeCameras",BindingFlags.Static|BindingFlags.NonPublic).GetValue(null);
+            Assert.That(cameras.Cast<Camera>().Any(c=>ReferenceEquals(c,camera)),Is.False,"Scene teardown must not retain a destroyed camera reference.");
         }
         [TestCase("Reset")] [TestCase("Disable")] [TestCase("SessionReset")] [TestCase("ForcedHit")] [TestCase("TargetLost")]
         public void PendingThirdCelImpactCannotLeakAfterInterruption(string interruption)
