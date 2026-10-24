@@ -323,7 +323,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(Find("VideoVfxRenderer"),"ActiveCount"),Is.Zero);
         }
         [TestCase(30)] [TestCase(60)] [TestCase(120)]
-        public void ParryNegativeLastsTwoRealVideoFramesWhileContactStaysFrozen(int fps)
+        public void ParryNegativeLastsFourRealVideoFramesWhileContactStaysFrozen(int fps)
         {
             Call(director,"StartTake",2,true);
             for(int i=0;i<fps*3&&!Get<bool>(presentation,"IsParryInverted");i++)Call(director,"StepCapture",1d/fps);
@@ -336,7 +336,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That((long)clockType.GetProperty("TickCount").GetValue(null),Is.EqualTo(impactTick));
                 Assert.That(state.GetComponent<SpriteRenderer>().sprite.name,Is.EqualTo("ParrySuccessLight_03"));
             }
-            Assert.That(exposed,Is.EqualTo(fps/30),"2/60 seconds, independent of the nine-frame combat stop.");
+            Assert.That(exposed,Is.EqualTo(fps/15),"4/60 seconds, independent of the nine-frame combat stop.");
             Assert.That((int)clockType.GetProperty("HitstopRemainingTicks").GetValue(null),Is.GreaterThan(0));
         }
         [TestCase("Reset")] [TestCase("Disable")] [TestCase("SessionReset")]

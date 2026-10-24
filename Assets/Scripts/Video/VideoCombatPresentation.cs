@@ -20,7 +20,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     // Nine preparation ticks at .15 speed, including the final tucked cel.
     [SerializeField, Range(.5f,1.5f)] private float chargeRealSeconds=1.1f;
     [SerializeField,Min(0)] private int kickHitstopFrames=DefaultKickHitstopFrames;
-    [SerializeField,Range(0,4)] private int parryInversionFrames=2;
+    [SerializeField,Range(0,4)] private int parryInversionFrames=4;
     [SerializeField,Range(0,.2f)] private float impactZoomAmount=.06f;
     [SerializeField] private float normalSize=DefaultNormalSize;
     [SerializeField] private float closeSize=DefaultCloseSize;

@@ -172,12 +172,15 @@ public static class CombatVideoArtBuilder
         EnemySubmissionSetup.Apply();
     }
     [MenuItem("Tools/Technical Sword Action/Video/Refresh Submitted Light Parry")]
-    public static void RefreshSubmittedLightParry()
+    public static void RefreshSubmittedLightParry()=>RefreshSubmittedParry("ParrySuccessLight");
+    [MenuItem("Tools/Technical Sword Action/Video/Refresh Submitted Parry Ready")]
+    public static void RefreshSubmittedParryReady()=>RefreshSubmittedParry("ParryReady");
+    private static void RefreshSubmittedParry(string actionName)
     {
         if(Application.isPlaying)throw new InvalidOperationException("Exit PlayMode before updating artwork.");
         const string folder="Assets/Art/Player/VideoSubmitted";
         AssetDatabase.Refresh();
-        var action=JsonUtility.FromJson<Manifest>(File.ReadAllText(folder+"/timing-manifest.json")).actions.Single(a=>a.name=="ParrySuccessLight");
+        var action=JsonUtility.FromJson<Manifest>(File.ReadAllText(folder+"/timing-manifest.json")).actions.Single(a=>a.name==actionName);
         var library=AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(LibraryPath);
         var motion=library.Find(action.name);
         var eyes=JsonUtility.FromJson<EyeManifest>(File.ReadAllText(folder+"/eye-mask-manifest.json")).frames.ToDictionary(f=>f.file,f=>f.pixels);
@@ -207,9 +210,12 @@ public static class CombatVideoArtBuilder
         motion.hasParryContact=action.hasParryContact;motion.parryContactOffset=action.parryContactOffset;
         EditorUtility.SetDirty(library);AssetDatabase.SaveAssetIfDirty(library);
         // Refresh only the selected clips; preserve the existing controller and all other artwork.
-        Clip("ParrySuccessLight",motion,false);Clip("ParrySuccess",motion,false);
-        AssetDatabase.SaveAssetIfDirty(AssetDatabase.LoadAssetAtPath<AnimationClip>(Folder+"/PlayerVideo_ParrySuccessLight.anim"));
-        AssetDatabase.SaveAssetIfDirty(AssetDatabase.LoadAssetAtPath<AnimationClip>(Folder+"/PlayerVideo_ParrySuccess.anim"));
+        string[] clips=actionName=="ParryReady"?new[]{"Parry"}:new[]{"ParrySuccessLight","ParrySuccess"};
+        foreach(string name in clips)
+        {
+            Clip(name,motion,false);
+            AssetDatabase.SaveAssetIfDirty(AssetDatabase.LoadAssetAtPath<AnimationClip>(Folder+"/PlayerVideo_"+name+".anim"));
+        }
     }
     private static string[] SelectCleanFrames(string folder)
     {
