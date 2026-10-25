@@ -11,6 +11,7 @@ namespace TechnicalSwordAction.PlayerState
         None = 0,
         Defense = 1 << 0,
         Late = 1 << 1,
+        Common = 1 << 2,
         All = Defense | Late
     }
 }

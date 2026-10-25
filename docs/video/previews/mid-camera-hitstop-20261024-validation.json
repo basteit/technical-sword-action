@@ -1,0 +1,164 @@
+{
+  "date": "2026-10-24",
+  "camera": {
+    "normal": 3.375,
+    "counter": 2.8125,
+    "normalPixelScale": 5,
+    "counterPixelScale": 6,
+    "gameplayCameraChanged": false
+  },
+  "hitstop": {
+    "normalParryBeforeFrames": 2,
+    "normalParryFrames": 4,
+    "justParryBeforeFrames": 3,
+    "justParryFrames": 5,
+    "kickBeforeFrames": 8,
+    "kickFrames": 10,
+    "slashFramesUnchanged": 2,
+    "tickRate": 60,
+    "pauseFreezesRemainingDuration": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T01:08:27.8349217Z",
+    "TestCount": 14,
+    "PassedCount": 14,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "fullSuiteRerun": false,
+  "repeatedResetSweepRerun": false,
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 5,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-mid-camera-hitstop-20261024.mp4",
+    "sha256": "fa976e45ceca45c1492bf9c79110d3d09a5fc31ac95b40f3864e97784a19502c",
+    "decodedFrames": 310,
+    "durationSeconds": 5.166666666666667,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "allEventKindsTargetsAndCombatTicksUnchanged": true,
+    "eventTimingDeltas": [
+      {
+        "kind": "Slash1",
+        "target": "Enemy_A",
+        "combatTick": 35,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "RearApproach",
+        "target": "Enemy_B",
+        "combatTick": 36,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "Death",
+        "target": "Enemy_A",
+        "combatTick": 61,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "Slash2",
+        "target": "Enemy_A",
+        "combatTick": 61,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "RearWindup",
+        "target": "Enemy_B",
+        "combatTick": 79,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "ParryReady",
+        "target": "Enemy_B",
+        "combatTick": 166,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "Parry",
+        "target": "Enemy_B",
+        "combatTick": 174,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "CounterStart",
+        "target": "Enemy_B",
+        "combatTick": 184,
+        "realSecondsDelta": 0.03333333
+      },
+      {
+        "kind": "ChargeStart",
+        "target": "Enemy_B",
+        "combatTick": 195,
+        "realSecondsDelta": 0.03333333
+      },
+      {
+        "kind": "ChargeRelease",
+        "target": "Enemy_B",
+        "combatTick": 203,
+        "realSecondsDelta": 0.03333333
+      },
+      {
+        "kind": "Death",
+        "target": "Enemy_B",
+        "combatTick": 204,
+        "realSecondsDelta": 0.03333333
+      },
+      {
+        "kind": "Kick",
+        "target": "Enemy_B",
+        "combatTick": 204,
+        "realSecondsDelta": 0.03333333
+      },
+      {
+        "kind": "Landing",
+        "target": "Enemy_B",
+        "combatTick": 228,
+        "realSecondsDelta": 0.06666667
+      }
+    ],
+    "chargeSecondsUnchanged": 0.9,
+    "floorFullWidthMatchesOriginalColor": true,
+    "endWaitUsesRealTime": true
+  },
+  "preview": {
+    "crf": 22,
+    "bytes": 863304,
+    "nativeVideoControls": true
+  },
+  "overallVideoAccepted": false,
+  "preservation": {
+    "baselineFiles": 2273,
+    "changedIntentionally": 13,
+    "byteIdentical": 2260,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 18
+  },
+  "background": {
+    "temporaryExtensionOnly": true,
+    "sourceTextureChanged": false,
+    "floorFullWidthMatchesOriginalColor": true,
+    "releasedAfterCapture": true
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "date": "2026-10-17",
+  "issue": 71,
+  "parentIssue": 69,
+  "branch": "issue/33-52-38-combat-polish",
+  "baseCommit": "7a535881d8cbe55d4a19a60df341c5ca9e59fc81",
+  "runtimeImplementationCommit": "ebfd6c40f8a434ebbfcb92b1b7afef3a620de249",
+  "runtimeBehavior": {
+    "attackFields": [
+      "parryable",
+      "parryReaction: Light / Heavy"
+    ],
+    "existingAttackDefault": "Light",
+    "normalJustTimingIndependent": true,
+    "counterInputTargetStockDamageAndRulesShared": true,
+    "onlyPrimaryHitSelectsReaction": true,
+    "specificMotionMissingFallsBackToExistingSuccess": true
+  },
+  "unityCompile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "playMode": {
+    "testCount": 315,
+    "passed": 315,
+    "failed": 0,
+    "skipped": 0,
+    "completedAtUtc": "2026-10-17T07:01:11.0997658Z",
+    "newCases": 17
+  },
+  "editMode": {
+    "testCount": 186,
+    "passed": 186,
+    "failed": 0,
+    "skipped": 0,
+    "completedAtUtc": "2026-10-17T07:02:44.3184282Z"
+  },
+  "reactionResetRuns": {
+    "configurations": [
+      "Light / per-attack definition",
+      "Heavy / per-attack definition",
+      "Light / single-attack fallback",
+      "Heavy / single-attack fallback"
+    ],
+    "runsPerConfiguration": 10,
+    "total": 40,
+    "passed": 40,
+    "counterDamagePerRun": 90,
+    "targetHpAfterCounter": 910
+  },
+  "existingVideoResetTests": [
+    "CombatVideoIntegrationTests.TwoAndFourStagesAndBothDirectionsResetTenTimesEach",
+    "DefenseCancelShowcaseTests.BothEndingsAndBothDirectionsResetTenTimesEach"
+  ],
+  "asepriteExport": {
+    "passed": 8,
+    "failed": 0,
+    "cases": [
+      "legacy-full",
+      "split-partial",
+      "expanded-split-full",
+      "expanded-needs-pivot",
+      "unknown-tag",
+      "empty-required",
+      "missing-required",
+      "invalid-pivot"
+    ],
+    "sourceFilesUnchanged": true,
+    "pngDimensionsPixelsEyesAndIntegerTimingVerified": true,
+    "reproduce": "python Tools/Art/validate-player-clean-export.py"
+  },
+  "sourceSha256": {
+    "Assets/Editor/CombatVideoArtBuilder.cs": "1f8c70da92151262a4b4affa53ad3912eeb594d5db38cc874fbb63aef2d3c419",
+    "Assets/Scripts/Combat/CombatHitContext2D.cs": "817b17e3c6e491bd4c3fcaf6ede6c9ea1d3fb9fe125490aa3d5ed06bbabcdfc4",
+    "Assets/Scripts/Enemy/EnemyAttackDefinition.cs": "0c1c7790eaba6d29b847eb55041337c4a56e59215391fd48da73fdd0702b9245",
+    "Assets/Scripts/Enemy/EnemyCombatDefinition.cs": "69448a6b37685fbedb58f269de720a8a77c738159a05f4f36daf070806f52351",
+    "Assets/Scripts/Enemy/EnemyMeleeChaser2D.cs": "321244343d5a6b353e92021f7dbd82b1767ef55def0d846c02cd1c58df2a5fe0",
+    "Assets/Scripts/Player/PlayerAnimationDriver2D.cs": "5079baa911e3923e57c8c7aa2dc39640cd50db1f4395571e4e409196a1e47bdc",
+    "Assets/Scripts/Player/PlayerDamageReceiver2D.cs": "4e1e45e5e02714c0f91a7a7a1219328388aac0a54e746f853877843b2395d069",
+    "Assets/Scripts/Player/PlayerParry2D.cs": "8939dbfb096c6a43e998a672fc93bc566ae4399dff261efe91ead272bbdb2566",
+    "Assets/Scripts/Video/VideoArtLibrary.cs": "00c167089daf476003abf3b5f20571ca44e8d1d985dc46db822f101125ae1efc",
+    "Assets/Scripts/Video/VideoPlayerAnimationDriver.cs": "81444f7bcec6d80c5898d029c117536ec2a781c46943a7c5f703846f1d567205",
+    "Assets/Tests/PlayMode/PlayerState/CombatVideoIntegrationTests.cs": "474c6bd043348591f7a62f772845280e606c4e5f0f9956de53a07c91bb3ce6bd",
+    "Assets/Tests/PlayMode/PlayerState/PrototypeCombatContractTests.cs": "551428d36b2cce2cf6a1d06afb054bf2aa072bcc4f56e053a225e19144dd3b7f",
+    "Tools/Art/export-player-clean.lua": "8d57f856b638e0ad4ab61d3ab28d57189e85f5cd43bcca22c0d9454c515212d8",
+    "Tools/Art/validate-player-clean-export.py": "70f0586f0696f3dd98708e405a4884396f1c9fc35079f9326ac12edcca4074dc"
+  },
+  "preservation": {
+    "originalModifiedScenesAndSettingsByteIdentical": true,
+    "originalRequirementEditsPreserved": true,
+    "noProductionArtworkChanged": true
+  },
+  "limitations": [
+    "Human ParryReady/ParrySuccessLight artwork not received or integrated.",
+    "Heavy production artwork and physical backward recoil are not implemented by this attribute/animation selection change.",
+    "Movie final acceptance and final recording remain pending; issues #69 and #71 stay open."
+  ],
+  "testRepair": "The first simultaneous-hit test assumed creation order. It was corrected to compare the actual primary source with its authored reaction. The final full 315-case run passed.",
+  "finalConsole": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "editorPipelineCompiledAfterFinalPlayModeRun": true
+}
