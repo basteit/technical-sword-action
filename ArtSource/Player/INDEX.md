@@ -8,7 +8,7 @@
 | --- | --- | --- | --- | --- | --- |
 | 待機 (`idle`) | [Player_idle.aseprite](Current/Player_idle.aseprite) | 受領済み | 64×64 / 6コマ / 600ms | video：登録版一致, prototype：登録版一致 | [1版](History/idle/) |
 | 歩行 (`walk`) | [Player_walk.aseprite](Current/Player_walk.aseprite) | 受領済み | 64×64 / 8コマ / 640ms | video：登録版一致, prototype：登録版一致 | [1版](History/walk/) |
-| 攻撃1段目 (`attack_1`) | [Player_attack_1.aseprite](Current/Player_attack_1.aseprite) | 仮提出 | 128×128 / 9コマ / 630ms | video：登録版一致, prototype：登録版一致 | [2版](History/attack_1/) |
+| 攻撃1段目 (`attack_1`) | [Player_attack_1.aseprite](Current/Player_attack_1.aseprite) | 仮提出 | 128×128 / 9コマ / 630ms | video：登録版一致, prototype：登録版一致 | [3版](History/attack_1/) |
 | 攻撃2段目 (`attack_2`) | [Player_attack_2.aseprite](Current/Player_attack_2.aseprite) | 仮提出 | 128×128 / 8コマ / 560ms | video：登録版一致, prototype：登録版一致 | [2版](History/attack_2/) |
 | パリィ待機 (`parry_wait`) | [Player_parry_wait.aseprite](Current/Player_parry_wait.aseprite) | 受領済み | 64×64 / 8コマ / 800ms | video：登録版一致, prototype：登録版一致 | [2版](History/parry_wait/) |
 | パリィ成功（軽） (`parry_light`) | [Player_parry_light.aseprite](Current/Player_parry_light.aseprite) | 仮提出 | 128×128 / 8コマ / 640ms | video：登録版一致, prototype：登録版一致 | [3版](History/parry_light/) |
@@ -23,7 +23,7 @@
 
 - **待機**：現在の64px待機。ゲーム用は6コマ×100ms。旧48px待機サンプルと区別。
 - **歩行**：標準の歩行で使用。原稿の表示時間とゲーム内の移動速度は別に管理。
-- **攻撃1段目**：縦斬り2版目。後ろ髪を含む9コマ×70ms。動画は復帰を省略。128pxの余白を含め原本保持。
+- **攻撃1段目**：縦斬り3版目。3コマ目の不要ドット除去。後ろ髪を含む9コマ×70ms。動画は復帰を省略。128pxの余白を含め原本保持。
 - **攻撃2段目**：1段目から逆側へ返す斬撃。現在の動画はこの2段目で撃破。
 - **パリィ待機**：入力時の構え。成功軽・成功重とは別素材。
 - **パリィ成功（軽）**：軽く弾く反応の仮提出。成功重の専用作画は未受領。
