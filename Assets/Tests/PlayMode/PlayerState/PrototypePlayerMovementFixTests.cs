@@ -151,7 +151,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             player.transform.position = body.position; body.linearVelocity = Vector2.zero;
             Call(motor, "SetFacing", 1); Physics2D.SyncTransforms();
             Assert.That((bool)Call(enemy, "BeginCaptureAttack"), Is.True);
-            Frames(20); Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Parry), Is.True); Frames(14);
+            // Both the old 30F and the reference 96F telegraph must be tested against actual contact.
+            int windupFrames = Mathf.RoundToInt(Get<float>(enemy, "WindupDuration") * 60);
+            Frames(Mathf.Max(0, windupFrames - 10));
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Parry), Is.True); Frames(14);
             Assert.That(Get<int>(player.GetComponent(T("PlayerDamageReceiver2D")), "CurrentHp"), Is.EqualTo(100));
             var counter = player.GetComponent(T("PlayerParryCounter2D"));
             Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(1));

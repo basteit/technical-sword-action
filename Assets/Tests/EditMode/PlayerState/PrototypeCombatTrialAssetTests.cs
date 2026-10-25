@@ -13,6 +13,22 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private static V Get<V>(object obj, string name) => (V)(obj.GetType().GetProperty(name)?.GetValue(obj) ?? obj.GetType().GetField(name).GetValue(obj));
         private static ScriptableObject Load(string name) => AssetDatabase.LoadAssetAtPath<ScriptableObject>(Folder + name + ".asset");
         private static object[] Steps(ScriptableObject definition) => Get<Array>(definition, "steps").Cast<object>().ToArray();
+        private static string[] Validate() => (string[])Type.GetType("PrototypeCombatTrialInstaller, Assembly-CSharp-Editor", true).GetMethod("Validate").Invoke(null, null);
+
+        [Test] public void EditorValidatorAcceptsInstalledTrialAndDetectsAThreeTickDesync()
+        {
+            Assert.That(Validate(), Is.Empty);
+            object step = Steps(Load("FourStepAttack_FastTrial"))[0];
+            var names = new[] { "activeStart", "activeEnd", "cancelStart" };
+            var values = names.Select(name => Get<int>(step, name)).ToArray();
+            try
+            {
+                for (int i = 0; i < names.Length; i++) step.GetType().GetField(names[i]).SetValue(step, values[i] + 3);
+                Assert.That(Validate(), Has.Some.Contains("more than 2F"));
+            }
+            finally { for (int i = 0; i < names.Length; i++) step.GetType().GetField(names[i]).SetValue(step, values[i]); }
+            Assert.That(Validate(), Is.Empty);
+        }
 
         [Test] public void TrialKeepsOriginalDefinitionsClipsDamageAndGauge()
         {

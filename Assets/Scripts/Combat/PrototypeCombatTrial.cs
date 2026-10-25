@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,11 +24,12 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
     public bool ReferenceTiming => referenceTiming;
     public bool ReferenceReaction => referenceReaction;
     public bool FastAttacks => fastAttacks;
+    public RuntimeAnimatorController ExpectedController => fastAttacks ? fastController : originalController;
     public bool IsConfigured => attack != null && originalAttack != null && originalAttack.IsValid &&
         fastAttack != null && fastAttack.IsValid && originalController != null && fastController != null &&
         originalEnemy != null && originalEnemy.IsValid &&
         referenceEnemy != null && referenceEnemy.IsValid && referenceLaunch != null && referenceLaunch.IsValid &&
-        normalEnemies != null && normalEnemies.Length > 0;
+        normalEnemies != null && normalEnemies.Length > 0 && normalEnemies.All(enemy => enemy != null);
 
     private void Awake() => arena = GetComponent<PrototypeCombatArena>();
     private void OnEnable()
@@ -67,7 +69,8 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
         {
             if (enemy == null) continue;
             var launch = enemy.GetComponent<EnemyCounterLaunch2D>();
-            launch?.CancelLaunch();
+            // Inactive scene enemies may not have run Awake yet; do not touch an uninitialized rest rotation.
+            if (launch != null && launch.IsActive) launch.CancelLaunch();
             enemy.ConfigureDefinition(referenceTiming ? referenceEnemy : originalEnemy);
             enemy.GetComponent<Damageable2D>().ConfigureDefinition(referenceTiming ? referenceEnemy : originalEnemy);
             launch?.SetLaunchOverride(referenceReaction ? referenceLaunch : null);

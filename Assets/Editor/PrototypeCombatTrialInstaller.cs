@@ -84,6 +84,39 @@ public static class PrototypeCombatTrialInstaller
         if (!AssetDatabase.CopyAsset(source, destination)) throw new InvalidOperationException("Could not snapshot " + source);
         return AssetDatabase.LoadAssetAtPath<T>(destination);
     }
+    public static string[] Validate()
+    {
+        var errors = new List<string>();
+        var fast = AssetDatabase.LoadAssetAtPath<PlayerAttackDefinition>(FastPath);
+        var enemy = AssetDatabase.LoadAssetAtPath<EnemyCombatDefinition>(EnemyPath);
+        var launch = AssetDatabase.LoadAssetAtPath<CounterCinematicProfile>(LaunchPath);
+        var controller = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(ControllerPath);
+        var original = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(PrototypePlayerArtInstaller.ControllerPath);
+        var art = AssetDatabase.LoadAssetAtPath<PrototypePlayerArtSet>(PrototypePlayerArtInstaller.SetPath);
+        if (fast == null || !fast.IsValid) errors.Add("Missing/invalid fast trial attack definition.");
+        if (enemy == null || !enemy.IsValid) errors.Add("Missing/invalid reference trial enemy definition.");
+        if (launch == null || !launch.IsValid) errors.Add("Missing/invalid reference trial launch profile.");
+        if (controller == null || original == null || controller.runtimeAnimatorController != original.runtimeAnimatorController)
+            errors.Add("Fast trial must preserve the original Animator state graph.");
+        if (fast == null || !fast.IsValid || controller == null || art == null) return errors.ToArray();
+        for (int i = 0; i < fast.steps.Length; i++)
+        {
+            var step = fast.steps[i]; var clip = controller[step.clip]; var entry = art.Find("Attack_" + (i + 1));
+            if (clip == null || entry == null || entry.contactSprite == null)
+            { errors.Add("Missing fast trial attack/contact clip: " + (i + 1)); continue; }
+            float Frame(float time) => time / step.clip.length * step.endFrame;
+            var marker = AnimationUtility.GetAnimationEvents(clip).FirstOrDefault(item => item.functionName == "OnAttackHit");
+            if (marker == null || Mathf.Abs(Frame(marker.time) - step.activeStart) > 2.001f)
+                errors.Add("Fast trial hit marker differs by more than 2F: " + (i + 1));
+            var keys = AnimationUtility.GetObjectReferenceCurveBindings(clip).Where(binding => binding.propertyName == "m_Sprite")
+                .SelectMany(binding => AnimationUtility.GetObjectReferenceCurve(clip, binding)).ToArray();
+            if (keys.Length == 0 || keys.Any(key => key.value == null)) errors.Add("Missing fast trial sprite keys: " + (i + 1));
+            var contact = keys.FirstOrDefault(key => key.value == entry.contactSprite);
+            if (contact.value == null || Mathf.Abs(Frame(contact.time) - step.activeStart) > 2.001f)
+                errors.Add("Fast trial contact sprite differs by more than 2F: " + (i + 1));
+        }
+        return errors.ToArray();
+    }
     private static AnimatorOverrideController BuildFastController(AnimatorOverrideController original, PlayerAttackDefinition baseline, PlayerAttackDefinition fast)
     {
         var result = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(ControllerPath);

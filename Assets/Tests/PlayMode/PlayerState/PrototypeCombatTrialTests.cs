@@ -96,6 +96,25 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [TestCase(30, 1)] [TestCase(60, -1)] [TestCase(120, 1)]
+        public void RealReferenceEnemyCanBeParriedAndCounteredWithoutArtificialStock(int fps, int direction)
+        {
+            Place(direction, 30); Assert.That((bool)Call(ai, "BeginCaptureAttack"), Is.True);
+            Until(() => Get<int>(ai, "WindupRemainingFrames") <= 10, fps);
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Parry), Is.True);
+            var counter = player.GetComponent(T("PlayerParryCounter2D"));
+            Until(() => Get<int>(counter, "StockCount") == 1, fps);
+            Assert.That(Get<bool>(health, "IsParryStaggered"), Is.True);
+            Assert.That(Drawing.sprite, Is.SameAs(First("Death")));
+            Until(() => Get<PlayerActionState>(player, "ActionState") == PlayerActionState.Neutral, fps);
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Until(() => Get<int>(counter, "HitCount") == 1, fps);
+            Assert.That(Get<int>(health, "CurrentHp"), Is.Zero);
+            Assert.That(Get<int>(player.GetComponent(T("PlayerDamageReceiver2D")), "CurrentHp"), Is.EqualTo(100));
+            Until(() => !Get<bool>(counter, "IsActive") && !Get<bool>(launch, "IsActive"), fps);
+            Assert.That(Get<int>(health, "MotionOwnerCount"), Is.Zero);
+        }
+
+        [TestCase(30, 1)] [TestCase(60, -1)] [TestCase(120, 1)]
         public void CounterLowHopHasNoRotationAndReleasesMotionAndDeathHolds(int fps, int direction)
         {
             Place(direction, 30); var counter = player.GetComponent(T("PlayerParryCounter2D"));

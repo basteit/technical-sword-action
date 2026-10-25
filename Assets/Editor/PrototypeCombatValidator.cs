@@ -19,6 +19,7 @@ public static class PrototypeCombatValidator
         var errors = new List<string>();
         errors.AddRange(PrototypePlayerArtInstaller.Validate());
         errors.AddRange(PrototypeCounterCinematicInstaller.Validate());
+        errors.AddRange(PrototypeCombatTrialInstaller.Validate());
         const string folder = "Assets/Settings/PrototypeCombat/";
         var attack = AssetDatabase.LoadAssetAtPath<PlayerAttackDefinition>(folder + "FourStepAttack.asset");
         var counter = AssetDatabase.LoadAssetAtPath<ParryCounterDefinition>(folder + "ParryCounter.asset");
@@ -69,10 +70,14 @@ public static class PrototypeCombatValidator
                     {
                         players++;
                         var art = transform.GetComponent<PrototypePlayerArtPresentation>();
+                        var trial = Array.Find(scene.GetRootGameObjects(), root => root.GetComponent<PrototypeCombatTrial>() != null)?.GetComponent<PrototypeCombatTrial>();
+                        var expectedController = Application.isPlaying && trial != null ? trial.ExpectedController : art != null ? art.ArtSet?.controller : null;
                         if (art == null || art.Artwork == null || art.ArtSet == null ||
-                            transform.GetComponent<Animator>().runtimeAnimatorController != art.ArtSet.controller)
+                            transform.GetComponent<Animator>().runtimeAnimatorController != expectedController)
                             errors.Add("Prototype player needs its submitted art set, visual renderer and controller connected.");
                     }
+                    if (transform.TryGetComponent<PrototypeCombatTrial>(out var comparison) && !comparison.IsConfigured)
+                        errors.Add("Prototype comparison is missing original/trial references.");
                     if (transform.name == "ActionPlatforms") actionPlatforms = transform;
                     if (transform.name == "VideoWhiteGrid") videoGrid = transform;
                     if (!Application.isPlaying && transform.TryGetComponent<EnemyMeleeChaser2D>(out _) && transform.gameObject.activeInHierarchy)
