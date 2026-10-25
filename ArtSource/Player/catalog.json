@@ -78,16 +78,6 @@
       ],
       "uses": [
         {
-          "consumer": "video",
-          "motion": "IdleReference",
-          "source_sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
-          "references": [
-            "Assets/Art/Player/VideoRough/IdleReference_01.png",
-            "Assets/Settings/CombatVideoArt.asset"
-          ],
-          "evidence": "docs/video/counter-submissions-20261018.md"
-        },
-        {
           "consumer": "prototype",
           "motion": "Idle",
           "source_sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
@@ -96,6 +86,17 @@
             "Assets/Scenes/PrototypeCombatValidation.unity"
           ],
           "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+        },
+        {
+          "consumer": "video",
+          "motion": "IdleReference",
+          "source_sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
+          "references": [
+            "Assets/Art/Player/VideoRough/IdleReference_01.png",
+            "Assets/Settings/CombatVideoArt.asset",
+            "docs/video/final/technical-sword-action-final-20261025.mp4"
+          ],
+          "evidence": "docs/video/final/README.md"
         }
       ]
     },
@@ -486,16 +487,6 @@
       ],
       "uses": [
         {
-          "consumer": "video",
-          "motion": "VerticalSlash",
-          "source_sha256": "bbfc6dd022cbe267300300ea653ecbe6bfe2381c9af655c1e2d3b477a854586b",
-          "references": [
-            "Assets/Art/Player/VideoSubmitted/VerticalSlash_01.png",
-            "Assets/Settings/CombatVideoArt.asset"
-          ],
-          "evidence": "docs/video/attack1-pixel-cleanup-20261025.md"
-        },
-        {
           "consumer": "prototype",
           "motion": "Attack_1",
           "source_sha256": "bbfc6dd022cbe267300300ea653ecbe6bfe2381c9af655c1e2d3b477a854586b",
@@ -504,6 +495,17 @@
             "Assets/Scenes/PrototypeCombatValidation.unity"
           ],
           "evidence": "docs/video/attack1-pixel-cleanup-20261025.md"
+        },
+        {
+          "consumer": "video",
+          "motion": "VerticalSlash",
+          "source_sha256": "bbfc6dd022cbe267300300ea653ecbe6bfe2381c9af655c1e2d3b477a854586b",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/VerticalSlash_01.png",
+            "Assets/Settings/CombatVideoArt.asset",
+            "docs/video/final/technical-sword-action-final-20261025.mp4"
+          ],
+          "evidence": "docs/video/final/README.md"
         }
       ]
     },
@@ -690,16 +692,6 @@
       ],
       "uses": [
         {
-          "consumer": "video",
-          "motion": "HorizontalSlash",
-          "source_sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
-          "references": [
-            "Assets/Art/Player/VideoSubmitted/HorizontalSlash_01.png",
-            "Assets/Settings/CombatVideoArt.asset"
-          ],
-          "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
-        },
-        {
           "consumer": "prototype",
           "motion": "Attack_2",
           "source_sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
@@ -708,6 +700,17 @@
             "Assets/Scenes/PrototypeCombatValidation.unity"
           ],
           "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
+        },
+        {
+          "consumer": "video",
+          "motion": "HorizontalSlash",
+          "source_sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/HorizontalSlash_01.png",
+            "Assets/Settings/CombatVideoArt.asset",
+            "docs/video/final/technical-sword-action-final-20261025.mp4"
+          ],
+          "evidence": "docs/video/final/README.md"
         }
       ]
     },
@@ -882,16 +885,6 @@
       ],
       "uses": [
         {
-          "consumer": "video",
-          "motion": "ParryReady",
-          "source_sha256": "c5dffc39dd22ed44d1a6e812386bb619b6c2c5efbf89bed5e8918e4dcb1a96d0",
-          "references": [
-            "Assets/Art/Player/VideoSubmitted/ParryReady_01.png",
-            "Assets/Settings/CombatVideoArt.asset"
-          ],
-          "evidence": "docs/video/parry-update-invert4-20261025.md"
-        },
-        {
           "consumer": "prototype",
           "motion": "Parry",
           "source_sha256": "c5dffc39dd22ed44d1a6e812386bb619b6c2c5efbf89bed5e8918e4dcb1a96d0",
@@ -900,6 +893,17 @@
             "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset"
           ],
           "evidence": "docs/video/parry-update-invert4-20261025.md"
+        },
+        {
+          "consumer": "video",
+          "motion": "ParryReady",
+          "source_sha256": "c5dffc39dd22ed44d1a6e812386bb619b6c2c5efbf89bed5e8918e4dcb1a96d0",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/ParryReady_01.png",
+            "Assets/Settings/CombatVideoArt.asset",
+            "docs/video/final/technical-sword-action-final-20261025.mp4"
+          ],
+          "evidence": "docs/video/final/README.md"
         }
       ]
     },
@@ -1162,17 +1166,6 @@
       ],
       "uses": [
         {
-          "consumer": "video",
-          "motion": "ParrySuccessLight",
-          "source_sha256": "d038a1c76e432c7803be090daa73cd3e6d2062cf1d1347c774d4262d378b1637",
-          "references": [
-            "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_01.png",
-            "Assets/Settings/CombatVideoArt.asset",
-            "Assets/Animations/Video/PlayerVideo_ParrySuccessLight.anim"
-          ],
-          "evidence": "docs/video/parry-update-invert4-20261025.md"
-        },
-        {
           "consumer": "prototype",
           "motion": "ParrySuccess",
           "source_sha256": "d038a1c76e432c7803be090daa73cd3e6d2062cf1d1347c774d4262d378b1637",
@@ -1181,6 +1174,18 @@
             "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset"
           ],
           "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
+        },
+        {
+          "consumer": "video",
+          "motion": "ParrySuccessLight",
+          "source_sha256": "d038a1c76e432c7803be090daa73cd3e6d2062cf1d1347c774d4262d378b1637",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_01.png",
+            "Assets/Settings/CombatVideoArt.asset",
+            "Assets/Animations/Video/PlayerVideo_ParrySuccessLight.anim",
+            "docs/video/final/technical-sword-action-final-20261025.mp4"
+          ],
+          "evidence": "docs/video/final/README.md"
         }
       ]
     },
@@ -1379,16 +1384,6 @@
       ],
       "uses": [
         {
-          "consumer": "video",
-          "motion": "CounterTransfer",
-          "source_sha256": "460ccce461d0640ffacc70f964f9c36c676fd8b8bc726be0aeeec84f9ae3ec07",
-          "references": [
-            "Assets/Art/Player/VideoSubmitted/CounterTransfer_01.png",
-            "Assets/Settings/CombatVideoArt.asset"
-          ],
-          "evidence": "docs/video/counter-lighting-20261025.md"
-        },
-        {
           "consumer": "prototype",
           "motion": "ParryCounter",
           "source_sha256": "460ccce461d0640ffacc70f964f9c36c676fd8b8bc726be0aeeec84f9ae3ec07",
@@ -1398,6 +1393,17 @@
             "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim"
           ],
           "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
+        },
+        {
+          "consumer": "video",
+          "motion": "CounterTransfer",
+          "source_sha256": "460ccce461d0640ffacc70f964f9c36c676fd8b8bc726be0aeeec84f9ae3ec07",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/CounterTransfer_01.png",
+            "Assets/Settings/CombatVideoArt.asset",
+            "docs/video/final/technical-sword-action-final-20261025.mp4"
+          ],
+          "evidence": "docs/video/final/README.md"
         }
       ]
     },
@@ -2000,16 +2006,6 @@
       ],
       "uses": [
         {
-          "consumer": "video",
-          "motion": "CounterKick",
-          "source_sha256": "170a5732e08d1cd3fe7626451c0ed85e7ebbdc07ca6803230466fcebdac4d4c5",
-          "references": [
-            "Assets/Art/Player/VideoSubmitted/timing-manifest.json",
-            "Assets/Settings/CombatVideoArt.asset"
-          ],
-          "evidence": "docs/video/counter-revision-and-camera-comparison-20261024.md"
-        },
-        {
           "consumer": "prototype",
           "motion": "ParryCounter",
           "source_sha256": "170a5732e08d1cd3fe7626451c0ed85e7ebbdc07ca6803230466fcebdac4d4c5",
@@ -2018,6 +2014,17 @@
             "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim"
           ],
           "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
+        },
+        {
+          "consumer": "video",
+          "motion": "CounterKick",
+          "source_sha256": "170a5732e08d1cd3fe7626451c0ed85e7ebbdc07ca6803230466fcebdac4d4c5",
+          "references": [
+            "Assets/Art/Player/VideoSubmitted/timing-manifest.json",
+            "Assets/Settings/CombatVideoArt.asset",
+            "docs/video/final/technical-sword-action-final-20261025.mp4"
+          ],
+          "evidence": "docs/video/final/README.md"
         }
       ]
     },
@@ -2444,16 +2451,6 @@
       ],
       "uses": [
         {
-          "consumer": "video",
-          "motion": "CounterKickEffect",
-          "source_sha256": "e1b72bf36cca4c8decfb18725e2db3b367f336be5fee481ca1af74d57fc6dfd8",
-          "references": [
-            "Assets/Art/Video/Submitted/20261024/timing-manifest.json",
-            "Assets/Settings/CombatVideoArt.asset"
-          ],
-          "evidence": "docs/video/counter-revision-and-camera-comparison-20261024.md"
-        },
-        {
           "consumer": "prototype",
           "motion": "CounterKickEffect",
           "source_sha256": "e1b72bf36cca4c8decfb18725e2db3b367f336be5fee481ca1af74d57fc6dfd8",
@@ -2461,6 +2458,17 @@
             "Assets/Settings/PrototypeCombat/CounterCinematicArt.asset"
           ],
           "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
+        },
+        {
+          "consumer": "video",
+          "motion": "CounterKickEffect",
+          "source_sha256": "e1b72bf36cca4c8decfb18725e2db3b367f336be5fee481ca1af74d57fc6dfd8",
+          "references": [
+            "Assets/Art/Video/Submitted/20261024/timing-manifest.json",
+            "Assets/Settings/CombatVideoArt.asset",
+            "docs/video/final/technical-sword-action-final-20261025.mp4"
+          ],
+          "evidence": "docs/video/final/README.md"
         }
       ]
     }
