@@ -136,6 +136,7 @@ public static class PrototypeCombatSceneBuilder
             arenaData.ApplyModifiedPropertiesWithoutUndo();
             player.SetActive(true);
             PrototypeActionStageInstaller.InstallIntoScene(scene);
+            PrototypeDialogueInstaller.InstallIntoScene(scene);
             AssetDatabase.SaveAssets();
             EditorSceneManager.SaveScene(scene, ScenePath);
         }

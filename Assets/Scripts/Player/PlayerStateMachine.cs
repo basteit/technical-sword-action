@@ -234,6 +234,12 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
 
         if ((normalized & PlayerActionRequest.Pause) != 0)
         {
+            // Escape / View belongs to dialogue Skip, including its release guard.
+            if (DialogueController.GameplayInputBlocked)
+            {
+                LastRejectionReason = PlayerActionRejectionReason.GameplayBlocked;
+                return false;
+            }
             LastRequestedActions = normalized | pendingRequests;
             LastAcceptedRequest = PlayerActionRequest.Pause;
             LastAcceptedPriority = -1;
