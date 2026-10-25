@@ -20,6 +20,7 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
     public int ElapsedFrames => elapsed;
     public float TravelDistance => Mathf.Abs(transform.position.x - origin.x);
     public string LastEndReason { get; private set; } = "NotStarted";
+    public event System.Action<int> LaunchStarted;
     public int CombatTickOrder => 330;
     public void Configure(Transform visual, LayerMask layers) { visualRoot = visual; obstacles = layers; }
     public void SetLaunchOverride(CounterCinematicProfile settings) { if (!active) launchOverride = settings; }
@@ -41,6 +42,7 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
         origin = transform.position; elapsed = 0; active = true; settling = false; fallSpeed = 0;
         health.AcquireMotionControl(this); health.AcquireStun(this, (profile.launchFrames + 4) / 60f);
         health.HoldDeathPresentation(this, 3f / 60f); LastEndReason = "Launching";
+        LaunchStarted?.Invoke(direction);
     }
     public void CombatTick()
     {

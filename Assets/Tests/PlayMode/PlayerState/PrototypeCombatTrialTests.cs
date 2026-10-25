@@ -158,6 +158,56 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(attack, "ComboStep"), Is.EqualTo(1));
         }
 
+        [TestCase(30, 1, 30)] [TestCase(30, -1, 30)] [TestCase(30, 1, 120)] [TestCase(30, -1, 120)]
+        [TestCase(60, 1, 30)] [TestCase(60, -1, 30)] [TestCase(60, 1, 120)] [TestCase(60, -1, 120)]
+        [TestCase(120, 1, 30)] [TestCase(120, -1, 30)] [TestCase(120, 1, 120)] [TestCase(120, -1, 120)]
+        public void CounterKeepsWiderSpacingThenFacesTheEnemyTowardHeroOnlyOnImpact(int fps, int direction, int hp)
+        {
+            Place(direction, hp); var counter = player.GetComponent(T("PlayerParryCounter2D"));
+            Vector2 originalAiFacing = Get<Vector2>(ai, "Facing"); bool originalFlip = Drawing.flipX;
+            Call(counter, "RegisterParriedEnemy", health);
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Until(() => Get<int>(counter, "ElapsedFrames") >= 13, fps);
+            Assert.That(Mathf.Abs(player.transform.position.x - ai.transform.position.x), Is.EqualTo(2.125f).Within(.02f));
+            Assert.That(Drawing.flipX, Is.EqualTo(originalFlip), "Do not turn during the rear approach/charge.");
+            Assert.That(Get<bool>(art, "IsCounterFacingHeld"), Is.False);
+            Until(() => Get<int>(counter, "HitCount") == 1, fps);
+            bool facesLeft = player.transform.position.x < ai.transform.position.x;
+            Assert.That(Drawing.flipX, Is.EqualTo(facesLeft), "Turn on the lethal/non-lethal contact tick, before hitstop.");
+            Assert.That(Get<bool>(art, "IsCounterFacingHeld"), Is.True);
+            Assert.That(Get<Vector2>(ai, "Facing"), Is.EqualTo(originalAiFacing), "Drawing must not steer the AI.");
+            Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(Mathf.Max(0, hp - 90)));
+            Frames(5, fps); Assert.That(Drawing.flipX, Is.EqualTo(facesLeft));
+            while (Get<bool>(launch, "IsActive")) { Assert.That(Drawing.flipX, Is.EqualTo(facesLeft)); Frames(1, fps); }
+            if (hp <= 90)
+            {
+                Frames(5, fps); Assert.That(Drawing.flipX, Is.EqualTo(facesLeft), "Do not turn back at landing/fade.");
+                Until(() => !ai.gameObject.activeSelf, fps);
+                Assert.That(Get<bool>(art, "IsCounterFacingHeld"), Is.False, "Disable releases drawing ownership.");
+            }
+            else
+            {
+                Until(() => !Get<bool>(health, "IsStunned"), fps); Frames(2, fps);
+                Assert.That(Get<bool>(art, "IsCounterFacingHeld"), Is.False);
+                Assert.That(Drawing.flipX, Is.EqualTo(Get<Vector2>(ai, "Facing").x < 0));
+            }
+            Call(arena, "ResetArena", false);
+            Assert.That(Get<bool>(art, "IsCounterFacingHeld"), Is.False);
+        }
+
+        [TestCase(1)] [TestCase(-1)] public void ACounterMissDoesNotTurnTheEnemy(int direction)
+        {
+            Place(direction); var counter = player.GetComponent(T("PlayerParryCounter2D"));
+            bool original = Drawing.flipX;
+            Call(counter, "RegisterParriedEnemy", health); Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Until(() => Get<int>(counter, "ElapsedFrames") >= 13);
+            ai.transform.position += Vector3.up * 4; Physics2D.SyncTransforms();
+            Until(() => !Get<bool>(counter, "IsActive"));
+            Assert.That(Get<int>(counter, "HitCount"), Is.Zero);
+            Assert.That(Get<bool>(art, "IsCounterFacingHeld"), Is.False);
+            Assert.That(Drawing.flipX, Is.EqualTo(original));
+        }
+
         [UnityTest] public IEnumerator EveryFastStepCanCancelAtItsBoundaryToAllDefenseActions()
         {
             foreach (var request in new[] { PlayerActionRequest.Dash, PlayerActionRequest.Parry, PlayerActionRequest.Special })

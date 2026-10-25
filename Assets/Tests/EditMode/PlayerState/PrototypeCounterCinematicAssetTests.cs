@@ -73,6 +73,18 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(legacy, "baseDamage"), Is.EqualTo(30)); Assert.That(Get<int>(legacy, "chainBufferFrames"), Is.EqualTo(6));
         }
 
+        [Test] public void RearSpacingGrowsTenPixelsWithoutMovingTheAuthoredFootContact()
+        {
+            foreach (string name in new[] { "CounterCinematic", "CounterLaunch_ReferenceTrial" })
+            {
+                var profile = AssetDatabase.LoadAssetAtPath<ScriptableObject>(Folder + name + ".asset");
+                Assert.That(Get<float>(profile, "targetHeadOffsetX"), Is.EqualTo(17f / 32));
+                Assert.That(Get<Vector2>(profile, "contactOffset"), Is.EqualTo(new Vector2(51f / 32, .325f)));
+                Assert.That(Get<float>(profile, "hitRadius"), Is.EqualTo(.5f));
+                Assert.That(Get<float>(profile, "targetHeadOffsetX") + Get<Vector2>(profile, "contactOffset").x, Is.EqualTo(2.125f));
+            }
+        }
+
         [TestCase("blinkTravelFrames", 0)] [TestCase("releaseFrame", 12)] [TestCase("endFrame", 30)] [TestCase("launchFrames", 25)]
         public void InvalidTimingIsRejectedBeforeCounterCanConsumeStock(string field, int value)
         {

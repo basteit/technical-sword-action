@@ -24,7 +24,7 @@ MonoBehaviour:
   contactOffset: {x: 1.59375, y: 0.325}
   hoverHeight: 0.125
   impactHeight: 0.0625
-  targetHeadOffsetX: 0.21875
+  targetHeadOffsetX: 0.53125
   hitRadius: 0.5
   chargeScale: 0.15
   chargeRealSeconds: 0.95

@@ -17,7 +17,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
     public Vector2 contactOffset = new Vector2(51f / 32f, .325f);
     [Min(0)] public float hoverHeight = .125f;
     [Min(0)] public float impactHeight = .0625f;
-    [Min(0)] public float targetHeadOffsetX = 7f / 32f;
+    [Min(0)] public float targetHeadOffsetX = 17f / 32f;
     [Min(.01f)] public float hitRadius = .5f;
     [Range(.01f, 1)] public float chargeScale = .15f;
     [Min(.01f)] public float chargeRealSeconds = .95f;

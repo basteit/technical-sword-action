@@ -113,7 +113,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var profile = Get<object>(counter, "CinematicProfile"); float gravity = Get<float>(counter, "savedGravity");
             ToFrame(11); Assert.That(Get<bool>(presentation, "IsBodyHidden"), Is.True);
             ToFrame(12); Assert.That(Get<bool>(presentation, "IsBodyHidden"), Is.False);
-            Assert.That((body.position.x - target.transform.position.x) * direction, Is.GreaterThan(1.7f));
+            Assert.That((body.position.x - target.transform.position.x) * direction, Is.EqualTo(2.125f).Within(.02f));
             Assert.That(Get<int>(counter, "KickFacingSign"), Is.EqualTo(-direction));
             int chargeStart = realFrames; ToFrame(14);
             Assert.That(Get<float>(presentation, "DimAlpha"), Is.GreaterThan(.9f));

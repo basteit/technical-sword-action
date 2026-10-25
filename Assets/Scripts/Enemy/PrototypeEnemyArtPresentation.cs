@@ -13,11 +13,13 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private Vector3 restPosition;
     private int elapsed, attackElapsed, hitRemaining, deathElapsed;
     private bool parried, attackRecoveryVisible, deathFacingLeft;
+    private bool counterFacingHeld, counterFacingLeft;
     public int CombatTickOrder => 320;
     public string MotionName { get; private set; } = "Idle";
     public SpriteRenderer Artwork => artwork;
     public VideoArtLibrary Library => library;
     public bool UsesDownParryPose => useDownParryPose;
+    public bool IsCounterFacingHeld => counterFacingHeld;
     public void SetDownParryPose(bool value) { useDownParryPose = value; Show(); }
 
     private void Awake()
@@ -32,6 +34,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         health.HitReceived += OnHit; health.Parried += OnParried;
         health.Died += OnDied; health.ResetPerformed += OnReset;
         ai.AttackStarted += OnAttack;
+        if (launch != null) launch.LaunchStarted += OnCounterLaunch;
         CombatTimeController.Register(this);
         ResetDrawing();
     }
@@ -48,16 +51,25 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     }
     private void OnDied(Damageable2D _, Vector2 direction)
     {
-        deathElapsed = 0; deathFacingLeft = ai.Facing.x < 0;
+        deathElapsed = 0; deathFacingLeft = counterFacingHeld ? counterFacingLeft : ai.Facing.x < 0;
         // Keep only the drawing alive. HP, colliders and combat participation already ended.
         health.HoldDeathPresentation(this, 2 * CombatTimeController.StepSeconds);
         Show();
+    }
+    private void OnCounterLaunch(int direction)
+    {
+        // The kick travels away from its attacker. Keep the drawing facing back toward them,
+        // without changing the AI direction that determined the rear approach.
+        counterFacingHeld = true; counterFacingLeft = direction > 0;
+        deathFacingLeft = counterFacingLeft;
+        Show(); // includes the lethal contact/hitstop tick, after Died has already fired
     }
     private void OnReset(Damageable2D _) => ResetDrawing();
     private void ResetDrawing()
     {
         elapsed = attackElapsed = hitRemaining = deathElapsed = 0;
         parried = attackRecoveryVisible = false;
+        counterFacingHeld = false;
         health.ReleaseDeathPresentation(this);
         // Arena reset notifies health before resetting AI. Do not resample its old windup here.
         MotionName = "Idle";
@@ -82,7 +94,11 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
             if (deathElapsed < frames) health.HoldDeathPresentation(this, 2 * CombatTimeController.StepSeconds);
             else health.ReleaseDeathPresentation(this);
         }
-        else if (!health.IsStunned) parried = false;
+        else if (!health.IsStunned)
+        {
+            parried = false;
+            if (launch == null || !launch.IsActive) counterFacingHeld = false;
+        }
         Show();
     }
 
@@ -137,13 +153,14 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
             sprite = library.Find("Enemy_" + MotionName)?.At(elapsed, true);
         }
         if (sprite != null) artwork.sprite = sprite;
-        artwork.flipX = !health.IsAlive ? deathFacingLeft : ai.Facing.x < 0;
+        artwork.flipX = counterFacingHeld ? counterFacingLeft : !health.IsAlive ? deathFacingLeft : ai.Facing.x < 0;
         bool down = MotionName == "Death" || (MotionName == "Parried" && useDownParryPose);
         artwork.transform.localPosition = restPosition + (down ? Vector3.down * (2f / 32f) : Vector3.zero);
     }
 
     private void OnDisable()
     {
+        counterFacingHeld = false;
         CombatTimeController.Unregister(this);
         if (health != null)
         {
@@ -152,6 +169,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
             health.ReleaseDeathPresentation(this);
         }
         if (ai != null) ai.AttackStarted -= OnAttack;
+        if (launch != null) launch.LaunchStarted -= OnCounterLaunch;
         if (artwork != null) { artwork.transform.localPosition = restPosition; artwork.color = Color.white; }
     }
 }
