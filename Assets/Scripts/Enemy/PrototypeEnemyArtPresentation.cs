@@ -6,6 +6,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
 {
     [SerializeField] private VideoArtLibrary library;
     [SerializeField] private SpriteRenderer artwork;
+    [SerializeField] private bool useDownParryPose;
     private EnemyMeleeChaser2D ai;
     private Damageable2D health;
     private EnemyCounterLaunch2D launch;
@@ -16,6 +17,8 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     public string MotionName { get; private set; } = "Idle";
     public SpriteRenderer Artwork => artwork;
     public VideoArtLibrary Library => library;
+    public bool UsesDownParryPose => useDownParryPose;
+    public void SetDownParryPose(bool value) { useDownParryPose = value; Show(); }
 
     private void Awake()
     {
@@ -104,7 +107,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         }
         else if (hitRemaining > 0) { MotionName = "Hit"; sprite = library.Find("Enemy_Hit")?.At(0); }
         else if (health.IsParryStaggered || (parried && health.IsStunned))
-        { MotionName = "Parried"; sprite = library.Find("Enemy_Parried")?.At(0); }
+        { MotionName = "Parried"; sprite = library.Find(useDownParryPose ? "Enemy_Death" : "Enemy_Parried")?.At(0); }
         else if (ai.IsWindingUp)
         {
             MotionName = "Windup";
@@ -135,7 +138,8 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         }
         if (sprite != null) artwork.sprite = sprite;
         artwork.flipX = !health.IsAlive ? deathFacingLeft : ai.Facing.x < 0;
-        artwork.transform.localPosition = restPosition + (MotionName == "Death" ? Vector3.down * (2f / 32f) : Vector3.zero);
+        bool down = MotionName == "Death" || (MotionName == "Parried" && useDownParryPose);
+        artwork.transform.localPosition = restPosition + (down ? Vector3.down * (2f / 32f) : Vector3.zero);
     }
 
     private void OnDisable()

@@ -15,6 +15,11 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     private Vector3[] enemyPositions;
     private int[] enemyHp;
     private InputAction reset;
+    private int encounterPreset;
+    private void Start()
+    {
+        if (GetComponent<PrototypeCombatTrial>() != null) ResetActionsOnly();
+    }
     private void Awake()
     {
         if (strongEnemy != null) strongPosition = strongEnemy.transform.position;
@@ -47,13 +52,19 @@ public sealed class PrototypeCombatArena : MonoBehaviour
         if (controls.FindAction("F9").WasPressedThisFrame()) settings.masterVolume = settings.masterVolume > 0 ? 0 : 1;
     }
     private static float Cycle(float value) => value >= .99f ? 0 : value < .49f ? .5f : 1;
-    public void ResetActionsOnly() => ResetCore(0);
-    public void ResetArena(bool twoTargets) => ResetCore(twoTargets ? 2 : 1);
+    public void ResetActionsOnly() { encounterPreset = 0; ResetCore(0); }
+    public void ResetArena(bool twoTargets) { encounterPreset = twoTargets ? 2 : 1; ResetCore(encounterPreset); }
+    public void ResetCurrentEncounter()
+    {
+        if (encounterPreset >= 3) ResetStrongEncounter(encounterPreset == 4);
+        else ResetCore(encounterPreset);
+    }
     private void ResetCore(int normalCount)
     {
         coordinator?.ResetEncounter(); feedback?.ResetPresentation();
         if (strongEnemy != null) strongEnemy.gameObject.SetActive(false);
         player.ResetToSafeState("PrototypeArenaReset", true);
+        GetComponent<PrototypeCombatTrial>()?.ApplyAfterPlayerReset();
         var body = player.GetComponent<Rigidbody2D>();
         player.transform.position = playerPosition; body.position = playerPosition; body.linearVelocity = Vector2.zero;
         player.GetComponent<PlayerDamageReceiver2D>().ResetHealth();
@@ -74,6 +85,7 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     }
     public void ResetStrongEncounter(bool includeNormal)
     {
+        encounterPreset = includeNormal ? 4 : 3;
         ResetCore(includeNormal ? 1 : 0);
         if (strongEnemy == null) return;
         var health = strongEnemy.GetComponent<Damageable2D>();

@@ -32,6 +32,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(0)] public float launchDistance = 3.2f;
     [Min(0)] public float launchHeight = .65f;
     [Min(1)] public int launchFrames = 22;
+    [Range(0, 180)] public float launchRotationDegrees = 95;
     [Header("Shared impact lighting (opt-in gameplay presentation)")]
     public bool enhancedPresentation;
     public Material parryBacklightMaterial;
@@ -54,6 +55,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
         Finite(hitRadius) && hitRadius > 0 && Finite(chargeScale) && chargeScale > 0 && chargeScale <= 1 &&
         Finite(chargeRealSeconds) && chargeRealSeconds >= (releaseFrame - chargeFrame) / (60f * chargeScale) &&
         Finite(launchDistance) && launchDistance >= 0 && Finite(launchHeight) && launchHeight >= 0 &&
+        Finite(launchRotationDegrees) && launchRotationDegrees >= 0 && launchRotationDegrees <= 180 &&
         Finite(dimStrength) && dimStrength >= 0 && dimStrength <= 1 &&
         Finite(heroLiftStrength) && heroLiftStrength >= 0 && heroLiftStrength <= 1 &&
         Finite(dimFadeSeconds) && dimFadeSeconds > 0 && Valid(Transfer) && Valid(Kick) &&

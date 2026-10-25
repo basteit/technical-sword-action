@@ -12,6 +12,13 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     private int recoveryStep;
     public bool UsesFrameDefinition => definition != null;
     public PlayerAttackDefinition Definition => definition;
+    /// <summary>Prototype A/B settings may only change after the current action and recovery were reset.</summary>
+    public bool TrySetDefinition(PlayerAttackDefinition value)
+    {
+        if (value == null || !value.IsValid || isAttacking || recovering) return false;
+        definition = value;
+        return true;
+    }
     public int ElapsedFrames => elapsedFrames;
     public bool IsRecovering => recovering;
     public AttackPhase Phase => recovering ? AttackPhase.Recovery : !isAttacking ? AttackPhase.None :

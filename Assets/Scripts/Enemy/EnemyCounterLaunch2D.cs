@@ -6,6 +6,7 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
 {
     [SerializeField] private Transform visualRoot;
     [SerializeField] private LayerMask obstacles;
+    [SerializeField] private CounterCinematicProfile launchOverride;
     private Damageable2D health;
     private BoxCollider2D shape;
     private CounterCinematicProfile profile;
@@ -21,6 +22,7 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
     public string LastEndReason { get; private set; } = "NotStarted";
     public int CombatTickOrder => 330;
     public void Configure(Transform visual, LayerMask layers) { visualRoot = visual; obstacles = layers; }
+    public void SetLaunchOverride(CounterCinematicProfile settings) { if (!active) launchOverride = settings; }
     private void Awake()
     {
         health = GetComponent<Damageable2D>(); shape = GetComponent<BoxCollider2D>();
@@ -33,6 +35,7 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
     }
     public void BeginLaunch(CounterCinematicProfile settings, int sign)
     {
+        if (launchOverride != null) settings = launchOverride;
         if (!isActiveAndEnabled || settings == null || !settings.IsValid) return;
         Stop(false, "Restarted"); profile = settings; direction = sign < 0 ? -1 : 1;
         origin = transform.position; elapsed = 0; active = true; settling = false; fallSpeed = 0;
@@ -58,7 +61,7 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
             Vector2.up * profile.launchHeight * Mathf.Sin(t * Mathf.PI);
         MoveAxis(Vector2.right * (desired.x - transform.position.x));
         MoveAxis(Vector2.up * (desired.y - transform.position.y));
-        if (visualRoot != null) visualRoot.localRotation = restRotation * Quaternion.Euler(0, 0, -direction * 95 * Mathf.Sin(t * Mathf.PI * .8f));
+        if (visualRoot != null) visualRoot.localRotation = restRotation * Quaternion.Euler(0, 0, -direction * profile.launchRotationDegrees * Mathf.Sin(t * Mathf.PI * .8f));
         if (t >= 1)
         {
             // The enemy can have been launched off a platform. Do not leave a living target floating.

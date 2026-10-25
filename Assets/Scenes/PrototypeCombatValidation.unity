@@ -3435,6 +3435,7 @@ MonoBehaviour:
   obstacles:
     serializedVersion: 2
     m_Bits: 8
+  launchOverride: {fileID: 0}
 --- !u!114 &689758917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3449,6 +3450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PrototypeEnemyArtPresentation
   library: {fileID: 11400000, guid: b636926366890e34389f9088e988a155, type: 2}
   artwork: {fileID: 1131051244}
+  useDownParryPose: 0
 --- !u!1 &757847922
 GameObject:
   m_ObjectHideFlags: 0
@@ -4618,6 +4620,7 @@ MonoBehaviour:
   obstacles:
     serializedVersion: 2
     m_Bits: 8
+  launchOverride: {fileID: 0}
 --- !u!114 &907002376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4632,6 +4635,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PrototypeEnemyArtPresentation
   library: {fileID: 11400000, guid: b636926366890e34389f9088e988a155, type: 2}
   artwork: {fileID: 655731127}
+  useDownParryPose: 0
 --- !u!1 &915269280
 GameObject:
   m_ObjectHideFlags: 0
@@ -5521,6 +5525,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1042588129}
   - component: {fileID: 1042588128}
+  - component: {fileID: 1042588130}
   m_Layer: 0
   m_Name: PrototypeArena
   m_TagString: Untagged
@@ -5562,6 +5567,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1042588130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042588127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29980547bc71a554d8c906af54fe4a8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PrototypeCombatTrial
+  attack: {fileID: 1882940589}
+  originalAttack: {fileID: 11400000, guid: 5f9d8a2e628c5cf449a3eec5ba56e7dd, type: 2}
+  fastAttack: {fileID: 11400000, guid: 7fda49836ea3a63429daa1eb4dd06cfb, type: 2}
+  originalController: {fileID: 22100000, guid: d003cb834f706204287868da53baf14e, type: 2}
+  fastController: {fileID: 22100000, guid: 8a36d22fc1de26e4bbed78bb7210a209, type: 2}
+  normalEnemies:
+  - {fileID: 689758911}
+  - {fileID: 907002370}
+  originalEnemy: {fileID: 11400000, guid: fd445e60d933db64a8f9ed3ca156ace0, type: 2}
+  referenceEnemy: {fileID: 11400000, guid: aeadde39aa0f5344f9a402496d0d8a13, type: 2}
+  referenceLaunch: {fileID: 11400000, guid: 78a9b5396fa4d2c49b1e2d2a3a892e53, type: 2}
+  referenceTiming: 1
+  referenceReaction: 1
+  fastAttacks: 1
 --- !u!1 &1048344828
 GameObject:
   m_ObjectHideFlags: 0
@@ -6474,6 +6505,7 @@ MonoBehaviour:
   obstacles:
     serializedVersion: 2
     m_Bits: 8
+  launchOverride: {fileID: 0}
 --- !u!1 &1218971979
 GameObject:
   m_ObjectHideFlags: 0

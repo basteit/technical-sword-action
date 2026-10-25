@@ -81,6 +81,14 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     public event Action WindupStarted;
     public event Action AttackStarted;
 
+    /// <summary>Reset-only configuration: release an old attack role before using another tuning preset.</summary>
+    public void ConfigureDefinition(EnemyCombatDefinition value)
+    {
+        if (value == null || !value.IsValid) return;
+        combatDefinition = value;
+        ResetForCapture(target, captureHeld);
+    }
+
     /// <summary>Explicit training override; normal scenes keep their serialized combat values.</summary>
     public void ConfigureForTraining(Transform playerTarget, float windup, float interval, int damage, float speed)
     {

@@ -37,6 +37,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             yield return EditorSceneManager.LoadSceneInPlayMode("Assets/Scenes/PrototypeCombatValidation.unity", new LoadSceneParameters(LoadSceneMode.Single));
             yield return null;
             arena = (Component)Object.FindFirstObjectByType(T("PrototypeCombatArena"));
+            // Preserve the #43 baseline contract; #34 trial behavior has its own comparisons.
+            Call(arena.GetComponent(T("PrototypeCombatTrial")), "RestoreOriginals");
             player = (Component)Object.FindFirstObjectByType(T("PlayerStateMachine"));
             ((Behaviour)player.GetComponent(T("PlayerInputRouter"))).enabled = false;
             body = player.GetComponent<Rigidbody2D>();
