@@ -31,4 +31,44 @@
 
 ## 検証結果
 
-実装後に追記する。人による素材・操作感の受入と、自動テストの結果を区別する。
+2026-10-25。人による素材・操作感の受入と、自動テストの結果を区別する。
+
+- Compile: Error0 / Warning0。
+- 最初の全体確認: EditMode 213/213、PlayMode 565/578。会話のEditMode 4件・PlayMode 19件はすべて合格。
+- 全体PlayModeの失敗13件は、会話テストを含めず既存の3テスト群だけ実行した場合も254件中同じ13件で再現した。会話開始を行わない動画の吹っ飛び2件、タメの時刻3件、4段防御キャンセル動画の終了7件、従来のパリィ期待値1件。全体合格とは扱わない。
+- パリィの旧テストは5FをJustと期待するが、基点コミット時点の `ParryTiming.asset` は `justEndFrame: 3`。今回の会話対応では戦闘・動画設定とこれらの旧期待値を変更しない。
+- 生ログ: `.uloop/outputs/TestResults/20261025_135652.xml`、切り分け `.uloop/outputs/TestResults/20261025_140057.xml`（生成物のためGit対象外）。
+- 最終確認（実装 `df348fb`）: Compile Error0 / Warning0、全EditMode 217/217（会話8件を含む）、関連PlayMode 114/114（会話19件＋入力・状態・パリィ反撃）。Asset複製時のID、重複ID・空本文の検出、Validatorが未保存データを保存しないことも確認した。
+- 実際のインタラクト経路から `Interact` 状態へ入り、Game View 1920×1080で[最初の左Test](validation/prototype-dialogue-2026-10-25/Rendering_20261025_140611_429.png)と[2人表示・左の再発言](validation/prototype-dialogue-2026-10-25/Rendering_20261025_140636_787.png)を確認した。再発言時も左右の登場回数は各1回。
+- 終了時は会話・表示・ロックをリセットし、Player入力と通常の時計を戻してEditModeへ復帰。対象Sceneの未保存変更なし、会話Validator問題0、Console Error0 / Warning0。
+- [検証要約](validation/prototype-dialogue-2026-10-25.json)。全体の13件を修正したり、変更前の完全な作業ツリーで全体テストをやり直したわけではない。
+
+## プロトタイプで試す
+
+1. `Assets/Scenes/PrototypeCombatValidation.unity` を開いてPlayする。古い配布ZIPは今回更新していない。
+2. 初期位置から左へ移動し、既存の水色の調べる対象（world x=-6）へ近づく。
+3. `E / B 会話テスト` が出たらE、またはゲームパッドBで開く。最初は左キャラと `Test` が現れる。
+4. 一度キーを離してからE、Enter、Space、左クリック、ゲームパッドA/Bで次へ。2行目で右、3行目で左が話す。左は登場を繰り返さない。
+5. 最終行の送りで閉じる。EscまたはゲームパッドViewはSkip。会話中にEscでPauseを開かない。終了に使った入力を離すと通常操作へ戻る。
+6. F2は従来どおり安全リセットで、会話も中断して閉じる。
+
+## 素材の差し替え
+
+- ボックス: `Assets/Settings/PrototypeDialogue/Presentation.asset` の `Box Sprite`。無指定の間だけ単色の仮ボックスを表示する。SpriteにBorderを設定してあれば9-slice、それ以外は通常のImageとして枠へ描く。`Box Tint / Box Size / Box Position` で色と枠の寸法を調整する。
+- 左キャラ: 同フォルダの `Speaker_PrototypeLeft.asset` の `Default Portrait`。`Portrait Side` は `Left`。
+- 右キャラ: `Speaker_PrototypeRight.asset` の `Default Portrait`。`Portrait Side` は `Right`。
+- 台詞: `Dialogue_PrototypeTest.asset` の `Lines`。話者、本文、順番、一行だけの `Portrait Override` はデータで編集する。別の左・右キャラはSpeakerを追加して同じ側を指定する。
+- フェード・スライドの秒数と距離は `Presentation.asset` で変更する。0秒なら即時表示する。会話の進行・入力ロックは表示秒数へ依存しない。
+- 立ち絵は透過PNGをSpriteとしてインポートし、現在は178×238基準pxの各枠に縦横比を保って収める。左右反転は自動で加えず、受領素材の向きを維持する。別寸法が必要なら専用Prefabの各Portrait枠を調整する。
+- 仮ボックスは608×104基準px。これを完成原稿の必須サイズとはしない。受領したボックスの余白・名前欄に合わせ、`PrototypeDialogueSystem.prefab` のSpeaker/Body/ContinueのRectを調整して再検証する。
+- 現在はPCの日本語フォントを利用する。最終製品のフォント同梱・ライセンス確認は別途必要。
+
+後からの素材受領時には原稿台帳の該当ルールを確認し、受領原稿と仮表示を分けて記録する。今回、プレイヤー原稿や動画側アセットは変更していない。
+
+## 人間による確認（未実施）
+
+- [ ] フェード0.35秒とスライド0.3秒が急すぎないか／遅すぎないか。別の登場方式との比較は素材受領後に行う。
+- [ ] キーボード／物理ゲームパッドで開始、送り、通常終了、Skip、再会話を確認する。各15分の操作感確認はまだ行っていない。
+- [ ] 1280×720と1920×1080で、受領ボックス内の本文・名前・送り案内、立ち絵の足元・余白・左右の顔向きを確認する。
+- [ ] 受領した実素材へ差し替えて表示を承認する。現在の仮シルエットを完成立ち絵として扱わない。
+- [ ] 最新のDevelopment Buildへ会話を含めて実機確認する。旧ZIPには会話が入っていない。
