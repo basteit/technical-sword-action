@@ -163,6 +163,7 @@ public static class PrototypeDialogueInstaller
         rect.gameObject.AddComponent<CanvasGroup>();
         var slot = rect.gameObject.AddComponent<DialoguePortraitSlot>();
         var portrait = Image("Artwork", rect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Color.white);
+        portrait.rectTransform.pivot = new Vector2(.5f, 0f);
         portrait.rectTransform.offsetMin = portrait.rectTransform.offsetMax = Vector2.zero;
         portrait.raycastTarget = false;
         var placeholder = Rect("Placeholder", rect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);

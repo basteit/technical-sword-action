@@ -16,14 +16,7 @@ public static class DialogueAssetValidator
 
     public static bool ValidateAll(bool logSuccess = false)
     {
-        List<string> problems = new();
-        Dictionary<string, Object> sequenceIds = new();
-        Dictionary<string, Object> lineIds = new();
-        Dictionary<string, Object> speakerIds = new();
-
-        ValidateSpeakers(speakerIds, problems);
-        ValidateSequences(sequenceIds, lineIds, problems);
-        ValidateLoadedSceneControllers(problems);
+        List<string> problems = CollectProblems();
 
         if (problems.Count == 0)
         {
@@ -44,6 +37,16 @@ public static class DialogueAssetValidator
         return false;
     }
 
+    /// <summary>Inspect only. Validation must not save an author's pending dialogue edits.</summary>
+    public static List<string> CollectProblems()
+    {
+        List<string> problems = new();
+        ValidateSpeakers(new Dictionary<string, Object>(), problems);
+        ValidateSequences(new Dictionary<string, Object>(), new Dictionary<string, Object>(), problems);
+        ValidateLoadedSceneControllers(problems);
+        return problems;
+    }
+
     private static void ValidateSpeakers(Dictionary<string, Object> usedIds, List<string> problems)
     {
         string[] guids = AssetDatabase.FindAssets("t:DialogueSpeakerDefinition");
@@ -55,10 +58,6 @@ public static class DialogueAssetValidator
             {
                 continue;
             }
-
-            speaker.SynchronizeStableIdForEditor();
-            EditorUtility.SetDirty(speaker);
-            AssetDatabase.SaveAssetIfDirty(speaker);
 
             ValidateStableId("Speaker", speaker.StableId, path, speaker, usedIds, problems);
             if (string.IsNullOrWhiteSpace(speaker.DisplayName))
@@ -82,10 +81,6 @@ public static class DialogueAssetValidator
             {
                 continue;
             }
-
-            sequence.SynchronizeStableIdsForEditor();
-            EditorUtility.SetDirty(sequence);
-            AssetDatabase.SaveAssetIfDirty(sequence);
 
             ValidateStableId("Dialogue Sequence", sequence.StableId, path, sequence, sequenceIds, problems);
             if (string.IsNullOrWhiteSpace(sequence.AuthoringTitle))
@@ -179,7 +174,7 @@ public static class DialogueAssetValidator
 
             if (unifiedState?.objectReferenceValue is PlayerStateMachine state)
             {
-                if (playerBody?.objectReferenceValue != state.GetComponent<Rigidbody2D>())
+                if (playerBody?.objectReferenceValue is not Rigidbody2D body || body != state.GetComponent<Rigidbody2D>())
                     problems.Add($"Dialogue Controller's state gate and Rigidbody2D refer to different Players: {location}");
                 continue;
             }
