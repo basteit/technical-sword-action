@@ -172,6 +172,16 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [Test]
+        public void ResetDuringWindupRestoresIdleBeforeAnotherCombatTick()
+        {
+            Place(); Call(ai, "BeginCaptureAttack"); Frames(8);
+            Assert.That(Get<string>(art, "MotionName"), Is.EqualTo("Windup"));
+            Call(arena, "ResetArena", false);
+            Assert.That(Get<string>(art, "MotionName"), Is.EqualTo("Idle"));
+            Assert.That(drawing.sprite, Is.SameAs(First("Idle")));
+        }
+
+        [Test]
         public void TenResetCyclesRestoreFeetOpacityAndNoPresentationLease()
         {
             for (int i = 0; i < 10; i++)

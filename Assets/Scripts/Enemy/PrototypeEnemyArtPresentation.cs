@@ -56,8 +56,15 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         elapsed = attackElapsed = hitRemaining = deathElapsed = 0;
         parried = attackRecoveryVisible = false;
         health.ReleaseDeathPresentation(this);
-        if (artwork != null) artwork.color = Color.white;
-        Show();
+        // Arena reset notifies health before resetting AI. Do not resample its old windup here.
+        MotionName = "Idle";
+        if (artwork != null)
+        {
+            artwork.color = Color.white;
+            artwork.sprite = library?.Find("Enemy_Idle")?.At(0);
+            artwork.transform.localPosition = restPosition;
+            artwork.flipX = ai.Facing.x < 0;
+        }
     }
 
     public void CombatTick()
