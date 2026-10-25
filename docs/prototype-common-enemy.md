@@ -27,5 +27,8 @@ F1の近接通常雑魚を、動画で使用した受領済みの汎用雑魚サ
 - 初回のテスト1件は、反撃命中のHitstop中に回転するという誤った期待を修正した。停止解除後の戦闘tickで回転を確認する。ゲーム側の停止規則は変更していない。
 - idle/chanceの不透明画素の最下端は原稿下から6pxでPivotより32px下。32PPUで1unitとして足元をCollider下端へ合わせる。downだけは2px高いため、描画を2/32unit下げて床へ合わせる。原稿やColliderは変更しない。
 - ULoopの `simulate-keyboard F1` は補助UIのMissing Script / `InputVisualizationCanvas component not found on prefab` で完了しなかった。今回の検証CLIだけを停止し、PlayModeを終了して補助オブジェクトを破棄した。パッケージとSceneの保存データへこの補助UIを持ち込まない。F1と同じ `ResetArena(false)` の経路で画面確認を行う。
+- 最終確認（実装 `fc32f93`）: Compile Error0 / Warning0、全EditMode **220/220**、関連PlayMode **104/104**（表示13件＋パリィ反撃＋会話）。予兆中にリセットしても、次のtickを待たず待機絵へ戻ることを追加で確認した。
+- F1と同じ処理で通常雑魚1体、HP30、`EnemySample_idle_01`、足元world y=0を[1920×1080 Game View](validation/prototype-common-enemy-2026-10-25/Rendering_20261025_222003_450.png)で確認した。
+- 最後は敵なし・通常入力・通常時計へ戻してEditModeへ復帰。対象Scene dirty=false、Missing Script0、Console Error0 / Warning0。[検証要約](validation/prototype-common-enemy-2026-10-25.json)。全体PlayModeは再実行しておらず、先行版の既知13件を今回解決した扱いにしない。
 
 物理ゲームパッドや15分の操作感、最終アート品質の承認を自動テストで代用しない。旧配布ZIPは更新しない。
