@@ -11,7 +11,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
     public sealed class PlayerBasicActionsTests
     {
         private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-        private GameObject player, floor;
+        private GameObject player, floor, counterTarget;
+        private Component counterTargetHealth;
         private Component state, motor, health, heal, respawn, counter, parry, attack, gauge, special;
         private Rigidbody2D body;
         private Component clock;
@@ -66,6 +67,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Object.DestroyImmediate(player);
             Object.DestroyImmediate(floor);
+            if(counterTarget!=null) Object.DestroyImmediate(counterTarget);
             clockType.GetProperty("ManualAdvanceOnly").SetValue(clock, previousManual);
             yield return null;
         }
@@ -201,6 +203,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             {
                 Reset(); Start(PlayerActionRequest.Parry);
                 Call(state, "ChangeActionPhase", PlayerActionState.Parry, PlayerActionState.ParrySuccess, "TestSuccess");
+                GrantCounterTarget();
                 Start(PlayerActionRequest.Attack);
                 Assert.That(Action, Is.EqualTo(PlayerActionState.ParryCounter));
                 for (int frame = 0; frame < 24; frame++) Call(counter, "CombatTickTimers");
@@ -262,6 +265,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             {
                 Start(PlayerActionRequest.Parry);
                 Call(state, "ChangeActionPhase", PlayerActionState.Parry, PlayerActionState.ParrySuccess, "TestSuccess");
+                Call(counter,"RegisterParriedEnemy",damageable);
                 Start(PlayerActionRequest.Attack);
                 for (int frame = 0; frame < 24; frame++) Call(counter, "CombatTickTimers");
                 Assert.That(Get<int>(damageable, "CurrentHp"), Is.EqualTo(17));
@@ -272,8 +276,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [Test]
         public void RealParrySuccessBuffersCounterThroughHitstopThenReturnsToNeutral()
         {
+            GrantCounterTarget();
             Start(PlayerActionRequest.Parry);
-            Assert.That((bool)Call(health, "TryReceiveHit", 1, (Vector2)player.transform.position + Vector2.left * 0.1f, 0f), Is.False);
+            var context=Activator.CreateInstance(Type.GetType("CombatHitContext2D, Assembly-CSharp",true),counterTargetHealth,1L,true);
+            Assert.That((bool)Call(health, "TryReceiveContextHit", 1, (Vector2)counterTarget.transform.position, 0f,context), Is.False);
             Assert.That(Action, Is.EqualTo(PlayerActionState.ParrySuccess));
             Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(1));
             Call(state, "RequestAction", PlayerActionRequest.Attack);
@@ -308,10 +314,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
             {
                 Reset(); Start(PlayerActionRequest.Parry);
                 Call(state, "ChangeActionPhase", PlayerActionState.Parry, PlayerActionState.ParrySuccess, "TestSuccess");
+                GrantCounterTarget();
                 Start(PlayerActionRequest.Attack); Call(state, "ForceHit", "CounterInterrupted");
                 Assert.That(Get<float>(counter, "LockRemaining"), Is.Zero);
                 Reset(); Start(PlayerActionRequest.Parry);
                 Call(state, "ChangeActionPhase", PlayerActionState.Parry, PlayerActionState.ParrySuccess, "TestSuccess");
+                GrantCounterTarget();
                 Start(PlayerActionRequest.Attack); ((Behaviour)counter).enabled = false;
                 Assert.That(Action, Is.EqualTo(PlayerActionState.Neutral));
                 Assert.That(Get<float>(counter, "LockRemaining"), Is.Zero);
@@ -319,6 +327,19 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
         }
 
+        private void GrantCounterTarget()
+        {
+            if(counterTarget==null)
+            {
+                counterTarget=new GameObject("CounterFixtureSource");counterTarget.SetActive(false);
+                counterTarget.AddComponent<BoxCollider2D>().isTrigger=true;
+                counterTargetHealth=counterTarget.AddComponent(Type.GetType("Damageable2D, Assembly-CSharp",true));
+                Field(counterTargetHealth,"maxHp",200);counterTarget.SetActive(true);
+            }
+            Call(motor,"SetFacing",1);
+            Call(counterTargetHealth,"ResetForCapture",player.transform.position+Vector3.right*.7f,200);
+            Call(counter,"RegisterParriedEnemy",counterTargetHealth);Physics2D.SyncTransforms();
+        }
         private void Reset()
         {
             Call(state, "ResetToSafeState", "Repeat", true);

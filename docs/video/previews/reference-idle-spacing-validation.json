@@ -1,0 +1,518 @@
+{
+  "date": "2026-10-17",
+  "branch": "issue/33-52-38-combat-polish",
+  "layout": {
+    "frontX": 1.35,
+    "rearX": -1.1,
+    "outwardDeltaEach": 0.25,
+    "sourcePixelsEach": 8,
+    "savedSceneAndResetMatch": true,
+    "mirroredLayoutTested": true,
+    "snapshot": "player=(0.000, 1.000, 0.000);front=(1.350, 1.000, 0.000);rear=(-1.100, 1.000, 0.000);idle=IdleReference_01;canvas=(64.00, 64.00);pivot=(32.00, 38.00);PPU=32"
+  },
+  "idle": {
+    "source": "Assets/Art/Player/Player_idle.aseprite",
+    "selectedMotion": "IdleReference",
+    "cels": 6,
+    "durationsMs": [
+      100,
+      100,
+      100,
+      100,
+      100,
+      100
+    ],
+    "loopSeconds": 0.6,
+    "size": [
+      64,
+      64
+    ],
+    "pivot": [
+      32,
+      38
+    ],
+    "ppu": 32,
+    "asepriteExportMatchesAllExistingPixels": true,
+    "originalAndPngsUnmodified": true,
+    "loopAndScaleTestedBothDirections": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-17T09:51:15.8290986Z",
+    "TestCount": 326,
+    "PassedCount": 326,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "editMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-17T09:51:33.8999777Z",
+    "TestCount": 186,
+    "PassedCount": 186,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "focusedWallAndIdle": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-17T09:49:45.8714383Z",
+    "TestCount": 4,
+    "PassedCount": 4,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "wallFixtureAdjustedToCurrentCounterPath": true,
+  "resetRuns": {
+    "runsPassed": 40,
+    "runs": [
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      }
+    ]
+  },
+  "consoleErrors": 0,
+  "consoleWarnings": 0,
+  "video": "docs/video/previews/combat-2stage-hybrid-reference-idle-spacing.mp4",
+  "frames": 249,
+  "durationSeconds": 4.15,
+  "fps": 60,
+  "width": 1920,
+  "height": 1080,
+  "audioStreams": 0,
+  "allFramesDecoded": true,
+  "videoSha256": "cde979d4582866c70656c2865fe7145d5bff3431f9d6ea930ef4c39a722e4e6c",
+  "eventsIdenticalToApprovedEarlyBranchTake": true,
+  "frontDeathOnSecondHitTick": true,
+  "sameParryCounterTarget": true,
+  "preservedBaselineFiles": 696,
+  "originalSceneRestored": "scene=Assets/Scenes/PrototypeCombatValidation.unity;dirty=False;playing=False",
+  "preview": {
+    "selfContained": true,
+    "byteIdenticalVideo": true,
+    "htmlBytes": 973814,
+    "externalResources": false
+  },
+  "events": [
+    {
+      "kind": "Slash1",
+      "target": "Enemy_A",
+      "realSeconds": 0.5833333333333335,
+      "tick": 35
+    },
+    {
+      "kind": "Death",
+      "target": "Enemy_A",
+      "realSeconds": 1.0500000000000012,
+      "tick": 61
+    },
+    {
+      "kind": "Slash2",
+      "target": "Enemy_A",
+      "realSeconds": 1.0500000000000012,
+      "tick": 61
+    },
+    {
+      "kind": "RecoveryStart:PlayerVideo_Recovery_HorizontalSlash",
+      "target": "",
+      "realSeconds": 1.3666666666666667,
+      "tick": 78
+    },
+    {
+      "kind": "RearWindup",
+      "target": "Enemy_B",
+      "realSeconds": 1.566666666666666,
+      "tick": 90
+    },
+    {
+      "kind": "RecoveryEnd:PlayerVideo_Recovery_HorizontalSlash",
+      "target": "",
+      "realSeconds": 1.6166666666666658,
+      "tick": 93
+    },
+    {
+      "kind": "Parry",
+      "target": "Enemy_B",
+      "realSeconds": 2.0499999999999976,
+      "tick": 119
+    },
+    {
+      "kind": "CounterStart",
+      "target": "Enemy_B",
+      "realSeconds": 2.2666666666666635,
+      "tick": 129
+    },
+    {
+      "kind": "ChargeStart",
+      "target": "Enemy_B",
+      "realSeconds": 2.549999999999996,
+      "tick": 146
+    },
+    {
+      "kind": "ChargeRelease",
+      "target": "Enemy_B",
+      "realSeconds": 3.21666666666666,
+      "tick": 152
+    },
+    {
+      "kind": "Death",
+      "target": "Enemy_B",
+      "realSeconds": 3.2833333333333266,
+      "tick": 156
+    },
+    {
+      "kind": "Kick",
+      "target": "Enemy_B",
+      "realSeconds": 3.2833333333333266,
+      "tick": 156
+    },
+    {
+      "kind": "Landing",
+      "target": "Enemy_B",
+      "realSeconds": 3.5499999999999923,
+      "tick": 164
+    },
+    {
+      "kind": "RecoveryStart:PlayerVideo_Recovery_AirRoundhouse",
+      "target": "",
+      "realSeconds": 3.566666666666659,
+      "tick": 165
+    },
+    {
+      "kind": "RecoveryEnd:PlayerVideo_Recovery_AirRoundhouse",
+      "target": "",
+      "realSeconds": 4.099999999999991,
+      "tick": 197
+    }
+  ],
+  "implementationCommit": "9581af33ba85ca295964085dde5e705e04aa5a58"
+}

@@ -43,6 +43,7 @@ public sealed class CombatTimeController : MonoBehaviour
     private bool ownsTime;
     public bool ManualAdvanceOnly { get; set; }
     public static event Action<long> BeforeCombatTick;
+    public static event Action SessionReset;
 
     public static bool IsPaused => instance != null && instance.clock.IsPaused;
     public static bool IsHitStopped => instance != null && instance.clock.IsHitStopped;
@@ -53,6 +54,8 @@ public sealed class CombatTimeController : MonoBehaviour
     public static double ElapsedSeconds => instance != null ? instance.clock.ElapsedSeconds : 0d;
     public static int HitstopRemainingTicks => instance != null ? instance.clock.HitstopRemainingTicks : 0;
     public static int HitstopOwnerCount => instance != null ? instance.clock.HitstopOwnerCount : 0;
+    public static int SlowOwnerCount => instance != null ? instance.clock.SlowOwnerCount : 0;
+    public static float SlowScale => instance != null ? (float)instance.clock.SlowScale : 1f;
     public static float AdvanceTimer(float remaining)
     {
         // Re-quantize after each subtraction so long timers do not accumulate float drift.
@@ -72,6 +75,7 @@ public sealed class CombatTimeController : MonoBehaviour
         PauseChanged = null;
         DefeatSlowRequested = null;
         BeforeCombatTick = null;
+        SessionReset = null;
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -137,11 +141,11 @@ public sealed class CombatTimeController : MonoBehaviour
 
     public static void UnregisterAnimator(Animator animator, object owner)
     {
-        if (instance == null || animator == null || !instance.animators.TryGetValue(animator, out AnimatorRegistration registration)) return;
+        if (instance == null || ReferenceEquals(animator, null) || !instance.animators.TryGetValue(animator, out AnimatorRegistration registration)) return;
         registration.Owners.Remove(owner);
         if (registration.Owners.Count != 0) return;
         instance.animators.Remove(animator);
-        animator.enabled = registration.WasEnabled;
+        if(animator != null) animator.enabled = registration.WasEnabled;
     }
 
     public static void SetPaused(bool paused)
@@ -170,11 +174,27 @@ public sealed class CombatTimeController : MonoBehaviour
         if (!IsExecutingTick) instance.ApplyTimeScale();
     }
 
+    public static void RequestSlow(object owner, float scale, float realSeconds)
+    {
+        EnsureInstance();
+        if (instance == null) return;
+        instance.clock.RequestSlow(owner, scale, realSeconds);
+        if (!IsExecutingTick) instance.ApplyTimeScale();
+    }
+
+    public static void ReleaseSlow(object owner)
+    {
+        if (instance == null) return;
+        instance.clock.ReleaseSlow(owner);
+        if (!IsExecutingTick) instance.ApplyTimeScale();
+    }
+
     public static void ResetSession()
     {
         if (instance == null) return;
         bool wasPaused = IsPaused;
         instance.clock.ResetStops(!IsExecutingTick);
+        SessionReset?.Invoke();
         instance.ApplyTimeScale();
         if (wasPaused) PauseChanged?.Invoke(false);
     }
@@ -240,7 +260,7 @@ public sealed class CombatTimeController : MonoBehaviour
     private void ApplyTimeScale()
     {
         if (!ownsTime) return;
-        Time.timeScale = clock.IsPaused || clock.IsHitStopped ? 0f : 1f;
+        Time.timeScale = clock.IsPaused || clock.IsHitStopped ? 0f : (float)clock.SlowScale;
         Time.fixedDeltaTime = StepSeconds;
     }
 

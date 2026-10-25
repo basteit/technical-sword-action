@@ -1,0 +1,153 @@
+{
+  "date": "2026-10-25",
+  "parry": {
+    "impactCel": 3,
+    "impactDelayCombatTicks": 3,
+    "impactEvent": {
+      "kind": "ParryImpact",
+      "target": "Enemy_B",
+      "realSeconds": 2.199999999999997,
+      "tick": 128
+    },
+    "successEvent": {
+      "kind": "Parry",
+      "target": "Enemy_B",
+      "realSeconds": 2.1499999999999972,
+      "tick": 125
+    },
+    "thirdCelVideoFrames": 5,
+    "hitstopTicks": 4,
+    "allCelVideoFrames": {
+      "ParrySuccessLight_01": 2,
+      "ParrySuccessLight_02": 1,
+      "ParrySuccessLight_03": 5,
+      "ParrySuccessLight_04": 1,
+      "ParrySuccessLight_05": 1,
+      "ParrySuccessLight_06": 1,
+      "ParrySuccessLight_07": 1,
+      "ParrySuccessLight_08": 2
+    },
+    "enemyReactionStartsOnVideoFrame": 132,
+    "cameraPeakOnVideoFrame": 132,
+    "cameraPeakWorldMagnitude": 0.22000001801093472,
+    "legacyVfxEmitted": false,
+    "judgementAndTargetingUnchanged": true,
+    "enemyCombatStunImmediateVisualOnlyDelayed": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "validationPassed": true,
+  "uniquePlayModeCasesPassed": 30,
+  "firstBroadRun": {
+    "Success": false,
+    "Message": "Test execution completed with status: Failed",
+    "CompletedAt": "2026-10-24T18:46:38.5366369Z",
+    "TestCount": 30,
+    "PassedCount": 24,
+    "FailedCount": 6,
+    "SkippedCount": 0,
+    "XmlPath": "C:\\Users\\hirot\\GitHub\\technical-sword-action\\.uloop/outputs\\TestResults\\20261025_034638.xml"
+  },
+  "secondBroadRun": {
+    "Success": false,
+    "Message": "Test execution completed with status: Failed",
+    "CompletedAt": "2026-10-24T18:48:46.5673883Z",
+    "TestCount": 30,
+    "PassedCount": 28,
+    "FailedCount": 2,
+    "SkippedCount": 0,
+    "XmlPath": "C:\\Users\\hirot\\GitHub\\technical-sword-action\\.uloop/outputs\\TestResults\\20261025_034846.xml"
+  },
+  "finalTwoJustParryCases": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T18:50:34.2345833Z",
+    "TestCount": 2,
+    "PassedCount": 2,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "runtimeUnchangedAfterSecondBroadRun": true,
+  "corrections": "Fixed Studio scene-unload unsubscription with a cached presenter reference. Corrected the added Just fixture to apply queued parry input before injecting contact; re-ran only those two cases after the other 28 passed.",
+  "mirroredTenResetRunsPassed": 20,
+  "fullSuiteRerun": false,
+  "legacyEightyResetSweepRerun": false,
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 20,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-parry-impact-cel3-20261025.mp4",
+    "sha256": "77b112fefbe84fa3ff1245b980aa19b42f48548f8adebb972ca335ab918c9fab",
+    "decodedFrames": 267,
+    "durationSeconds": 4.45,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "allPreexistingEventsLayoutAndTimingIdentical": true
+  },
+  "counter": {
+    "allCelVideoFrames": {
+      "CounterKick_01": 14,
+      "CounterKick_02": 6,
+      "CounterKick_03": 7,
+      "CounterKick_04": 7,
+      "CounterKick_05": 6,
+      "CounterKick_06": 7,
+      "CounterKick_07": 7,
+      "CounterKick_08": 7,
+      "CounterKick_09": 11,
+      "CounterKick_10": 4,
+      "CounterKick_11": 4,
+      "CounterKick_12": 4,
+      "CounterKick_13": 4,
+      "CounterKick_14": 4,
+      "CounterKick_15": 4
+    },
+    "authoredElectricitySynchronizedEveryVisibleFrame": true
+  },
+  "preview": {
+    "crf": 22,
+    "bytes": 853084,
+    "nativeVideoControls": true
+  },
+  "overallVideoAccepted": false,
+  "preservation": {
+    "baselineFiles": 2387,
+    "changedIntentionally": 12,
+    "byteIdentical": 2375,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 17,
+    "originalDirtyChangesKept": true,
+    "allSourcesPngClipsControllersAndScenesUnchanged": true,
+    "sourceCurrentHistoryAndCatalogUnchanged": true,
+    "prototypeCinematicProfileUnchanged": true,
+    "reexportMatchesCurrentManifestAndAllEightPngs": true
+  },
+  "repositoryStaged": {
+    "branch": "issue/33-52-38-combat-polish",
+    "base": "",
+    "staged": true,
+    "changedFiles": 17,
+    "attributes": [
+      "Assets/Scenes/PrototypeCombatValidation.unity: merge: unityyamlmerge",
+      "Assets/Art/test.aseprite: merge: unset"
+    ],
+    "problems": [],
+    "success": true
+  }
+}

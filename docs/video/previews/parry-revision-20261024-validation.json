@@ -1,0 +1,152 @@
+{
+  "date": "2026-10-24",
+  "source": {
+    "sha256": "115ab7f81eb0016932a93ca36d8eb0c9f667beec19dfb392c4943d9916628996",
+    "revision": 2,
+    "canvas": [
+      128,
+      128
+    ],
+    "nativeCels": 8,
+    "nativeCelMs": 80,
+    "gameDurations": [
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2
+    ],
+    "pixelsMatchVisibleSourceExceptHiddenGuide": true,
+    "originalCurrentHistoryAndUnityCopyIdentical": true,
+    "parryCelVideoFrames": {
+      "ParrySuccessLight_01": 6,
+      "ParrySuccessLight_02": 1,
+      "ParrySuccessLight_03": 1,
+      "ParrySuccessLight_04": 1,
+      "ParrySuccessLight_05": 1,
+      "ParrySuccessLight_06": 1,
+      "ParrySuccessLight_07": 1,
+      "ParrySuccessLight_08": 2
+    },
+    "legacyParrySpriteGlowParticlesEmitted": false,
+    "cameraShakeHitstopAndContactFlashKept": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T13:45:27.3039820Z",
+    "TestCount": 22,
+    "PassedCount": 22,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "editMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T13:46:12.0863412Z",
+    "TestCount": 2,
+    "PassedCount": 2,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "uniqueTestsPassed": 24,
+  "initialPlayMode": {
+    "Success": false,
+    "Message": "Test execution completed with status: Failed",
+    "CompletedAt": "2026-10-24T13:43:30.4687641Z",
+    "TestCount": 22,
+    "PassedCount": 19,
+    "FailedCount": 3,
+    "SkippedCount": 0,
+    "XmlPath": "C:\\Users\\hirot\\GitHub\\technical-sword-action\\.uloop/outputs\\TestResults\\20261024_224330.xml"
+  },
+  "initialCorrections": "The added reflection fixture needed field access. New last cel initially began after the counter branch; advanced its onset to tick 8 without changing the ten-tick window. Re-ran the same 22 cases.",
+  "mirroredTenResetRunsPassed": 20,
+  "fullSuiteRerun": false,
+  "legacyEightyResetSweepRerun": false,
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 20,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-parry-revision-20261024.mp4",
+    "sha256": "6f089ec70a641688b30346d4483e74d60b88bdec34572f72139de39bc604199e",
+    "decodedFrames": 267,
+    "durationSeconds": 4.45,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "allEventsLayoutAndTimingIdenticalToPrevious": true
+  },
+  "counter": {
+    "allCelVideoFrames": {
+      "CounterKick_01": 14,
+      "CounterKick_02": 6,
+      "CounterKick_03": 7,
+      "CounterKick_04": 7,
+      "CounterKick_05": 6,
+      "CounterKick_06": 7,
+      "CounterKick_07": 7,
+      "CounterKick_08": 7,
+      "CounterKick_09": 11,
+      "CounterKick_10": 4,
+      "CounterKick_11": 4,
+      "CounterKick_12": 4,
+      "CounterKick_13": 4,
+      "CounterKick_14": 4,
+      "CounterKick_15": 4
+    },
+    "authoredElectricitySynchronizedEveryVisibleFrame": true,
+    "lastTuckVideoFrames": 7
+  },
+  "preview": {
+    "crf": 22,
+    "bytes": 844762,
+    "nativeVideoControls": true
+  },
+  "overallVideoAccepted": false,
+  "preservation": {
+    "baselineFiles": 2368,
+    "changedIntentionally": 49,
+    "byteIdentical": 2319,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 68,
+    "oldSourceHistoryAndOtherActionArtUnchanged": true,
+    "allOriginalDirtyChangesKept": true,
+    "captureScenesAndCinematicProfileUnchanged": true,
+    "prototypeSceneSavedExistingDefaultsOnly": true
+  },
+  "sourceLibraryValidation": true,
+  "repositoryStaged": {
+    "branch": "issue/33-52-38-combat-polish",
+    "base": "",
+    "staged": true,
+    "changedFiles": 68,
+    "attributes": [
+      "Assets/Scenes/PrototypeCombatValidation.unity: merge: unityyamlmerge",
+      "Assets/Art/test.aseprite: merge: unset"
+    ],
+    "problems": [],
+    "success": true
+  }
+}

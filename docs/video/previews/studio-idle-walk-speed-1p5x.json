@@ -1,0 +1,78 @@
+{
+    "scene": "Assets/Scenes/CombatVideoStudio.unity",
+    "takeKind": "original-idle-walk",
+    "sampling": "native milliseconds, sampled at 60 fps",
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "frameCount": 360,
+    "duration": 6.0,
+    "walkSpeed": 4.401900291442871,
+    "cameraSize": 5.0,
+    "finalX": -7.450580596923828e-8,
+    "requestedSpeedMultiplier": 1.5,
+    "baselineMeasuredSpeed": 2.803800106048584,
+    "measuredMoveSpeed": 4.205703258514404,
+    "actualSpeedMultiplier": 1.500001072883606,
+    "cameraCenter": {
+        "x": 2.4000000953674318,
+        "y": 1.0499999523162842
+    },
+    "cameraReferenceScene": "Assets/Scenes/SampleScene.unity",
+    "audio": false,
+    "originalArtwork": true,
+    "sourceFloorGuideHidden": true,
+    "motions": [
+        {
+            "source": "Assets/Art/Player/Player_idle.aseprite",
+            "durationsMs": [
+                100,
+                100,
+                100,
+                100,
+                100,
+                100
+            ]
+        },
+        {
+            "source": "Assets/Art/Player/Player_walk.aseprite",
+            "durationsMs": [
+                80,
+                80,
+                80,
+                80,
+                80,
+                80,
+                80,
+                80
+            ]
+        }
+    ],
+    "segments": [
+        {
+            "motion": "idle",
+            "frameCount": 72,
+            "direction": 0
+        },
+        {
+            "motion": "walk",
+            "frameCount": 96,
+            "direction": 1
+        },
+        {
+            "motion": "idle",
+            "frameCount": 36,
+            "direction": 0
+        },
+        {
+            "motion": "walk",
+            "frameCount": 96,
+            "direction": -1
+        },
+        {
+            "motion": "idle",
+            "frameCount": 60,
+            "direction": 0
+        }
+    ]
+}

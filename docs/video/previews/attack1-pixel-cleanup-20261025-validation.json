@@ -1,0 +1,176 @@
+{
+  "date": "2026-10-25",
+  "sourceId": "attack_1",
+  "sourceRevision": 3,
+  "sourceSha256": "bbfc6dd022cbe267300300ea653ecbe6bfe2381c9af655c1e2d3b477a854586b",
+  "pixelDiff": {
+    "sourceSha256": "bbfc6dd022cbe267300300ea653ecbe6bfe2381c9af655c1e2d3b477a854586b",
+    "changedCels": [
+      3
+    ],
+    "removedPixelCount": 1,
+    "removedPixels": [
+      [
+        75,
+        47,
+        [
+          105,
+          124,
+          134,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    ],
+    "otherEightCelsUnchanged": true,
+    "allEyeMasksUnchanged": true,
+    "timingAndHitboxManifestUnchanged": true,
+    "nativeValidation": {
+      "sourceUnmodified": true,
+      "reviewCopyReopened": true,
+      "guideHidden": true,
+      "hairVisibilityPreserved": true,
+      "restoredAttackLayers": false,
+      "nativeDurationMs": 630,
+      "gameTicks": 38,
+      "contactFrame": 5,
+      "contactTick": 17,
+      "frames": [
+        {
+          "frame": 1,
+          "durationMs": 70,
+          "startTick": 0,
+          "ticks": 4
+        },
+        {
+          "frame": 2,
+          "durationMs": 70,
+          "startTick": 4,
+          "ticks": 4
+        },
+        {
+          "frame": 3,
+          "durationMs": 70,
+          "startTick": 8,
+          "ticks": 5
+        },
+        {
+          "frame": 4,
+          "durationMs": 70,
+          "startTick": 13,
+          "ticks": 4
+        },
+        {
+          "frame": 5,
+          "durationMs": 70,
+          "startTick": 17,
+          "ticks": 4
+        },
+        {
+          "frame": 6,
+          "durationMs": 70,
+          "startTick": 21,
+          "ticks": 4
+        },
+        {
+          "frame": 7,
+          "durationMs": 70,
+          "startTick": 25,
+          "ticks": 4
+        },
+        {
+          "frame": 8,
+          "durationMs": 70,
+          "startTick": 29,
+          "ticks": 5
+        },
+        {
+          "frame": 9,
+          "durationMs": 70,
+          "startTick": 34,
+          "ticks": 4
+        }
+      ]
+    }
+  },
+  "unityImport": {
+    "Success": true,
+    "Result": "{ sprite = VerticalSlash_03, videoShared = True, prototypeClips = PlayerPrototype_Attack_1, ppu = 32, pivot = (32.00, 38.00), hitFrame = 17, totalFrames = 38, scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = True }",
+    "Logs": [
+      "Execution completed successfully"
+    ],
+    "CompilationErrors": [],
+    "ErrorMessage": "",
+    "SecurityLevel": "Restricted",
+    "Error": "",
+    "UpdatedCode": null,
+    "DiagnosticsSummary": null,
+    "Diagnostics": []
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "editMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-25T03:41:35.4815752Z",
+    "TestCount": 1,
+    "PassedCount": 1,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "playModeRerun": false,
+  "fullSuiteRerun": false,
+  "moviesRerecorded": false,
+  "existingMoviesRemainRevision2": true,
+  "usesRecordedFor": [
+    "video-shared-scene-sprites",
+    "prototype-shared-sprites"
+  ],
+  "sourceLibraryValid": true,
+  "pendingSourceUpdates": [],
+  "console": {
+    "TotalCount": 2,
+    "DisplayedCount": 2,
+    "LogType": "All",
+    "MaxCount": 8,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": [
+      {
+        "Type": "Log",
+        "Message": "Saving results to: C:/Users/hirot/AppData/LocalLow/DefaultCompany/technical-sword-action\\TestResults.xml",
+        "StackTrace": null
+      },
+      {
+        "Type": "Log",
+        "Message": "Executing IPrebuildSetup for: Unity.PerformanceTesting.Editor.TestRunBuilder.",
+        "StackTrace": null
+      }
+    ]
+  },
+  "savedEditorState": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "sourceSceneBytesUnchanged": true,
+  "allCodeSettingsScenesClipsControllersAndOtherArtworkUnchanged": true,
+  "baselineFiles": 2507,
+  "unchangedBaselineFiles": 2502,
+  "intentionalExistingChanges": [
+    "ArtSource/Player/Current/Player_attack_1.aseprite",
+    "ArtSource/Player/INDEX.md",
+    "ArtSource/Player/README.md",
+    "ArtSource/Player/catalog.json",
+    "Assets/Art/Player/VideoSubmitted/VerticalSlash_03.png"
+  ],
+  "overallVideoAccepted": false
+}

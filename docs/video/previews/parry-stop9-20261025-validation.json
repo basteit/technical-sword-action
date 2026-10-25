@@ -1,0 +1,195 @@
+{
+  "date": "2026-10-25",
+  "hitstop": {
+    "parryBefore": 7,
+    "parryAfter": 9,
+    "justBefore": 8,
+    "justAfter": 10,
+    "kickUnchanged": 16,
+    "parryThirdCelVideoFrames": 10,
+    "kickContactCelVideoFrames": 17,
+    "parryImpactPeakAndEnemyDownStillSynchronized": true,
+    "allCounterCelExposuresUnchanged": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T19:29:52.0686735Z",
+    "TestCount": 18,
+    "PassedCount": 18,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "uniquePlayModeCasesPassed": 18,
+  "mirroredTenResetRunsPassed": 20,
+  "fullSuiteRerun": false,
+  "legacyEightyResetSweepRerun": false,
+  "events": {
+    "allTargetsKindsAndCombatTicksUnchanged": true,
+    "realTimeDeltas": [
+      {
+        "kind": "RearApproach",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "RearWindup",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "Slash1",
+        "target": "Enemy_A",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "Death",
+        "target": "Enemy_A",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "Slash2",
+        "target": "Enemy_A",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "ParryReady",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "Parry",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "ParryImpact",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "CounterStart",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.033333333333333215
+      },
+      {
+        "kind": "ChargeStart",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.033333333333333215
+      },
+      {
+        "kind": "ChargeRelease",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.033333333333333215
+      },
+      {
+        "kind": "Death",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.033333333333333215
+      },
+      {
+        "kind": "Kick",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.033333333333333215
+      },
+      {
+        "kind": "Landing",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.033333333333333215
+      }
+    ]
+  },
+  "counterCelVideoFrames": {
+    "CounterKick_01": 14,
+    "CounterKick_02": 6,
+    "CounterKick_03": 7,
+    "CounterKick_04": 7,
+    "CounterKick_05": 6,
+    "CounterKick_06": 7,
+    "CounterKick_07": 7,
+    "CounterKick_08": 7,
+    "CounterKick_09": 17,
+    "CounterKick_10": 4,
+    "CounterKick_11": 4,
+    "CounterKick_12": 4,
+    "CounterKick_13": 4,
+    "CounterKick_14": 4,
+    "CounterKick_15": 4
+  },
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 20,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-parry-stop9-20261025.mp4",
+    "sha256": "19d5f366b6e86dfd881aa7bbae21f346dff7fb6b5caf166e5203886943c27042",
+    "decodedFrames": 275,
+    "durationSeconds": 4.583333333333333,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "bothEnemiesHiddenAtEnd": true,
+    "vfxActiveAtEnd": 0
+  },
+  "preview": {
+    "crf": 22,
+    "bytes": 863864,
+    "nativeVideoControls": true
+  },
+  "overallVideoAccepted": false,
+  "preservation": {
+    "baselineFiles": 2397,
+    "changedIntentionally": 7,
+    "byteIdentical": 2390,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 12,
+    "originalDirtyChangesKept": true,
+    "allSourcesPngClipsControllersAndSharedArtUnchanged": true,
+    "sourceCurrentHistoryAndCatalogUnchanged": true,
+    "prototypeCinematicProfileUnchanged": true,
+    "captureSceneDiffOnlyTwoParryValuesEach": true,
+    "counterSettingsUnchanged": true
+  },
+  "repositoryStaged": {
+    "branch": "issue/33-52-38-combat-polish",
+    "base": "",
+    "staged": true,
+    "changedFiles": 12,
+    "attributes": [
+      "Assets/Scenes/PrototypeCombatValidation.unity: merge: unityyamlmerge",
+      "Assets/Art/test.aseprite: merge: unset"
+    ],
+    "problems": [],
+    "success": true
+  }
+}

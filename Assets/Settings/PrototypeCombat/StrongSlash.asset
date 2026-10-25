@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf47ab2d55cf64c4e909a7627d15eb21, type: 3}
+  m_Name: StrongSlash
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackDefinition
+  attackId: heavy-overhead-slash
+  windupFrames: 42
+  activeFrames: 4
+  recoveryFrames: 38
+  cooldownFrames: 40
+  damage: 14
+  knockback: 4.5
+  parryable: 1
+  resistHitStunWhileAttacking: 0
+  attackRange: 1.65
+  hitOffset: {x: 0.8, y: 0}
+  hitSize: {x: 1.65, y: 1.3}
+  countermeasure: Parry or Dash; punish recovery
+  windupClip: {fileID: 8300000, guid: 50cfbacf7f8677246ad28c29b2e66f84, type: 3}
