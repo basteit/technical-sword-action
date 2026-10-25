@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19790acc9adf1d9419bbbc46d44136ad, type: 3}
+  m_Name: 05_Melee
+  m_EditorClassIdentifier: Assembly-CSharp::StudioPreset
+  displayName: "\u8907\u6570\u6575"
+  description: "\u5DE6\u53F3\u304B\u3089\u65E2\u5B58\u306E\u8FD1\u63A5AI\u3067\u8FFD\u8DE1\u3002\u6575\u3054\u3068\u306BHP\u30FB\u653B\u6483\u9593\u9694\u3092\u5909\u66F4\u53EF\u80FD\u3002"
+  playerPosition: {x: 0, y: 1}
+  faceLeft: 0
+  followCamera: 1
+  cameraSize: 3.375
+  cameraCenter: {x: 0, y: 1.05}
+  enemies:
+  - prefab: {fileID: 0}
+    position: {x: 3, y: 1}
+    hp: 8
+    mode: 3
+    windupSeconds: 0.65
+    intervalSeconds: 1.2
+    damage: 1
+    moveSpeed: 1.5
+  - prefab: {fileID: 0}
+    position: {x: -3, y: 1}
+    hp: 3
+    mode: 3
+    windupSeconds: 0.65
+    intervalSeconds: 1.2
+    damage: 1
+    moveSpeed: 1.5
+  gimmicks: []

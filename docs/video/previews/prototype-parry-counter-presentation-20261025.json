@@ -1,0 +1,8 @@
+{
+    "frameCount": 210,
+    "fps": 60,
+    "enemyHp": 30,
+    "playerHp": 100,
+    "duration": 3.5,
+    "takeKind": "prototype-real-ai-parry-and-counter"
+}

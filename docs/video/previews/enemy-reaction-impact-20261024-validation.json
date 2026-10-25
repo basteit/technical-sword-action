@@ -1,0 +1,131 @@
+{
+  "date": "2026-10-24",
+  "camera": {
+    "normalUnchanged": 3.375,
+    "counterChargeUnchanged": 2.8125,
+    "impactMinimum": 2.64375,
+    "impactZoomAmount": 0.06,
+    "pushInFrames": 2,
+    "holdFrames": 6,
+    "returnFrames": 12,
+    "peakShakeWorldUnits": 0.3800000490565384,
+    "parryShakeWorldUnits": 0.22,
+    "kickShakeWorldUnits": 0.38,
+    "gameplayCameraChanged": false
+  },
+  "enemyPresentation": {
+    "parriedHeldFrames": 80,
+    "parriedSprite": "EnemySample_chance_01",
+    "parriedPositionRotationAndFacingHeld": true,
+    "defeatSlideFrames": 39,
+    "kickPlannedDistance": 3.2,
+    "secondSlashPlannedDistance": 1.4625,
+    "fadeSamples": [
+      {
+        "actor": "front",
+        "fadeFrames": 13,
+        "firstX": 3.954808,
+        "lastX": 4.35173,
+        "smallestTravelPerFrame": 0.030960999999999572,
+        "rootY": 1.0,
+        "localY": -0.0625,
+        "facingAttacker": true,
+        "rotationDegrees": 0,
+        "sprite": "EnemySample_down_01"
+      },
+      {
+        "actor": "rear",
+        "fadeFrames": 14,
+        "firstX": 1.638552,
+        "lastX": 2.573937,
+        "smallestTravelPerFrame": 0.06690400000000007,
+        "rootY": 1.002561,
+        "localY": -0.0625,
+        "facingAttacker": true,
+        "rotationDegrees": 0,
+        "sprite": "EnemySample_down_01"
+      }
+    ]
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "relatedPlayMode": {
+    "uniqueCasesPassed": 34,
+    "initialRun": {
+      "Success": false,
+      "Message": "Test execution completed with status: Failed",
+      "CompletedAt": "2026-10-24T02:06:41.6760543Z",
+      "TestCount": 34,
+      "PassedCount": 32,
+      "FailedCount": 2,
+      "SkippedCount": 0,
+      "XmlPath": "C:\\Users\\hirot\\GitHub\\technical-sword-action\\.uloop/outputs\\TestResults\\20261024_110641.xml"
+    },
+    "resetCasesAfterFixtureCorrection": {
+      "Success": true,
+      "Message": "Test execution completed with status: Passed",
+      "CompletedAt": "2026-10-24T02:08:17.7530009Z",
+      "TestCount": 2,
+      "PassedCount": 2,
+      "FailedCount": 0,
+      "SkippedCount": 0,
+      "XmlPath": null
+    },
+    "finalContactFacingHitstopAndResetRun": {
+      "Success": true,
+      "Message": "Test execution completed with status: Passed",
+      "CompletedAt": "2026-10-24T02:13:53.5809623Z",
+      "TestCount": 6,
+      "PassedCount": 6,
+      "FailedCount": 0,
+      "SkippedCount": 0,
+      "XmlPath": null
+    },
+    "fixtureCorrection": "The rear approach can differ from initial Y by less than one art pixel; check the defeat Y stays fixed from contact. Verify the target in the hit mark because the finished counter clears SelectedTarget.",
+    "mirroredTenResetRunsPassed": 20,
+    "fullSuiteRerun": false,
+    "legacyEightyResetSweepRerun": false
+  },
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 5,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-enemy-reaction-impact-20261024.mp4",
+    "sha256": "7f7a47012e09fae34a9b15d22453e487584766659cdc9c05302c9a3afc38fc17",
+    "decodedFrames": 310,
+    "durationSeconds": 5.166666666666667,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "allLayoutEventsTargetsTicksAndRealTimingUnchanged": true,
+    "floorFullWidth": true
+  },
+  "preview": {
+    "crf": 22,
+    "bytes": 847658,
+    "nativeVideoControls": true
+  },
+  "overallVideoAccepted": false,
+  "preservation": {
+    "baselineFiles": 2345,
+    "changedIntentionally": 7,
+    "byteIdentical": 2338,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 12,
+    "playerSourcesAndExistingSceneLayoutUnchanged": true
+  }
+}

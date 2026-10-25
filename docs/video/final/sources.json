@@ -1,0 +1,141 @@
+{
+  "acceptedScope": "current-two-stage-video",
+  "legacyAuthoringLabelsPreserved": true,
+  "sources": [
+    {
+      "id": "idle",
+      "motion": "IdleReference",
+      "revision": 1,
+      "current": "ArtSource/Player/Current/Player_idle.aseprite",
+      "sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
+      "authoringStatusPreserved": "received",
+      "spriteSha256": {}
+    },
+    {
+      "id": "attack_1",
+      "motion": "VerticalSlash",
+      "revision": 3,
+      "current": "ArtSource/Player/Current/Player_attack_1.aseprite",
+      "sha256": "bbfc6dd022cbe267300300ea653ecbe6bfe2381c9af655c1e2d3b477a854586b",
+      "authoringStatusPreserved": "provisional",
+      "spriteSha256": {
+        "Assets/Art/Player/VideoSubmitted/VerticalSlash_01.png": "cf26f2858e1e2c13aeacb3cc10df3a52991e9c84d30e7dbc3063f820a77212cb",
+        "Assets/Art/Player/VideoSubmitted/VerticalSlash_02.png": "cf26f2858e1e2c13aeacb3cc10df3a52991e9c84d30e7dbc3063f820a77212cb",
+        "Assets/Art/Player/VideoSubmitted/VerticalSlash_03.png": "94e269391afc0b7cc186b8d2cb468f4965ff883a366ca16bc0374b4211ead9ce",
+        "Assets/Art/Player/VideoSubmitted/VerticalSlash_04.png": "ccedf8470967eaa6aa4f6ccbeff0394bab9e7c2323a323a5cfa6d5122ee55d7f",
+        "Assets/Art/Player/VideoSubmitted/VerticalSlash_05.png": "1d240c7c8b3ef632f93623ae6bd7c14ab3e667807cc3592ffcb447a6c991e66c",
+        "Assets/Art/Player/VideoSubmitted/VerticalSlash_06.png": "076e2bda6edb3897595bc949289e9dc79c53f61810d60293aa38f8deec9725c6",
+        "Assets/Art/Player/VideoSubmitted/VerticalSlash_07.png": "484faf00e41e2578904a18ba6cb047e0a0dff9cd938bb4a6ff274764a8056e54",
+        "Assets/Art/Player/VideoSubmitted/VerticalSlash_08.png": "e6fb9985d21f7308181cb7272150ab97458158d17ed830410ae85cefef22c470",
+        "Assets/Art/Player/VideoSubmitted/VerticalSlash_09.png": "2280c9821f588fac88527085f7f5b5fa5d5a61d7392315e500e267dac845065a"
+      }
+    },
+    {
+      "id": "attack_2",
+      "motion": "HorizontalSlash",
+      "revision": 2,
+      "current": "ArtSource/Player/Current/Player_attack_2.aseprite",
+      "sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
+      "authoringStatusPreserved": "provisional",
+      "spriteSha256": {
+        "Assets/Art/Player/VideoSubmitted/HorizontalSlash_01.png": "2402f357718c4c5bbe45bfcfa837f33a1e92831561bdce9a16a69494a848e4ff",
+        "Assets/Art/Player/VideoSubmitted/HorizontalSlash_02.png": "64c9378d356de60d19d6a4df90f569e893676a09226376488cc5342d859db98e",
+        "Assets/Art/Player/VideoSubmitted/HorizontalSlash_03.png": "f1d84fa6237f297400fcd7b8e403ba034e5cc4de2a579aac51b893240a76ca01",
+        "Assets/Art/Player/VideoSubmitted/HorizontalSlash_04.png": "6e201ec6778e54c799c867942146137237feef304ff4d575fe02b22a5ef142f4",
+        "Assets/Art/Player/VideoSubmitted/HorizontalSlash_05.png": "a016bd2ba89ba4a69d20d834edf904688f7b3033f43af064b228d0006df5e6bd",
+        "Assets/Art/Player/VideoSubmitted/HorizontalSlash_06.png": "0575aad20b266d56cfaba8ad2069eae7f1273b360f802c9e5693a1e8a0507089",
+        "Assets/Art/Player/VideoSubmitted/HorizontalSlash_07.png": "547674a52eeae58a73122bae5887a7a4752b6b3386e65afa461213e58d39ca70",
+        "Assets/Art/Player/VideoSubmitted/HorizontalSlash_08.png": "1a5ca17fe84cb447bd29bca151e7d1e447870102f44c947ae518f0a22867dc16"
+      }
+    },
+    {
+      "id": "parry_wait",
+      "motion": "ParryReady",
+      "revision": 2,
+      "current": "ArtSource/Player/Current/Player_parry_wait.aseprite",
+      "sha256": "c5dffc39dd22ed44d1a6e812386bb619b6c2c5efbf89bed5e8918e4dcb1a96d0",
+      "authoringStatusPreserved": "received",
+      "spriteSha256": {
+        "Assets/Art/Player/VideoSubmitted/ParryReady_01.png": "66714a22667f338621eefd48e9efc7061150271858a163dcdb5d63fa8686416b",
+        "Assets/Art/Player/VideoSubmitted/ParryReady_02.png": "6559e681c5714fff19d76729b0f0c541bffe6b8a7db843d449d45cb7c8eacdaa",
+        "Assets/Art/Player/VideoSubmitted/ParryReady_03.png": "b3c1895fab6668694067d67bc2a2cb05586272ec74413373656e67d20faa0d9b",
+        "Assets/Art/Player/VideoSubmitted/ParryReady_04.png": "d32a2cda68bbc6ba50a4f024974511e4db243da16e16c0dc398a5839d6ff317f",
+        "Assets/Art/Player/VideoSubmitted/ParryReady_05.png": "12c17f13df5d20c8ec6f539c6e158d8a2f64828cdb8a404e6008b322d4170d4f",
+        "Assets/Art/Player/VideoSubmitted/ParryReady_06.png": "7446d731b032b8f7ba4bc0d5efc599a6f045a47ac1c1b0b59dce5714fae4eb97",
+        "Assets/Art/Player/VideoSubmitted/ParryReady_07.png": "ce5a57cf1b78f0948d7a026e6a9bc278c1ab44141781a418b41b9f2d265f2f20",
+        "Assets/Art/Player/VideoSubmitted/ParryReady_08.png": "5843f703cf86f22a11fc5fd3d15161ccdfc4517d30581e0d7b68645ea79d6295"
+      }
+    },
+    {
+      "id": "parry_light",
+      "motion": "ParrySuccessLight",
+      "revision": 3,
+      "current": "ArtSource/Player/Current/Player_parry_light.aseprite",
+      "sha256": "d038a1c76e432c7803be090daa73cd3e6d2062cf1d1347c774d4262d378b1637",
+      "authoringStatusPreserved": "provisional",
+      "spriteSha256": {
+        "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_01.png": "e4d482e84146d10ed6926c033b36afd5b7a585db42092463a403945702bdced1",
+        "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_02.png": "fc8c10c16494e797d1baf2de35e2bc2d1a75892c7977117f9f77d26457124b9b",
+        "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_03.png": "b1b47c2f069c5ef6676ff3be5367e6a72dbf81a5cb4f5040108dd48c59520daf",
+        "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_04.png": "057c0c4a7adce494331de74a27fc67d9bce628977c1a8777865c650140227186",
+        "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_05.png": "c6aa2c38131a34d072d7700a0d85f3b465c73708a991972db33a5f9fd6c80d5d",
+        "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_06.png": "c5ac9c9138880bed7c2bf287e16360ec1fc02690623848cf4dd73a2c7d29fc80",
+        "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_07.png": "c9334de8d7a50c3018d05fd5352d69129ebd49f641659ba429608cc912c6cfe2",
+        "Assets/Art/Player/VideoSubmitted/ParrySuccessLight_08.png": "770538551a45d27c08ed93930b5c992af8334ddb851785b1561736b46c75d990"
+      }
+    },
+    {
+      "id": "counter_transfer",
+      "motion": "CounterTransfer",
+      "revision": 2,
+      "current": "ArtSource/Player/Current/Player_counter_transfer.aseprite",
+      "sha256": "460ccce461d0640ffacc70f964f9c36c676fd8b8bc726be0aeeec84f9ae3ec07",
+      "authoringStatusPreserved": "provisional",
+      "spriteSha256": {
+        "Assets/Art/Player/VideoSubmitted/CounterTransfer_01.png": "66989ff49999f2d0d384bebe35f424359de918e6748ea3b389f26e99ca30f595",
+        "Assets/Art/Player/VideoSubmitted/CounterTransfer_02.png": "d9d15732e76b25d3e973feebfe67f229d9d32c38e6993b45850d1fed7c4801e2",
+        "Assets/Art/Player/VideoSubmitted/CounterTransfer_03.png": "2b458f5854eb1ccbf62ff1fddb1cd4a9e62fbe893384d7b851a29844ddddd2f6",
+        "Assets/Art/Player/VideoSubmitted/CounterTransfer_04.png": "5e94fdccfcf053bf17d3e2cadfc69d3b5e1d49216d1e01cb5c7514bfef09eff4",
+        "Assets/Art/Player/VideoSubmitted/CounterTransfer_05.png": "0565ae7673163b72f2d99428b18c8505acbcecfc6feabf651c28596afd6ed667",
+        "Assets/Art/Player/VideoSubmitted/CounterTransfer_06.png": "692258f1b3e12228199b0c0e9580f73c891fa44023fb18b7f9dc1030ed519276",
+        "Assets/Art/Player/VideoSubmitted/CounterTransfer_07.png": "3bca845da707e1631e443fc544cf45694974e11c34bc69b8da012169fdaff0c3",
+        "Assets/Art/Player/VideoSubmitted/CounterTransfer_08.png": "85f320da9a62a1ae867ac5c64ac26210497b2b7c31e92b2d7c19eb887bbfa1d9"
+      }
+    },
+    {
+      "id": "counter_kick",
+      "motion": "CounterKick",
+      "revision": 5,
+      "current": "ArtSource/Player/Current/Player_counter_kick.aseprite",
+      "sha256": "170a5732e08d1cd3fe7626451c0ed85e7ebbdc07ca6803230466fcebdac4d4c5",
+      "authoringStatusPreserved": "received",
+      "spriteSha256": {
+        "Assets/Art/Player/VideoSubmitted/CounterKick_01.png": "0132b2b0eea6ad26c39436465380dc5d3bb06b0303e9bad30cf7dfac422c54ab",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_02.png": "973ec725759dccd808960cb75b43facf762376bd7649da854c5f63b537dd6fef",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_03.png": "f287a5edf83d4fd97c3c5b88c5b915802fe03c9d700488053ec327dd1251f743",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_04.png": "b766993268211291b14e9ce2c10b72324538d62e70d5fa83418525a2d84eee08",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_05.png": "8c7d09d514c1e2abea58c502a9bdfd0d83af36a62599829fc825f5b61e6a4c93",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_06.png": "d5a8ce5e90ec600bad4876fbe5664804c3de53fae5ef7cb81551f029e0850fcb",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_07.png": "259ab47c0dd747e06a88c992c40328a2ce963403bb4d75a4dd8c3be8d12e362e",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_08.png": "1a157dd75fa9d16935bd0fc5c2be5d4e8b5f95f533d1da32d765131bd2192f83",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_09.png": "6faa09bffe224019d56f48ff3694b26f1271b0f0586108e3895f74c49919014d",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_10.png": "a4ba99a406764bcf491d89656ac2b445a255598af6d8a683724f729a26984fe1",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_11.png": "274b93723813c48382521a5887701a409ad31e9328b3ef85c68e4814136490cc",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_12.png": "4609606c02aa6a9bbd0b2aa4e11b2e1322e792ea4c764414c6198137cc95d653",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_13.png": "9f9781bbe86886883f5b604f1873e7f29ca216d0d822c8d58275a432eb3c63c6",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_14.png": "0dd95bd657c65d00ff079d7e97baf171bb539430803f937a170839032b5f901e",
+        "Assets/Art/Player/VideoSubmitted/CounterKick_15.png": "d03ab7744926559139c8c46392323116f11d66887491ca794b5d3bd7abcfc3de"
+      }
+    },
+    {
+      "id": "counter_kick_effect",
+      "motion": "CounterKickEffect",
+      "revision": 2,
+      "current": "ArtSource/Player/Current/Player_counter_kick_effect.aseprite",
+      "sha256": "e1b72bf36cca4c8decfb18725e2db3b367f336be5fee481ca1af74d57fc6dfd8",
+      "authoringStatusPreserved": "received",
+      "spriteSha256": {}
+    }
+  ],
+  "codeHead": "09dd1c5fd0d91541c02420438a70b83b0dcc6ce0"
+}

@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-15",
+  "unity": "6000.3.9f1",
+  "branch": "codex/69-combat-video",
+  "scene": "Assets/Scenes/CombatVideoStudio.unity",
+  "compile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "editMode": {
+    "passed": 187,
+    "failed": 0,
+    "completedAt": "2026-10-15T08:32:46.5378222Z",
+    "newStudioTests": 6
+  },
+  "playMode": {
+    "passed": 185,
+    "failed": 0,
+    "completedAt": "2026-10-15T08:34:06.4892653Z",
+    "newStudioTests": 27
+  },
+  "repeatedResetChecks": {
+    "studio": {
+      "attack": 10,
+      "dash": 10,
+      "charge": 10,
+      "dead": 10,
+      "movingPlatform": 30
+    },
+    "originalCaptureScene": 40,
+    "defenseCancelScene": 40
+  },
+  "verified": [
+    "five presets and independent mutable setup copies",
+    "prefab-linked enemy overrides survive Scene save and reload",
+    "custom set enemy/gimmick/camera settings survive asset save and reload",
+    "authored Scene HP/positions survive actual Play entry and reset without changing source preset",
+    "rear parry and counter use actual source at 30/60/120fps and both directions",
+    "single attack rejects duplicate requests and returns to idle without looping",
+    "four real combo hits after extended free play",
+    "moving platform carries player at 30/60/120fps and respects slow/pause/reset",
+    "one-way floor drop collision ignores restored on reset",
+    "set switch during charge releases target, invincibility, slow, dim and camera",
+    "custom content survives set changes and restores local transform/physics",
+    "spawned enemy identities are distinct; removed enemy cannot keep attacking",
+    "normal keyboard movement D and attack J",
+    "F1 diagnostics, F2 reset, F3 single enemy attack, F8 still and F9 start/stop",
+    "F2 during F9 recording preserves recorder time and produces a complete MP4",
+    "clean Camera capture excludes OnGUI diagnostics and tool overlay canvas",
+    "zero-frame recording reports failure instead of successful completion",
+    "background execution restored to false when leaving studio",
+    "free-play dash uses normal 18unit/s speed and travels faster than walking",
+    "enemy names remain unique after Scene reload and adding a new prefab instance"
+  ],
+  "authoredScenePlayCheck": {
+    "enemyHp": 11,
+    "sourcePresetHp": 20,
+    "enemyPosition": [
+      1.5,
+      1.0
+    ],
+    "playerResetPosition": [
+      -0.5,
+      1.0
+    ],
+    "temporarySceneEditsDiscardedAfterCheck": true
+  },
+  "liveCapture": {
+    "artifact": "docs/video/previews/studio-live-parry-rough.mp4",
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "decodedFrames": 360,
+    "durationSeconds": 6.0,
+    "repeatedFrames": 42,
+    "audioStreams": 0,
+    "parrySuccesses": 1,
+    "counterHits": 1,
+    "enemyHp": 0,
+    "playerHp": 5,
+    "fullDecode": "passed",
+    "orientationAndContactSheet": "visually inspected"
+  },
+  "shortcutCapture": {
+    "localArtifact": "output/video-studio/studio-20261015-171100-782.mp4",
+    "decodedFrames": 452,
+    "durationSeconds": 7.533333333333333,
+    "repeatedFrames": 67,
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "audioStreams": 0,
+    "fullDecode": "passed",
+    "resetDuringRecording": true
+  },
+  "finalOrdinaryPlayConsole": {
+    "errors": 0,
+    "warnings": 0,
+    "parry": 1,
+    "counter": 1
+  },
+  "externalToolIssue": {
+    "tool": "uloop simulate-keyboard 2.1.3 overlay",
+    "errors": 10,
+    "warnings": 98,
+    "error": "InputVisualizationCanvas component not found on prefab",
+    "origin": "Library/PackageCache/io.github.hatayama.uloopmcp@ad9aed7d228a/Editor/Api/McpTools/Core/OverlayCanvasFactory.cs:61",
+    "scope": "Tool overlay only. Keyboard injection worked; clean Camera capture excluded overlays. No package files modified. Cleared after preserving the cause, then verified ordinary studio Play with zero errors/warnings."
+  },
+  "preserved": [
+    "user's pre-existing uncommitted files",
+    "original two deterministic capture scenes and five existing clips",
+    "player Aseprite rough, showcase mobility, idle and walk"
+  ],
+  "limits": [
+    "current player art is rough; Jump/Fall use placeholder poses",
+    "live recording can repeat frames when rendering is slower than 60fps; JSON exposes repeats",
+    "custom stateful gimmicks require IStudioResettable; destroyed objects/projectiles are not generically respawned",
+    "final player cleanup and original issue 69 final acceptance remain pending"
+  ],
+  "inputFixtureIsolation": {
+    "reason": "Virtual input tests were affected by Editor focus and native held keys after manual input testing",
+    "change": "Temporarily disable enabled native devices and use input settings independent of Editor focus, then restore devices/settings in teardown. Gameplay input code unchanged.",
+    "focusedPanelCheckPassed": 12
+  }
+}

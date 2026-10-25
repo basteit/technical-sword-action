@@ -1,0 +1,104 @@
+{
+    "frameCount": 254,
+    "fps": 60,
+    "duration": 4.233333333333333,
+    "playerArtworkIsRough": true,
+    "takeKind": "sequential",
+    "counterAction": "OverheadHeelDrop",
+    "provisionalActions": [
+        "HorizontalSlash",
+        "VerticalSlash"
+    ],
+    "events": [
+        {
+            "kind": "Slash1",
+            "target": "Enemy_A",
+            "realSeconds": 0.5833333333333335,
+            "tick": 35
+        },
+        {
+            "kind": "Death",
+            "target": "Enemy_A",
+            "realSeconds": 1.1333333333333343,
+            "tick": 66
+        },
+        {
+            "kind": "Slash2",
+            "target": "Enemy_A",
+            "realSeconds": 1.1333333333333343,
+            "tick": 66
+        },
+        {
+            "kind": "RecoveryStart:PlayerVideo_Recovery_HorizontalSlash",
+            "target": "",
+            "realSeconds": 1.4499999999999998,
+            "tick": 83
+        },
+        {
+            "kind": "RearWindup",
+            "target": "Enemy_B",
+            "realSeconds": 1.649999999999999,
+            "tick": 95
+        },
+        {
+            "kind": "RecoveryEnd:PlayerVideo_Recovery_HorizontalSlash",
+            "target": "",
+            "realSeconds": 1.6999999999999989,
+            "tick": 98
+        },
+        {
+            "kind": "Parry",
+            "target": "Enemy_B",
+            "realSeconds": 2.1333333333333308,
+            "tick": 124
+        },
+        {
+            "kind": "CounterStart",
+            "target": "Enemy_B",
+            "realSeconds": 2.3499999999999967,
+            "tick": 134
+        },
+        {
+            "kind": "ChargeStart",
+            "target": "Enemy_B",
+            "realSeconds": 2.633333333333329,
+            "tick": 151
+        },
+        {
+            "kind": "ChargeRelease",
+            "target": "Enemy_B",
+            "realSeconds": 3.299999999999993,
+            "tick": 157
+        },
+        {
+            "kind": "Death",
+            "target": "Enemy_B",
+            "realSeconds": 3.3666666666666598,
+            "tick": 161
+        },
+        {
+            "kind": "Kick",
+            "target": "Enemy_B",
+            "realSeconds": 3.3666666666666598,
+            "tick": 161
+        },
+        {
+            "kind": "Landing",
+            "target": "Enemy_B",
+            "realSeconds": 3.6333333333333255,
+            "tick": 169
+        },
+        {
+            "kind": "RecoveryStart:PlayerVideo_Recovery_AirRoundhouse",
+            "target": "",
+            "realSeconds": 3.649999999999992,
+            "tick": 170
+        },
+        {
+            "kind": "RecoveryEnd:PlayerVideo_Recovery_AirRoundhouse",
+            "target": "",
+            "realSeconds": 4.183333333333324,
+            "tick": 202
+        }
+    ]
+}

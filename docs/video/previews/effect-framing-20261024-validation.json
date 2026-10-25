@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-24",
+  "camera": {
+    "normalBefore": 2.4107142857142856,
+    "normalAfter": 2.8125,
+    "closeBefore": 2.109375,
+    "closeAfter": 2.4107142857142856,
+    "normalPixelScale": 6,
+    "closePixelScale": 7,
+    "frameAllEffectPixels": false,
+    "gameplayCameraChanged": false
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "limitedPlayModeTests": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-23T23:52:02.8423213Z",
+    "TestCount": 12,
+    "PassedCount": 12,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "fullSuiteRerun": false,
+  "repeatedResetSweepRerun": false,
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 5,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "preservation": {
+    "baselineFiles": 2259,
+    "changedIntentionally": 11,
+    "byteIdentical": 2248,
+    "unexpectedChanges": []
+  },
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-effect-framing-20261024.mp4",
+    "sha256": "f338ff9cbe430276200f136c3d971159ee587b956dbcb16835a4282682399e55",
+    "decodedFrames": 308,
+    "durationSeconds": 5.133333333333334,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "eventsAndTimingUnchanged": true
+  },
+  "previewCrf": 22,
+  "overallVideoAccepted": false
+}
