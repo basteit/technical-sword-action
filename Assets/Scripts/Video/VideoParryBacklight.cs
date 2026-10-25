@@ -12,8 +12,10 @@ public sealed class VideoParryBacklight : MonoBehaviour
     private Vector2 contact;
     private Damageable2D target;
     private MaterialPropertyBlock properties;
+    private readonly CombatLightSprites lightSprites=new();
     private static readonly int LightWorld=Shader.PropertyToID("_LightWorld"),Bloom=Shader.PropertyToID("_Bloom"),KeepGold=Shader.PropertyToID("_KeepGold");
     public bool IsVisible {get;private set;}
+    public float Intensity {get;set;}=1;
     public bool IsHaloVisible=>IsVisible&&haloAllowed;
     public Damageable2D Target=>IsVisible?target:null;
     private void Awake()=>properties=new MaterialPropertyBlock();
@@ -75,15 +77,18 @@ public sealed class VideoParryBacklight : MonoBehaviour
         float height=captureCamera.orthographicSize*2;
         backdrop.transform.localPosition=new Vector3(0,0,captureCamera.nearClipPlane+.01f);
         backdrop.transform.localScale=new Vector3(height*Mathf.Max(captureCamera.aspect,16/9f),height,1);
+        backdrop.color=new Color(0,0,0,.99f*Mathf.Clamp01(Intensity));
         bloom.transform.position=new Vector3(contact.x,contact.y,0);bloom.transform.rotation=Quaternion.identity;
         bloom.transform.localScale=new Vector3(3.6f,2.4f,1);
+        bloom.color=new Color(1,1,1,Mathf.Clamp01(Intensity));
         properties.Clear();properties.SetFloat(Bloom,1);bloom.SetPropertyBlock(properties);
         Match(litPlayer,player);Match(litEnemy,enemy);
     }
     private void Match(SpriteRenderer destination,SpriteRenderer source)
     {
-        destination.sprite=source.sprite;destination.flipX=source.flipX;destination.flipY=source.flipY;
-        destination.color=new Color(1,1,1,source.color.a);
+        destination.sprite=lightSprites.For(source);destination.flipX=source.flipX;destination.flipY=source.flipY;
+        destination.drawMode=source.drawMode;destination.size=source.size;destination.tileMode=source.tileMode;
+        destination.color=new Color(1,1,1,source.color.a*Mathf.Clamp01(Intensity));
         destination.transform.localPosition=Vector3.zero;destination.transform.localRotation=Quaternion.identity;destination.transform.localScale=Vector3.one;
         properties.Clear();properties.SetVector(LightWorld,new Vector4(contact.x,contact.y,0,0));properties.SetFloat(Bloom,0);
         properties.SetFloat(KeepGold,keepGold?1:0);
@@ -103,5 +108,6 @@ public sealed class VideoParryBacklight : MonoBehaviour
         foreach(var renderer in new[]{backdrop,bloom,litPlayer,litEnemy})if(renderer!=null)Destroy(renderer.gameObject);
         if(white!=null)Destroy(white);
         if(ownsMaterial&&material!=null)Destroy(material);
+        lightSprites.Clear();
     }
 }

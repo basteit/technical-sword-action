@@ -25,6 +25,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<float>(profile, "launchDistance"), Is.EqualTo(3.2f));
             Assert.That(Get<float>(profile, "cameraOrthographicSize"), Is.EqualTo(3.75f));
             Assert.That(Get<float>(profile, "cameraBlendSeconds"), Is.EqualTo(.1f));
+            Assert.That(Get<Vector2>(profile,"cameraFocusOffset").x,Is.EqualTo(.8f));
+            Assert.That(Get<bool>(profile,"enhancedPresentation"),Is.True);
+            Assert.That(Get<int>(profile,"hitstopFrames"),Is.EqualTo(16));
+            Assert.That(Get<int>(profile,"parryHitstopFrames"),Is.EqualTo(9));
+            Assert.That(Get<int>(profile,"justParryHitstopFrames"),Is.EqualTo(10));
+            Assert.That(Get<Material>(profile,"parryBacklightMaterial"),Is.Not.Null);
+            Assert.That(Get<Material>(profile,"counterLightingMaterial"),Is.Not.Null);
             var art = Get<Object>(profile, "art"); Assert.That(AssetDatabase.GetAssetPath(art), Is.EqualTo(Folder + "CounterCinematicArt.asset"));
             var motions = Get<Array>(art, "motions").Cast<object>().ToArray();
             Assert.That(motions.Select(m => Get<string>(m, "name")), Is.EquivalentTo(new[] { "CounterTransfer", "CounterKick", "Fx_ElectricKick", "CounterKickEffect" }));

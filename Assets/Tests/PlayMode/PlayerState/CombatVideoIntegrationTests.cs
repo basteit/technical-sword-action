@@ -1408,7 +1408,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         public void KickImpactBrieflyPushesCloserWithStrongerShakeThenReturnsAndResets(int fps,bool mirrored)
         {
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,true);
-            var target=(Component)Get<object>(director,"RearEnemy");bool parried=false;
+            var target=(Component)Get<object>(director,"RearEnemy");bool parried=false,framed=false;
             var driver=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
             for(int i=0;i<fps*5&&Get<int>(target,"HitCount")==0;i++)
             {
@@ -1416,8 +1416,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 // The authored third cel carries the impact after the success event.
                 if(!parried&&Get<int>(driver,"ParryImpactCount")>0)
                 {parried=true;Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.InRange(.18f,.23f));}
+                if(Get<bool>(presentation,"IsCharged")&&Get<float>(presentation,"Zoom")>=.9999f)
+                {
+                    float center=(state.transform.position.x+target.transform.position.x)*.5f+Get<int>(counter,"KickFacingSign")*.30f;
+                    Assert.That(Camera.main.transform.position.x-Get<Vector2>(presentation,"ShakeOffset").x,Is.EqualTo(center).Within(.032f));framed=true;
+                }
             }
-            Assert.That(parried,Is.True);Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));
+            Assert.That(parried,Is.True);Assert.That(framed,Is.True);Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));
             // Preserve the stronger kick at every capture rate and in both layouts.
             Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.GreaterThan(.42f));
             Assert.That(Get<Vector2>(presentation,"ShakeOffset").magnitude,Is.LessThanOrEqualTo(.52f));

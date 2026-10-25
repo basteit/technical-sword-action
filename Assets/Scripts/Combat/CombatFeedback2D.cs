@@ -22,6 +22,8 @@ public sealed class CombatFeedback2D : MonoBehaviour
         public Color original, tint;
         public float remaining;
     }
+    private sealed class DirectionalImpulse
+    { public Vector2 direction; public float age, duration, strength, cycles; }
     [SerializeField] private CombatFeedbackProfile profile;
     [SerializeField] private CombatFeedbackSettings settings;
     [SerializeField] private Camera feedbackCamera;
@@ -30,6 +32,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     [SerializeField, Range(4, 64)] private int poolCapacity = 24;
     private readonly List<Effect> pool = new();
     private readonly List<Flash> flashes = new();
+    private readonly List<DirectionalImpulse> directionalImpulses = new();
     private readonly Dictionary<AudioSource, float> audioVolumes = new();
     private PlayerAttack2D attack;
     private PlayerParryCounter2D counter;
@@ -45,6 +48,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     private Vector2 cameraFocusOffset;
     private float baseCameraSize, cameraFocusSize, cameraFocusBlend, cameraBlendSeconds;
     private bool hasCameraFocus, cameraFocusRequested;
+    private float impactZoomAge = -1;
     private float shakeAge, shakeDuration, shakeMagnitude;
     private long lastAudioTick = -1;
     private int lastAudioPriority = -1;
@@ -70,6 +74,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     public Vector3 ShakeOffset => appliedShake;
     public bool HasCameraFocus => hasCameraFocus;
     public float CameraFocusBlend => cameraFocusBlend;
+    public float ImpactZoom { get; private set; }
     public static bool IsManaging(GameObject target)
     {
         var feedback = target != null ? target.GetComponent<CombatFeedback2D>() : null;
@@ -132,36 +137,53 @@ public sealed class CombatFeedback2D : MonoBehaviour
     private void OnSceneChanged(Scene before, Scene after) => ResetPresentation();
     private void OnAttack(Damageable2D target, int step, Vector2 position) =>
         Present(step == 4 ? CombatFeedbackKind.HeavyHit : CombatFeedbackKind.LightHit, position, target);
-    private void OnCounter(Damageable2D target, Vector2 position) => Present(CombatFeedbackKind.Counter, position, target);
-    private void OnParry(Damageable2D target, ParryResult result) =>
+    private void OnCounter(Damageable2D target, Vector2 position)
+    {
+        if (counter != null && counter.CinematicProfile != null && counter.CinematicProfile.enhancedPresentation)
+            PresentAuthoredImpact(CombatFeedbackKind.Counter, position, target);
+        else Present(CombatFeedbackKind.Counter, position, target);
+    }
+    private void OnParry(Damageable2D target, ParryResult result)
+    {
+        var cinematic = GetComponent<PrototypeCounterPresentation>();
+        if (cinematic != null && cinematic.TryPresentParryImpact(target, result)) return;
         Present(result == ParryResult.Just ? CombatFeedbackKind.JustParry : CombatFeedbackKind.Parry,
             target != null ? ((Vector2)target.transform.position + (Vector2)transform.position) * .5f : (Vector2)transform.position, null);
+    }
     private void OnParryMiss() => Present(CombatFeedbackKind.ParryMiss, transform.position, null);
     private void OnPlayerHit(int amount, string source, long sequence) => Present(CombatFeedbackKind.PlayerHit, transform.position, null);
     private void OnSpecial(Damageable2D target, int amount) => Present(CombatFeedbackKind.HeavyHit, target.transform.position, target);
     private void OnDefeat(Damageable2D target, Vector2 direction) => Present(CombatFeedbackKind.Defeat, target.transform.position, null);
 
     public void Present(CombatFeedbackKind kind, Vector2 position, Damageable2D target)
+        => PresentFeedback(kind, position, target, false);
+    // Authored sprites carry the information shape; their presenter owns the timed impact stop.
+    public void PresentAuthoredImpact(CombatFeedbackKind kind, Vector2 position, Damageable2D target)
+        => PresentFeedback(kind, position, target, true);
+    private void PresentFeedback(CombatFeedbackKind kind, Vector2 position, Damageable2D target, bool authored)
     {
         if (!IsReady || CombatTimeController.IsPaused) return;
         var entry = profile.Find(kind);
         LastKind = kind; LastEmissionTick = CombatTimeController.TickCount;
         EmissionCount++; EssentialGlyphCount++;
-        if (entry.hitstopFrames > 0) CombatTimeController.RequestHitstop(this, entry.hitstopFrames / 60f);
+        if (!authored && entry.hitstopFrames > 0) CombatTimeController.RequestHitstop(this, entry.hitstopFrames / 60f);
         float magnitude = entry.shakePixels / 32f * Mathf.Clamp01(Settings.shake);
-        if (magnitude > 0)
+        if (!authored && magnitude > 0)
         {
             shakeAge = 0; shakeDuration = Mathf.Max(shakeDuration, entry.shakeSeconds);
             shakeMagnitude = Mathf.Max(shakeMagnitude, magnitude);
         }
-        var effect = pool.Find(x => !x.root.activeSelf) ?? pool[EmissionCount % pool.Count];
-        effect.kind = kind; effect.position = position; effect.age = 0;
-        effect.duration = entry.lifetimeFrames / 60f; effect.size = entry.glyphSize;
-        effect.decoration = Mathf.Clamp01(Settings.vfx); effect.tint = entry.tint;
-        effect.root.SetActive(true); DrawEffect(effect);
+        if (!authored)
+        {
+            var effect = pool.Find(x => !x.root.activeSelf) ?? pool[EmissionCount % pool.Count];
+            effect.kind = kind; effect.position = position; effect.age = 0;
+            effect.duration = entry.lifetimeFrames / 60f; effect.size = entry.glyphSize;
+            effect.decoration = Mathf.Clamp01(Settings.vfx); effect.tint = entry.tint;
+            effect.root.SetActive(true); DrawEffect(effect);
+        }
         SpriteRenderer sprite = kind == CombatFeedbackKind.PlayerHit ? GetComponentInChildren<SpriteRenderer>() :
             target != null ? target.GetComponentInChildren<SpriteRenderer>() : null;
-        if (sprite != null && entry.flashFrames > 0 && Settings.flash > 0)
+        if (!authored && sprite != null && entry.flashFrames > 0 && Settings.flash > 0)
         {
             var flash = flashes.Find(x => x.renderer == sprite);
             if (flash == null) { flash = new Flash { renderer = sprite, original = sprite.color }; flashes.Add(flash); }
@@ -178,6 +200,14 @@ public sealed class CombatFeedback2D : MonoBehaviour
             sound.Play(); lastAudioTick = CombatTimeController.TickCount; lastAudioPriority = priority;
         }
     }
+    public void ShakeDirectional(float seconds, float strength, Vector2 direction, float cycles)
+    {
+        if (!IsReady || seconds <= 0 || strength <= 0 || !float.IsFinite(seconds) || !float.IsFinite(strength) ||
+            !float.IsFinite(direction.x) || !float.IsFinite(direction.y) || !float.IsFinite(cycles)) return;
+        directionalImpulses.Add(new DirectionalImpulse {duration=seconds, strength=strength, direction=direction.normalized, cycles=cycles});
+    }
+    public void PunchCamera(UnityEngine.Object owner)
+    { if (hasCameraFocus && cameraFocusOwner == owner) { impactZoomAge = 0; ImpactZoom = 0; } }
     public bool FocusCamera(UnityEngine.Object owner, Transform subject, Vector2 offset, float size, float blendSeconds)
     {
         if (!IsReady || owner == null || subject == null || feedbackCamera == null || !feedbackCamera.orthographic ||
@@ -201,6 +231,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     }
     private void RestoreCameraFocus()
     {
+        impactZoomAge = -1; ImpactZoom = 0;
         if (!hasCameraFocus) return;
         if (feedbackCamera != null)
         {
@@ -266,6 +297,20 @@ public sealed class CombatFeedback2D : MonoBehaviour
             { if (f.renderer != null) f.renderer.color = f.original; flashes.RemoveAt(i); }
         }
         shakeAge += realSeconds;
+        if (impactZoomAge >= 0)
+        {
+            impactZoomAge += realSeconds;
+            ImpactZoom = impactZoomAge < 2f/60 ? impactZoomAge/(2f/60) :
+                1-Mathf.Clamp01((impactZoomAge-8f/60)/(12f/60));
+            if (impactZoomAge >= 20f/60) { impactZoomAge = -1; ImpactZoom = 0; }
+        }
+        Vector2 directional = Vector2.zero;
+        for (int i=directionalImpulses.Count-1; i>=0; i--)
+        {
+            var impulse=directionalImpulses[i];float t=Mathf.Clamp01(impulse.age/impulse.duration);
+            directional += impulse.direction*impulse.strength*(1-t)*(1-t)*Mathf.Cos(t*Mathf.PI*2*impulse.cycles);
+            impulse.age += realSeconds;if(impulse.age>=impulse.duration)directionalImpulses.RemoveAt(i);
+        }
         if (feedbackCamera != null)
         {
             // Compose focus and shake here so no second component writes the camera.
@@ -280,7 +325,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
                 Vector3 subject = cameraSubject.position + (Vector3)cameraFocusOffset;
                 subject.z = baseCameraPosition.z;
                 cameraPosition = Vector3.Lerp(baseCameraPosition, subject, cameraFocusBlend);
-                feedbackCamera.orthographicSize = Mathf.Lerp(baseCameraSize, cameraFocusSize, cameraFocusBlend);
+                feedbackCamera.orthographicSize = Mathf.Lerp(baseCameraSize, cameraFocusSize*(1-.06f*ImpactZoom), cameraFocusBlend);
                 if (!cameraFocusRequested && cameraFocusBlend == 0) RestoreCameraFocus();
             }
             else
@@ -291,6 +336,8 @@ public sealed class CombatFeedback2D : MonoBehaviour
             }
             float strength = shakeDuration > 0 ? Mathf.Clamp01(1 - shakeAge / shakeDuration) : 0;
             appliedShake = Settings.shake <= 0 ? Vector3.zero : new Vector3(Mathf.Sin(shakeAge * 95), Mathf.Cos(shakeAge * 71) * .4f) * (shakeMagnitude * strength);
+            if (Settings.shake > 0 && directionalImpulses.Count > 0)
+                appliedShake = Vector2.ClampMagnitude((Vector2)appliedShake+directional*Mathf.Clamp01(Settings.shake),.52f);
             appliedShake.x = Mathf.Round(appliedShake.x * 32) / 32;
             appliedShake.y = Mathf.Round(appliedShake.y * 32) / 32;
             feedbackCamera.transform.position = cameraPosition + appliedShake;
@@ -313,6 +360,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
         RestoreCameraFocus();
         if (feedbackCamera != null) feedbackCamera.transform.position -= appliedShake;
         appliedShake = Vector3.zero; shakeAge = shakeDuration = shakeMagnitude = 0;
+        directionalImpulses.Clear(); impactZoomAge = -1; ImpactZoom = 0;
         sound?.Stop(); lastAudioTick = -1; lastAudioPriority = -1;
         CombatTimeController.ReleaseOwner(this);
     }

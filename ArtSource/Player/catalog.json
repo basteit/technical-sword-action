@@ -607,7 +607,7 @@
             "Assets/Art/Player/VideoSubmitted/HorizontalSlash_01.png",
             "Assets/Settings/CombatVideoArt.asset"
           ],
-          "evidence": "docs/video/kick-shake-attack2-20261025.md"
+          "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
         },
         {
           "consumer": "prototype",
@@ -617,7 +617,7 @@
             "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
             "Assets/Scenes/PrototypeCombatValidation.unity"
           ],
-          "evidence": "docs/video/kick-shake-attack2-20261025.md"
+          "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
         }
       ]
     },
@@ -1090,7 +1090,7 @@
             "Assets/Animations/Player/Submitted/PlayerPrototype_ParrySuccess.anim",
             "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset"
           ],
-          "evidence": "docs/video/parry-update-invert4-20261025.md"
+          "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
         }
       ]
     },
@@ -1307,7 +1307,7 @@
             "Assets/Settings/PrototypeCombat/CounterCinematic.asset",
             "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim"
           ],
-          "evidence": "docs/video/counter-lighting-20261025.md"
+          "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
         }
       ]
     },
@@ -1927,7 +1927,7 @@
             "Assets/Settings/PrototypeCombat/CounterCinematicArt.asset",
             "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim"
           ],
-          "evidence": "docs/video/counter-revision-and-camera-comparison-20261024.md"
+          "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
         }
       ]
     },
@@ -2370,7 +2370,7 @@
           "references": [
             "Assets/Settings/PrototypeCombat/CounterCinematicArt.asset"
           ],
-          "evidence": "docs/video/counter-revision-and-camera-comparison-20261024.md"
+          "evidence": "docs/video/prototype-presentation-and-slash2-20261025.md"
         }
       ]
     }

@@ -78,6 +78,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(body.gravityScale, Is.GreaterThan(0));
             Assert.That(Camera.main.orthographicSize, Is.EqualTo(5.625f));
             Assert.That(Get<bool>(feedback, "HasCameraFocus"), Is.False);
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
+            Assert.That(Get<string>(presentation,"CounterLightPhase"),Is.EqualTo("None"));
+            Assert.That(Get<float>(feedback,"ImpactZoom"),Is.Zero);
         }
 
         [UnitySetUp] public IEnumerator Setup()
@@ -131,7 +134,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<float>(gauge, "CurrentGauge"), Is.EqualTo(3));
             Assert.That(player.GetComponent<SpriteRenderer>().sprite, Is.SameAs(Get<Sprite>(profile, "ContactSprite")));
             Assert.That(Get<bool>(launch, "IsActive"), Is.True);
-            long tick = TimeValue<long>("TickCount"); Frames(1); Assert.That(TimeValue<long>("TickCount"), Is.EqualTo(tick), "The 8F contact stop must freeze motion and the impact cel.");
+            long tick = TimeValue<long>("TickCount"); Frames(1); Assert.That(TimeValue<long>("TickCount"), Is.EqualTo(tick), "The contact stop must freeze motion and the impact cel.");
             Until(() => !Get<bool>(counter, "IsActive")); Until(() => !Get<bool>(launch, "IsActive")); Frames(6);
             Assert.That(Get<float>(launch, "TravelDistance"), Is.EqualTo(3.2f).Within(.02f));
             Assert.That(Get<int>(target, "CurrentHp"), Is.EqualTo(30)); Assert.That(Get<int>(target, "HitCount"), Is.EqualTo(1));
@@ -139,7 +142,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(body.gravityScale, Is.EqualTo(gravity)); AssertClean();
         }
 
-        [TestCase(5)] [TestCase(10)]
+        [TestCase(1)] [TestCase(10)]
         public void BufferedCounterConsumesParryPoseWithoutReplayingSuccessAfterward(int parryFrame)
         {
             body.position = new Vector2(0, .81f); player.transform.position = body.position;
@@ -151,7 +154,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             object context = Activator.CreateInstance(T("CombatHitContext2D"), target, 91L, true,
                 Enum.Parse(T("ParryReactionWeight"), "Light"));
             Call(receiver, "TryReceiveContextHit", 10, (Vector2)target.transform.position, 0f, context);
-            Assert.That(Get<object>(parry, "LastParryResult").ToString(), Is.EqualTo(parryFrame == 5 ? "Just" : "Normal"));
+            Assert.That(Get<object>(parry, "LastParryResult").ToString(), Is.EqualTo(parryFrame == 1 ? "Just" : "Normal"));
+            Until(() => !TimeValue<bool>("IsHitStopped"));
             Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
             Until(() => Get<bool>(counter, "IsActive"));
             Until(() => !Get<bool>(counter, "IsActive"));
@@ -287,7 +291,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var target = Begin(direction, false, 30); ToFrame(21);
             Assert.That(Get<bool>(target, "IsAlive"), Is.False); Assert.That(target.gameObject.activeSelf, Is.True);
             Assert.That(Get<int>(target, "DeathPresentationOwnerCount"), Is.GreaterThan(0));
-            var launch = target.GetComponent(T("EnemyCounterLaunch2D")); Frames(12);
+            var launch = target.GetComponent(T("EnemyCounterLaunch2D")); Until(() => !TimeValue<bool>("IsHitStopped")); Frames(12);
             Assert.That(Get<float>(launch, "TravelDistance"), Is.GreaterThan(.5f));
             Until(() => !target.gameObject.activeSelf); Until(() => !Get<bool>(counter, "IsActive")); Frames(6);
             Assert.That(Get<int>(target, "DeathCount"), Is.EqualTo(1)); Assert.That(Get<int>(target, "MotionOwnerCount"), Is.Zero); AssertClean();
@@ -437,6 +441,141 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(counter, "IsActive"), Is.True); Assert.That(Get<bool>(presentation, "IsCharged"), Is.True);
         }
 
+        private void RenderAt(int fps)
+        {
+            Call(clock,"AdvanceFrame",1d/fps);
+            Call(presentation,"AdvanceVisuals",1f/fps);Call(feedback,"AdvanceVisuals",1f/fps);
+        }
+        private Component BeginActualParry(int direction,bool just)
+        {
+            body.position=new Vector2(0,.81f);player.transform.position=body.position;body.linearVelocity=Vector2.zero;
+            Call(motor,"SetFacing",direction);Call(motor,"SetMoveInput",Vector2.zero);
+            var target=Enemy("StrongMelee",body.position+Vector2.right*direction*1.15f,120);
+            Assert.That((bool)Call(player,"RequestAction",PlayerActionRequest.Parry),Is.True);Frames(just?1:10);
+            int impacts=Get<int>(presentation,"ParryImpactCount");
+            var context=Activator.CreateInstance(T("CombatHitContext2D"),target,987L,true);
+            Call(player.GetComponent(T("PlayerDamageReceiver2D")),"TryReceiveContextHit",1,(Vector2)target.transform.position,0f,context);
+            Assert.That(Get<int>(presentation,"ParryImpactCount"),Is.EqualTo(impacts+1));
+            Assert.That(Get<long>(presentation,"ParryImpactTick"),Is.EqualTo(TimeValue<long>("TickCount")));
+            return target;
+        }
+        [TestCase(30,1,false)] [TestCase(60,1,false)] [TestCase(120,1,false)]
+        [TestCase(30,-1,true)] [TestCase(60,-1,true)] [TestCase(120,-1,true)]
+        public void GameplayParryLightsItsThirdCelForFourRealFramesWithoutLegacyGlyphs(int fps,int direction,bool just)
+        {
+            Set(Get<object>(feedback,"Settings"),"shake",1f);var target=BeginActualParry(direction,just);
+            RenderAt(fps);var profile=Get<object>(counter,"CinematicProfile");
+            Assert.That(player.GetComponent<SpriteRenderer>().sprite,Is.SameAs(Get<Sprite>(profile,"parryContactSprite")));
+            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.InRange((just?10:9)-Mathf.CeilToInt(60f/fps),just?10:9));
+            Assert.That(Get<int>(feedback,"ActiveEffectCount"),Is.Zero,"The authored spark replaces the procedural glyph.");
+            Assert.That(Get<Vector3>(feedback,"ShakeOffset").magnitude,Is.InRange(.18f,.25f));
+            long tick=TimeValue<long>("TickCount");var sprite=player.GetComponent<SpriteRenderer>().sprite;int lit=0;
+            while(Get<bool>(presentation,"IsParryBacklit")&&lit<fps)
+            {lit++;RenderAt(fps);Assert.That(TimeValue<long>("TickCount"),Is.EqualTo(tick));Assert.That(player.GetComponent<SpriteRenderer>().sprite,Is.SameAs(sprite));}
+            Assert.That(lit,Is.EqualTo(fps*4/60));
+            Frames(35);Assert.That(Get<int>(target,"HitCount"),Is.Zero);AssertClean();
+        }
+        [TestCase(30,1)] [TestCase(60,1)] [TestCase(120,1)]
+        [TestCase(30,-1)] [TestCase(60,-1)] [TestCase(120,-1)]
+        public void GameplayCounterSharesRimPulseImpactLightAndStrongCameraWithoutChangingDamage(int fps,int direction)
+        {
+            Set(Get<object>(feedback,"Settings"),"shake",1f);var target=Begin(direction);
+            float low=1,high=0;int samples=0;
+            for(int i=0;i<fps*5&&Get<int>(target,"HitCount")==0;i++)
+            {
+                RenderAt(fps);
+                if(Get<string>(presentation,"CounterLightPhase")=="Charge")
+                {float pulse=Get<float>(presentation,"CounterRimPulse");low=Mathf.Min(low,pulse);high=Mathf.Max(high,pulse);samples++;}
+            }
+            Assert.That(samples,Is.GreaterThan(fps*.7f));Assert.That(low,Is.LessThan(.18f));Assert.That(high,Is.GreaterThan(.98f));
+            Assert.That(Get<string>(presentation,"CounterLightPhase"),Is.EqualTo("Flash"));
+            Assert.That(Get<Vector3>(feedback,"ShakeOffset").magnitude,Is.InRange(.42f,.54f));
+            Assert.That(Get<int>(target,"CurrentHp"),Is.EqualTo(30));Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));
+            var position=Camera.main.transform.position;int lightFrame=Get<int>(presentation,"CounterLightFrame");
+            Static("SetPaused",true);for(int i=0;i<fps;i++)RenderAt(fps);
+            Assert.That(Camera.main.transform.position,Is.EqualTo(position));Assert.That(Get<int>(presentation,"CounterLightFrame"),Is.EqualTo(lightFrame));
+            Static("SetPaused",false);for(int i=0;i<Mathf.CeilToInt(fps*2/60f);i++)RenderAt(fps);
+            Assert.That(Get<float>(feedback,"ImpactZoom"),Is.EqualTo(1).Within(.001f));Assert.That(Camera.main.orthographicSize,Is.LessThan(3.75f));
+            Until(()=>!Get<bool>(counter,"IsActive"));Frames(30);AssertClean();
+        }
+        [TestCase("Reset")] [TestCase("Disable")] [TestCase("TargetLost")]
+        public void ParryImpactClearsOnResetDisableOrTargetLossWithoutResurrecting(string operation)
+        {
+            var target=BeginActualParry(1,true);int count=Get<int>(presentation,"ParryImpactCount");
+            if(operation=="Reset")Call(arena,"ResetActionsOnly");
+            else if(operation=="Disable"){((Behaviour)presentation).enabled=false;((Behaviour)presentation).enabled=true;}
+            else target.gameObject.SetActive(false);
+            Frames(35);Assert.That(Get<int>(presentation,"ParryImpactCount"),Is.EqualTo(count));AssertClean();
+        }
+        [UnityTest]
+        public IEnumerator ActualParryAndEnhancedCounterRepeatTenTimesWithoutPresentationOrDamageResidue()
+        {
+            Set(Get<object>(feedback,"Settings"),"shake",1f);
+            foreach(int direction in new[]{1,-1})
+            for(int run=0;run<10;run++)
+            {
+                Call(arena,"ResetActionsOnly");yield return null;Frames(2);var target=BeginActualParry(direction,run%2==0);
+                Until(()=>Get<PlayerActionState>(player,"ActionState")==PlayerActionState.Neutral);
+                Assert.That((bool)Call(player,"RequestAction",PlayerActionRequest.Attack),Is.True);Frames(1);
+                Assert.That(Get<bool>(counter,"IsActive"),Is.True);
+                Until(()=>!Get<bool>(counter,"IsActive"));Frames(30);
+                Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));Assert.That(Get<int>(target,"CurrentHp"),Is.EqualTo(30));AssertClean();
+                Call(arena,"ResetActionsOnly");Frames(2);Assert.That(Get<int>(presentation,"ActiveEffectCount"),Is.Zero);AssertClean();
+            }
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void CameraLocalLightsKeepThePrototypeEnemiesSlicedBodySizeAndFlashStrength(bool kick)
+        {
+            Set(Get<object>(feedback,"Settings"),"flash",.5f);
+            Component target;
+            if(kick){target=Begin();ToFrame(21);}
+            else{target=BeginActualParry(1,true);Call(presentation,"AdvanceVisuals",0f);}
+            var light=Camera.main.GetComponent(T(kick?"VideoCounterLighting":"VideoParryBacklight"));
+            Call(light,"BeforeCamera",default(UnityEngine.Rendering.ScriptableRenderContext),Camera.main);
+            try
+            {
+                var original=target.GetComponentsInChildren<SpriteRenderer>().Single(r=>r.name=="HeavySilhouette");
+                var lit=target.GetComponentsInChildren<SpriteRenderer>().Single(r=>r.name==(kick?"CounterLitEnemy":"ParryLitEnemy"));
+                Assert.That(original.drawMode,Is.EqualTo(SpriteDrawMode.Sliced));
+                Assert.That(lit.drawMode,Is.EqualTo(original.drawMode));Assert.That(lit.size,Is.EqualTo(original.size));
+                Assert.That(lit.bounds.size,Is.EqualTo(original.bounds.size));Assert.That(lit.color.a,Is.EqualTo(.5f));
+                Assert.That(lit.sprite.texture,Is.SameAs(original.sprite.texture));Assert.That(lit.sprite.triangles.Length,Is.EqualTo(6));
+                var cached=lit.sprite;Call(light,"BeforeCamera",default(UnityEngine.Rendering.ScriptableRenderContext),Camera.main);
+                Assert.That(lit.sprite,Is.SameAs(cached),"Reuse the full-rect drawing instead of allocating every render.");
+            }
+            finally{Call(light,"AfterCamera",default(UnityEngine.Rendering.ScriptableRenderContext),Camera.main);}
+        }
+        [TestCase(1)] [TestCase(-1)]
+        public void ParryAcceptsAHitOnItsFirstTickAndShowsTheImpactWithoutAVisualDelay(int direction)
+        {
+            body.position=new Vector2(0,.81f);player.transform.position=body.position;Call(motor,"SetFacing",direction);
+            var target=Enemy("StrongMelee",body.position+Vector2.right*direction*1.15f,120);
+            var parry=player.GetComponent(T("PlayerParry2D"));
+            Assert.That(Get<int>(parry,"AcceptanceStartFrame"),Is.Zero);
+            Assert.That((bool)Call(player,"RequestAction",PlayerActionRequest.Parry),Is.True);Call(player,"CombatTick");
+            Assert.That(Get<int>(parry,"ElapsedFrames"),Is.Zero);
+            int impacts=Get<int>(presentation,"ParryImpactCount");var context=Activator.CreateInstance(T("CombatHitContext2D"),target,876L,true);
+            Call(player.GetComponent(T("PlayerDamageReceiver2D")),"TryReceiveContextHit",1,(Vector2)target.transform.position,0f,context);
+            Assert.That(Get<int>(presentation,"ParryImpactCount"),Is.EqualTo(impacts+1));
+            Assert.That(Get<long>(presentation,"ParryImpactTick"),Is.EqualTo(TimeValue<long>("TickCount")));
+            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(10));
+            var profile=Get<object>(counter,"CinematicProfile");Assert.That(player.GetComponent<SpriteRenderer>().sprite,Is.SameAs(Get<Sprite>(profile,"parryContactSprite")));
+            Frames(11);Assert.That(player.GetComponent<SpriteRenderer>().sprite.name,Is.Not.EqualTo("ParrySuccessLight_01"));
+        }
+        [Test] public void EmptyParryHoldsTheReadyPoseAndNeverPlaysTheSuccessImpact()
+        {
+            int impacts=Get<int>(presentation,"ParryImpactCount"),emissions=Get<int>(feedback,"EmissionCount");
+            Assert.That((bool)Call(player,"RequestAction",PlayerActionRequest.Parry),Is.True);Frames(1);
+            var pose=Get<Sprite>(Get<object>(counter,"CinematicProfile"),"parryWaitSprite");int held=0;
+            while(Get<PlayerActionState>(player,"ActionState")!=PlayerActionState.Neutral&&held++<40)
+            {
+                Assert.That(player.GetComponent<SpriteRenderer>().sprite,Is.SameAs(pose));
+                Assert.That(Get<int>(presentation,"ParryImpactCount"),Is.EqualTo(impacts));
+                Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);Assert.That(TimeValue<bool>("IsHitStopped"),Is.False);Step();
+            }
+            Assert.That(held,Is.InRange(25,28));
+            Assert.That(Get<int>(feedback,"EmissionCount")-emissions,Is.LessThanOrEqualTo(1),"Only the existing miss cue may occur.");
+        }
         [UnityTest] public IEnumerator ActiveSceneChangeRestoresCounterAndLaunchOwnership()
         {
             Set(Get<object>(feedback, "Settings"), "shake", 1f);

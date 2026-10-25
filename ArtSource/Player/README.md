@@ -2,6 +2,8 @@
 
 [素材一覧を開く](INDEX.md)
 
+2026-10-25斬撃2の表示修正：受領2版目の原稿はそのまま保持し、出力用コピーのEffectだけを表示して斬撃を復元しました。Body内の新しい剣を使い、古いSwordは非表示のままです。確認用原稿は `Assets/Art/Player/VideoSubmitted/20261025/Player_attack_2_effects_preview.aseprite`。原稿版やネイティブ時間は増減せず、検証後に撮影/本編の使用証跡を更新します。[復元・プロトタイプ演出・即時成功](../../docs/video/prototype-presentation-and-slash2-20261025.md)。
+
 2026-10-25攻撃2更新：`attack_2` の2版目（128px/8×70ms、後ろ髪を含む）を登録・共有PNG8枚へ反映。全34tick/命中13tick/判定と全Clip/Controllerを保持し、Attack 2個別更新メニューを追加しました。動画の関連PlayModeと本編の参照/ClipのEditMode確認後に使用版を記録。[原稿・揺れ・動画・検証](../../docs/video/kick-shake-attack2-20261025.md)。
 
 2026-10-25攻撃1更新：`attack_1` の2版目（128px/9×70ms、後ろ髪を含む）を登録・共有PNG9枚へ反映しました。命中17tick/次段29tick/全38tickとリーチ、全Clip/Controllerを保持。個別のAttack 1更新メニューを追加し、動画はPlayMode、本編は参照/ClipのEditMode確認後に使用版を記録します。[原稿・動画・照明の調整](../../docs/video/counter-pulse-attack1-20261025.md)。

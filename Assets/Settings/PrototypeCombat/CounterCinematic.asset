@@ -28,13 +28,22 @@ MonoBehaviour:
   hitRadius: 0.5
   chargeScale: 0.15
   chargeRealSeconds: 0.95
-  hitstopFrames: 8
+  hitstopFrames: 16
   dimStrength: 0.965
   heroLiftStrength: 0.6
   dimFadeSeconds: 0.05
   cameraOrthographicSize: 3.75
-  cameraFocusOffset: {x: 0.45, y: 0.4}
+  cameraFocusOffset: {x: 0.8, y: 0.4}
   cameraBlendSeconds: 0.1
   launchDistance: 3.2
   launchHeight: 0.65
   launchFrames: 22
+  enhancedPresentation: 1
+  parryBacklightMaterial: {fileID: 2100000, guid: e1ea5eabfa1e06542a2fbfc41d5f42c5, type: 2}
+  counterLightingMaterial: {fileID: 2100000, guid: 51fc69c70358d2e458c0364ef4b41b14, type: 2}
+  parryContactSprite: {fileID: 21300000, guid: 1e988b5e1f4e8f24babc07aa67ea253b, type: 3}
+  parryWaitSprite: {fileID: 21300000, guid: 92dde6b3e6bcc5f4a83c2000e7556742, type: 3}
+  parrySuccessStartNormalized: 0.3
+  parryContactOffset: {x: 1.40625, y: 0.1875}
+  parryHitstopFrames: 9
+  justParryHitstopFrames: 10

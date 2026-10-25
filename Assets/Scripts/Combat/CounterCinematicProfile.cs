@@ -27,11 +27,21 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(.001f)] public float dimFadeSeconds = 3f / 60f;
     [Header("Gameplay camera close-up")]
     [Min(.01f)] public float cameraOrthographicSize = 3.75f;
-    public Vector2 cameraFocusOffset = new Vector2(.45f, .4f);
+    public Vector2 cameraFocusOffset = new Vector2(.8f, .4f);
     [Min(.001f)] public float cameraBlendSeconds = .1f;
     [Min(0)] public float launchDistance = 3.2f;
     [Min(0)] public float launchHeight = .65f;
     [Min(1)] public int launchFrames = 22;
+    [Header("Shared impact lighting (opt-in gameplay presentation)")]
+    public bool enhancedPresentation;
+    public Material parryBacklightMaterial;
+    public Material counterLightingMaterial;
+    public Sprite parryContactSprite;
+    public Sprite parryWaitSprite;
+    [Range(0,1)] public float parrySuccessStartNormalized;
+    public Vector2 parryContactOffset;
+    [Min(0)] public int parryHitstopFrames = 9;
+    [Min(0)] public int justParryHitstopFrames = 10;
     public int BlinkArrivalFrame => blinkStartFrame + blinkTravelFrames;
     public VideoArtLibrary.Motion Transfer => art != null ? art.Find("CounterTransfer") : null;
     public VideoArtLibrary.Motion Kick => art != null ? art.Find("CounterKick") : null;
@@ -52,7 +62,12 @@ public sealed class CounterCinematicProfile : ScriptableObject
         Transfer.TotalFrames == BlinkArrivalFrame && Transfer.TotalFrames + Kick.TotalFrames == endFrame &&
         Valid(art.Find("Fx_ElectricKick")) &&
         (art.Find("CounterKickEffect")==null||Valid(art.Find("CounterKickEffect"))&&art.Find("CounterKickEffect").TotalFrames==Kick.TotalFrames) &&
-        subjectLiftShader != null && glowMaterial != null;
+        subjectLiftShader != null && glowMaterial != null &&
+        (!enhancedPresentation || parryBacklightMaterial != null && counterLightingMaterial != null &&
+            parryContactSprite != null && parryWaitSprite != null && Finite(parrySuccessStartNormalized) &&
+            parrySuccessStartNormalized >= 0 && parrySuccessStartNormalized < 1 &&
+            Finite(parryContactOffset.x) && Finite(parryContactOffset.y) &&
+            parryHitstopFrames >= 0 && justParryHitstopFrames >= 0);
     public Sprite Sample(int frame) => frame < BlinkArrivalFrame ? Transfer.At(frame) : Kick.At(frame - BlinkArrivalFrame);
     private static bool Finite(float value) => float.IsFinite(value);
     private static bool Valid(VideoArtLibrary.Motion motion) => motion != null && motion.frames != null &&

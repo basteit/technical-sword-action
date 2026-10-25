@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad610f55d52bae8418c6e30f71f9e7a4, type: 3}
   m_Name: ParryTiming
   m_EditorClassIdentifier: Assembly-CSharp::ParryTimingDefinition
-  startFrame: 5
-  justEndFrame: 8
-  endFrame: 18
+  startFrame: 0
+  justEndFrame: 3
+  endFrame: 13
   failEndFrame: 26
   successFrames: 10
   justSuccessFrames: 8

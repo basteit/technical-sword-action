@@ -14,6 +14,29 @@ public static class PrototypeCounterCinematicInstaller
     private const string ClipPath = "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim";
     private static readonly EditorCurveBinding SpriteBinding = EditorCurveBinding.PPtrCurve("", typeof(SpriteRenderer), "m_Sprite");
 
+    [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Impact Presentation")]
+    public static void RefreshImpactPresentation()
+    {
+        if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode before updating presentation.");
+        var profile = AssetDatabase.LoadAssetAtPath<CounterCinematicProfile>(ProfilePath);
+        var art = AssetDatabase.LoadAssetAtPath<VideoArtLibrary>("Assets/Settings/CombatVideoArt.asset");
+        if (profile == null || art?.Find("ParrySuccessLight") == null) throw new InvalidOperationException("Install the existing counter and parry artwork first.");
+        var parry = art.Find("ParrySuccessLight");
+        profile.enhancedPresentation = true;
+        profile.parryBacklightMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Settings/VideoParryBacklight.mat");
+        profile.counterLightingMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Settings/VideoCounterLighting.mat");
+        profile.parryContactSprite = parry.At(parry.hitFrame); profile.parryContactOffset = parry.parryContactOffset;
+        profile.parryWaitSprite = art.Find("ParryReady").frames[^1];
+        profile.parrySuccessStartNormalized = parry.hitFrame/(float)parry.TotalFrames;
+        profile.cameraFocusOffset = new Vector2(.8f,profile.cameraFocusOffset.y);
+        profile.parryHitstopFrames = 9; profile.justParryHitstopFrames = 10; profile.hitstopFrames = 16;
+        if (!profile.IsValid) throw new InvalidOperationException("Invalid impact presentation references.");
+        EditorUtility.SetDirty(profile); AssetDatabase.SaveAssetIfDirty(profile);
+        var timing=AssetDatabase.LoadAssetAtPath<ParryTimingDefinition>("Assets/Settings/PrototypeCombat/ParryTiming.asset");
+        timing.startFrame=0;timing.justEndFrame=3;timing.endFrame=13;
+        EditorUtility.SetDirty(timing);AssetDatabase.SaveAssetIfDirty(timing);
+    }
+
     [MenuItem("Tools/Technical Sword Action/Prototype/Install Counter Cinematic")]
     public static void Install()
     {

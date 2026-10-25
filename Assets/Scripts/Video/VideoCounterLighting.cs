@@ -12,12 +12,14 @@ public sealed class VideoCounterLighting : MonoBehaviour
     private Damageable2D target;
     private Material material;
     private MaterialPropertyBlock properties;
+    private readonly CombatLightSprites lightSprites=new();
     private Sprite white;
     private bool ownsMaterial,fresh,charging;
     private float impactAge=-1,visualAge,progress;
     private Vector2 contact;
     private int facing;
     public bool IsVisible {get;private set;}
+    public float Intensity {get;set;}=1;
     public float ChargeProgress=>charging?progress:0;
     public int ImpactFrame=>impactAge>=0?Mathf.FloorToInt(impactAge*60+.0001f):-1;
     public string Phase=>!IsVisible?"None":charging?"Charge":ImpactFrame<FlashFrames?"Flash":"Fade";
@@ -82,16 +84,18 @@ public sealed class VideoCounterLighting : MonoBehaviour
         float height=captureCamera.orthographicSize*2;
         backdrop.transform.localPosition=new Vector3(0,0,captureCamera.nearClipPlane+.015f);
         backdrop.transform.localScale=new Vector3(height*Mathf.Max(captureCamera.aspect,16/9f),height,1);
-        float darkness=.99f*ImpactWeight;
+        float darkness=.99f*ImpactWeight*Mathf.Clamp01(Intensity);
         backdrop.color=new Color(0,.001f,.004f,darkness);
         field.transform.position=new Vector3(contact.x,contact.y,0);field.transform.rotation=Quaternion.identity;
         field.transform.localScale=new Vector3(8,6,1);ApplyProperties(field,false);
+        field.color=new Color(1,1,1,Mathf.Clamp01(Intensity));
         Match(litPlayer,player);Match(litEnemy,enemy);
     }
     private void Match(SpriteRenderer destination,SpriteRenderer source)
     {
-        destination.sprite=source.sprite;destination.flipX=source.flipX;destination.flipY=source.flipY;
-        destination.color=new Color(1,1,1,source.color.a);destination.transform.localPosition=Vector3.zero;
+        destination.sprite=lightSprites.For(source);destination.flipX=source.flipX;destination.flipY=source.flipY;
+        destination.drawMode=source.drawMode;destination.size=source.size;destination.tileMode=source.tileMode;
+        destination.color=new Color(1,1,1,source.color.a*Mathf.Clamp01(Intensity));destination.transform.localPosition=Vector3.zero;
         destination.transform.localRotation=Quaternion.identity;destination.transform.localScale=Vector3.one;ApplyProperties(destination,true);
     }
     private void SetRenderers(bool visible)
@@ -107,5 +111,6 @@ public sealed class VideoCounterLighting : MonoBehaviour
     {
         foreach(var renderer in new[]{backdrop,field,litPlayer,litEnemy})if(renderer!=null)Destroy(renderer.gameObject);
         if(white!=null)Destroy(white);if(ownsMaterial&&material!=null)Destroy(material);
+        lightSprites.Clear();
     }
 }

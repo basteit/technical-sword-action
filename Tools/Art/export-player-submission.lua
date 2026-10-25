@@ -24,6 +24,15 @@ for _,cel in ipairs(guide.cels) do for p in cel.image:pixels() do
   local c=p();assert(app.pixelColor.rgbaA(c)==0 or c==app.pixelColor.rgba(0,0,0,255),'Guide contains artwork; inspect before export')
 end end
 guide.isVisible=false
+-- Restore the existing trail without bringing back the older hidden sword drawing.
+-- The current sword is already in Body. Keep Current/History byte-identical.
+local restoreAttackLayers=action=='HorizontalSlash' and app.params['restore-attack-layers']~='false'
+if restoreAttackLayers then
+  for _,name in ipairs{'Effect'} do
+    local found=nil;for _,layer in ipairs(s.layers) do if layer.name==name then found=layer end end
+    assert(found,'Missing restored attack layer: '..name);found.isVisible=true
+  end
+end
 local frames={};local eyes={};local native={};local cumulative=0;local start=0;local hitFrame=0;local branchFrame=0;local nativeMs=0
 local sheet=Image(128*#s.frames,128,ColorMode.RGB)
 for i,f in ipairs(s.frames) do
@@ -51,14 +60,15 @@ local recoveryFrame=branchFrame
 if action=='VerticalSlash' then branchFrame=29 end
 sheet:saveAs(out..'/'..action..'.png')
 local t=s:newTag(1,count);t.name=action
--- The editable review copy gains only a tag and hidden construction guide.
+-- The editable review copy records the export visibility as well as its Action tag.
 local review=out..'/Player_attack_'..number..'_preview.aseprite'
 s:saveAs(review);s:close()
 local reopen=assert(app.open(review))
 assert(#reopen.frames==count and reopen.tags[1].name==action and not reopen.layers[1].isVisible)
+if restoreAttackLayers then for _,layer in ipairs(reopen.layers) do if layer.name=='Effect' then assert(layer.isVisible) end end end
 for _,f in ipairs(reopen.frames) do assert(math.floor(f.duration*1000+.5)==70) end
 reopen:close()
 local f=assert(io.open(out..'/timing-manifest.json','w'))
 f:write(string.format('{"actions":[{"name":%q,"provisional":true,"includesSlashTrail":true,"hasTrailHitbox":true,"hitboxMin":%s,"hitboxMax":%s,"canvasWidth":128,"canvasHeight":128,"pivotX":32,"pivotY":38,"count":%d,"totalFrames":%d,"hitFrame":%d,"branchFrame":%d,"recoveryFrame":%d,"frames":[%s]}]}',action,boxMin,boxMax,count,start,hitFrame,branchFrame,recoveryFrame,table.concat(frames,',')));f:close()
 local e=assert(io.open(out..'/eye-mask-manifest.json','w'));e:write('{"frames":['..table.concat(eyes,',')..']}');e:close()
-local r=assert(io.open(out..'/submission-validation.json','w'));r:write(string.format('{"sourceUnmodified":true,"reviewCopyReopened":true,"guideHidden":true,"hairVisibilityPreserved":true,"nativeDurationMs":%d,"gameTicks":%d,"contactFrame":%d,"contactTick":%d,"frames":[%s]}',nativeMs,start,contact,hitFrame,table.concat(native,',')));r:close()
+local r=assert(io.open(out..'/submission-validation.json','w'));r:write(string.format('{"sourceUnmodified":true,"reviewCopyReopened":true,"guideHidden":true,"hairVisibilityPreserved":true,"restoredAttackLayers":%s,"nativeDurationMs":%d,"gameTicks":%d,"contactFrame":%d,"contactTick":%d,"frames":[%s]}',tostring(restoreAttackLayers),nativeMs,start,contact,hitFrame,table.concat(native,',')));r:close()

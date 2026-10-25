@@ -126,6 +126,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     {
         RestorePlayerBody();charged=true;counterLightReady=true;ChargeRealElapsed=0;
         focus=(counter.transform.position+counter.SelectedTarget.transform.position)*.5f;
+        focus.x+=counter.KickFacingSign*.30f;
         focus.y=counter.IsOverheadHeelDrop?focus.y-.15f:adaptiveFocusHeight?counter.transform.position.y-.5f:1.05f;focus.z=restPosition.z;
         CombatTimeController.RequestSlow(counter,chargeScale,chargeRealSeconds);
     }

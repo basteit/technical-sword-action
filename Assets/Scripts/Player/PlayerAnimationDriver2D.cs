@@ -156,7 +156,9 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
         string reaction = parry != null && parry.LastReactionWeight == ParryReactionWeight.Heavy ? "Heavy" : "Light";
         int success = Animator.StringToHash("PlayerPrototype_ParrySuccess" + reaction);
         if (!animator.HasState(0, success)) success = Animator.StringToHash("PlayerPrototype_ParrySuccessLight");
-        animator.Play(animator.HasState(0, success) ? success : ParrySuccessState, 0, 0f);
+        var impact = GetComponent<PrototypeCounterPresentation>();
+        float start = impact != null ? impact.ParrySuccessNormalizedStart : 0;
+        animator.Play(animator.HasState(0, success) ? success : ParrySuccessState, 0, start);
         lastDrivenState = (PlayerState)(-1);
         return true;
     }
