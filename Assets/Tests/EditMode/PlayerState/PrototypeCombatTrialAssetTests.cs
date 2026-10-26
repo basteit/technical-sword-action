@@ -15,6 +15,37 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private static object[] Steps(ScriptableObject definition) => Get<Array>(definition, "steps").Cast<object>().ToArray();
         private static string[] Validate() => (string[])Type.GetType("PrototypeCombatTrialInstaller, Assembly-CSharp-Editor", true).GetMethod("Validate").Invoke(null, null);
 
+        [Test] public void HeavyImpactTrialIsNormalAttackOnlyAndInheritsLaterSteps()
+        {
+            var impact = Load("AttackImpact_HeavyTrial");
+            Assert.That(Get<bool>(impact, "IsValid"), Is.True);
+            Assert.That(Get<int[]>(impact, "stepHitstopFrames"), Is.EqualTo(new[] { 8, 8, -1, -1 }));
+            var resolve = impact.GetType().GetMethod("Resolve");
+            Assert.That(resolve.Invoke(impact, new object[] { 1, 3 }), Is.EqualTo(8));
+            Assert.That(resolve.Invoke(impact, new object[] { 2, 3 }), Is.EqualTo(8));
+            Assert.That(resolve.Invoke(impact, new object[] { 3, 3 }), Is.EqualTo(3));
+            Assert.That(resolve.Invoke(impact, new object[] { 4, 5 }), Is.EqualTo(5));
+            var entries = Get<Array>(Load("CombatFeedback"), "entries").Cast<object>().ToArray();
+            Assert.That(Get<int>(entries.Single(entry => Get<object>(entry, "kind").ToString() == "LightHit"), "hitstopFrames"), Is.EqualTo(3));
+            Assert.That(Get<int>(entries.Single(entry => Get<object>(entry, "kind").ToString() == "HeavyHit"), "hitstopFrames"), Is.EqualTo(5));
+        }
+
+        [Test] public void ImpactProfileValidatesAllFourStepsAndAllowsExplicitZero()
+        {
+            var impact = UnityEngine.Object.Instantiate(Load("AttackImpact_HeavyTrial"));
+            var field = impact.GetType().GetField("stepHitstopFrames");
+            try
+            {
+                field.SetValue(impact, new[] { 0, 0, -1, -1 });
+                Assert.That(Get<bool>(impact, "IsValid"), Is.True);
+                Assert.That(impact.GetType().GetMethod("Resolve").Invoke(impact, new object[] { 1, 3 }), Is.EqualTo(0));
+                field.SetValue(impact, new[] { 8, -2, -1, -1 }); Assert.That(Get<bool>(impact, "IsValid"), Is.False);
+                field.SetValue(impact, new[] { 8, 8 }); Assert.That(Get<bool>(impact, "IsValid"), Is.False);
+                field.SetValue(impact, null); Assert.That(Get<bool>(impact, "IsValid"), Is.False);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(impact); }
+        }
+
         [TestCase("FastTrial")] [TestCase("SnappyTrial")]
         public void EditorValidatorAcceptsInstalledTrialAndDetectsAThreeTickDesync(string mode)
         {

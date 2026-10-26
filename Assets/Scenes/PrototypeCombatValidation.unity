@@ -5592,10 +5592,12 @@ MonoBehaviour:
   originalEnemy: {fileID: 11400000, guid: fd445e60d933db64a8f9ed3ca156ace0, type: 2}
   referenceEnemy: {fileID: 11400000, guid: aeadde39aa0f5344f9a402496d0d8a13, type: 2}
   referenceLaunch: {fileID: 11400000, guid: 78a9b5396fa4d2c49b1e2d2a3a892e53, type: 2}
+  strongAttackImpact: {fileID: 11400000, guid: f3d05f52a69d31c45852d40621613e34, type: 2}
   referenceTiming: 1
   referenceReaction: 1
   fastAttacks: 1
   snappyFirstTwo: 0
+  strongAttackHits: 1
 --- !u!1 &1048344828
 GameObject:
   m_ObjectHideFlags: 0
@@ -9554,6 +9556,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatFeedback2D
   profile: {fileID: 11400000, guid: 56d113299f63af74e96e2f4ce13c279a, type: 2}
+  attackImpactProfile: {fileID: 0}
   settings: {fileID: 11400000, guid: 4ae45b4ed0c6a1e46879a70dec1d96ca, type: 2}
   feedbackCamera: {fileID: 212492668}
   lineMaterial: {fileID: 0}

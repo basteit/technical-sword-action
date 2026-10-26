@@ -11,6 +11,7 @@ public static class PrototypeCombatTrialInstaller
 {
     public const string FastPath = "Assets/Settings/PrototypeCombat/FourStepAttack_FastTrial.asset";
     public const string SnappyPath = "Assets/Settings/PrototypeCombat/FourStepAttack_SnappyTrial.asset";
+    public const string ImpactPath = "Assets/Settings/PrototypeCombat/AttackImpact_HeavyTrial.asset";
     public const string EnemyPath = "Assets/Settings/PrototypeCombat/NormalMelee_ReferenceTrial.asset";
     public const string LaunchPath = "Assets/Settings/PrototypeCombat/CounterLaunch_ReferenceTrial.asset";
     public const string ControllerPath = "Assets/Animations/Player/Submitted/PlayerSubmitted_FastTrial.overrideController";
@@ -55,6 +56,12 @@ public static class PrototypeCombatTrialInstaller
                 }
                 Save(snappy);
             }
+            var impact = AssetDatabase.LoadAssetAtPath<PlayerAttackImpactProfile>(ImpactPath);
+            if (impact == null)
+            {
+                impact = ScriptableObject.CreateInstance<PlayerAttackImpactProfile>();
+                AssetDatabase.CreateAsset(impact, ImpactPath); Save(impact);
+            }
             var reference = CopyOnce<EnemyCombatDefinition>(OriginalEnemyPath, EnemyPath, out bool newEnemy);
             if (newEnemy) { reference.windupFrames = 96; reference.recoveryFrames = 24; Save(reference); }
             var launch = CopyOnce<CounterCinematicProfile>(PrototypeCounterCinematicInstaller.ProfilePath, LaunchPath, out bool newLaunch);
@@ -82,6 +89,7 @@ public static class PrototypeCombatTrialInstaller
             Reference("originalController", originalController); Reference("fastController", fastController);
             Reference("snappyController", snappyController);
             Reference("originalEnemy", enemy); Reference("referenceEnemy", reference); Reference("referenceLaunch", launch);
+            Reference("strongAttackImpact", impact);
             var array = so.FindProperty("normalEnemies"); array.arraySize = normals.Length;
             for (int i = 0; i < normals.Length; i++) array.GetArrayElementAtIndex(i).objectReferenceValue = normals[i];
             so.ApplyModifiedPropertiesWithoutUndo();
@@ -107,6 +115,7 @@ public static class PrototypeCombatTrialInstaller
         var errors = new List<string>();
         var fast = AssetDatabase.LoadAssetAtPath<PlayerAttackDefinition>(FastPath);
         var snappy = AssetDatabase.LoadAssetAtPath<PlayerAttackDefinition>(SnappyPath);
+        var impact = AssetDatabase.LoadAssetAtPath<PlayerAttackImpactProfile>(ImpactPath);
         var enemy = AssetDatabase.LoadAssetAtPath<EnemyCombatDefinition>(EnemyPath);
         var launch = AssetDatabase.LoadAssetAtPath<CounterCinematicProfile>(LaunchPath);
         var controller = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(ControllerPath);
@@ -115,6 +124,7 @@ public static class PrototypeCombatTrialInstaller
         var art = AssetDatabase.LoadAssetAtPath<PrototypePlayerArtSet>(PrototypePlayerArtInstaller.SetPath);
         if (fast == null || !fast.IsValid) errors.Add("Missing/invalid fast trial attack definition.");
         if (snappy == null || !snappy.IsValid) errors.Add("Missing/invalid snappy trial attack definition.");
+        if (impact == null || !impact.IsValid) errors.Add("Missing/invalid normal attack impact trial profile.");
         if (enemy == null || !enemy.IsValid) errors.Add("Missing/invalid reference trial enemy definition.");
         if (launch == null || !launch.IsValid) errors.Add("Missing/invalid reference trial launch profile.");
         if (controller == null || original == null || controller.runtimeAnimatorController != original.runtimeAnimatorController)

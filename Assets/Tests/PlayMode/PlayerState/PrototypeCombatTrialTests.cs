@@ -24,13 +24,19 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private GameObject wall;
         private static Type T(string name) => Type.GetType(name + ", Assembly-CSharp", true);
         private static object Call(object obj, string name, params object[] args) => obj.GetType().GetMethod(name, Flags).Invoke(obj, args);
-        private static V Get<V>(object obj, string name) => (V)(obj.GetType().GetProperty(name, Flags)?.GetValue(obj) ?? obj.GetType().GetField(name, Flags).GetValue(obj));
+        private static V Get<V>(object obj, string name)
+        {
+            var property = obj.GetType().GetProperty(name, Flags);
+            return (V)(property != null ? property.GetValue(obj) : obj.GetType().GetField(name, Flags).GetValue(obj));
+        }
         private void Frames(int count, int fps = 60) { for (int i = 0; i < count; i++) Call(clock, "AdvanceFrame", 1d / fps); }
         private void Until(Func<bool> predicate, int fps = 60, int maximum = 900)
         { while (!predicate() && maximum-- > 0) Frames(1, fps); Assert.That(predicate(), Is.True, "Timeout"); }
         private static void Pause(bool paused) => T("CombatTimeController").GetMethod("SetPaused").Invoke(null, new object[] { paused });
         private object[] Steps => Get<Array>(Get<object>(attack, "Definition"), "steps").Cast<object>().ToArray();
         private SpriteRenderer Drawing => Get<SpriteRenderer>(art, "Artwork");
+        private Component Feedback => player.GetComponent(T("CombatFeedback2D"));
+        private static int StopRemaining => (int)T("CombatTimeController").GetProperty("HitstopRemainingTicks").GetValue(null);
         private Sprite First(string name) => Get<Sprite[]>(Call(Get<object>(art, "Library"), "Find", "Enemy_" + name), "frames")[0];
         private void Place(int direction = 1, int hp = 1000)
         {
@@ -71,6 +77,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(sceneDefaultTempo, Is.EqualTo("FastTrial"));
             Assert.That(sceneDefaultHitFrames, Is.EqualTo(new[] { 12, 9, 12, 30 }));
             Assert.That(sceneDefaultController, Is.SameAs(sceneExpectedController));
+            Assert.That(Get<bool>(trial, "StrongAttackHits"), Is.True);
+            Assert.That(Call(Feedback, "GetAttackHitstopFrames", 1), Is.EqualTo(8));
+            Assert.That(Call(Feedback, "GetAttackHitstopFrames", 2), Is.EqualTo(8));
             Assert.That(Get<bool>(trial, "FastAttacks"), Is.True); Assert.That(ai.gameObject.activeSelf, Is.False);
             Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo("SnappyFirstTwo"));
             Assert.That(Steps.Select(s => Get<int>(s, "activeStart")), Is.EqualTo(new[] { 9, 7, 12, 30 }));
@@ -78,6 +87,100 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var strong = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "StrongMelee");
             Assert.That(Get<int>(Get<object>(strong.GetComponent(T("EnemyMeleeChaser2D")), "Definition"), "maxHp"), Is.EqualTo(120));
             Assert.That(strong.GetComponent(T("PrototypeEnemyArtPresentation")), Is.Null);
+        }
+
+        [TestCase(30, 1)] [TestCase(30, -1)] [TestCase(60, 1)] [TestCase(60, -1)] [TestCase(120, 1)] [TestCase(120, -1)]
+        public void StrongImpactStopsOnlyFirstTwoStepsAndFreezesTheirContactPoses(int fps, int direction)
+        {
+            Place(direction); Call(health, "AcquireMotionControl", this);
+            var presentation = player.GetComponent(T("PrototypePlayerArtPresentation"));
+            var set = Get<object>(presentation, "ArtSet"); var drawing = Get<SpriteRenderer>(presentation, "Artwork");
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Until(() => Get<int>(attack, "ComboStep") == 1, fps);
+            for (int step = 1; step <= 4; step++)
+            {
+                Until(() => Get<int>(health, "HitCount") == step, fps);
+                int expected = step <= 2 ? 8 : step == 3 ? 3 : 5;
+                int remaining = StopRemaining;
+                Assert.That(remaining, Is.InRange(expected - (fps == 30 ? 1 : 0), expected));
+                Call(presentation, "RefreshVisual");
+                var contact = Get<Sprite>(Call(set, "Find", "Attack_" + step), "contactSprite");
+                Assert.That(drawing.sprite, Is.SameAs(contact), "Freeze the contact, not the windup.");
+                Vector2 frozen = body.position; int elapsed = Get<int>(attack, "ElapsedFrames");
+                Frames(remaining); Call(presentation, "RefreshVisual");
+                Assert.That(StopRemaining, Is.Zero);
+                Assert.That(body.position, Is.EqualTo(frozen)); Assert.That(Get<int>(attack, "ElapsedFrames"), Is.EqualTo(elapsed));
+                Assert.That(drawing.sprite, Is.SameAs(contact));
+                Frames(1); Assert.That(Get<int>(health, "HitCount"), Is.EqualTo(step), "Do not hit again after the stop.");
+                Until(() => Get<object>(attack, "Phase").ToString() == "Cancel", fps);
+                if (step < 4)
+                {
+                    Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+                    Until(() => Get<int>(attack, "ComboStep") == step + 1, fps);
+                }
+            }
+            Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(940));
+        }
+
+        [TestCase(30)] [TestCase(60)] [TestCase(120)] public void StrongImpactNeverStopsWhiffsAndItsSwitchKeepsOtherModes(int fps)
+        {
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Until(() => Get<int>(attack, "ComboStep") == 1, fps);
+            for (int step = 1; step <= 4; step++)
+            {
+                int limit = 120;
+                while (Get<object>(attack, "Phase").ToString() != "Cancel" && --limit > 0)
+                { Frames(1, fps); Assert.That(StopRemaining, Is.Zero); }
+                Assert.That(limit, Is.GreaterThan(0));
+                if (step < 4) { Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True); Until(() => Get<int>(attack, "ComboStep") == step + 1, fps); }
+            }
+            var mode = Get<object>(trial, "AttackTempo");
+            Call(trial, "SetStrongAttackHits", false);
+            Assert.That(Get<object>(trial, "AttackTempo"), Is.EqualTo(mode));
+            Assert.That(Get<bool>(trial, "ReferenceTiming"), Is.True); Assert.That(Get<bool>(trial, "ReferenceReaction"), Is.True);
+            Assert.That(Get<object>(Feedback, "AttackImpactProfile"), Is.Null);
+            Assert.That(Call(Feedback, "GetAttackHitstopFrames", 1), Is.EqualTo(3));
+            Assert.That(Call(Feedback, "GetAttackHitstopFrames", 4), Is.EqualTo(5));
+        }
+
+        [UnityTest] public IEnumerator ImpactRollbackDuringAHitstopResetsItsOwnerAndRestoresThreeTicks()
+        {
+            Place(); Call(health, "AcquireMotionControl", this);
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Until(() => Get<int>(health, "HitCount") == 1); Assert.That(StopRemaining, Is.EqualTo(8));
+            Assert.That((bool)Call(Feedback, "TrySetAttackImpactProfile", (object)null), Is.False, "Reject unsafe mid-attack data edits.");
+            Call(trial, "SetStrongAttackHits", false);
+            Assert.That(StopRemaining, Is.Zero); Assert.That(Get<bool>(attack, "IsAttacking"), Is.False);
+            Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo("SnappyFirstTwo"));
+            yield return null;
+            Place(); Call(health, "AcquireMotionControl", this);
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Until(() => Get<int>(health, "HitCount") == 1); Assert.That(StopRemaining, Is.EqualTo(3));
+            Call(trial, "SetStrongAttackHits", true); Call(trial, "RestoreOriginals");
+            Assert.That(Get<bool>(trial, "StrongAttackHits"), Is.False);
+            Assert.That(Get<object>(Feedback, "AttackImpactProfile"), Is.Null); Assert.That(StopRemaining, Is.Zero);
+        }
+
+        [Test] public void ExplicitZeroStopsNothingAndGenericSpecialParryCounterRemainUnchanged()
+        {
+            var impact = UnityEngine.Object.Instantiate(Get<ScriptableObject>(trial, "StrongAttackImpact"));
+            impact.GetType().GetField("stepHitstopFrames").SetValue(impact, new[] { 0, 0, -1, -1 });
+            try
+            {
+                Assert.That((bool)Call(Feedback, "TrySetAttackImpactProfile", impact), Is.True);
+                foreach (var item in new[] { new object[] { "HeavyHit", 5 }, new object[] { "Parry", 3 }, new object[] { "Counter", 5 } })
+                {
+                    Call(Feedback, "Present", Enum.Parse(T("CombatFeedbackKind"), (string)item[0]), Vector2.zero, null);
+                    Assert.That(StopRemaining, Is.EqualTo((int)item[1]));
+                    T("CombatTimeController").GetMethod("ReleaseOwner").Invoke(null, new object[] { Feedback });
+                }
+                Place(); Call(health, "AcquireMotionControl", this);
+                Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+                Until(() => Get<int>(health, "HitCount") == 1); Assert.That(StopRemaining, Is.Zero);
+                Assert.That(Call(Feedback, "GetAttackHitstopFrames", 3), Is.EqualTo(3));
+                Assert.That(Call(Feedback, "GetAttackHitstopFrames", 4), Is.EqualTo(5));
+            }
+            finally { Call(arena, "ResetActionsOnly"); UnityEngine.Object.DestroyImmediate(impact); }
         }
 
         [TestCase(30)] [TestCase(60)] [TestCase(120)]

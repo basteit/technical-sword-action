@@ -25,6 +25,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     private sealed class DirectionalImpulse
     { public Vector2 direction; public float age, duration, strength, cycles; }
     [SerializeField] private CombatFeedbackProfile profile;
+    [SerializeField] private PlayerAttackImpactProfile attackImpactProfile;
     [SerializeField] private CombatFeedbackSettings settings;
     [SerializeField] private Camera feedbackCamera;
     [SerializeField] private Material lineMaterial;
@@ -56,6 +57,20 @@ public sealed class CombatFeedback2D : MonoBehaviour
     private CombatFeedbackProfile validatedProfile;
     private bool profileValid;
     public CombatFeedbackSettings Settings => runtimeSettings != null ? runtimeSettings : settings;
+    public PlayerAttackImpactProfile AttackImpactProfile => attackImpactProfile;
+    public bool TrySetAttackImpactProfile(PlayerAttackImpactProfile value)
+    {
+        if ((value != null && !value.IsValid) || (attack != null && (attack.IsAttacking || attack.IsRecovering)) ||
+            (counter != null && counter.IsActive)) return false;
+        attackImpactProfile = value;
+        return true;
+    }
+    public int GetAttackHitstopFrames(int step)
+    {
+        if (step < 1 || step > 4) return 0;
+        int fallback = profile?.Find(step == 4 ? CombatFeedbackKind.HeavyHit : CombatFeedbackKind.LightHit)?.hitstopFrames ?? 0;
+        return attackImpactProfile != null ? attackImpactProfile.Resolve(step, fallback) : fallback;
+    }
     public bool IsReady
     {
         get
@@ -136,7 +151,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     }
     private void OnSceneChanged(Scene before, Scene after) => ResetPresentation();
     private void OnAttack(Damageable2D target, int step, Vector2 position) =>
-        Present(step == 4 ? CombatFeedbackKind.HeavyHit : CombatFeedbackKind.LightHit, position, target);
+        PresentFeedback(step == 4 ? CombatFeedbackKind.HeavyHit : CombatFeedbackKind.LightHit, position, target, false, GetAttackHitstopFrames(step));
     private void OnCounter(Damageable2D target, Vector2 position)
     {
         if (counter != null && counter.CinematicProfile != null && counter.CinematicProfile.enhancedPresentation)
@@ -160,13 +175,14 @@ public sealed class CombatFeedback2D : MonoBehaviour
     // Authored sprites carry the information shape; their presenter owns the timed impact stop.
     public void PresentAuthoredImpact(CombatFeedbackKind kind, Vector2 position, Damageable2D target)
         => PresentFeedback(kind, position, target, true);
-    private void PresentFeedback(CombatFeedbackKind kind, Vector2 position, Damageable2D target, bool authored)
+    private void PresentFeedback(CombatFeedbackKind kind, Vector2 position, Damageable2D target, bool authored, int attackStopOverride = -1)
     {
         if (!IsReady || CombatTimeController.IsPaused) return;
         var entry = profile.Find(kind);
         LastKind = kind; LastEmissionTick = CombatTimeController.TickCount;
         EmissionCount++; EssentialGlyphCount++;
-        if (!authored && entry.hitstopFrames > 0) CombatTimeController.RequestHitstop(this, entry.hitstopFrames / 60f);
+        int stopFrames = attackStopOverride >= 0 ? attackStopOverride : entry.hitstopFrames;
+        if (!authored && stopFrames > 0) CombatTimeController.RequestHitstop(this, stopFrames / 60f);
         float magnitude = entry.shakePixels / 32f * Mathf.Clamp01(Settings.shake);
         if (!authored && magnitude > 0)
         {
