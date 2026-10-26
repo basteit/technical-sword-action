@@ -5582,8 +5582,10 @@ MonoBehaviour:
   attack: {fileID: 1882940589}
   originalAttack: {fileID: 11400000, guid: 5f9d8a2e628c5cf449a3eec5ba56e7dd, type: 2}
   fastAttack: {fileID: 11400000, guid: 7fda49836ea3a63429daa1eb4dd06cfb, type: 2}
+  snappyAttack: {fileID: 11400000, guid: cc6b630ba115f1b46bd534f8b10c2fcf, type: 2}
   originalController: {fileID: 22100000, guid: d003cb834f706204287868da53baf14e, type: 2}
   fastController: {fileID: 22100000, guid: 8a36d22fc1de26e4bbed78bb7210a209, type: 2}
+  snappyController: {fileID: 22100000, guid: 4c3184bade682e740b7b279e3cae977c, type: 2}
   normalEnemies:
   - {fileID: 689758911}
   - {fileID: 907002370}
@@ -5593,6 +5595,7 @@ MonoBehaviour:
   referenceTiming: 1
   referenceReaction: 1
   fastAttacks: 1
+  snappyFirstTwo: 1
 --- !u!1 &1048344828
 GameObject:
   m_ObjectHideFlags: 0

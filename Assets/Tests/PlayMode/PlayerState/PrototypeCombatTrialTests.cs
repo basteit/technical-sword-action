@@ -60,7 +60,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Assert.That(Get<bool>(trial, "IsConfigured"), Is.True);
             Assert.That(Get<bool>(trial, "FastAttacks"), Is.True); Assert.That(ai.gameObject.activeSelf, Is.False);
-            Assert.That(Steps.Select(s => Get<int>(s, "activeStart")), Is.EqualTo(new[] { 12, 9, 12, 30 }));
+            Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo("SnappyFirstTwo"));
+            Assert.That(Steps.Select(s => Get<int>(s, "activeStart")), Is.EqualTo(new[] { 9, 7, 12, 30 }));
             Assert.That(Get<int>(Get<object>(ai, "Definition"), "windupFrames"), Is.EqualTo(96));
             var strong = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "StrongMelee");
             Assert.That(Get<int>(Get<object>(strong.GetComponent(T("EnemyMeleeChaser2D")), "Definition"), "maxHp"), Is.EqualTo(120));
@@ -135,7 +136,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [TestCase(30)] [TestCase(60)] [TestCase(120)]
-        public void FastFourStepComboStillHitsEachTargetOnlyOnceAndKeepsDamage(int fps)
+        public void SnappyFourStepComboStillHitsEachTargetOnlyOnceAndKeepsDamage(int fps)
         {
             Place(); Call(health, "AcquireMotionControl", this);
             Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
@@ -208,7 +209,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Drawing.flipX, Is.EqualTo(original));
         }
 
-        [UnityTest] public IEnumerator EveryFastStepCanCancelAtItsBoundaryToAllDefenseActions()
+        [UnityTest] public IEnumerator EverySnappyStepCanCancelAtItsBoundaryToAllDefenseActions()
         {
             foreach (var request in new[] { PlayerActionRequest.Dash, PlayerActionRequest.Parry, PlayerActionRequest.Special })
                 for (int desired = 1; desired <= 4; desired++)
@@ -232,6 +233,156 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     Frames(1);
                     Assert.That(Get<bool>(attack, "IsAttacking"), Is.False);
                 }
+        }
+
+        [UnityTest] public IEnumerator AttackTempoCyclesBackToPreviousFastInOneActionAndKeepsEnemyAxesIndependent()
+        {
+            Call(arena, "ResetStrongEncounter", true); yield return null;
+            var counterProfile = Get<object>(player.GetComponent(T("PlayerParryCounter2D")), "CinematicProfile");
+            for (int repeat = 0; repeat < 3; repeat++)
+                foreach (var expected in new[] { "FastTrial", "Original", "SnappyFirstTwo" })
+                {
+                    Call(trial, "CycleAttackTempo"); yield return null;
+                    Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo(expected));
+                    int hit = expected == "Original" ? 15 : expected == "FastTrial" ? 12 : 9;
+                    Assert.That(Get<int>(Steps[0], "activeStart"), Is.EqualTo(hit));
+                    Assert.That(player.GetComponent<Animator>().runtimeAnimatorController, Is.SameAs(Get<RuntimeAnimatorController>(trial, "ExpectedController")));
+                    Assert.That(Get<object>(attack, "Definition"), Is.SameAs(Get<object>(trial, "ExpectedAttack")));
+                    Assert.That(Get<bool>(trial, "ReferenceTiming"), Is.True);
+                    Assert.That(Get<bool>(trial, "ReferenceReaction"), Is.True);
+                    Assert.That(ai.gameObject.activeSelf, Is.True);
+                    Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(30));
+                    Assert.That(Get<object>(player.GetComponent(T("PlayerParryCounter2D")), "CinematicProfile"), Is.SameAs(counterProfile));
+                    Call(trial, "SetEnemyTiming", false); Call(trial, "SetEnemyReaction", false);
+                    Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo(expected));
+                    Call(trial, "SetEnemyTiming", true); Call(trial, "SetEnemyReaction", true); yield return null;
+                }
+            Call(trial, "RestoreOriginals");
+            Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo("Original"));
+            Assert.That(Get<bool>(trial, "ReferenceTiming"), Is.False); Assert.That(Get<bool>(trial, "ReferenceReaction"), Is.False);
+        }
+
+        [TestCase(30, 1)] [TestCase(30, -1)] [TestCase(60, 1)] [TestCase(60, -1)] [TestCase(120, 1)] [TestCase(120, -1)]
+        public void FirstTwoGroundBurstsAreShortAndMirrored(int fps, int direction)
+        {
+            var motor = player.GetComponent(T("PlayerMotor2D"));
+            body.position = new Vector2(0, .81f); player.transform.position = body.position;
+            body.linearVelocity = Vector2.zero; Call(motor, "SetFacing", direction); Physics2D.SyncTransforms(); Frames(2);
+            Assert.That(Get<bool>(motor, "IsGrounded"), Is.True);
+            for (int step = 1; step <= 2; step++)
+            {
+                Vector2 before = body.position;
+                Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+                Until(() => Get<int>(attack, "ComboStep") == step, fps);
+                Until(() => Get<object>(attack, "Phase").ToString() == "Cancel", fps);
+                float distance = (body.position.x - before.x) * direction;
+                Assert.That(distance, Is.EqualTo(step == 1 ? .25f : .30f).Within(.025f));
+                Assert.That(Get<float>(attack, "GroundMotionVelocity"), Is.Zero);
+                Assert.That(Get<PlayerActionState>(player, "ActionState"), Is.EqualTo(PlayerActionState.Attack));
+            }
+        }
+
+        [UnityTest] public IEnumerator GroundBurstsFreezeWithoutBypassingThePauseReleaseInputGuard()
+        {
+            foreach (int fps in new[] { 30, 60, 120 })
+                foreach (int direction in new[] { 1, -1 })
+                {
+                    Call(arena, "ResetActionsOnly"); yield return null;
+                    var motor = player.GetComponent(T("PlayerMotor2D"));
+                    body.position = new Vector2(0, .81f); player.transform.position = body.position;
+                    body.linearVelocity = Vector2.zero; Call(motor, "SetFacing", direction); Physics2D.SyncTransforms(); Frames(2);
+                    for (int step = 1; step <= 2; step++)
+                    {
+                        Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+                        Until(() => Get<int>(attack, "ComboStep") == step, fps);
+                        Frames(1, fps); Vector2 frozen = body.position; int elapsed = Get<int>(attack, "ElapsedFrames");
+                        Pause(true); Frames(fps / 2, fps); Assert.That(body.position, Is.EqualTo(frozen)); Pause(false);
+                        Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.False,
+                            "Pause release must keep rejecting gameplay input on the same rendered frame.");
+                        yield return null;
+                        T("CombatTimeController").GetMethod("RequestHitstop").Invoke(null, new object[] { this, .1f });
+                        Frames(Mathf.Max(1, fps / 30), fps);
+                        Assert.That(body.position, Is.EqualTo(frozen)); Assert.That(Get<int>(attack, "ElapsedFrames"), Is.EqualTo(elapsed));
+                        T("CombatTimeController").GetMethod("ReleaseOwner").Invoke(null, new object[] { this });
+                        Until(() => Get<object>(attack, "Phase").ToString() == "Cancel", fps);
+                    }
+                }
+        }
+
+        [TestCase(1)] [TestCase(-1)] public void SnappyGroundBurstStopsAtWalls(int direction)
+        {
+            var motor = player.GetComponent(T("PlayerMotor2D"));
+            body.position = new Vector2(0, .81f); player.transform.position = body.position; body.linearVelocity = Vector2.zero;
+            Call(motor, "SetFacing", direction); Physics2D.SyncTransforms(); Frames(2);
+            wall = new GameObject("SnappyAttackWall"); wall.layer = LayerMask.NameToLayer("Ground");
+            wall.transform.position = new Vector3(direction * .49f, 1.5f);
+            wall.AddComponent<BoxCollider2D>().size = new Vector2(.2f, 3); Physics2D.SyncTransforms();
+            for (int step = 1; step <= 2; step++)
+            {
+                Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+                Frames(1); Until(() => Get<object>(attack, "Phase").ToString() == "Cancel");
+                Assert.That(body.position.x * direction, Is.InRange(0, .08f));
+            }
+            Assert.That(Get<int>(attack, "TimeoutFallbackCount"), Is.Zero);
+        }
+
+        [TestCase(30, 1)] [TestCase(30, -1)] [TestCase(60, 1)] [TestCase(60, -1)] [TestCase(120, 1)] [TestCase(120, -1)]
+        public void FirstTwoAirAttacksKeepExistingSteeringAndGravity(int fps, int direction)
+        {
+            var motor = player.GetComponent(T("PlayerMotor2D"));
+            body.position = new Vector2(0, 5); player.transform.position = body.position;
+            body.linearVelocity = new Vector2(0, 2); Physics2D.SyncTransforms(); Frames(1);
+            Call(motor, "SetFacing", direction); Call(motor, "SetMoveInput", new Vector2(direction, 0));
+            float gravity = body.gravityScale;
+            for (int step = 1; step <= 2; step++)
+            {
+                float velocityY = body.linearVelocity.y;
+                Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+                Until(() => Get<int>(attack, "ComboStep") == step, fps);
+                Until(() => Get<object>(attack, "Phase").ToString() == "Cancel", fps);
+                Assert.That(Get<bool>(motor, "IsGrounded"), Is.False);
+                Assert.That(body.gravityScale, Is.EqualTo(gravity));
+                Assert.That(body.linearVelocity.y, Is.LessThan(velocityY));
+                float expected = Get<float>(motor, "moveSpeed") * Get<float>(attack, "AirMoveSpeedMultiplier");
+                Assert.That(body.linearVelocity.x * direction, Is.EqualTo(expected).Within(.1f));
+            }
+        }
+
+        [UnityTest] public IEnumerator RollbackDuringAnAttackResetsMotionInputAndControllerTogether()
+        {
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True); Frames(3);
+            Assert.That(Get<bool>(attack, "IsAttacking"), Is.True);
+            Call(trial, "CycleAttackTempo"); yield return null;
+            Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo("FastTrial"));
+            Assert.That(Get<bool>(attack, "IsAttacking"), Is.False); Assert.That(Get<bool>(attack, "IsRecovering"), Is.False);
+            Assert.That(Get<float>(attack, "GroundMotionVelocity"), Is.Zero);
+            Assert.That(Get<float>(attack, "InputBufferRemaining"), Is.Zero);
+            Assert.That(player.GetComponent<Animator>().runtimeAnimatorController, Is.SameAs(Get<RuntimeAnimatorController>(trial, "ExpectedController")));
+            Assert.That(Get<PlayerActionState>(player, "ActionState"), Is.EqualTo(PlayerActionState.Neutral));
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True); Frames(1);
+            Assert.That(Get<int>(Steps[0], "activeStart"), Is.EqualTo(12));
+        }
+
+        [UnityTest] public IEnumerator BothPreviousAttackBaselinesStillShowAllContactPosesAndDealSixtyDamage()
+        {
+            foreach (var mode in new[] { "FastTrial", "Original" })
+            {
+                Call(trial, "SetAttackTempo", Enum.Parse(T("PrototypeAttackTempo"), mode)); yield return null;
+                Place(); Call(health, "AcquireMotionControl", this);
+                var presentation = player.GetComponent(T("PrototypePlayerArtPresentation"));
+                var set = Get<object>(presentation, "ArtSet");
+                var drawing = Get<SpriteRenderer>(presentation, "Artwork");
+                for (int step = 1; step <= 4; step++)
+                {
+                    Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True); Frames(1);
+                    Until(() => Get<int>(health, "HitCount") == step);
+                    Call(presentation, "RefreshVisual");
+                    Assert.That(drawing.sprite, Is.SameAs(Get<Sprite>(Call(set, "Find", "Attack_" + step), "contactSprite")), mode + " / " + step);
+                    Until(() => Get<object>(attack, "Phase").ToString() == "Cancel");
+                }
+                Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(940));
+                Assert.That(Get<int>(attack, "TimeoutFallbackCount"), Is.Zero);
+            }
         }
 
         [TestCase(1)] [TestCase(-1)] public void ReferenceLaunchStopsAtWallAndPauseAndHitstopFreezeIt(int direction)
