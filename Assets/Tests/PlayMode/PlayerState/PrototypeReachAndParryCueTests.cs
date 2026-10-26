@@ -119,6 +119,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<int>(targets[i], "CurrentHp"), Is.EqualTo(1000 - expected * 10), targets[i].name);
             }
             Assert.That(Get<int>(health, "HitCount"), Is.Zero, "The distant scene enemy remains outside the slash.");
+            var effects = Get<IEnumerable>(player.GetComponent(T("CombatFeedback2D")), "pool").Cast<object>();
+            Assert.That(effects.Any(effect => Get<GameObject>(effect, "root").activeSelf &&
+                Vector2.Distance(Get<Vector2>(effect, "position"), targets[0].transform.position) <= .022f), Is.True,
+                "The far-tip hit spark belongs on the struck collider, not at the old HitPoint next to the hand.");
         }
 
         private Component Probe(string name, Vector2 position)

@@ -402,7 +402,9 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
             }
 
             if (!damageable.TryTakeCombatHit(data.damage, knockbackDir, step == 4 ? EnemyHitStrength.Strong : EnemyHitStrength.Light)) continue;
-            HitConfirmed?.Invoke(damageable, step, hitPoint.position);
+            // Extended slashes must not leave their impact spark at the old, nearer circle origin.
+            Vector2 impactPoint = extended ? hits[i].ClosestPoint(hitPoint.position) : (Vector2)hitPoint.position;
+            HitConfirmed?.Invoke(damageable, step, impactPoint);
             hitSomething = true;
             hitTargetCount++;
         }
