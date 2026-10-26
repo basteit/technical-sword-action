@@ -14,6 +14,12 @@
 
 実装段階の検証：Compile Error0/Warning0、全EditMode230/230、関連PlayMode175/175。新規PlayMode11件で、30/60/120fps・左右の8/8/3/5Fと接触姿勢の凍結、空振りの停止なし、0F指定、共有Special/Parry/Counterの非変更、命中停止中の安全切り戻しを確認した。PlayModeの途中で専用設定を直接差し替える操作は拒否し、比較パネルでは安全リセットして切り替える。パネルの `Attack 1/2 hitstop` でTRIALとBASEを切り替え、一括旧設定復帰でもBASEへ戻る。
 
+全体PlayModeは643/656、失敗13件の名前は前回と同一で、追加の失敗0件。動画の高さ2件・タメ時刻3件・4段キャンセル動画7件・旧Just期待1件は未解決のまま。ログは `.uloop/outputs/TestResults/20261026_151829.xml`。[検証要約](validation/prototype-attack-hitstop-2026-10-26.json)。
+
+[8F/3Fの比較プレビュー](video/previews/prototype-attack-hitstop8-review-20261026.mp4)は15秒・1280×720・60fps・約1.1MB。0〜3秒が8F、3〜6秒が元の3F、6〜9秒が左8F/右3Fの同時比較、9〜12秒が左向き8F、12〜15秒が空振り。すべてFASTの命中12/9F・同じ入力予定で、原映像の時間加工なし。各命中区間は4Hit・HP1000→960。実測の命中フレームは8F版30/49/114/133、3F版30/44/114/128で、違いは1段目の停止が5F長くなった分だけ次段が遅れること。空振りの停止は0。音はライブ録音ではなく、既存の `HitSound_RayTap.mp3` を記録した命中時刻へ、共通設定のpitch1.15・gain0.5で重ねたもの。次の命中で前の音を切る既存の単一ボイス規則に合わせ、左右同時比較中の音は8F側だけを使う。新しい音やVFXは追加していない。AACのパケット余白を各区間で取り除き、最終900F・15秒・重複/欠落0をデコード確認した。
+
+数値を調整する場合は、非再生中に `Assets/Settings/PrototypeCombat/AttackImpact_HeavyTrial.asset` の `Step Hitstop Frames` を編集する。Element0/1が1/2段目、Element2/3は現在-1で共通3/5Fを継承する。比較パネルのBASEは元の共通設定へ戻すため、専用アセットを削除する必要はない。継続的にBASEで起動するならSceneの `Strong Attack Hits` をOFFにして保存する。人による15分の操作感・物理ゲームパッド・配布Buildは別途で、8Fは調整用の仮値である。
+
 ## 2026-10-26 方針変更：追加高速化から命中の重みへ
 
 体験目的：1/2段の速度を増す方向はいったん戻し、命中時の手応えを次の調整対象にする。
@@ -104,6 +110,7 @@
 | 敵のやられ | chance姿勢 / 3.2×0.65unit・22F・回転あり | down姿勢 / 1.6×0.27unit・18F・回転なし | 姿勢と吹っ飛びプロファイルの2軸 |
 | 主人公速度 | 命中15/12/15/38F、全体38/32/38/62F | 命中12/9/12/30F、全体30/24/30/49F | 通常攻撃テンポのみ |
 | 主人公1/2段の追加試用 | 直前高速版：命中12/9F、全体30/24F、踏み込み0.10/0.14unit・8F | 新版：命中9/7F、全体24/20F、踏み込み0.25/0.30unit・6F | 時間配分と地上踏み込みの2軸。3/4段目は直前高速版のまま |
+| 主人公1/2段の命中停止 | 共通設定の3F | 専用設定で合計8F。3/4段は共通3/5Fを継承 | 停止時間のみ。現在はFAST速度を維持してこの比較を採用 |
 
 速度変更は既存の「定義Clip長÷行動尺」のAnimator同期を利用する。元の絵とClipを変更せず、高速版の4つの派生Clipと専用Animator Overrideで接触・復帰の姿勢を新しい時刻へ合わせる。2Fの持続・命中翌々Fからの共通キャンセルを保ち、復帰開始28/22/28/47Fとする。次段へつなぐ最短間隔は17/14/17Fから14/11/14Fへ短縮する。
 
@@ -111,7 +118,7 @@
 
 - `PrototypeCombatValidation` を再生すると、直前版FAST・敵の動画尺・down/低い吹っ飛びがON、敵なしで開始する。F1で通常ザコ、F3で2体、F4で元の強ザコ、F5で混成。
 - **F10**：現在の初期状態からは `FAST → ORIGINAL → SNAPPY → FAST`。SNAPPYを選んだ後は次の1回でFASTへ戻る。**F11**：通常ザコの96/24Fと旧30/30F。**F12**：down＋低い吹っ飛びと旧chance＋回転する吹っ飛び。F11/F12は主人公の比較モードを保持し、既存F6〜F9の演出設定も変更しない。
-- 右側の `#34 Combat trial` パネルでも切り替えられる。`Restore ALL original settings` は3比較をすべて旧版へ戻す。比較は一つずつ切り替える。
+- 右側の `#34 Combat trial` パネルでも切り替えられる。`Attack 1/2 hitstop` は速度と独立した8F/3Fの切り替え。`Restore ALL original settings` は主人公速度・敵の尺・敵のやられ・命中停止の4比較をすべて旧版へ戻す。比較は一つずつ切り替える。
 - 切り替えは現在の遭遇構成を保ってHP・位置・入力・演出をリセットする。途中の攻撃を継続したまま数値だけを変えない。会話中も安全リセットで閉じ、終了入力を攻撃へ流用しない。
 - PlayMode内の切り替えは保存しない。再生を終了して再開するとSceneに保存した既定へ戻る。継続的に直前高速版を使う場合は、非再生中に `PrototypeArena` の `PrototypeCombatTrial` の `Snappy First Two` だけをOFFにしてSceneを保存する。最初の旧速度は `Fast Attacks` もOFF、敵も旧版にする場合は `Reference Timing/Reaction` もOFFにする。
 - 元の `FourStepAttack.asset` / `NormalMelee.asset`、原稿とAnimationClipは上書きしない。直前の `_FastTrial` / `_ReferenceTrial` アセットも保持する。追加の `FourStepAttack_SnappyTrial` と1/2段の派生Clip・専用Animator Overrideは独立し、他の行動と3/4段のClip参照は直前高速版と同じ。速度を戻す際は定義とControllerを同時に戻す。`CounterCinematic.asset` と対応する試用Launch Profileは10/26の共通間合いだけを7/32→17/32unitへ更新済みで、今回の通常攻撃調整では触らない。

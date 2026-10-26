@@ -11,24 +11,29 @@ using UnityEngine.Rendering.Universal;
 /// <summary>Review-only recording of the actual prototype attack clock; no gameplay/asset edits.</summary>
 public static class PrototypeAttackCaptureUtility
 {
-    private static bool prepared, savedManual, savedPaused, withTarget;
+    private static bool prepared, savedManual, savedPaused, savedImpact, withTarget;
     private static int direction;
+    private static string takeRevision;
     private static PrototypeAttackTempo savedTempo, takeTempo;
 
-    public static string Prepare(PrototypeAttackTempo tempo, bool target, int facing)
+    public static string Prepare(PrototypeAttackTempo tempo, bool target, int facing, bool? strongImpact = null, string revision = "20261026")
     {
         Check(Application.isPlaying && !prepared, "Open the prototype in PlayMode; finish/cancel the previous capture first.");
+        Check(!string.IsNullOrEmpty(revision) && revision.All(c => c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '-'), "Use an ASCII revision name.");
         var arena = UnityEngine.Object.FindFirstObjectByType<PrototypeCombatArena>();
         var player = UnityEngine.Object.FindFirstObjectByType<PlayerStateMachine>();
         Check(arena != null && player.gameObject.scene.path == PrototypeCombatSceneBuilder.ScenePath, "Open PrototypeCombatValidation.");
         var trial = arena.GetComponent<PrototypeCombatTrial>();
         var clock = UnityEngine.Object.FindFirstObjectByType<CombatTimeController>();
         savedManual = clock.ManualAdvanceOnly; savedPaused = EditorApplication.isPaused; savedTempo = trial.AttackTempo;
+        savedImpact = trial.StrongAttackHits; takeRevision = revision;
         takeTempo = tempo; withTarget = target; direction = facing < 0 ? -1 : 1; prepared = true;
         try
         {
             clock.ManualAdvanceOnly = true;
-            trial.SetAttackTempo(tempo); arena.ResetActionsOnly();
+            trial.SetAttackTempo(tempo);
+            if (strongImpact.HasValue) trial.SetStrongAttackHits(strongImpact.Value);
+            arena.ResetActionsOnly();
             var body = player.GetComponent<Rigidbody2D>();
             body.position = new Vector2(0, .81f); player.transform.position = body.position; body.linearVelocity = Vector2.zero;
             var motor = player.GetComponent<PlayerMotor2D>(); motor.SetMoveInput(Vector2.zero); motor.SetFacing(direction);
@@ -58,7 +63,8 @@ public static class PrototypeAttackCaptureUtility
         var health = withTarget ? GameObject.Find("Melee_1").GetComponent<Damageable2D>() : null;
         string key = (takeTempo == PrototypeAttackTempo.SnappyFirstTwo ? "snappy" : "previous-fast") +
             (withTarget ? "-hit" : "-whiff") + (direction < 0 ? "-left" : "-right");
-        string folder = Path.GetFullPath(".uloop/outputs/video/prototype-attack-review-20261026/" + key);
+        if (takeRevision != "20261026") key += "-stop" + feedback.GetAttackHitstopFrames(1);
+        string folder = Path.GetFullPath(".uloop/outputs/video/prototype-attack-review-" + takeRevision + "/" + key);
         Check(!Directory.Exists(folder), "Preserve existing takes; use a fresh output folder.");
         Directory.CreateDirectory(folder);
         var render = new RenderTexture(1920, 1080, 24, RenderTextureFormat.ARGB32); render.Create();
@@ -83,7 +89,10 @@ public static class PrototypeAttackCaptureUtility
                     Check(player.RequestAction(PlayerActionRequest.Attack), "Second attack request rejected.");
                     chainQueued = true; chains++; marks.Add(new Mark { frame = frame, kind = "Attack2Input" });
                 }
+                int beforeHits = health != null ? health.HitCount : 0;
                 clock.AdvanceFrame(1d / 60);
+                if (health != null && health.HitCount > beforeHits)
+                    marks.Add(new Mark { frame = frame, kind = "Hit", step = attack.ComboStep });
                 feedback.AdvanceVisuals(1f / 60); art.RefreshVisual();
                 RenderPipeline.SubmitRenderRequest(Camera.main, new UniversalRenderPipeline.SingleCameraRequest { destination = render });
                 RenderTexture.active = render;
@@ -94,11 +103,15 @@ public static class PrototypeAttackCaptureUtility
             Check(pairs == 2 && chains == 2 && !attack.IsAttacking && !attack.IsRecovering, "Expected two finished 1/2 attack pairs.");
             Check(!withTarget || (health.HitCount == 4 && health.CurrentHp == 960), "Expected four ordinary 10-damage hits.");
             File.WriteAllText(Path.Combine(folder, "trace.csv"), string.Join("\n", rows));
+            var hitAudio = AssetDatabase.LoadAssetAtPath<CombatFeedbackProfile>("Assets/Settings/PrototypeCombat/CombatFeedback.asset").Find(CombatFeedbackKind.LightHit);
             File.WriteAllText(Path.Combine(folder, "events.json"), JsonUtility.ToJson(new Report
             {
                 mode = takeTempo.ToString(), target = withTarget, facing = direction, attack1 = attack.Definition.steps[0].activeStart,
                 attack2 = attack.Definition.steps[1].activeStart, targetHits = health != null ? health.HitCount : 0,
-                targetHp = health != null ? health.CurrentHp : 0, events = marks.ToArray()
+                targetHp = health != null ? health.CurrentHp : 0, events = marks.ToArray(),
+                hitstopFrames = Enumerable.Range(1, 4).Select(feedback.GetAttackHitstopFrames).ToArray(),
+                hitAudioAsset = AssetDatabase.GetAssetPath(hitAudio.clip), hitAudioFrequency = hitAudio.clip != null ? hitAudio.clip.frequency : 0,
+                hitAudioPitch = hitAudio.pitch, hitAudioGain = hitAudio.volume * feedback.Settings.masterVolume * feedback.Settings.sfxVolume
             }, true));
             return folder;
         }
@@ -117,19 +130,24 @@ public static class PrototypeAttackCaptureUtility
         if (Application.isPlaying)
         {
             var arena = UnityEngine.Object.FindFirstObjectByType<PrototypeCombatArena>();
-            arena.GetComponent<PrototypeCombatTrial>().SetAttackTempo(savedTempo); arena.ResetActionsOnly();
+            var trial = arena.GetComponent<PrototypeCombatTrial>();
+            trial.SetAttackTempo(savedTempo); trial.SetStrongAttackHits(savedImpact); arena.ResetActionsOnly();
             UnityEngine.Object.FindFirstObjectByType<CombatTimeController>().ManualAdvanceOnly = savedManual;
         }
         EditorApplication.isPaused = savedPaused;
     }
     private static void Check(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
-    [Serializable] private sealed class Mark { public int frame; public string kind; }
+    [Serializable] private sealed class Mark { public int frame, step; public string kind; }
     [Serializable] private sealed class Report
     {
         public int frameCount = 180, fps = 60, facing, attack1, attack2, targetHits, targetHp;
         public double duration = 3;
         public string mode, note = "Real prototype 1/2 attacks at 1x speed; stationary high-HP review target, no parry/counter.";
         public bool target;
+        public int[] hitstopFrames;
+        public string hitAudioAsset;
+        public int hitAudioFrequency;
+        public float hitAudioPitch, hitAudioGain;
         public Mark[] events;
     }
 }
