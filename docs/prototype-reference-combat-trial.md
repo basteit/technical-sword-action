@@ -14,6 +14,14 @@
 
 実画面では遠端に命中しても火花が元の手元寄りHitPointへ残ることも確認したため、延長した1/2段だけは実際に重なった敵Colliderの最近接点へ命中通知を送る。火花の形・尺・SE・Hitstopは変えず、旧イベント式の撮影用攻撃や3/4段へ波及させない。横判定の修正に付随する接触位置の整合とし、追加の演出調整軸にはしない。
 
+検証結果：横判定/合図の実装 `e8713ca`、接触点補正 `5cfe458`。最終版でCompile Error0/Warning0、全EditMode235/235、関連PlayMode255/255。追加80件の内訳は、1/2段×左右×地上/空中×30/60/120fpsの24件、通常96F/旧通常30F/強ザコ42F×左右×3fps×入力遅延0/6/10Fの54件、Pause/Hitstopと赤い不可攻撃の2件。縦/背面/先端外の非命中、複数Colliderと持続2Fでも1Hit、実際の命中Collider上の火花、初点灯/6F後はNormal・10F後はJustを確認した。
+
+全体PlayModeは横判定/合図実装時点で723/736。失敗13件の名前は前回643/656と完全一致し、追加失敗0・既知の解消0。CLIは180秒で待機を終了したが、実行を重複させず、Unity側で262.778秒後に完了したXML `.uloop/outputs/TestResults/20261026_195251.xml` を読んで結果を回収した。終了直後の時計存在確認は既にEditModeだったためnullとなり、その診断呼出し1回は失敗したがゲームの例外ではなく、以後は再生状態を先に確認した。続く接触点だけの補正後は上記の関連255件と全EditModeを再実行し、全体736件の再実行とは区別する。
+
+1920×1080の[1段目](validation/prototype-reach-parry-cue-2026-10-26/Rendering_20261026_195727_399.png)はroot x0.07384から敵x2.65（Collider左端2.3）、[2段目](validation/prototype-reach-parry-cue-2026-10-26/Rendering_20261026_195741_588.png)はroot x0.18768から敵x3.1（左端2.75）で命中し、各10ダメージ・各8F停止。撮影中だけ敵を停止・HP1000とした。[黄色の初点灯](validation/prototype-reach-parry-cue-2026-10-26/Rendering_20261026_195759_895.png)は残り13Fでは非表示、12Fで表示。その時点から[通常パリィ成功](validation/prototype-reach-parry-cue-2026-10-26/Rendering_20261026_195820_617.png)となり、HP100・反撃1件・よろめき180F・黄色消灯を確認した。画面確認は実キーではなく同じ行動受付への直接要求で、物理ゲームパッドや15分の操作感確認ではない。
+
+調整する場合は各 `FourStepAttack*.asset` の段別 `Forward Extension`（0で元の円）と、敵/敵攻撃アセットの `Parry Cue Lead Frames`（現行12）を編集する。テンポ比較や一括旧設定復帰は、この見た目と判定の修正を取り消さない。原稿・アニメーション・Scene・パリィ受付/反撃/Feedback設定に今回の差分なし。以下にある「元定義を上書きしない」は過去の速度比較についての記録で、今回の共通リーチ修正は3テンポの設定へ明示的に適用した例外とする。最後はFAST/8F・敵なし・通常入力/時計へ戻して再生終了、Scene dirty=false、Missing Script0、Validator0、Console Error0/Warning0。[検証要約](validation/prototype-reach-parry-cue-2026-10-26.json)。新Build/ZIP・マージ・Issue Closeは行っていない。
+
 ## 2026-10-26 追加試用：通常攻撃1・2段目の強い命中停止
 
 体験目的：速度を変えず、命中した瞬間の停止を強くして剣戟の重みを比較する。
