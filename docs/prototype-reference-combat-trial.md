@@ -12,6 +12,14 @@
 
 成功時は原稿の発光から反撃へつながること、失敗時は光の前に押しすぎた・赤い不可攻撃だったことを説明できることを重視する。今回の調整軸は合図表示の同期1件で、以下の追加マーカー方式は検証履歴として残し、現行仕様には使わない。14Fと大きな光の6F保持は調整可能な仮値である。初期12F案は30fpsで振り抜き1コマが飛んだため14Fへ修正し、専用素材のない強ザコの仮合図は12Fのままとする。
 
+実装 `42425b5` の検証：Compile Error0/Warning0、全EditMode238/238、関連PlayMode269/269。実際に表示された8枚目のSpriteを検出して入力する54ケースを30/60/120fps・左右・通常96F/比較30F/強ザコ42Fで確認し、0/6F後はNormal、10F後はJust、HP100・反撃1件を維持した。通常ザコの追加マーカーは予兆中も消灯し、強ザコだけ既存の仮合図を継続する。早い小光の段階では入力を接触まで特別保持せず、Pause/Hitstopで大きい光も停止する。素材の全12コマと6Fの発光保持、動画の元Libraryの線形表示、横リーチ・反撃・リセットも回帰確認した。
+
+初回の12F案は関連268/269で、30fpsの `ReferenceWindupUsesNinetySixTicksAllCelsAndExactlyOneHit(30)` だけが振り抜き1コマの未表示を検出した。発光6F＋後4コマ×2Fの合計14Fへ変更して269/269へ復帰した。初回XMLは `.uloop/outputs/TestResults/20261026_203828.xml`。全体PlayModeは今回は再実行しておらず、前回の既知13件を解消した扱いにはしない。
+
+1920×1080の[直前の小光](validation/prototype-authored-parry-cue-2026-10-26/Rendering_20261026_204422_556.png)は残り15F・元65F・`EnemySample_attack_07`、[大きくなった光](validation/prototype-authored-parry-cue-2026-10-26/Rendering_20261026_204427_919.png)は残り14F・元66F・`EnemySample_attack_08`。どちらも追加マーカーは非表示。その瞬間から[パリィ成功](validation/prototype-authored-parry-cue-2026-10-26/Rendering_20261026_204442_519.png)し、受付13FでNormal・HP100・反撃1件・よろめき180Fを確認した。ULoopから同じ行動受付を呼んだ確認であり、物理入力や15分の感触テストではない。
+
+調整箇所は本編用 `NormalMeleeArt.asset` の `Enemy_Windup.hasParryCue/parryCueFrame` と、通常ザコ2設定の `parryCueLeadFrames`（14）。元のPNGや動画用Libraryのコマ・尺は変えず、ゲームプレイ表示だけがこのメタデータを使う。最後は通常入力/時計・敵なしに戻し、EditMode・非Pause・Scene dirty=false、Missing Script0、Validator0、Console Error0/Warning0。新Build/ZIP・マージ・Issue Closeは未実施。[検証要約](validation/prototype-authored-parry-cue-2026-10-26.json)。
+
 ## 2026-10-26 修正：斬撃の横リーチと黄色パリィ合図
 
 > 黄色マーカーの検証は当時の記録。現在の通常ザコは上記の素材内発光を使用し、追加マーカーは表示しない。横リーチ修正は引き続き有効。
