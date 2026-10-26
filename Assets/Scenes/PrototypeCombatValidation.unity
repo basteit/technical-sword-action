@@ -5595,7 +5595,7 @@ MonoBehaviour:
   referenceTiming: 1
   referenceReaction: 1
   fastAttacks: 1
-  snappyFirstTwo: 1
+  snappyFirstTwo: 0
 --- !u!1 &1048344828
 GameObject:
   m_ObjectHideFlags: 0

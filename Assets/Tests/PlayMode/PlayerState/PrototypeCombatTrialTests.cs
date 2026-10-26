@@ -18,6 +18,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private Component clock, arena, trial, player, attack, ai, health, art, launch;
         private Rigidbody2D body;
         private bool savedManual;
+        private string sceneDefaultTempo;
+        private int[] sceneDefaultHitFrames;
+        private RuntimeAnimatorController sceneDefaultController, sceneExpectedController;
         private GameObject wall;
         private static Type T(string name) => Type.GetType(name + ", Assembly-CSharp", true);
         private static object Call(object obj, string name, params object[] args) => obj.GetType().GetMethod(name, Flags).Invoke(obj, args);
@@ -44,6 +47,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
             yield return null;
             arena = (Component)Object.FindFirstObjectByType(T("PrototypeCombatArena")); trial = arena.GetComponent(T("PrototypeCombatTrial"));
             player = (Component)Object.FindFirstObjectByType(T("PlayerStateMachine")); attack = player.GetComponent(T("PlayerAttack2D"));
+            sceneDefaultTempo = Get<object>(trial, "AttackTempo").ToString();
+            sceneDefaultHitFrames = Steps.Select(s => Get<int>(s, "activeStart")).ToArray();
+            sceneDefaultController = player.GetComponent<Animator>().runtimeAnimatorController;
+            sceneExpectedController = Get<RuntimeAnimatorController>(trial, "ExpectedController");
+            // Exercise the retained experimental mode explicitly; it is no longer the scene default.
+            Call(trial, "SetAttackTempo", Enum.Parse(T("PrototypeAttackTempo"), "SnappyFirstTwo"));
             ((Behaviour)player.GetComponent(T("PlayerInputRouter"))).enabled = false; body = player.GetComponent<Rigidbody2D>();
             var root = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "Melee_1");
             ai = root.GetComponent(T("EnemyMeleeChaser2D")); health = root.GetComponent(T("Damageable2D"));
@@ -56,9 +65,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(arena, "ResetActionsOnly"); clock.GetType().GetProperty("ManualAdvanceOnly").SetValue(clock, savedManual); yield return null;
         }
 
-        [Test] public void StartsInTrialWithoutEnemiesAndKeepsStrongBaseline()
+        [Test] public void StartsInPreviousFastWithoutEnemiesAndKeepsSnappyAsAnExplicitComparison()
         {
             Assert.That(Get<bool>(trial, "IsConfigured"), Is.True);
+            Assert.That(sceneDefaultTempo, Is.EqualTo("FastTrial"));
+            Assert.That(sceneDefaultHitFrames, Is.EqualTo(new[] { 12, 9, 12, 30 }));
+            Assert.That(sceneDefaultController, Is.SameAs(sceneExpectedController));
             Assert.That(Get<bool>(trial, "FastAttacks"), Is.True); Assert.That(ai.gameObject.activeSelf, Is.False);
             Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo("SnappyFirstTwo"));
             Assert.That(Steps.Select(s => Get<int>(s, "activeStart")), Is.EqualTo(new[] { 9, 7, 12, 30 }));

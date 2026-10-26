@@ -23,7 +23,7 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
     [SerializeField] private bool referenceTiming = true;
     [SerializeField] private bool referenceReaction = true;
     [SerializeField] private bool fastAttacks = true;
-    [SerializeField] private bool snappyFirstTwo = true;
+    [SerializeField] private bool snappyFirstTwo;
     private PrototypeCombatArena arena;
     private InputActionMap controls;
     public bool ReferenceTiming => referenceTiming;
