@@ -36,7 +36,8 @@ public static class PrototypeEnemyArtInstaller
             {
                 var original = source.Find(name);
                 return new VideoArtLibrary.Motion { name = name, provisional = original.provisional,
-                    frames = (Sprite[])original.frames.Clone(), durations = (int[])original.durations.Clone() };
+                    frames = (Sprite[])original.frames.Clone(), durations = (int[])original.durations.Clone(),
+                    hasParryCue = name == "Enemy_Windup", parryCueFrame = name == "Enemy_Windup" ? 66 : 0 };
             }).ToArray();
             EditorUtility.SetDirty(library); AssetDatabase.SaveAssetIfDirty(library);
         }

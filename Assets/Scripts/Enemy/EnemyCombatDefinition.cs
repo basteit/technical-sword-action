@@ -24,7 +24,7 @@ public sealed class EnemyCombatDefinition : ScriptableObject
     public EnemyAttackDefinition[] attacks = new EnemyAttackDefinition[0];
     [Min(0)] public float moveSpeed = 2.2f;
     [Min(1)] public int windupFrames = 30;
-    [Tooltip("Show the yellow parry cue only this many combat ticks before contact; the full windup is unchanged.")]
+    [Tooltip("Align the authored flash (or placeholder cue) this many combat ticks before contact; the full windup is unchanged.")]
     [Min(1)] public int parryCueLeadFrames = 12;
     [Min(1)] public int activeFrames = 3;
     [Min(1)] public int recoveryFrames = 30;

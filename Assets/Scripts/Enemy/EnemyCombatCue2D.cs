@@ -9,6 +9,7 @@ public sealed class EnemyCombatCue2D : MonoBehaviour, ICombatTickListener, IComb
     [SerializeField] private SpriteRenderer cue;
     private EnemyMeleeChaser2D enemy;
     private Damageable2D health;
+    private PrototypeEnemyArtPresentation artwork;
     private Vector3 silhouetteScale;
     private Quaternion silhouetteRotation, weaponRotation;
     private Vector3 weaponPosition;
@@ -16,6 +17,7 @@ public sealed class EnemyCombatCue2D : MonoBehaviour, ICombatTickListener, IComb
     private void Awake()
     {
         enemy = GetComponent<EnemyMeleeChaser2D>(); health = GetComponent<Damageable2D>();
+        artwork = GetComponent<PrototypeEnemyArtPresentation>();
         if (silhouette != null) { silhouetteScale = silhouette.localScale; silhouetteRotation = silhouette.localRotation; }
         if (weapon != null) { weaponPosition = weapon.localPosition; weaponRotation = weapon.localRotation; }
     }
@@ -66,9 +68,10 @@ public sealed class EnemyCombatCue2D : MonoBehaviour, ICombatTickListener, IComb
         }
         if (cue != null)
         {
-            // Yellow means "parry now", not the entire (possibly 96F) preparation.
-            // Red retains the full warning for an attack which cannot be parried.
-            cue.enabled = !stunned && (lowSweep ? winding || active : enemy.IsParryCueActive);
+            // Submitted art owns its flash. The glyph is only a fallback for placeholder enemies.
+            if (artwork == null) artwork = GetComponent<PrototypeEnemyArtPresentation>();
+            bool authored = artwork != null && artwork.HasAuthoredParryCue;
+            cue.enabled = !stunned && (lowSweep ? winding || active : !authored && enemy.IsParryCueActive);
             cue.transform.localScale = Vector3.one * (enemy.WindupRemainingFrames <= 6 ? 1.4f : 1);
             cue.transform.localRotation = Quaternion.Euler(0, 0, enemy.AttackKind == "Unparryable" ? 45 : 0);
             cue.color = enemy.AttackKind == "Unparryable" ? Color.red : Color.yellow;

@@ -51,10 +51,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             finally { UnityEngine.Object.DestroyImmediate(copy); }
         }
 
-        [Test] public void YellowCueLeadIsExplicitPerEnemyAndPerAttackAndTimingWindowsAreUnchanged()
+        [Test] public void ParryCueLeadIsExplicitPerEnemyAndPerAttackAndTimingWindowsAreUnchanged()
         {
             foreach (string name in new[] { "NormalMelee", "NormalMelee_ReferenceTrial", "StrongMelee", "StrongSlash", "StrongLowSweep" })
-                Assert.That(Get<int>(Load(name), "parryCueLeadFrames"), Is.EqualTo(12), name);
+                Assert.That(Get<int>(Load(name), "parryCueLeadFrames"), Is.EqualTo(name.StartsWith("NormalMelee") ? 14 : 12), name);
             var timing = Load("ParryTiming");
             Assert.That(Get<int>(timing, "startFrame"), Is.Zero);
             Assert.That(Get<int>(timing, "justEndFrame"), Is.EqualTo(3));

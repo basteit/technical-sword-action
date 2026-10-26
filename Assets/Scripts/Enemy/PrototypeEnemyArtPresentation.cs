@@ -20,6 +20,13 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     public VideoArtLibrary Library => library;
     public bool UsesDownParryPose => useDownParryPose;
     public bool IsCounterFacingHeld => counterFacingHeld;
+    public bool HasAuthoredParryCue => isActiveAndEnabled && artwork != null && artwork.enabled &&
+        library != null && library.Find("Enemy_Windup") is { HasValidParryCue: true };
+    public int WindupSourceFrame { get; private set; } = -1;
+    public bool IsAuthoredParryCueVisible => HasAuthoredParryCue && ai != null && ai.IsWindingUp &&
+        health != null && health.IsAlive && !health.IsStunned &&
+        WindupSourceFrame >= library.Find("Enemy_Windup").parryCueFrame &&
+        WindupSourceFrame < library.Find("Enemy_Windup").parryCueFrame + library.Find("Enemy_Windup").ParryCueCelFrames;
     public void SetDownParryPose(bool value) { useDownParryPose = value; Show(); }
 
     private void Awake()
@@ -73,6 +80,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         health.ReleaseDeathPresentation(this);
         // Arena reset notifies health before resetting AI. Do not resample its old windup here.
         MotionName = "Idle";
+        WindupSourceFrame = -1;
         if (artwork != null)
         {
             artwork.color = Color.white;
@@ -111,6 +119,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private void Show()
     {
         if (artwork == null || library == null || ai == null || health == null) return;
+        WindupSourceFrame = -1;
         Sprite sprite;
         if (!health.IsAlive)
         {
@@ -130,7 +139,8 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
             var windup = library.Find("Enemy_Windup");
             int total = Mathf.Max(1, Mathf.RoundToInt(ai.WindupDuration * 60));
             int frame = Mathf.Clamp(total - ai.WindupRemainingFrames, 0, total - 1);
-            sprite = windup?.At(Mathf.FloorToInt(frame * windup.TotalFrames / (float)total));
+            WindupSourceFrame = MapWindupFrame(windup, frame, total, ai.ParryCueLeadFrames);
+            sprite = windup?.At(WindupSourceFrame);
         }
         else if (ai.ActiveRemainingFrames > 0)
         {
@@ -156,6 +166,26 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         artwork.flipX = counterFacingHeld ? counterFacingLeft : !health.IsAlive ? deathFacingLeft : ai.Facing.x < 0;
         bool down = MotionName == "Death" || (MotionName == "Parried" && useDownParryPose);
         artwork.transform.localPosition = restPosition + (down ? Vector3.down * (2f / 32f) : Vector3.zero);
+    }
+
+    /// <summary>Retime only gameplay drawing. Keep the authored large flash readable and the AI contact tick unchanged.</summary>
+    public static int MapWindupFrame(VideoArtLibrary.Motion motion, int elapsed, int total, int cueLead)
+    {
+        if (motion == null || motion.TotalFrames <= 0) return 0;
+        total = Mathf.Max(1, total); elapsed = Mathf.Clamp(elapsed, 0, total - 1);
+        int sourceTotal = motion.TotalFrames;
+        if (!motion.HasValidParryCue) return Mathf.Min(sourceTotal - 1, Mathf.FloorToInt(elapsed * sourceTotal / (float)total));
+        int lead = Mathf.Clamp(cueLead, 1, total), targetStart = total - lead;
+        int sourceStart = motion.parryCueFrame, sourceHold = motion.ParryCueCelFrames;
+        int hold = Mathf.Min(sourceHold, Mathf.Max(1, lead - 1));
+        if (elapsed < targetStart)
+            return Mathf.Min(sourceStart - 1, Mathf.FloorToInt(elapsed * sourceStart / (float)targetStart));
+        if (elapsed < targetStart + hold)
+            return sourceStart + Mathf.Min(sourceHold - 1, elapsed - targetStart);
+        int tail = total - targetStart - hold, sourceTail = sourceTotal - sourceStart - sourceHold;
+        if (tail <= 0 || sourceTail <= 0) return sourceTotal - 1;
+        return Mathf.Min(sourceTotal - 1, sourceStart + sourceHold +
+            Mathf.FloorToInt((elapsed - targetStart - hold) * sourceTail / (float)tail));
     }
 
     private void OnDisable()

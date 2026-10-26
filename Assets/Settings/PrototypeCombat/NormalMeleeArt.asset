@@ -77,6 +77,8 @@ MonoBehaviour:
     landingFrame: 0
     recoveryFrame: 0
   - name: Enemy_Windup
+    hasParryCue: 1
+    parryCueFrame: 66
     provisional: 0
     includesSlashTrail: 0
     includesParryEffect: 0

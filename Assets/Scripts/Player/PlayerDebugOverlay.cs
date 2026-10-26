@@ -106,7 +106,10 @@ public class PlayerDebugOverlay : MonoBehaviour
                 text.AppendLine($"{health.IndividualId}: {enemy.CurrentStateName}, {health.CurrentHp}/{health.MaxHp} HP / {enemy.AttackKind}\n  Windup {enemy.WindupRemainingFrames}F / Active {enemy.ActiveRemainingFrames}F / Attack {enemy.AttackId} #{enemy.AttackSequence}\n  Role {enemy.AttackRoleReason} / Counter x{health.CounterMultiplier:0.00} / Reaction {health.LastHitReaction} / Armor {enemy.ResistsHitStun}");
                 var launch = enemy.GetComponent<EnemyCounterLaunch2D>();
                 text.AppendLine($"  Parry stagger {health.ParryStaggerRemainingFrames}F / configured {health.ConfiguredParryStaggerFrames}F");
-                text.AppendLine($"  Yellow parry cue {enemy.IsParryCueActive} / last {enemy.ParryCueLeadFrames}F of windup");
+                var enemyArt = enemy.GetComponent<PrototypeEnemyArtPresentation>();
+                text.AppendLine(enemyArt != null && enemyArt.HasAuthoredParryCue
+                    ? $"  Authored flash {enemyArt.IsAuthoredParryCueVisible} / source {enemyArt.WindupSourceFrame}F / lead {enemy.ParryCueLeadFrames}F (no extra marker)"
+                    : $"  Placeholder parry cue {enemy.IsParryCueActive} / last {enemy.ParryCueLeadFrames}F of windup");
                 if (launch != null) text.AppendLine($"  Launch {launch.IsActive} {launch.ElapsedFrames}F / {launch.TravelDistance:0.00}u / {launch.LastEndReason} / Motion owners {health.MotionOwnerCount}");
             }
             var feedback = GetComponent<CombatFeedback2D>();

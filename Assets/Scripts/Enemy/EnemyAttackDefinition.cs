@@ -6,7 +6,7 @@ public sealed class EnemyAttackDefinition : ScriptableObject
 {
     public string attackId = "melee-slash";
     [Min(1)] public int windupFrames = 36;
-    [Tooltip("Yellow cue lead-in before contact. Does not shorten windup or change parry acceptance.")]
+    [Tooltip("Authored flash / placeholder cue lead-in before contact. Does not shorten windup or change parry acceptance.")]
     [Min(1)] public int parryCueLeadFrames = 12;
     [Min(1)] public int activeFrames = 3;
     [Min(1)] public int recoveryFrames = 32;

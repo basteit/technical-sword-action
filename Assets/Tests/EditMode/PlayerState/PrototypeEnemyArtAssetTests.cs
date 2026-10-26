@@ -15,6 +15,33 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private static V Get<V>(object obj, string name) => (V)(obj.GetType().GetProperty(name)?.GetValue(obj) ?? obj.GetType().GetField(name).GetValue(obj));
         private static object Find(object obj, string name) => obj.GetType().GetMethod("Find").Invoke(obj, new object[] { name });
 
+        [TestCase(30)] [TestCase(96)]
+        public void ExistingLargeFlashIsHeldForSixTicksAndStartsFourteenTicksBeforeContact(int total)
+        {
+            var art = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Settings/PrototypeCombat/NormalMeleeArt.asset");
+            var windup = Find(art, "Enemy_Windup");
+            Assert.That(Get<bool>(windup, "HasValidParryCue"), Is.True);
+            Assert.That(Get<int>(windup, "parryCueFrame"), Is.EqualTo(66));
+            Assert.That(Get<int>(windup, "ParryCueCelFrames"), Is.EqualTo(6));
+            var map = T("PrototypeEnemyArtPresentation").GetMethod("MapWindupFrame");
+            var at = windup.GetType().GetMethod("At"); var source = Get<Sprite[]>(windup, "frames");
+            var shown = Enumerable.Range(0, total).Select(frame =>
+                (Sprite)at.Invoke(windup, new object[] { (int)map.Invoke(null, new object[] { windup, frame, total, 14 }), false })).ToArray();
+            Assert.That(Array.FindIndex(shown, sprite => sprite == source[7]), Is.EqualTo(total - 14));
+            Assert.That(shown.Count(sprite => sprite == source[7]), Is.EqualTo(6));
+            Assert.That(shown, Is.SupersetOf(source), "Do not drop submitted poses while retiming the flash.");
+            Assert.That(shown.Last(), Is.SameAs(source.Last()));
+        }
+
+        [Test] public void VideoLibraryWithoutGameplayCueMetadataKeepsLinearSampling()
+        {
+            var video = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Settings/CombatVideoArt.asset");
+            var windup = Find(video, "Enemy_Windup"); Assert.That(Get<bool>(windup, "hasParryCue"), Is.False);
+            var map = T("PrototypeEnemyArtPresentation").GetMethod("MapWindupFrame"); int frames = Get<int>(windup, "TotalFrames");
+            for (int frame = 0; frame < 96; frame++)
+                Assert.That(map.Invoke(null, new object[] { windup, frame, 96, 12 }), Is.EqualTo(Mathf.FloorToInt(frame * frames / 96f)));
+        }
+
         [Test]
         public void SnapshotContainsOnlySevenEnemyMotionsAndKeepsReceivedSprites()
         {

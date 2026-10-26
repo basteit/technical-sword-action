@@ -144,7 +144,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [TestCaseSource(nameof(CueCases))]
-        public void FirstYellowAndDelayedInputsBothParryTheActualAttack(int fps, int direction, string kind, int delay)
+        public void FirstLargeAuthoredFlashAndDelayedInputsBothParryTheActualAttack(int fps, int direction, string kind, int delay)
         {
             if (kind == "Strong") ai = Enemy("StrongMelee");
             if (kind == "OriginalNormal") Call(ai, "ConfigureDefinition", AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/Settings/PrototypeCombat/NormalMelee.asset"));
@@ -156,15 +156,26 @@ namespace TechnicalSwordAction.PlayerState.Tests
             int expectedWindup = kind == "Strong" ? 42 : kind == "OriginalNormal" ? 30 : 96;
             Assert.That(Get<int>(ai, "WindupRemainingFrames"), Is.EqualTo(expectedWindup));
             var cue = Get<SpriteRenderer>(ai.GetComponent(T("EnemyCombatCue2D")), "cue");
+            var art = ai.GetComponent(T("PrototypeEnemyArtPresentation"));
+            Func<bool> visible = art == null ? () => cue.enabled : () => Get<bool>(art, "IsAuthoredParryCueVisible");
             int limit = 900;
-            while (!Get<bool>(ai, "IsParryCueActive") && --limit > 0)
+            while (!visible() && --limit > 0)
             {
                 Assert.That(cue.enabled, Is.False, "Do not invite an input too early in the windup.");
                 Frames(1, fps);
             }
             Assert.That(limit, Is.GreaterThan(0));
-            Assert.That(cue.enabled, Is.True); Assert.That(cue.color, Is.EqualTo(Color.yellow));
-            Assert.That(Get<int>(ai, "WindupRemainingFrames"), Is.InRange(fps == 30 ? 11 : 12, 12));
+            if (art == null) { Assert.That(cue.enabled, Is.True); Assert.That(cue.color, Is.EqualTo(Color.yellow)); }
+            else
+            {
+                Assert.That(Get<bool>(art, "HasAuthoredParryCue"), Is.True);
+                Assert.That(cue.enabled, Is.False, "Never duplicate the flash already drawn into the enemy sprite.");
+                var windup = Call(Get<object>(art, "Library"), "Find", "Enemy_Windup");
+                Assert.That(Get<SpriteRenderer>(art, "Artwork").sprite, Is.SameAs(Get<Sprite[]>(windup, "frames")[7]));
+                Assert.That(Get<int>(art, "WindupSourceFrame"), Is.InRange(66, 71));
+            }
+            int lead = kind == "Strong" ? 12 : 14;
+            Assert.That(Get<int>(ai, "WindupRemainingFrames"), Is.InRange(lead - (fps == 30 ? 1 : 0), lead));
             Frames(delay); Request(PlayerActionRequest.Parry);
             Until(() => Get<int>(parry, "SuccessCount") == 1, fps);
             Assert.That(Get<int>(player.GetComponent(T("PlayerDamageReceiver2D")), "CurrentHp"), Is.EqualTo(100));
@@ -172,21 +183,44 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(health, "IsParryStaggered"), Is.True);
             Assert.That(Get<object>(parry, "LastParryResult").ToString(), Is.EqualTo(delay == 10 ? "Just" : "Normal"));
             Assert.That(cue.enabled, Is.False, "Do not leave a yellow cue after contact/stagger.");
+            if (art != null) Assert.That(Get<bool>(art, "IsAuthoredParryCueVisible"), Is.False);
         }
 
-        [Test] public void PauseAndHitstopFreezeTheYellowLeadInAndResetHidesIt()
+        [Test] public void PauseAndHitstopFreezeTheAuthoredLargeFlashAndResetHidesIt()
         {
             Position(1); Call(health, "ResetForCapture", new Vector3(1.2f, .8f), 1000);
             Call(ai, "ResetForCapture", player.transform, true); Physics2D.SyncTransforms();
             Assert.That((bool)Call(ai, "BeginCaptureAttack"), Is.True);
-            Until(() => Get<bool>(ai, "IsParryCueActive"));
+            var art = ai.GetComponent(T("PrototypeEnemyArtPresentation"));
+            Until(() => Get<bool>(art, "IsAuthoredParryCueVisible"));
             int remaining = Get<int>(ai, "WindupRemainingFrames");
+            int sourceFrame = Get<int>(art, "WindupSourceFrame"); var sprite = Get<SpriteRenderer>(art, "Artwork").sprite;
             var cue = Get<SpriteRenderer>(ai.GetComponent(T("EnemyCombatCue2D")), "cue");
-            Pause(true); Frames(120); Assert.That(Get<int>(ai, "WindupRemainingFrames"), Is.EqualTo(remaining)); Assert.That(cue.enabled, Is.True);
+            Pause(true); Frames(120); Assert.That(Get<int>(ai, "WindupRemainingFrames"), Is.EqualTo(remaining)); Assert.That(cue.enabled, Is.False);
+            Assert.That(Get<int>(art, "WindupSourceFrame"), Is.EqualTo(sourceFrame)); Assert.That(Get<SpriteRenderer>(art, "Artwork").sprite, Is.SameAs(sprite));
             Pause(false); T("CombatTimeController").GetMethod("RequestHitstop").Invoke(null, new object[] { this, 8f / 60f });
-            Frames(8); Assert.That(Get<int>(ai, "WindupRemainingFrames"), Is.EqualTo(remaining)); Assert.That(cue.enabled, Is.True);
+            Frames(8); Assert.That(Get<int>(ai, "WindupRemainingFrames"), Is.EqualTo(remaining)); Assert.That(cue.enabled, Is.False);
+            Assert.That(Get<int>(art, "WindupSourceFrame"), Is.EqualTo(sourceFrame)); Assert.That(Get<SpriteRenderer>(art, "Artwork").sprite, Is.SameAs(sprite));
             Frames(1); Assert.That(Get<int>(ai, "WindupRemainingFrames"), Is.EqualTo(remaining - 1));
             Call(arena, "ResetActionsOnly"); Assert.That(cue.enabled, Is.False); Assert.That(Get<bool>(ai, "IsParryCueActive"), Is.False);
+            Assert.That(Get<bool>(art, "IsAuthoredParryCueVisible"), Is.False);
+        }
+
+        [Test] public void TheEarlierSmallSparkDoesNotLatchParryForThirtyFrames()
+        {
+            Position(1); Call(health, "ResetForCapture", new Vector3(1.2f, .8f), 1000);
+            Call(ai, "ResetForCapture", player.transform, true); Physics2D.SyncTransforms();
+            Assert.That((bool)Call(ai, "BeginCaptureAttack"), Is.True);
+            var art = ai.GetComponent(T("PrototypeEnemyArtPresentation"));
+            var windup = Call(Get<object>(art, "Library"), "Find", "Enemy_Windup");
+            var drawing = Get<SpriteRenderer>(art, "Artwork"); var small = Get<Sprite[]>(windup, "frames")[6];
+            Until(() => drawing.sprite == small);
+            Assert.That(Get<int>(ai, "WindupRemainingFrames"), Is.GreaterThan(13));
+            Assert.That(Get<bool>(art, "IsAuthoredParryCueVisible"), Is.False);
+            Assert.That(Get<SpriteRenderer>(ai.GetComponent(T("EnemyCombatCue2D")), "cue").enabled, Is.False);
+            Request(PlayerActionRequest.Parry); Frames(30);
+            Assert.That(Get<int>(parry, "SuccessCount"), Is.Zero); Assert.That(Get<int>(counter, "StockCount"), Is.Zero);
+            Assert.That(Get<int>(player.GetComponent(T("PlayerDamageReceiver2D")), "CurrentHp"), Is.EqualTo(90));
         }
 
         [Test] public void UnparryableSweepKeepsItsFullRedWarningAndStillDamagesParry()

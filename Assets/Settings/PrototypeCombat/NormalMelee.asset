@@ -17,7 +17,7 @@ MonoBehaviour:
   parryStaggerFrames: 180
   moveSpeed: 2.2
   windupFrames: 30
-  parryCueLeadFrames: 12
+  parryCueLeadFrames: 14
   activeFrames: 3
   recoveryFrames: 30
   cooldownFrames: 32

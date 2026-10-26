@@ -20,6 +20,21 @@ public sealed class VideoArtLibrary : ScriptableObject
         public Sprite[] eyeFrames;
         public int[] durations;
         public int hitFrame,branchFrame,chargeFrame,releaseFrame,landingFrame,recoveryFrame;
+        [Tooltip("The source art already contains a parry cue. Gameplay may align its first large flash without drawing an extra marker.")]
+        public bool hasParryCue;
+        [Min(0)] public int parryCueFrame;
+        public bool HasValidParryCue => hasParryCue && frames != null && durations != null &&
+            frames.Length == durations.Length && frames.Length > 0 && parryCueFrame >= 0 && parryCueFrame < TotalFrames;
+        public int ParryCueCelFrames
+        {
+            get
+            {
+                if (!HasValidParryCue) return 0;
+                int end = 0;
+                foreach (int duration in durations) { end += duration; if (end > parryCueFrame) return end - parryCueFrame; }
+                return 0;
+            }
+        }
         public int TotalFrames { get { int n=0; foreach(int duration in durations) n+=duration; return n; } }
         public Sprite At(int gameFrame, bool loop = false)
         {
