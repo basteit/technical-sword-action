@@ -1,0 +1,91 @@
+{
+  "dateJst": "2026-10-26",
+  "issue": 34,
+  "branch": "issue/34-reference-combat-trial",
+  "implementationCommit": "46f07f5",
+  "parentCommit": "01bcfe0",
+  "pullRequest": 81,
+  "changedAxes": ["first-two attack timeline", "first-two ground burst"],
+  "compile": {"errors": 0, "warnings": 0},
+  "editMode": {"total": 228, "passed": 228, "additionalCases": 3},
+  "focusedPlayMode": {"total": 187, "passed": 187, "trialFixtureCases": 54, "additionalTrialCases": 18},
+  "fullPlayMode": {
+    "total": 645,
+    "passed": 632,
+    "failed": 13,
+    "newFailureNamesComparedWithPreviousRun": [],
+    "localXml": ".uloop/outputs/TestResults/20261026_133831.xml",
+    "comparedWithLocalXml": ".uloop/outputs/TestResults/20261025_230217.xml",
+    "knownFailuresUnresolved": true,
+    "failureNames": [
+      "CombatVideoIntegrationTests.KickKnocksBackOnlyItsTargetAndPauseFreezesTheFixedPose(False)",
+      "CombatVideoIntegrationTests.KickKnocksBackOnlyItsTargetAndPauseFreezesTheFixedPose(True)",
+      "CombatVideoIntegrationTests.ReleasePrecedesImpactAndFollowThroughReachesGroundAtEveryRenderRate(30)",
+      "CombatVideoIntegrationTests.ReleasePrecedesImpactAndFollowThroughReachesGroundAtEveryRenderRate(60)",
+      "CombatVideoIntegrationTests.ReleasePrecedesImpactAndFollowThroughReachesGroundAtEveryRenderRate(120)",
+      "DefenseCancelShowcaseTests.AttackCancelCounterDashAndReturnComboUseTheActualStateAndTarget(4,30,False)",
+      "DefenseCancelShowcaseTests.AttackCancelCounterDashAndReturnComboUseTheActualStateAndTarget(4,60,False)",
+      "DefenseCancelShowcaseTests.AttackCancelCounterDashAndReturnComboUseTheActualStateAndTarget(4,120,False)",
+      "DefenseCancelShowcaseTests.AttackCancelCounterDashAndReturnComboUseTheActualStateAndTarget(4,30,True)",
+      "DefenseCancelShowcaseTests.AttackCancelCounterDashAndReturnComboUseTheActualStateAndTarget(4,60,True)",
+      "DefenseCancelShowcaseTests.AttackCancelCounterDashAndReturnComboUseTheActualStateAndTarget(4,120,True)",
+      "DefenseCancelShowcaseTests.BothEndingsAndBothDirectionsResetTenTimesEach",
+      "PrototypePlayerMovementFixTests.SuccessfulParryKeepsHeldMovementStoppedOnlyForItsExistingLock(5,\"Just\")"
+    ]
+  },
+  "attackModes": {
+    "default": "SnappyFirstTwo",
+    "cycle": ["SnappyFirstTwo", "FastTrial", "Original"],
+    "oneCycleRestoresPreviousSettings": true,
+    "enemyTogglesPreserveSelectedAttackMode": true,
+    "switchResetsCurrentEncounter": true,
+    "playModeChangesAreNotPersisted": true
+  },
+  "snappy": {
+    "activeStart": [9, 7, 12, 30],
+    "activeEnd": [10, 8, 13, 31],
+    "cancelStart": [11, 9, 14, 32],
+    "recoveryStart": [22, 18, 28, 47],
+    "endFrame": [24, 20, 30, 49],
+    "motionDistance": [0.25, 0.30, 0.18, 0.22],
+    "motionFrames": [6, 6, 8, 8],
+    "damageUnchanged": [10, 10, 15, 25],
+    "gaugeUnchanged": [2, 2, 2, 5],
+    "hitstopChanged": false
+  },
+  "runtimeCoverage": [
+    "30/60/120fps",
+    "left/right ground bursts and walls",
+    "left/right air steering and gravity",
+    "Pause release rendered-frame input guard remains intact",
+    "Pause and hitstop freeze body and action clock",
+    "four-step 60 damage and one hit per target per step",
+    "Dash/Parry/Special cancel boundaries and recovery restart",
+    "previous FAST and ORIGINAL contact poses and damage",
+    "one-step rollback during an attack and controller/definition synchronization",
+    "independent enemy timing/reaction modes and encounter reset",
+    "counter spacing/facing, enemy art, dialogue and platforms"
+  ],
+  "gameView": {
+    "resolution": [1920, 1080],
+    "firstTwoContactSpritesConfirmed": [true, true],
+    "hitCountAfterEachStep": [1, 2],
+    "targetHpAfterEachStep": [990, 980],
+    "elapsedFramesReportedAfterHitTickTimers": [10, 8],
+    "hitstopTicksAfterEachHit": [3, 3],
+    "actualGroundXAfterEachStepFromZero": [0.23038, 0.5104865],
+    "distanceNote": "Configured displacement is reduced by existing ground friction/collision; physics was not changed.",
+    "rollbackMode": "FastTrial",
+    "rollbackFirstHitFrame": 12,
+    "rollbackFirstMotionDistance": 0.1,
+    "screenshots": [
+      "prototype-attack-snappy-2026-10-26/Rendering_20261026_134004_171.png",
+      "prototype-attack-snappy-2026-10-26/Rendering_20261026_134030_629.png",
+      "prototype-attack-snappy-2026-10-26/Rendering_20261026_134043_984.png"
+    ]
+  },
+  "preserved": ["received art and shared PNGs", "original clips and controllers", "previous FAST assets and clips", "steps 3/4 of the previous FAST mode", "damage, gauge, hitstop and hit radius", "parry/counter timing, spacing and presentation", "enemy definitions", "walking, air steering and physics", "filming settings", "unrelated uncommitted changes"],
+  "initialFocusedTestFailure": "Six new tests requested the next attack on the same rendered frame as unpausing. The tests were corrected to verify the rejection, yield one rendered frame, and continue; no gameplay guard was changed.",
+  "finalEditorState": {"isPlaying": false, "isPaused": false, "sceneDirty": false, "missingScripts": 0, "validationErrors": 0, "consoleErrors": 0, "consoleWarnings": 0},
+  "notPerformed": ["physical keys/gamepad", "15-minute human feel comparison", "new distribution Build/ZIP", "merge or issue close"]
+}
