@@ -1,0 +1,118 @@
+{
+  "validatedAtUtc": "2026-10-15T20:31:48.082535+00:00",
+  "variants": [
+    {
+      "take": "speed-1p5x",
+      "requestedMultiplier": 1.5,
+      "actualMultiplier": 1.500001072883606,
+      "pixelDisplacementMultiplier": 1.5,
+      "baselineMeasuredSpeed": 2.803800106048584,
+      "commandedSpeed": 4.401900291442871,
+      "actualMoveSpeed": 4.205703258514404,
+      "sourcePoseFramesChecked": 360,
+      "pointSamplingExactMatches": 321,
+      "pointSamplingMaxMismatchRate": 0.006742769267167445,
+      "pointSamplingComparisonTolerance": 0.03,
+      "allFramesInsideCamera": true,
+      "returnedToStart": true
+    },
+    {
+      "take": "speed-2x",
+      "requestedMultiplier": 2.0,
+      "actualMultiplier": 2.0000011920928955,
+      "pixelDisplacementMultiplier": 2.0,
+      "baselineMeasuredSpeed": 2.803800106048584,
+      "commandedSpeed": 5.803800106048584,
+      "actualMoveSpeed": 5.607603549957275,
+      "sourcePoseFramesChecked": 360,
+      "pointSamplingExactMatches": 317,
+      "pointSamplingMaxMismatchRate": 0.012296010879419764,
+      "pointSamplingComparisonTolerance": 0.03,
+      "allFramesInsideCamera": true,
+      "returnedToStart": true
+    }
+  ],
+  "videos": [
+    {
+      "path": "studio-idle-walk-speed-1p5x.mp4",
+      "decodedFrames": 360,
+      "fps": 60,
+      "durationSeconds": 6,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "audioStreams": 0
+    },
+    {
+      "path": "studio-idle-walk-speed-2x.mp4",
+      "decodedFrames": 360,
+      "fps": 60,
+      "durationSeconds": 6,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "audioStreams": 0
+    },
+    {
+      "path": "studio-idle-walk-speed-comparison.mp4",
+      "decodedFrames": 360,
+      "fps": 60,
+      "durationSeconds": 6,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "audioStreams": 0
+    }
+  ],
+  "sameCamera": {
+    "size": 5,
+    "center": {
+      "x": 2.4000000953674316,
+      "y": 1.0499999523162842
+    }
+  },
+  "sameAnimationTiming": true,
+  "comparison": {
+    "top": 1.5,
+    "bottom": 2.0,
+    "crop": [
+      0,
+      300,
+      1920,
+      540
+    ],
+    "resized": false
+  },
+  "sourceFileSha256": {
+    "idle": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
+    "walk": "92FC9E07636331D2D6B5AAC363DC3AC6A53E030608DB1533D9CAE1505AE5F107"
+  },
+  "baselineVideoSha256": "7F9A068ECB49CF6386AA86E5BA28DBDB0C83494448892B1B9B3F2F4ED1608FDB",
+  "unityCompile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "unityPostCaptureConsole": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "restored": {
+    "cameraSize": 2.109375,
+    "followCamera": true,
+    "moveSpeed": 6.5,
+    "manualAdvanceOnly": false,
+    "animationDriver": true,
+    "recovery": true,
+    "inputRouter": true,
+    "enemyActive": true,
+    "customContentActive": true,
+    "action": "Neutral",
+    "slowScale": 1,
+    "slowOwners": 0,
+    "hitstopOwners": 0,
+    "activeVfx": 0
+  }
+}

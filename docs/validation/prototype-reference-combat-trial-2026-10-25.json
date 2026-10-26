@@ -1,0 +1,89 @@
+{
+  "dateJst": "2026-10-25",
+  "issue": 34,
+  "branch": "issue/34-reference-combat-trial",
+  "baselineCommit": "207692af83c0dce3546e2d83a26f39a8c73a55a9",
+  "implementationCommits": ["aadb186", "6c34a8f"],
+  "draftPullRequest": 81,
+  "dependencyPullRequests": [78, 79, 80],
+  "referenceVideo": {
+    "name": "カウンター動画.mp4",
+    "sha256": "3ED193EEC61FDE82112DA1F83E9CBAA9578D8512BB8265726F96782D5629467A",
+    "fps": 60,
+    "frames": 275,
+    "seconds": 4.583333333333333,
+    "sourceChangedOrPublished": false
+  },
+  "compile": {"errors": 0, "warnings": 0},
+  "editMode": {"total": 224, "passed": 224, "newAssetTests": 4},
+  "playMode": {
+    "total": 613,
+    "passed": 600,
+    "failed": 13,
+    "focusedTotal": 151,
+    "focusedPassed": 151,
+    "newTrialTests": 22,
+    "knownFailureNamesMatchEarlierRun": true,
+    "earlierRun": ".uloop/outputs/TestResults/20261025_140057.xml",
+    "finalRun": ".uloop/outputs/TestResults/20261025_230217.xml",
+    "unresolvedCategories": {
+      "videoKnockbackHeight": 2,
+      "videoChargeEightVersusNineTicks": 3,
+      "fourStepDefenseCancelVideoCompletion": 7,
+      "legacyJustParryAtContactFrameFive": 1
+    }
+  },
+  "original": {
+    "playerHitFrames": [15, 12, 15, 38],
+    "playerEndFrames": [38, 32, 38, 62],
+    "enemyWindupFrames": 30,
+    "enemyRecoveryFrames": 30,
+    "launchDistance": 3.2,
+    "launchHeight": 0.65,
+    "launchFrames": 22,
+    "launchRotationDegrees": 95,
+    "parryPose": "Enemy_Parried (chance)"
+  },
+  "trial": {
+    "playerHitFrames": [12, 9, 12, 30],
+    "playerActiveEndFrames": [13, 10, 13, 31],
+    "playerCancelFrames": [14, 11, 14, 32],
+    "playerRecoveryFrames": [28, 22, 28, 47],
+    "playerEndFrames": [30, 24, 30, 49],
+    "enemyWindupFrames": 96,
+    "enemyRecoveryFrames": 24,
+    "launchDistance": 1.6,
+    "launchHeight": 0.27,
+    "launchFrames": 18,
+    "launchRotationDegrees": 0,
+    "parryPose": "Enemy_Death (down), only during real stagger/counter hold"
+  },
+  "preserved": {
+    "normalHp": 30,
+    "normalDamage": 10,
+    "counterMultiplier": 3,
+    "parryStaggerFrames": 180,
+    "strongEnemy": true,
+    "playerDamageGaugeAndHitstop": true,
+    "parryAcceptance": true,
+    "originalDefinitionsClipsAndOverride": true,
+    "receivedSourcesSharedSpritesAndFilmingData": true
+  },
+  "gameView": {
+    "resolution": [1920, 1080],
+    "realAiParrySucceeded": true,
+    "parryStaggerRemaining": 180,
+    "playerHp": 100,
+    "counterHitCount": 1,
+    "enemyHpAfterCounter": 0,
+    "launchSnapshot": {"frame": 5, "travelDistance": 0.9972566, "rootY": 1.006832, "rotationZ": 0},
+    "screenshots": [
+      "prototype-reference-combat-trial-2026-10-25/Rendering_20261025_230326_926.png",
+      "prototype-reference-combat-trial-2026-10-25/Rendering_20261025_230402_593.png",
+      "prototype-reference-combat-trial-2026-10-25/Rendering_20261025_230433_175.png"
+    ]
+  },
+  "rollback": {"attackKey": "F10", "enemyTimingKey": "F11", "reactionKey": "F12", "allOriginalsButton": true, "safeEncounterReset": true, "originalModeConfirmed": true},
+  "finalEditorState": {"isPlaying": false, "scene": "PrototypeCombatValidation", "sceneDirty": false, "missingScripts": 0, "validationErrors": 0, "consoleErrors": 0, "consoleWarnings": 0},
+  "notPerformed": ["physical F10/F11/F12 key confirmation", "physical gamepad playtest", "15-minute human feel comparisons", "Development Build or ZIP rebuild", "merge or issue close"]
+}

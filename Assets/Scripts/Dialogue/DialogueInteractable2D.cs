@@ -38,7 +38,8 @@ public sealed class DialogueInteractable2D : MonoBehaviour, IInteractable2D
 
     public bool CanInteract(GameObject interactor)
     {
-        return sequence != null && controller != null && !controller.IsGameplayLockActive && (!playOnce || !hasPlayed);
+        return isActiveAndEnabled && sequence != null && controller != null && controller.isActiveAndEnabled &&
+               !controller.IsGameplayLockActive && (!playOnce || !hasPlayed);
     }
 
     public void Interact(GameObject interactor)

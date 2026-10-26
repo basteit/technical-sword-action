@@ -49,7 +49,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             foreach (PlayerActionState state in Enum.GetValues(typeof(PlayerActionState)))
             {
-                if (state != PlayerActionState.Neutral && state != PlayerActionState.Attack && state != PlayerActionState.ParrySuccess)
+                if (state != PlayerActionState.Neutral && state != PlayerActionState.Attack && state != PlayerActionState.ParrySuccess && state != PlayerActionState.ParryCounter)
                 {
                     yield return new TestCaseData(state);
                 }

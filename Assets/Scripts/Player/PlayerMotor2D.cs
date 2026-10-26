@@ -6,8 +6,10 @@ using TechnicalSwordAction.PlayerState;
 [RequireComponent(typeof(Collider2D))]
 public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
+    // Approved 1.5x walking take (2026-10-16); about 4.2057 unit/s after floor friction.
+    public const float StandardMoveSpeed = 4.4019f;
     [Header("Move")]
-    [SerializeField] private float moveSpeed = 6.5f;
+    [SerializeField] private float moveSpeed = StandardMoveSpeed;
     [SerializeField] private bool flipSpriteByMoveInput = true;
 
     [Header("Jump")]
@@ -20,6 +22,9 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     private bool jumpHeld;
     private bool variableJumpActive;
     private bool airDashUsed;
+    [SerializeField, Min(0)] private int coyoteFrames = 6;
+    private int coyoteRemaining;
+    public int CoyoteRemainingFrames => coyoteRemaining;
     private int groundSuppressFrames;
     private int floorDropRemaining;
     private readonly List<Collider2D> droppedFloors = new();
@@ -31,6 +36,9 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     [SerializeField] private float dashSpeed = 18f;
     [SerializeField] private float dashDuration = 0.18f;
     [SerializeField] private float dashCooldown = 0.8f;
+    [SerializeField, Min(0)] private int dashMoveFrames;
+    [SerializeField] private bool preserveAirDashVertical;
+    private int dashElapsedFrames;
     [SerializeField] private LayerMask ignoreCollisionLayersWhileDashing;
 
     [Header("Optional References")]
@@ -58,6 +66,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     private readonly HashSet<Collider2D> ignoredDashColliders = new();
 
     public float MoveInput => moveInput;
+    public float MoveSpeed => moveSpeed;
     public bool DownInput { get; private set; }
     // The floor traversal executor in #49 consumes this sample with the Jump request.
     public bool JumpDownInput => jumpDownInput;
@@ -69,9 +78,11 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     public void SetJumpDownInput(bool down) => jumpDownInput = down;
     public bool IsGrounded => isGrounded;
     public bool IsDashing => isDashing;
+    public bool IsDashInvincible => isDashing && (dashMoveFrames <= 0 || dashElapsedFrames < dashMoveFrames);
     public bool CanDash => CanStartDash;
     public bool CanStartDash => isActiveAndEnabled && !isDashing && dashCooldownTimer <= 0f && (isGrounded || !airDashUsed);
-    public bool CanStartJump => isActiveAndEnabled && isGrounded && !isDashing;
+    public bool CanStartJump => isActiveAndEnabled && (isGrounded || coyoteRemaining > 0) && !isDashing;
+    public string VelocityOwner => isDashing ? "Dash" : stateMachine == null ? "Motor" : stateMachine.ActionState.ToString();
     public Vector2 Velocity => rb != null ? rb.linearVelocity : Vector2.zero;
     public float DashRemaining => Mathf.Max(0f, dashTimer);
     public float DashCooldownRemaining => Mathf.Max(0f, dashCooldownTimer);
@@ -141,6 +152,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     public void CombatTickTimers()
     {
         if (groundSuppressFrames > 0) groundSuppressFrames--;
+        if (!isGrounded && coyoteRemaining > 0) coyoteRemaining--;
         if (floorDropRemaining > 0 && --floorDropRemaining == 0)
         {
             bool overlapping = false;
@@ -163,7 +175,8 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         }
         if (isDashing)
         {
-            rb.linearVelocity = dashDirection * dashSpeed;
+            float speed = IsDashInvincible ? dashSpeed : 0f;
+            rb.linearVelocity = new Vector2(dashDirection.x * speed, preserveAirDashVertical && !isGrounded ? rb.linearVelocity.y : 0f);
             return;
         }
 
@@ -187,6 +200,13 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
                 rb.linearVelocity = new Vector2(moveInput * moveSpeed * attack.AirMoveSpeedMultiplier, rb.linearVelocity.y);
             }
 
+            return;
+        }
+
+        if (stateMachine != null && stateMachine.ActionState == PlayerActionState.Heal)
+        {
+            float multiplier = GetComponent<PlayerHeal2D>()?.MoveMultiplier ?? 0f;
+            rb.linearVelocity = new Vector2(moveInput * moveSpeed * multiplier, rb.linearVelocity.y);
             return;
         }
 
@@ -216,7 +236,9 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     private void UpdateFacing()
     {
         if (!flipSpriteByMoveInput || isDashing ||
-            (stateMachine != null && stateMachine.ActionState == PlayerActionState.Attack))
+            (stateMachine != null && (stateMachine.ActionState == PlayerActionState.Attack ||
+             stateMachine.ActionState == PlayerActionState.Parry || stateMachine.ActionState == PlayerActionState.ParrySuccess ||
+             stateMachine.ActionState == PlayerActionState.ParryFail || stateMachine.ActionState == PlayerActionState.ParryCounter)))
         {
             return;
         }
@@ -231,7 +253,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         }
     }
 
-    private void SetFacing(int sign)
+    public void SetFacing(int sign)
     {
         if (sign == 0 || facingSign == sign)
         {
@@ -259,6 +281,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
             if (floor == ownCollider || floor.isTrigger || droppedFloors.Contains(floor) ||
                 Physics2D.GetIgnoreCollision(ownCollider, floor)) continue;
             isGrounded = true;
+            coyoteRemaining = coyoteFrames;
             airDashUsed = false;
             break;
         }
@@ -272,6 +295,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         }
 
         bool down = jumpDownInput;
+        coyoteRemaining = 0;
         jumpDownInput = false;
         if (down && TryDropThroughFloor()) return true;
         isGrounded = false;
@@ -300,11 +324,12 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         dashDirection = new Vector2(dashSign, 0f);
         if (!isGrounded) airDashUsed = true;
         isDashing = true;
+        dashElapsedFrames = 0;
         dashTimer = dashDuration;
         dashCooldownTimer = dashCooldown;
 
-        rb.gravityScale = 0f;
-        rb.linearVelocity = dashDirection * dashSpeed;
+        rb.gravityScale = preserveAirDashVertical && !isGrounded ? originalGravityScale : 0f;
+        rb.linearVelocity = new Vector2(dashDirection.x * dashSpeed, preserveAirDashVertical && !isGrounded ? rb.linearVelocity.y : 0f);
         IgnoreDashOverlaps();
         return true;
     }
@@ -314,7 +339,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         isDashing = false;
         dashTimer = 0f;
         rb.gravityScale = originalGravityScale;
-        rb.linearVelocity = Vector2.zero;
+        rb.linearVelocity = preserveAirDashVertical && !isGrounded ? new Vector2(0, rb.linearVelocity.y) : Vector2.zero;
         RestoreDashIgnoredCollisions();
 
         if (notifyStateMachine)
@@ -354,6 +379,8 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         }
 
         dashTimer = CombatTimeController.AdvanceTimer(dashTimer);
+        dashElapsedFrames++;
+        if (dashMoveFrames > 0 && dashElapsedFrames == dashMoveFrames) RestoreDashIgnoredCollisions();
 
         if (dashTimer <= 0f)
         {
@@ -466,6 +493,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         RestoreDroppedFloors();
         groundSuppressFrames = 0;
         airDashUsed = false;
+        coyoteRemaining = 0;
         variableJumpActive = false;
         isGrounded = false;
         ClearSampledInput();

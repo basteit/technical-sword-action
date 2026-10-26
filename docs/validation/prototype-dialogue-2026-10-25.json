@@ -1,0 +1,44 @@
+{
+  "dateJst": "2026-10-25",
+  "issue": 51,
+  "branch": "issue/51-prototype-dialogue",
+  "baselineCommit": "940dc9d5df1a58b462cc8ba3b7e521788f44f901",
+  "implementationCommits": ["d4b4e1b", "df348fb"],
+  "unityVersion": "6000.3.9f1",
+  "compile": {"errors": 0, "warnings": 0},
+  "finalEditMode": {"total": 217, "passed": 217, "dialogueTests": 8},
+  "finalFocusedPlayMode": {
+    "total": 114,
+    "passed": 114,
+    "dialogueTests": 19,
+    "fixtures": ["PrototypeDialogueTests", "PlayerStateContractTests", "PlayerInputRouterTests", "PrototypeCounterCinematicTests"]
+  },
+  "fullPlayModeBeforeEditorValidationRefinement": {
+    "total": 578,
+    "passed": 565,
+    "failed": 13,
+    "xml": ".uloop/outputs/TestResults/20261025_135652.xml"
+  },
+  "independentExistingFixtureReproduction": {
+    "total": 254,
+    "passed": 241,
+    "failed": 13,
+    "sameFailureNamesAsFullRun": true,
+    "fixtures": ["CombatVideoIntegrationTests", "DefenseCancelShowcaseTests", "PrototypePlayerMovementFixTests"],
+    "failureGroups": {"videoKnockbackHeight": 2, "videoChargeTiming": 3, "fourStageDefenseCancelCaptureCompletion": 7, "oldJustParryExpectation": 1},
+    "xml": ".uloop/outputs/TestResults/20261025_140057.xml",
+    "note": "The unchanged pre-task working tree was not re-tested. These fixtures do not start dialogue. The parry asset already used justEndFrame=3 at the baseline commit, while the old test expects Just at frame 5. No video/combat timing was changed for this feature."
+  },
+  "gameView": {
+    "resolution": [1920, 1080],
+    "startedThroughInteractor": true,
+    "firstLine": "Test",
+    "firstSide": "Left",
+    "firstLineVisiblePortraits": 1,
+    "thirdLineVisiblePortraits": 2,
+    "entranceCountsAfterThirdLine": {"left": 1, "right": 1},
+    "screenshots": ["prototype-dialogue-2026-10-25/Rendering_20261025_140611_429.png", "prototype-dialogue-2026-10-25/Rendering_20261025_140636_787.png"]
+  },
+  "finalEditorState": {"isPlaying": false, "scene": "Assets/Scenes/PrototypeCombatValidation.unity", "sceneDirty": false, "dialogueValidationProblems": 0, "consoleErrors": 0, "consoleWarnings": 0},
+  "notPerformed": ["user artwork integration", "physical gamepad playtest", "15-minute human feel test", "1280x720 human layout acceptance", "new Development Build or ZIP"]
+}

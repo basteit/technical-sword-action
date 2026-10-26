@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
@@ -11,6 +13,17 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     }
 
     [SerializeField] private int maxHp = 5;
+    [SerializeField] private string individualId;
+    [SerializeField] private EnemyCombatRank combatRank;
+    [SerializeField] private EnemyCombatDefinition combatDefinition;
+    [SerializeField] private bool overrideMaxHp;
+    [SerializeField, Min(1)] private int instanceMaxHp = 30;
+    [SerializeField] private bool overrideCounterMultiplier;
+    [SerializeField, Min(.01f)] private float instanceCounterMultiplier = 3f;
+    [SerializeField] private bool overrideParryStaggerFrames;
+    [SerializeField, Min(1)] private int instanceParryStaggerFrames = 180;
+    [SerializeField, Min(0f)] private float deathDisplayDuration;
+    [SerializeField, Min(0f)] private float lightHitStunDuration;
     [SerializeField] private bool blockContactPushFromPlayer = true;
     [SerializeField] private LayerMask playerBodyLayers;
     [SerializeField] private float knockbackPower = 5.5f;
@@ -41,10 +54,106 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     private Color defaultColor = Color.white;
     private Vector2 knockbackVelocity;
     private float stunTimer;
+    private int parryStaggerRemainingFrames;
+    private int activeParryStaggerFrames;
+    private long parryStaggerStartedTick = -1;
     private float currentBreak;
     private float breakResistTimer;
+    private float deathTimer;
+    private Collider2D[] bodyColliders;
+    private bool[] initialColliderStates;
+    private readonly Dictionary<object,float> stunHolds=new();
+    private readonly List<object> stunHoldOwners=new();
+    private readonly Dictionary<object, float> deathPresentationHolds = new();
+    private readonly HashSet<object> motionOwners = new();
+    public int DeathPresentationOwnerCount => deathPresentationHolds.Count;
+    public int MotionOwnerCount => motionOwners.Count;
+    public void HoldDeathPresentation(object owner, float combatSeconds)
+    {
+        if (owner != null && isActiveAndEnabled && float.IsFinite(combatSeconds) && combatSeconds > 0)
+            deathPresentationHolds[owner] = Mathf.Max(deathPresentationHolds.TryGetValue(owner, out float remaining) ? remaining : 0, combatSeconds);
+    }
+    public void ReleaseDeathPresentation(object owner) { if (owner != null) deathPresentationHolds.Remove(owner); }
+    public void AcquireMotionControl(object owner) { if (owner != null) { motionOwners.Add(owner); knockbackVelocity = Vector2.zero; } }
+    public void ReleaseMotionControl(object owner) { if (owner != null) motionOwners.Remove(owner); knockbackVelocity = Vector2.zero; }
+    private bool participatingInCombat = true;
+    public bool ParticipatingInCombat => IsAlive && participatingInCombat;
+    public EnemyCombatRank CombatRank => combatRank;
+    public EnemyCombatDefinition Definition => combatDefinition;
+    public int ConfiguredMaxHp => overrideMaxHp ? Mathf.Max(1, instanceMaxHp) : combatDefinition != null ? combatDefinition.maxHp : maxHp;
+    public float CounterMultiplier => overrideCounterMultiplier ? Mathf.Max(.01f, instanceCounterMultiplier) :
+        combatDefinition != null ? combatDefinition.CounterMultiplier : EnemyCombatDefinition.DefaultCounterMultiplier(combatRank);
+    public int ConfiguredParryStaggerFrames => Mathf.Max(1, overrideParryStaggerFrames ? instanceParryStaggerFrames :
+        combatDefinition != null ? combatDefinition.parryStaggerFrames : 180);
+    public int ParryStaggerRemainingFrames => IsParryStaggered ? parryStaggerRemainingFrames : 0;
+    public int ParryStaggerElapsedFrames => IsParryStaggered ? activeParryStaggerFrames - parryStaggerRemainingFrames : 0;
+    public bool IsParryStaggered => ParticipatingInCombat && parryStaggerRemainingFrames > 0;
+    public string LastHitReaction { get; private set; } = "None";
+    private float lightResistanceTimer;
+    private CombatFeedback2D feedbackOwner;
+    private bool HasExternalFeedback => feedbackOwner != null && feedbackOwner.IsReady;
+    public void SetFeedbackOwner(CombatFeedback2D owner) => feedbackOwner = owner;
+    public void ReleaseFeedbackOwner(CombatFeedback2D owner) { if (feedbackOwner == owner) feedbackOwner = null; }
+    public int LastDamageTaken { get; private set; }
+    public event Action<Damageable2D> LeftCombat;
+    public void SetCombatParticipation(bool participating)
+    {
+        if (!participating) EndParryStagger();
+        if (participatingInCombat && !participating) LeftCombat?.Invoke(this);
+        participatingInCombat = participating;
+    }
+    public void ConfigureCombat(EnemyCombatRank rank, int hp)
+    {
+        combatDefinition = null;
+        combatRank = rank;
+        maxHp = Mathf.Max(1, hp);
+        currentHp = maxHp;
+        participatingInCombat = true;
+    }
+    public void ConfigureDefinition(EnemyCombatDefinition definition)
+    {
+        if (definition == null) return;
+        combatDefinition = definition;
+        combatRank = definition.rank;
+        maxHp = ConfiguredMaxHp;
+        currentHp = maxHp;
+        participatingInCombat = true;
+    }
+    public void ConfigureInstanceOverrides(int hp, float multiplier)
+    {
+        overrideMaxHp = hp > 0; instanceMaxHp = Mathf.Max(1, hp);
+        overrideCounterMultiplier = float.IsFinite(multiplier) && multiplier > 0;
+        instanceCounterMultiplier = overrideCounterMultiplier ? Mathf.Max(.01f, multiplier) : 3f;
+        maxHp = ConfiguredMaxHp; currentHp = maxHp;
+    }
+    public void ConfigureParryStaggerFrames(int frames)
+    {
+        overrideParryStaggerFrames = frames > 0;
+        instanceParryStaggerFrames = Mathf.Max(1, frames);
+    }
+    public void RefreshParryStagger()
+    {
+        if (!ParticipatingInCombat || (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick)) return;
+        activeParryStaggerFrames = parryStaggerRemainingFrames = ConfiguredParryStaggerFrames;
+        parryStaggerStartedTick = CombatTimeController.TickCount;
+    }
+    public void EndParryStagger()
+    {
+        parryStaggerRemainingFrames = activeParryStaggerFrames = 0;
+        parryStaggerStartedTick = -1;
+    }
 
-    public bool IsStunned => stunTimer > 0f;
+    public string IndividualId => string.IsNullOrEmpty(individualId) ? GetInstanceID().ToString() : individualId;
+    public bool IsAlive => isActiveAndEnabled && currentHp > 0;
+    public float StunRemaining { get { float n=Mathf.Max(ParryStaggerRemainingFrames * CombatTimeController.StepSeconds,stunTimer);foreach(float value in stunHolds.Values) n=Mathf.Max(n,value);return n; } }
+    public int HitCount { get; private set; }
+    public int DeathCount { get; private set; }
+    public event Action<Damageable2D, int, Vector2> HitReceived;
+    public event Action<Damageable2D, ParryResult> Parried;
+    public event Action<Damageable2D, Vector2> Died;
+    public event Action<Damageable2D> ResetPerformed;
+
+    public bool IsStunned => StunRemaining > 0f;
     public float CurrentBreak => currentBreak;
     public float BreakThreshold => breakThreshold;
     public int CurrentHp => currentHp;
@@ -59,12 +168,16 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     private void OnDisable()
     {
+        SetCombatParticipation(false);
         CombatTimeController.Unregister(this);
         CombatTimeController.ReleaseOwner(this);
         flashTimer = 0f;
         stunTimer = 0f;
         breakResistTimer = 0f;
         currentBreak = 0f;
+        lightResistanceTimer = 0;
+        stunHolds.Clear();
+        deathPresentationHolds.Clear(); motionOwners.Clear();
         knockbackVelocity = Vector2.zero;
         if (spriteRenderer != null)
         {
@@ -79,7 +192,11 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
             ApplyPresetValues();
         }
 
+        if (combatDefinition != null) ConfigureDefinition(combatDefinition);
         currentHp = maxHp;
+        bodyColliders = GetComponentsInChildren<Collider2D>(true);
+        initialColliderStates = new bool[bodyColliders.Length];
+        for (int i = 0; i < bodyColliders.Length; i++) initialColliderStates[i] = bodyColliders[i].enabled;
 
         if (audioSource == null)
         {
@@ -99,7 +216,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     public void CombatTick()
     {
-        if (knockbackVelocity.sqrMagnitude > 0.0001f)
+        if (motionOwners.Count == 0 && knockbackVelocity.sqrMagnitude > 0.0001f)
         {
             transform.position += (Vector3)(knockbackVelocity * CombatTimeController.StepSeconds);
         }
@@ -107,6 +224,25 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     public void CombatTickTimers()
     {
+        if (parryStaggerRemainingFrames > 0 &&
+            (!CombatTimeController.IsExecutingTick || parryStaggerStartedTick != CombatTimeController.TickCount))
+            parryStaggerRemainingFrames--;
+        lightResistanceTimer = CombatTimeController.AdvanceTimer(lightResistanceTimer);
+        stunHoldOwners.Clear();stunHoldOwners.AddRange(stunHolds.Keys);
+        foreach(object owner in stunHoldOwners)
+        { float value=CombatTimeController.AdvanceTimer(stunHolds[owner]);if(value<=0) stunHolds.Remove(owner);else stunHolds[owner]=value; }
+        stunHoldOwners.Clear(); stunHoldOwners.AddRange(deathPresentationHolds.Keys);
+        foreach (object owner in stunHoldOwners)
+        {
+            float value = CombatTimeController.AdvanceTimer(deathPresentationHolds[owner]);
+            if (value <= 0) deathPresentationHolds.Remove(owner); else deathPresentationHolds[owner] = value;
+        }
+        if (currentHp <= 0)
+        {
+            deathTimer = CombatTimeController.AdvanceTimer(deathTimer);
+            if (deathTimer <= 0f && deathPresentationHolds.Count == 0) gameObject.SetActive(false);
+            return;
+        }
         if (breakResistTimer > 0f)
         {
             breakResistTimer = CombatTimeController.AdvanceTimer(breakResistTimer);
@@ -149,35 +285,71 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     public void TakeHit(int damage, Vector2 direction)
     {
-        if (!isActiveAndEnabled || currentHp <= 0 ||
+        TryTakeHit(damage, direction);
+    }
+
+    public bool TryTakeHit(int damage, Vector2 direction)
+    {
+        return TryTakeCombatHit(damage, direction, EnemyHitStrength.Light);
+    }
+
+    public bool TryTakeCombatHit(int damage, Vector2 direction, EnemyHitStrength strength)
+    {
+        if (damage <= 0 || !isActiveAndEnabled || currentHp <= 0 ||
             (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick))
         {
-            return;
+            return false;
         }
 
+        LastDamageTaken = Mathf.Min(currentHp, damage);
         currentHp = Mathf.Max(0, currentHp - damage);
-        AddBreak(damage * hitBreakMultiplier);
+        HitCount++;
+        if (combatDefinition == null)
+        {
+            AddBreak(damage * hitBreakMultiplier);
+            stunTimer = Mathf.Max(stunTimer, lightHitStunDuration);
+        }
+        else
+        {
+            bool armored = TryGetComponent<EnemyMeleeChaser2D>(out var melee) && melee.ResistsHitStun;
+            int frames = strength == EnemyHitStrength.Strong ? combatDefinition.strongHitStunFrames : combatDefinition.lightHitStunFrames;
+            bool resistsLight = strength == EnemyHitStrength.Light && lightResistanceTimer > 0;
+            if (!armored && !resistsLight && frames > 0)
+            {
+                stunTimer = Mathf.Max(stunTimer, frames / 60f);
+                lightResistanceTimer = (frames + combatDefinition.lightStunResistanceFrames) / 60f;
+                LastHitReaction = strength + "Stun";
+            }
+            else LastHitReaction = armored ? "AttackArmor" : resistsLight ? "LightResistance" : "NoStun";
+        }
 
         Vector2 dir = direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.right;
-        knockbackVelocity = dir * knockbackPower;
+        knockbackVelocity = dir * (combatDefinition != null ? combatDefinition.hitKnockback : knockbackPower);
 
-        if (audioSource != null && hitClip != null)
+        if (!HasExternalFeedback && audioSource != null && hitClip != null)
         {
             audioSource.PlayOneShot(hitClip, 0.9f);
         }
 
-        if (spriteRenderer != null)
+        if (!HasExternalFeedback && spriteRenderer != null)
         {
             spriteRenderer.color = hitFlashColor;
             flashTimer = hitFlashDuration;
         }
 
-        CombatCameraFeedback2D.PlayHitShake();
+        if (!HasExternalFeedback) CombatCameraFeedback2D.PlayHitShake();
+        HitReceived?.Invoke(this, LastDamageTaken, dir);
 
         if (currentHp <= 0)
         {
-            gameObject.SetActive(false);
+            EndParryStagger();
+            DeathCount++;
+            deathTimer = deathDisplayDuration;
+            foreach (Collider2D body in bodyColliders) if (body != null) body.enabled = false;
+            Died?.Invoke(this, dir);
+            if (deathTimer <= 0f && deathPresentationHolds.Count == 0) gameObject.SetActive(false);
         }
+        return true;
     }
 
     public void ApplyParryStun(ParryResult result)
@@ -190,14 +362,50 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
         if (result == ParryResult.Just)
         {
-            stunTimer = justParryStunDuration;
-            AddBreak(parryJustBreakGain);
+            stunTimer = combatDefinition != null ? combatDefinition.justParryStunFrames / 60f : justParryStunDuration;
+            if (combatDefinition == null) AddBreak(parryJustBreakGain);
         }
         else if (result == ParryResult.Normal)
         {
-            stunTimer = normalParryStunDuration;
-            AddBreak(parryNormalBreakGain);
+            stunTimer = combatDefinition != null ? combatDefinition.normalParryStunFrames / 60f : normalParryStunDuration;
+            if (combatDefinition == null) AddBreak(parryNormalBreakGain);
         }
+        if (result != ParryResult.None)
+        {
+            RefreshParryStagger();
+            Parried?.Invoke(this, result);
+        }
+    }
+
+    public void ExtendStun(float combatSeconds)
+    {
+        if (IsAlive) stunTimer = Mathf.Max(stunTimer, combatSeconds);
+    }
+    public void AcquireStun(object owner,float combatSeconds)
+    { if(owner!=null&&IsAlive) stunHolds[owner]=Mathf.Max(0,combatSeconds); }
+    public void ReleaseStun(object owner) { if(owner!=null) stunHolds.Remove(owner); }
+
+    public void ResetForCapture(Vector3 position, int hp)
+    {
+        gameObject.SetActive(true);
+        transform.position = position;
+        maxHp = Mathf.Max(1, hp);
+        currentHp = maxHp;
+        participatingInCombat = true;
+        EndParryStagger();
+        LastDamageTaken = 0;
+        flashTimer = stunTimer = deathTimer = currentBreak = breakResistTimer = 0f;
+        lightResistanceTimer = 0; LastHitReaction = "None";
+        stunHolds.Clear();
+        deathPresentationHolds.Clear(); motionOwners.Clear();
+        HitCount = DeathCount = 0;
+        knockbackVelocity = Vector2.zero;
+        if (spriteRenderer != null) spriteRenderer.color = defaultColor;
+        if (bodyColliders != null)
+            for (int i = 0; i < bodyColliders.Length; i++) if (bodyColliders[i] != null) bodyColliders[i].enabled = initialColliderStates[i];
+        if (TryGetComponent(out Rigidbody2D body)) { body.linearVelocity = Vector2.zero; body.angularVelocity = 0; }
+        CombatTimeController.ReleaseOwner(this);
+        ResetPerformed?.Invoke(this);
     }
 
     private void AddBreak(float value)

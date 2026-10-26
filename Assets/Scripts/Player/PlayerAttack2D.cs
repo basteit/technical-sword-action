@@ -2,8 +2,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using TechnicalSwordAction.PlayerState;
 
-public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
+public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener, ICombatHitListener
 {
+    [SerializeField] private PlayerAttackDefinition definition;
+    private int elapsedFrames;
+    private bool configuredHitDispatch;
+    private float configuredGaugeAwarded;
+    private bool recovering;
+    private int recoveryStep;
+    public bool UsesFrameDefinition => definition != null;
+    public PlayerAttackDefinition Definition => definition;
+    /// <summary>Prototype A/B settings may only change after the current action and recovery were reset.</summary>
+    public bool TrySetDefinition(PlayerAttackDefinition value)
+    {
+        if (value == null || !value.IsValid || isAttacking || recovering) return false;
+        definition = value;
+        return true;
+    }
+    public int ElapsedFrames => elapsedFrames;
+    public bool IsRecovering => recovering;
+    public AttackPhase Phase => recovering ? AttackPhase.Recovery : !isAttacking ? AttackPhase.None :
+        definition == null ? AttackPhase.None : elapsedFrames < CurrentDefinition.activeStart ? AttackPhase.Startup :
+        elapsedFrames <= CurrentDefinition.activeEnd ? AttackPhase.Active : AttackPhase.Cancel;
+    private PlayerAttackDefinition.Step CurrentDefinition => definition.steps[Mathf.Clamp((recovering ? recoveryStep : comboStep) - 1, 0, 3)];
+    public int CancelStartFrame => definition != null && (isAttacking || recovering) ? CurrentDefinition.cancelStart : -1;
+    public int CancelEndFrame => definition != null && (isAttacking || recovering) ? CurrentDefinition.recoveryStart - 1 : -1;
     private const int ComboStepCount = 4;
     private const float SixFramesAtSixtyFps = 6f / 60f;
 
@@ -12,6 +35,9 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     {
         public int damage;
         public float radius;
+        public bool useBoxHitbox;
+        public Vector2 hitboxOffset;
+        public Vector2 hitboxSize;
         public float gaugeGain;
         public float fallbackDuration;
         [Tooltip("Signed displacement in world units during this ground attack step. Positive moves toward facing direction; negative moves backward.")]
@@ -32,6 +58,10 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     [SerializeField] private Animator animator;
     [SerializeField] private string attackTriggerName = "AttackTrigger";
     [SerializeField] private string comboStepParamName = "ComboStep";
+    [SerializeField] private string directStatePrefix;
+    [SerializeField, Min(0)] private int lightHitstopFrames;
+    public event System.Action<int> StepStarted;
+    public event System.Action<Damageable2D, int, Vector2> HitConfirmed;
 
     [Header("Hit Base")]
     [SerializeField] private Transform hitPoint;
@@ -42,9 +72,9 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     [SerializeField] private AttackStepData[] attackSteps =
     {
         new AttackStepData { damage = 1, radius = 0.65f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.10f, groundMotionDuration = 0.14f },
-        new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.52f, groundMotionDistance = 0.14f, groundMotionDuration = 0.16f },
+        new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.14f, groundMotionDuration = 0.16f },
         new AttackStepData { damage = 2, radius = 0.75f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.18f, groundMotionDuration = 0.18f },
-        new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 1.02f, groundMotionDistance = 0.22f, groundMotionDuration = 0.20f }
+        new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 0.62f, groundMotionDistance = 0.22f, groundMotionDuration = 0.20f }
     };
 
     [Header("Air Attack Movement")]
@@ -89,11 +119,12 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     public bool IsAttacking => isAttacking;
     public int ComboStep => comboStep;
     public int MaxComboStep => ComboStepCount;
-    public bool IsComboWindowOpen => comboWindowOpen;
+    public bool IsComboWindowOpen => definition != null ? Phase == AttackPhase.Cancel && comboStep < 4 : comboWindowOpen;
     public bool HasQueuedAttack => queuedNextAttack;
     public bool HitAppliedForCurrentStep => hitAppliedForCurrentStep;
     public float InputBufferRemaining => Mathf.Max(0f, bufferedAttackRemaining);
-    public float StepTimeoutRemaining => Mathf.Max(0f, stepTimeoutRemaining);
+    public float StepTimeoutRemaining => definition != null && (isAttacking || recovering)
+        ? Mathf.Max(0, CurrentDefinition.recoveryStart - elapsedFrames) / 60f : Mathf.Max(0f, stepTimeoutRemaining);
     public float GroundMotionRemaining => Mathf.Max(0f, groundMotionRemaining);
     public float GroundMotionDistance => GetStepData(Mathf.Max(1, comboStep)).groundMotionDistance;
     public float GroundMotionDuration => GetStepData(Mathf.Max(1, comboStep)).groundMotionDuration;
@@ -108,6 +139,12 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
             }
 
             AttackStepData data = GetStepData(Mathf.Max(1, comboStep));
+            if (definition != null)
+            {
+                data.useGroundMotionCurve = false;
+                data.groundMotionDistance = CurrentDefinition.motionDistance;
+                data.groundMotionDuration = CurrentDefinition.motionFrames / 60f;
+            }
             float tick = CombatTimeController.StepSeconds;
             if (data.useGroundMotionCurve && data.groundMotionCurve != null && data.groundMotionCurve.length >= 2)
             {
@@ -119,8 +156,10 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
             return data.groundMotionDistance / duration * Mathf.Min(tick, groundMotionRemaining) / tick * attackFacingSign;
         }
     }
-    public PlayerAttackCancelWindow OpenCancelWindows => openCancelWindows;
-    public bool CanStartAttackFromStateMachine => isActiveAndEnabled && !isAttacking;
+    public PlayerAttackCancelWindow OpenCancelWindows => definition != null ?
+        Phase == AttackPhase.Cancel ? PlayerAttackCancelWindow.Common : PlayerAttackCancelWindow.None : openCancelWindows;
+    public bool CanStartAttackFromStateMachine => isActiveAndEnabled && (definition == null || definition.IsValid) &&
+        (!isAttacking || (definition != null && Phase == AttackPhase.Cancel && comboStep < 4));
     public int ComboAttemptCount { get; private set; }
     public int FullComboCount { get; private set; }
     public float FullComboRate => ComboAttemptCount <= 0 ? 0f : FullComboCount / (float)ComboAttemptCount;
@@ -153,10 +192,42 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         CombatTimeController.RegisterAnimator(animator, this);
     }
 
-    public void CombatTick() => TryConsumeBufferedInput();
+    public void CombatTick()
+    {
+        if (definition == null) TryConsumeBufferedInput();
+        else if (recovering && stateMachine != null && (stateMachine.ActionState != PlayerActionState.Neutral ||
+                 Mathf.Abs(motor != null ? motor.MoveInput : 0f) > .01f))
+            ResetAttackState(true);
+    }
+
+    public void ResolveCombatHits()
+    {
+        if (definition == null || !isAttacking || Phase != AttackPhase.Active) return;
+        configuredHitDispatch = true;
+        OnAttackHit(comboStep);
+        configuredHitDispatch = false;
+    }
 
     public void CombatTickTimers()
     {
+        if (definition != null)
+        {
+            if (!isAttacking && !recovering) return;
+            elapsedFrames++;
+            groundMotionRemaining = CombatTimeController.AdvanceTimer(groundMotionRemaining);
+            groundMotionElapsed += CombatTimeController.StepSeconds;
+            if (isAttacking && elapsedFrames >= CurrentDefinition.recoveryStart)
+            {
+                if (comboStep == 4) FullComboCount++;
+                recoveryStep = comboStep;
+                comboStep = 0; isAttacking = false; recovering = true;
+                LastEndReason = "ConfiguredRecovery";
+                ClearBufferedInput();
+                stateMachine?.CompleteAction(PlayerActionState.Attack, "ConfiguredRecovery");
+            }
+            if (recovering && elapsedFrames >= CurrentDefinition.endFrame) ResetAttackState(true);
+            return;
+        }
         UpdateBufferedInput();
 
         if (isAttacking)
@@ -182,8 +253,17 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
             return false;
         }
 
+        if (definition != null)
+        {
+            if (GetComponent<PlayerParryCounter2D>() is { IsActive: true } configuredCounter)
+                return configuredCounter.ReserveNextCounter();
+            return stateMachine != null && stateMachine.RequestAction(PlayerActionRequest.Attack);
+        }
+
         if (!isAttacking)
         {
+            if (GetComponent<PlayerParryCounter2D>() is { IsActive: true } counter)
+                return counter.ReserveNextCounter();
             return stateMachine != null && stateMachine.RequestAction(PlayerActionRequest.Attack);
         }
 
@@ -193,6 +273,13 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         }
 
         bufferedAttackRemaining = Mathf.Max(inputBufferDuration, SixFramesAtSixtyFps);
+        return true;
+    }
+
+    public bool TryAdvanceConfiguredCombo()
+    {
+        if (definition == null || !isAttacking || Phase != AttackPhase.Cancel || comboStep >= 4) return false;
+        StartAttackStep(comboStep + 1);
         return true;
     }
 
@@ -215,7 +302,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
     public void CancelAttack(string reason = "Cancelled")
     {
-        if (!isAttacking && comboStep == 0)
+        if (!isAttacking && !recovering && comboStep == 0)
         {
             return;
         }
@@ -226,6 +313,8 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
     private void StartAttackStep(int step)
     {
+        recovering = false; elapsedFrames = 0;
+        configuredGaugeAwarded = 0;
         comboStep = Mathf.Clamp(step, 1, ComboStepCount);
         if (comboStep == 1)
         {
@@ -240,6 +329,13 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         openCancelWindows = PlayerAttackCancelWindow.None;
 
         AttackStepData data = GetStepData(comboStep);
+        if (definition != null)
+        {
+            PlayerAttackDefinition.Step configured = CurrentDefinition;
+            data.damage = configured.damage; data.radius = configured.radius; data.gaugeGain = configured.gaugeGain;
+            data.groundMotionDistance = configured.motionDistance; data.groundMotionDuration = configured.motionFrames / 60f;
+            data.useGroundMotionCurve = false;
+        }
         stepTimeoutRemaining = data.fallbackDuration + fallbackGraceDuration;
         groundMotionRemaining = Mathf.Max(0f, data.groundMotionDuration);
         groundMotionElapsed = 0f;
@@ -252,33 +348,49 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
         if (animator != null)
         {
+            animator.speed = definition != null && CurrentDefinition.clip != null
+                ? CurrentDefinition.clip.length / (CurrentDefinition.endFrame / 60f) : 1f;
+            if (definition != null && !string.IsNullOrEmpty(CurrentDefinition.animatorState)) animator.Play(CurrentDefinition.animatorState, 0, 0f);
+            if (!string.IsNullOrEmpty(directStatePrefix)) animator.Play(directStatePrefix + comboStep, 0, 0f);
             animator.SetInteger(comboStepHash, comboStep);
             animator.ResetTrigger(attackTriggerHash);
             animator.SetTrigger(attackTriggerHash);
         }
 
         PlayClip(attackSwingClip, 0.9f);
+        StepStarted?.Invoke(comboStep);
     }
 
     public void OnAttackHit(int step)
     {
-        if (!CanProcessAnimationEvent(step) || hitAppliedForCurrentStep || hitPoint == null)
+        if ((definition != null && !configuredHitDispatch) || !CanProcessAnimationEvent(step) ||
+            (definition == null && hitAppliedForCurrentStep) || hitPoint == null)
         {
             return;
         }
 
         hitAppliedForCurrentStep = true;
-        damagedTargets.Clear();
+        if (definition == null) damagedTargets.Clear();
 
         AttackStepData data = GetStepData(step);
+        if (definition != null) { data.damage = CurrentDefinition.damage; data.radius = CurrentDefinition.radius; data.gaugeGain = CurrentDefinition.gaugeGain; }
         bool hitSomething = false;
+        int hitTargetCount = 0;
         float radius = data.radius > 0f ? data.radius : attackRadius;
-        Collider2D[] hits = Physics2D.OverlapCircleAll(hitPoint.position, radius, targetLayers);
+        bool useBox=definition==null&&data.useBoxHitbox;
+        Vector2 boxCenter=(Vector2)transform.position+new Vector2(data.hitboxOffset.x*attackFacingSign,data.hitboxOffset.y);
+        bool extended = definition != null && CurrentDefinition.forwardExtension > 0;
+        Collider2D[] hits = extended
+            ? Physics2D.OverlapCapsuleAll(CurrentDefinition.HitboxCenter(hitPoint.position, attackFacingSign),
+                CurrentDefinition.HitboxSize, CapsuleDirection2D.Horizontal, 0, targetLayers)
+            : useBox
+            ? Physics2D.OverlapBoxAll(boxCenter,data.hitboxSize,0,targetLayers)
+            : Physics2D.OverlapCircleAll(hitPoint.position, radius, targetLayers);
 
         for (int i = 0; i < hits.Length; i++)
         {
             Damageable2D damageable = hits[i].GetComponentInParent<Damageable2D>();
-            if (damageable == null || !damagedTargets.Add(damageable))
+            if (damageable == null || !damageable.IsAlive || !damagedTargets.Add(damageable))
             {
                 continue;
             }
@@ -289,8 +401,12 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
                 knockbackDir = transform.right;
             }
 
-            damageable.TakeHit(data.damage, knockbackDir);
+            if (!damageable.TryTakeCombatHit(data.damage, knockbackDir, step == 4 ? EnemyHitStrength.Strong : EnemyHitStrength.Light)) continue;
+            // Extended slashes must not leave their impact spark at the old, nearer circle origin.
+            Vector2 impactPoint = extended ? hits[i].ClosestPoint(hitPoint.position) : (Vector2)hitPoint.position;
+            HitConfirmed?.Invoke(damageable, step, impactPoint);
             hitSomething = true;
+            hitTargetCount++;
         }
 
         if (!hitSomething)
@@ -298,16 +414,37 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
             return;
         }
 
-        if (specialGauge != null)
+        if (specialGauge != null && (definition == null || configuredGaugeAwarded < 12f))
         {
-            specialGauge.AddOnAttackHit(data.gaugeGain);
+            float gain = definition != null ? Mathf.Min(data.gaugeGain * hitTargetCount, 12f - configuredGaugeAwarded) : data.gaugeGain;
+            specialGauge.AddOnAttackHit(gain);
+            configuredGaugeAwarded += gain;
         }
 
-        PlayClip(hitConfirmClip, 1f);
+        if (!CombatFeedback2D.IsManaging(gameObject))
+        {
+            PlayClip(hitConfirmClip, 1f);
+            if (lightHitstopFrames > 0) CombatTimeController.RequestHitstop(this, lightHitstopFrames * CombatTimeController.StepSeconds);
+        }
+    }
+
+    // A queued follow-up may interrupt only the authored tail of this step.
+    // Without a reservation, keep playing until the normal recovery event.
+    public void OnComboBranch(int step)
+    {
+        if (definition != null || !queuedNextAttack || !CanProcessAnimationEvent(step)) return;
+        CompleteAttackStep(step, "ComboBranch");
+    }
+
+    public void OnAttackRecovery(int step)
+    {
+        if (definition != null) return;
+        if (CanProcessAnimationEvent(step)) CompleteAttackStep(step, "Recovery");
     }
 
     public void OnComboWindowOpen(int step)
     {
+        if (definition != null) return;
         if (!CanProcessAnimationEvent(step) || comboStep >= ComboStepCount)
         {
             return;
@@ -319,6 +456,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
     public void OnComboWindowClose(int step)
     {
+        if (definition != null) return;
         if (!CanProcessAnimationEvent(step))
         {
             return;
@@ -357,6 +495,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
     public void OnAttackEnd(int step)
     {
+        if (definition != null) return;
         if (!CanProcessAnimationEvent(step))
         {
             return;
@@ -429,6 +568,9 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
     private void ResetAttackState(bool updateAnimator)
     {
+        recovering = false; recoveryStep = 0; elapsedFrames = 0;
+        if (animator != null) animator.speed = 1f;
+        CombatTimeController.ReleaseOwner(this);
         isAttacking = false;
         comboStep = 0;
         comboWindowOpen = false;
@@ -514,9 +656,9 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         return index switch
         {
             0 => new AttackStepData { damage = 1, radius = 0.65f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.10f, groundMotionDuration = 0.14f },
-            1 => new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.52f, groundMotionDistance = 0.14f, groundMotionDuration = 0.16f },
+            1 => new AttackStepData { damage = 1, radius = 0.70f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.14f, groundMotionDuration = 0.16f },
             2 => new AttackStepData { damage = 2, radius = 0.75f, gaugeGain = 2f, fallbackDuration = 0.62f, groundMotionDistance = 0.18f, groundMotionDuration = 0.18f },
-            _ => new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 1.02f, groundMotionDistance = 0.22f, groundMotionDuration = 0.20f }
+            _ => new AttackStepData { damage = 3, radius = 0.80f, gaugeGain = 5f, fallbackDuration = 0.62f, groundMotionDistance = 0.22f, groundMotionDuration = 0.20f }
         };
     }
 
@@ -538,7 +680,40 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         }
 
         AttackStepData data = GetStepData(Mathf.Max(1, comboStep));
-        float radius = data.radius > 0f ? data.radius : attackRadius;
+        float radius = definition != null ? CurrentDefinition.radius : data.radius > 0f ? data.radius : attackRadius;
+
+        if (definition != null && CurrentDefinition.forwardExtension > 0)
+        {
+            int facing = isAttacking ? attackFacingSign : motor != null ? motor.FacingSign : 1;
+            Vector2 center = CurrentDefinition.HitboxCenter(hitPoint.position, facing);
+            float halfSegment = CurrentDefinition.forwardExtension * .5f;
+            Vector2 left = center + Vector2.left * halfSegment, right = center + Vector2.right * halfSegment;
+            if (isAttacking && Phase == AttackPhase.Active)
+            {
+                Gizmos.color = activeFillColor;
+                Gizmos.DrawCube(center, new Vector3(halfSegment * 2, radius * 2, 0));
+                Gizmos.DrawSphere(left, radius); Gizmos.DrawSphere(right, radius);
+            }
+            Gizmos.color = isAttacking && Phase == AttackPhase.Active ? activeHitboxColor : idleHitboxColor;
+            Gizmos.DrawLine(left + Vector2.up * radius, right + Vector2.up * radius);
+            Gizmos.DrawLine(left + Vector2.down * radius, right + Vector2.down * radius);
+            for (int i = 0; i < 16; i++)
+            {
+                float a = (90 + i * 180f / 16) * Mathf.Deg2Rad, b = (90 + (i + 1) * 180f / 16) * Mathf.Deg2Rad;
+                Vector2 from = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * radius;
+                Vector2 to = new Vector2(Mathf.Cos(b), Mathf.Sin(b)) * radius;
+                Gizmos.DrawLine(left + from, left + to); Gizmos.DrawLine(right - from, right - to);
+            }
+            return;
+        }
+
+        if(definition==null&&data.useBoxHitbox)
+        {
+            int facing=isAttacking?attackFacingSign:motor!=null?motor.FacingSign:1;
+            Vector2 center=(Vector2)transform.position+new Vector2(data.hitboxOffset.x*facing,data.hitboxOffset.y);
+            if(isAttacking) { Gizmos.color=activeFillColor;Gizmos.DrawCube(center,data.hitboxSize); }
+            Gizmos.color=isAttacking?activeHitboxColor:idleHitboxColor;Gizmos.DrawWireCube(center,data.hitboxSize);return;
+        }
 
         if (isAttacking)
         {

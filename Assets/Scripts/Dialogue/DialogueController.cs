@@ -26,6 +26,8 @@ public sealed class DialogueController : MonoBehaviour
     [Tooltip("Temporary bridge until all gameplay input is routed through Input Actions.")]
     [SerializeField] private Behaviour[] gameplayBehavioursToDisable;
     [SerializeField] private Rigidbody2D playerBody;
+    [Tooltip("Use the unified gameplay state gate; do not disable individual combat components on the prototype.")]
+    [SerializeField] private PlayerStateMachine playerStateMachine;
 
     [Header("Voice")]
     [SerializeField] private AudioSource voiceSource;
@@ -45,6 +47,8 @@ public sealed class DialogueController : MonoBehaviour
     private bool waitingForRelease;
     private float releaseGuardRemaining;
     private bool pendingGameplayUnlock;
+    private bool advanceRequested;
+    private bool skipRequested;
 
     private static DialogueController activeController;
 
@@ -91,15 +95,13 @@ public sealed class DialogueController : MonoBehaviour
     {
         if (waitingForRelease)
         {
+            advanceRequested = skipRequested = false;
             releaseGuardRemaining = Mathf.Max(0f, releaseGuardRemaining - Time.unscaledDeltaTime);
             if (releaseGuardRemaining <= 0f && !advanceAction.IsPressed() && !skipAction.IsPressed())
             {
                 waitingForRelease = false;
             }
-            if (waitingForRelease)
-            {
-                return;
-            }
+            if (waitingForRelease) return;
         }
 
         if (pendingGameplayUnlock)
@@ -113,13 +115,16 @@ public sealed class DialogueController : MonoBehaviour
             return;
         }
 
-        if (currentSequence.AllowSkip && skipAction.WasPressedThisFrame())
+        bool skip = skipRequested;
+        bool advance = advanceRequested;
+        skipRequested = advanceRequested = false;
+        if (currentSequence.AllowSkip && skip)
         {
             Finish(DialogueCompletionReason.Skipped);
             return;
         }
 
-        if (advanceAction.WasPressedThisFrame())
+        if (advance)
         {
             Advance();
         }
@@ -127,7 +132,7 @@ public sealed class DialogueController : MonoBehaviour
 
     public bool TryPlay(DialogueSequence sequence)
     {
-        if (sequence == null || sequence.LineCount <= 0 || IsGameplayLockActive)
+        if (!isActiveAndEnabled || sequence == null || sequence.LineCount <= 0 || IsGameplayLockActive)
         {
             return false;
         }
@@ -141,6 +146,7 @@ public sealed class DialogueController : MonoBehaviour
         currentLineIndex = 0;
         activeController = this;
         pendingGameplayUnlock = false;
+        advanceRequested = skipRequested = false;
         waitingForRelease = true;
         releaseGuardRemaining = releaseGuardDuration;
 
@@ -235,6 +241,7 @@ public sealed class DialogueController : MonoBehaviour
         DialogueSequence finishedSequence = currentSequence;
         currentSequence = null;
         currentLineIndex = -1;
+        advanceRequested = skipRequested = false;
         waitingForRelease = true;
         releaseGuardRemaining = releaseGuardDuration;
 
@@ -268,12 +275,14 @@ public sealed class DialogueController : MonoBehaviour
         {
             activeController = null;
         }
+        playerStateMachine?.ClearBufferedGameplayInput();
     }
 
     private void SetGameplayLocked(bool locked)
     {
         if (locked)
         {
+            playerStateMachine?.ClearBufferedGameplayInput();
             previousBehaviourStates = new bool[gameplayBehavioursToDisable?.Length ?? 0];
             for (int i = 0; i < previousBehaviourStates.Length; i++)
             {
@@ -327,10 +336,18 @@ public sealed class DialogueController : MonoBehaviour
         advanceAction.AddBinding("<Mouse>/leftButton");
         advanceAction.AddBinding("<Gamepad>/buttonEast");
         advanceAction.AddBinding("<Gamepad>/buttonSouth");
+        advanceAction.performed += _ =>
+        {
+            if (IsOpen && !waitingForRelease) advanceRequested = true;
+        };
 
         skipAction = new InputAction("DialogueSkip", InputActionType.Button);
         skipAction.AddBinding("<Keyboard>/escape");
         skipAction.AddBinding("<Gamepad>/select");
+        skipAction.performed += _ =>
+        {
+            if (IsOpen && !waitingForRelease) skipRequested = true;
+        };
     }
 
     private void OnDisable()
