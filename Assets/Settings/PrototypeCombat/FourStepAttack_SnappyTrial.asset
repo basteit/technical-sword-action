@@ -23,6 +23,7 @@ MonoBehaviour:
     endFrame: 24
     gaugeGain: 2
     radius: 0.8
+    forwardExtension: 0.6125
     motionDistance: 0.25
     motionFrames: 6
   - clip: {fileID: 7400000, guid: f27f68921cc7f1c4e83a6446b7bb259a, type: 2}
@@ -35,6 +36,7 @@ MonoBehaviour:
     endFrame: 20
     gaugeGain: 2
     radius: 0.8
+    forwardExtension: 0.95625
     motionDistance: 0.3
     motionFrames: 6
   - clip: {fileID: 7400000, guid: 1b5caafd7d2d1f34abf6ff47cb7b2a94, type: 2}

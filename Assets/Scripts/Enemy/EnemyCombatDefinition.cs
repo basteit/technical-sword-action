@@ -24,6 +24,8 @@ public sealed class EnemyCombatDefinition : ScriptableObject
     public EnemyAttackDefinition[] attacks = new EnemyAttackDefinition[0];
     [Min(0)] public float moveSpeed = 2.2f;
     [Min(1)] public int windupFrames = 30;
+    [Tooltip("Show the yellow parry cue only this many combat ticks before contact; the full windup is unchanged.")]
+    [Min(1)] public int parryCueLeadFrames = 12;
     [Min(1)] public int activeFrames = 3;
     [Min(1)] public int recoveryFrames = 30;
     [Min(1)] public int cooldownFrames = 32;
@@ -55,7 +57,7 @@ public sealed class EnemyCombatDefinition : ScriptableObject
                 foreach (var attack in attacks) if (attack == null || !attack.IsValid) return false;
                 return true;
             }
-            return windupFrames > 0 && activeFrames > 0 && recoveryFrames > 0 && cooldownFrames > 0 && damage > 0 &&
+            return windupFrames > 0 && parryCueLeadFrames > 0 && activeFrames > 0 && recoveryFrames > 0 && cooldownFrames > 0 && damage > 0 &&
                 hitSize.x > 0 && hitSize.y > 0 && !string.IsNullOrWhiteSpace(countermeasure);
         }
     }

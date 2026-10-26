@@ -101,7 +101,8 @@ public static class PrototypeCombatSceneBuilder
                     activeStart = active, activeEnd = active + 1, cancelStart = active + 2,
                     recoveryStart = Mathf.Max(active + 4, Mathf.RoundToInt(endEvent.time * 60)),
                     endFrame = Mathf.Max(active + 6, Mathf.RoundToInt(clip.length * 60)),
-                    radius = .8f, gaugeGain = i == 3 ? 5 : 2, motionDistance = .1f + i * .04f
+                    radius = .8f, forwardExtension = i == 0 ? .6125f : i == 1 ? .95625f : 0,
+                    gaugeGain = i == 3 ? 5 : 2, motionDistance = .1f + i * .04f
                 };
             }
             EditorUtility.SetDirty(attackData); Set(attack, "definition", attackData);

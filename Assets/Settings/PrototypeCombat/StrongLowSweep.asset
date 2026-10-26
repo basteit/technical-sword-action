@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackDefinition
   attackId: heavy-low-unparryable-sweep
   windupFrames: 54
+  parryCueLeadFrames: 12
   activeFrames: 5
   recoveryFrames: 48
   cooldownFrames: 42

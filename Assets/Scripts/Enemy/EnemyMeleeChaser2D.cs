@@ -70,6 +70,10 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     public string AttackKind => combatDefinition == null || configuredParryable ? "Parryable" : "Unparryable";
     public ParryReactionWeight AttackParryReaction => configuredParryReaction;
     public int WindupRemainingFrames => Mathf.CeilToInt(WindupRemaining * 60f - .0001f);
+    public int ParryCueLeadFrames => currentAttack != null ? currentAttack.parryCueLeadFrames :
+        combatDefinition != null ? combatDefinition.parryCueLeadFrames : 12;
+    public bool IsParryCueActive => damageable != null && damageable.IsAlive && !damageable.IsStunned &&
+        IsWindingUp && AttackKind == "Parryable" && WindupRemainingFrames > 0 && WindupRemainingFrames <= ParryCueLeadFrames;
     public int ActiveRemainingFrames => currentState == State.Active ? activeRemaining : 0;
     public Vector2 Facing => facing;
     public string CurrentStateName => damageable != null && !damageable.IsAlive ? "Dead" :

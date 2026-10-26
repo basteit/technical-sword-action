@@ -15,6 +15,52 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private static object[] Steps(ScriptableObject definition) => Get<Array>(definition, "steps").Cast<object>().ToArray();
         private static string[] Validate() => (string[])Type.GetType("PrototypeCombatTrialInstaller, Assembly-CSharp-Editor", true).GetMethod("Validate").Invoke(null, null);
 
+        [TestCase("FourStepAttack")] [TestCase("FourStepAttack_FastTrial")] [TestCase("FourStepAttack_SnappyTrial")]
+        public void HorizontalReachMatchesTheExistingFirstTwoSlashSpritesWithoutGrowingHeight(string name)
+        {
+            var steps = Steps(Load(name));
+            Assert.That(steps.Select(s => Get<float>(s, "forwardExtension")), Is.EqualTo(new[] { .6125f, .95625f, 0, 0 }));
+            for (int i = 0; i < 4; i++)
+            {
+                Assert.That(Get<float>(steps[i], "radius"), Is.EqualTo(.8f));
+                var size = Get<Vector2>(steps[i], "HitboxSize");
+                Assert.That(size.y, Is.EqualTo(1.6f));
+                var centerMethod = steps[i].GetType().GetMethod("HitboxCenter");
+                foreach (int direction in new[] { -1, 1 })
+                {
+                    var center = (Vector2)centerMethod.Invoke(steps[i], new object[] { new Vector2(.9f * direction, 0), direction });
+                    float front = center.x * direction + size.x / 2;
+                    float rear = center.x * direction - size.x / 2;
+                    Assert.That(front, Is.EqualTo(i == 0 ? 2.3125f : i == 1 ? 2.65625f : 1.7f).Within(.00001f));
+                    Assert.That(rear, Is.EqualTo(.1f).Within(.00001f));
+                }
+            }
+        }
+
+        [Test] public void InvalidForwardExtensionsAreRejectedAndZeroRestoresTheOriginalCircle()
+        {
+            var copy = UnityEngine.Object.Instantiate(Load("FourStepAttack"));
+            try
+            {
+                var step = Steps(copy)[0]; var field = step.GetType().GetField("forwardExtension");
+                foreach (float invalid in new[] { -.1f, float.NaN, float.PositiveInfinity })
+                { field.SetValue(step, invalid); Assert.That(Get<bool>(copy, "IsValid"), Is.False); }
+                field.SetValue(step, 0f); Assert.That(Get<bool>(copy, "IsValid"), Is.True);
+                Assert.That(Get<Vector2>(step, "HitboxSize"), Is.EqualTo(new Vector2(1.6f, 1.6f)));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(copy); }
+        }
+
+        [Test] public void YellowCueLeadIsExplicitPerEnemyAndPerAttackAndTimingWindowsAreUnchanged()
+        {
+            foreach (string name in new[] { "NormalMelee", "NormalMelee_ReferenceTrial", "StrongMelee", "StrongSlash", "StrongLowSweep" })
+                Assert.That(Get<int>(Load(name), "parryCueLeadFrames"), Is.EqualTo(12), name);
+            var timing = Load("ParryTiming");
+            Assert.That(Get<int>(timing, "startFrame"), Is.Zero);
+            Assert.That(Get<int>(timing, "justEndFrame"), Is.EqualTo(3));
+            Assert.That(Get<int>(timing, "endFrame"), Is.EqualTo(13));
+        }
+
         [Test] public void HeavyImpactTrialIsNormalAttackOnlyAndInheritsLaterSteps()
         {
             var impact = Load("AttackImpact_HeavyTrial");

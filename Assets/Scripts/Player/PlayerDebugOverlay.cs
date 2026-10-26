@@ -67,6 +67,11 @@ public class PlayerDebugOverlay : MonoBehaviour
                 text.AppendLine($"Step {attack.ComboStep}/4 / Phase {attack.Phase} / Frame {attack.ElapsedFrames} / Next {attack.HasQueuedAttack}");
                 text.AppendLine(attack.UsesFrameDefinition ? $"Common cancel: [{attack.CancelStartFrame}..{attack.CancelEndFrame}] / Open {attack.OpenCancelWindows}" : $"Legacy event profile / Windows {attack.OpenCancelWindows}");
                 text.AppendLine($"Buffer {attack.InputBufferRemaining * 60:0}F / End {attack.LastEndReason} / Full {attack.FullComboCount}/{attack.ComboAttemptCount} / Fallback {attack.TimeoutFallbackCount}");
+                if (attack.Definition != null)
+                {
+                    var step = attack.Definition.steps[Mathf.Clamp(attack.ComboStep - 1, 0, 3)];
+                    text.AppendLine($"Hitbox height {step.radius * 2:0.000}u / forward extension {step.forwardExtension:0.00000}u (Gizmos)");
+                }
             }
             text.AppendLine(parry != null ? $"Parry {parry.ElapsedFrames}F / Accept [{parry.AcceptanceStartFrame}..{parry.AcceptanceEndFrame}] / CD {parry.ParryCooldownRemaining * 60:0}F\nSuccess {parry.SuccessCount}/{parry.AttemptCount} / Just {parry.JustSuccessCount} / Miss {parry.MissCount}" : "Parry: N/A (PlayerParry2D missing)");
             if (counter == null) text.AppendLine("Counter: N/A (PlayerParryCounter2D missing)");
@@ -101,6 +106,7 @@ public class PlayerDebugOverlay : MonoBehaviour
                 text.AppendLine($"{health.IndividualId}: {enemy.CurrentStateName}, {health.CurrentHp}/{health.MaxHp} HP / {enemy.AttackKind}\n  Windup {enemy.WindupRemainingFrames}F / Active {enemy.ActiveRemainingFrames}F / Attack {enemy.AttackId} #{enemy.AttackSequence}\n  Role {enemy.AttackRoleReason} / Counter x{health.CounterMultiplier:0.00} / Reaction {health.LastHitReaction} / Armor {enemy.ResistsHitStun}");
                 var launch = enemy.GetComponent<EnemyCounterLaunch2D>();
                 text.AppendLine($"  Parry stagger {health.ParryStaggerRemainingFrames}F / configured {health.ConfiguredParryStaggerFrames}F");
+                text.AppendLine($"  Yellow parry cue {enemy.IsParryCueActive} / last {enemy.ParryCueLeadFrames}F of windup");
                 if (launch != null) text.AppendLine($"  Launch {launch.IsActive} {launch.ElapsedFrames}F / {launch.TravelDistance:0.00}u / {launch.LastEndReason} / Motion owners {health.MotionOwnerCount}");
             }
             var feedback = GetComponent<CombatFeedback2D>();

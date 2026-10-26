@@ -6,6 +6,8 @@ public sealed class EnemyAttackDefinition : ScriptableObject
 {
     public string attackId = "melee-slash";
     [Min(1)] public int windupFrames = 36;
+    [Tooltip("Yellow cue lead-in before contact. Does not shorten windup or change parry acceptance.")]
+    [Min(1)] public int parryCueLeadFrames = 12;
     [Min(1)] public int activeFrames = 3;
     [Min(1)] public int recoveryFrames = 32;
     [Min(1)] public int cooldownFrames = 36;
@@ -21,7 +23,7 @@ public sealed class EnemyAttackDefinition : ScriptableObject
     public string countermeasure = "Parry or Dash; punish recovery";
     public AudioClip windupClip;
 
-    public bool IsValid => !string.IsNullOrWhiteSpace(attackId) && windupFrames > 0 && activeFrames > 0 &&
+    public bool IsValid => !string.IsNullOrWhiteSpace(attackId) && windupFrames > 0 && parryCueLeadFrames > 0 && activeFrames > 0 &&
         recoveryFrames > 0 && cooldownFrames > 0 && damage > 0 && attackRange > 0 &&
         hitSize.x > 0 && hitSize.y > 0 && !string.IsNullOrWhiteSpace(countermeasure);
 }

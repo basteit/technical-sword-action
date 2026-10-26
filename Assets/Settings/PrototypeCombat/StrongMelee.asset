@@ -28,6 +28,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7901b57c3b4b14d448241ef6b480178c, type: 2}
   moveSpeed: 1.25
   windupFrames: 30
+  parryCueLeadFrames: 12
   activeFrames: 3
   recoveryFrames: 30
   cooldownFrames: 32

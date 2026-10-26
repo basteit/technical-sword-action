@@ -66,7 +66,9 @@ public sealed class EnemyCombatCue2D : MonoBehaviour, ICombatTickListener, IComb
         }
         if (cue != null)
         {
-            cue.enabled = !stunned && (winding || active);
+            // Yellow means "parry now", not the entire (possibly 96F) preparation.
+            // Red retains the full warning for an attack which cannot be parried.
+            cue.enabled = !stunned && (lowSweep ? winding || active : enemy.IsParryCueActive);
             cue.transform.localScale = Vector3.one * (enemy.WindupRemainingFrames <= 6 ? 1.4f : 1);
             cue.transform.localRotation = Quaternion.Euler(0, 0, enemy.AttackKind == "Unparryable" ? 45 : 0);
             cue.color = enemy.AttackKind == "Unparryable" ? Color.red : Color.yellow;

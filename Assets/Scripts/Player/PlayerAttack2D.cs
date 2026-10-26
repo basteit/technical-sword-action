@@ -379,7 +379,11 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         float radius = data.radius > 0f ? data.radius : attackRadius;
         bool useBox=definition==null&&data.useBoxHitbox;
         Vector2 boxCenter=(Vector2)transform.position+new Vector2(data.hitboxOffset.x*attackFacingSign,data.hitboxOffset.y);
-        Collider2D[] hits = useBox
+        bool extended = definition != null && CurrentDefinition.forwardExtension > 0;
+        Collider2D[] hits = extended
+            ? Physics2D.OverlapCapsuleAll(CurrentDefinition.HitboxCenter(hitPoint.position, attackFacingSign),
+                CurrentDefinition.HitboxSize, CapsuleDirection2D.Horizontal, 0, targetLayers)
+            : useBox
             ? Physics2D.OverlapBoxAll(boxCenter,data.hitboxSize,0,targetLayers)
             : Physics2D.OverlapCircleAll(hitPoint.position, radius, targetLayers);
 
@@ -674,7 +678,32 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         }
 
         AttackStepData data = GetStepData(Mathf.Max(1, comboStep));
-        float radius = data.radius > 0f ? data.radius : attackRadius;
+        float radius = definition != null ? CurrentDefinition.radius : data.radius > 0f ? data.radius : attackRadius;
+
+        if (definition != null && CurrentDefinition.forwardExtension > 0)
+        {
+            int facing = isAttacking ? attackFacingSign : motor != null ? motor.FacingSign : 1;
+            Vector2 center = CurrentDefinition.HitboxCenter(hitPoint.position, facing);
+            float halfSegment = CurrentDefinition.forwardExtension * .5f;
+            Vector2 left = center + Vector2.left * halfSegment, right = center + Vector2.right * halfSegment;
+            if (isAttacking && Phase == AttackPhase.Active)
+            {
+                Gizmos.color = activeFillColor;
+                Gizmos.DrawCube(center, new Vector3(halfSegment * 2, radius * 2, 0));
+                Gizmos.DrawSphere(left, radius); Gizmos.DrawSphere(right, radius);
+            }
+            Gizmos.color = isAttacking && Phase == AttackPhase.Active ? activeHitboxColor : idleHitboxColor;
+            Gizmos.DrawLine(left + Vector2.up * radius, right + Vector2.up * radius);
+            Gizmos.DrawLine(left + Vector2.down * radius, right + Vector2.down * radius);
+            for (int i = 0; i < 16; i++)
+            {
+                float a = (90 + i * 180f / 16) * Mathf.Deg2Rad, b = (90 + (i + 1) * 180f / 16) * Mathf.Deg2Rad;
+                Vector2 from = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * radius;
+                Vector2 to = new Vector2(Mathf.Cos(b), Mathf.Sin(b)) * radius;
+                Gizmos.DrawLine(left + from, left + to); Gizmos.DrawLine(right - from, right - to);
+            }
+            return;
+        }
 
         if(definition==null&&data.useBoxHitbox)
         {

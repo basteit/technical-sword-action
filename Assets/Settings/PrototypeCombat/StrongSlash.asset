@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackDefinition
   attackId: heavy-overhead-slash
   windupFrames: 42
+  parryCueLeadFrames: 12
   activeFrames: 4
   recoveryFrames: 38
   cooldownFrames: 40

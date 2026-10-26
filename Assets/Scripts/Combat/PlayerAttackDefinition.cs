@@ -19,10 +19,16 @@ public sealed class PlayerAttackDefinition : ScriptableObject
         [Min(1)] public int endFrame = 50;
         [Min(0)] public int gaugeGain = 2;
         [Min(.01f)] public float radius = .75f;
+        [Tooltip("Extend the original hit circle forward into a horizontal capsule, without changing its height or rear edge.")]
+        [Min(0)] public float forwardExtension;
         public float motionDistance = .1f;
         [Min(1)] public int motionFrames = 8;
+        public Vector2 HitboxSize => new Vector2(radius * 2 + forwardExtension, radius * 2);
+        public Vector2 HitboxCenter(Vector2 origin, int facing) => origin + Vector2.right *
+            ((facing < 0 ? -1 : 1) * forwardExtension * .5f);
         public bool IsValid => damage > 0 && activeStart >= 0 && activeEnd >= activeStart &&
-            cancelStart == activeEnd + 1 && recoveryStart > cancelStart && endFrame > recoveryStart && radius > 0;
+            cancelStart == activeEnd + 1 && recoveryStart > cancelStart && endFrame > recoveryStart && radius > 0 &&
+            float.IsFinite(forwardExtension) && forwardExtension >= 0;
     }
 
     public Step[] steps = { new Step(), new Step(), new Step { damage = 15 }, new Step { damage = 25, gaugeGain = 5 } };
