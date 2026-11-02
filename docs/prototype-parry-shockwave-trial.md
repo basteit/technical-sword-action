@@ -1,6 +1,6 @@
 # パリィ衝撃波の画面屈折試作（#33）
 
-最新のプロトタイプ演出は[停止解除から戻るカメラと反撃通し](prototype-parry-hitstop-return.md)。[弧と時間差・派手な接点演出の試作](prototype-parry-expressive-trial.md)、[強い接点光・線形カメラと主人公前面表示](prototype-parry-camera-impact.md)、[オレンジ演出の初期追加](prototype-parry-orange-impact.md)、[36F・背景30%・8F待ちの調整](prototype-parry-impact-sync-retune.md)、[初回の40F同期版](prototype-parry-impact-sync-trial.md)と本書の0.24秒の波・成功直後の強い暗転は比較履歴として残す。既存完成動画側の表示は変更していない。
+最新のプロトタイプ演出は[反撃への直接カメラ接続と予備動作全体の収録](prototype-parry-counter-camera-link.md)。[停止解除から戻るカメラ](prototype-parry-hitstop-return.md)、[弧と時間差・派手な接点演出の試作](prototype-parry-expressive-trial.md)、[強い接点光・線形カメラと主人公前面表示](prototype-parry-camera-impact.md)、[オレンジ演出の初期追加](prototype-parry-orange-impact.md)、[36F・背景30%・8F待ちの調整](prototype-parry-impact-sync-retune.md)、[初回の40F同期版](prototype-parry-impact-sync-trial.md)と本書の0.24秒の波・成功直後の強い暗転は比較履歴として残す。既存完成動画側の表示は変更していない。
 
 ## 体験目的と範囲
 
