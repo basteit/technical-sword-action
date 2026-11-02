@@ -11,7 +11,7 @@ using UnityEngine.Rendering.Universal;
 public static class AdaptiveParryCaptureUtility
 {
     public static string Prepare() => PrototypeImpactCaptureUtility.Prepare();
-    public static string Capture(bool legacy = false, string revision = "20261102-sync-v1")
+    public static string Capture(bool legacy = false, string revision = "20261102-sync-v2")
     {
         Check(Application.isPlaying, "PlayMode required.");
         Check(!string.IsNullOrEmpty(revision) && revision.All(c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-'), "Use an ASCII revision.");
@@ -31,7 +31,9 @@ public static class AdaptiveParryCaptureUtility
         var camera = Camera.main; var previous = RenderTexture.active;
         var target = new RenderTexture(1920,1080,24,RenderTextureFormat.ARGB32); target.Create();
         var image = new Texture2D(1920,1080,TextureFormat.RGB24,false);
-        var report = new Report {legacy=legacy};
+        var report = new Report {legacy=legacy, cameraOrthographicSize=camera.orthographicSize, cameraAspect=camera.aspect,
+            cameraPosition=camera.transform.position, configuredStopTicks=profile.parryTrialHitstopFrames,
+            configuredApproachMaxFrames=profile.parryApproachMaxFrames, configuredBackgroundDim=profile.parryBackgroundDim};
         var rows = new List<string>{"frame,tick,playerSprite,enemySprite,enemyMotion,successes,impactCount,phase,hitstop,backgroundAlpha,wave,enemyHp,playerHp"};
         int successes = parry.SuccessCount, impacts = presentation.ParryImpactCount;
         void Advance() {clock.AdvanceFrame(1d/60);presentation.AdvanceVisuals(1f/60);feedback.AdvanceVisuals(1f/60);}
@@ -58,6 +60,7 @@ public static class AdaptiveParryCaptureUtility
                 var light=camera.GetComponent<VideoParryBacklight>();
                 report.maximumBackgroundAlpha=Mathf.Max(report.maximumBackgroundAlpha,light.BackgroundAlpha);
                 report.maximumStopTicks=Mathf.Max(report.maximumStopTicks,CombatTimeController.HitstopRemainingTicks);
+                Check(Mathf.Abs(camera.orthographicSize-report.cameraOrthographicSize)<.0001f,"Parry preview must keep the real gameplay camera size.");
                 RenderPipeline.SubmitRenderRequest(camera,new UniversalRenderPipeline.SingleCameraRequest{destination=target});
                 RenderTexture.active=target;image.ReadPixels(new Rect(0,0,1920,1080),0,0,false);image.Apply(false);
                 File.WriteAllBytes(Path.Combine(folder,$"frame-{frame:D4}.png"),image.EncodeToPNG());
@@ -65,7 +68,9 @@ public static class AdaptiveParryCaptureUtility
             }
             Check(parry.SuccessCount==successes+1&&presentation.ParryImpactCount==impacts+1&&enemy.HitCount==0&&enemy.CurrentHp==30&&player.GetComponent<PlayerDamageReceiver2D>().CurrentHp==100,"Expected one real parry without damage/counter.");
             Check(!presentation.IsParrySequenceActive&&!presentation.IsParryBacklit&&!feedback.IsParryShockwaveVisible&&!CombatTimeController.IsHitStopped,"Presentation residue at capture end.");
-            Check(legacy || report.impactEnemySprite=="EnemySample_attack_14"&&report.maximumStopTicks==40&&report.reactionFrame>report.impactFrame&&report.maximumBackgroundAlpha<=.201f,"Adaptive peak/stop/lighting invariant failed.");
+            Check(legacy || report.impactEnemySprite=="EnemySample_attack_14"&&report.maximumStopTicks==profile.parryTrialHitstopFrames&&
+                report.leadCombatFrames<=profile.parryApproachMaxFrames&&report.reactionFrame>report.impactFrame&&
+                Mathf.Abs(report.maximumBackgroundAlpha-profile.parryBackgroundDim)<.001f,"Adaptive peak/stop/lighting invariant failed.");
             File.WriteAllText(Path.Combine(folder,"trace.csv"),string.Join("\n",rows));
             File.WriteAllText(Path.Combine(folder,"events.json"),JsonUtility.ToJson(report,true));
             return folder;
@@ -82,6 +87,8 @@ public static class AdaptiveParryCaptureUtility
     [Serializable] private sealed class Report
     {
         public bool legacy; public int frameCount=180,fps=60,successFrame=-1,impactFrame=-1,reactionFrame=-1,leadCombatFrames,maximumStopTicks;
-        public float duration=3,maximumBackgroundAlpha; public string impactEnemySprite;
+        public int configuredStopTicks,configuredApproachMaxFrames;
+        public float duration=3,maximumBackgroundAlpha,configuredBackgroundDim,cameraOrthographicSize,cameraAspect;
+        public Vector3 cameraPosition; public string impactEnemySprite;
     }
 }
