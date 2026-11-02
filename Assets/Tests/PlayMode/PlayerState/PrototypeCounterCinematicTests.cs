@@ -1070,6 +1070,18 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             finally{Call(arena,"ResetActionsOnly");Set(profile,"parryCounterCameraBridge",saved);}
         }
+        [Test] public void CounterCameraBridgeLongerThanTheActionStillReleasesItsCamera()
+        {
+            var profile=Get<object>(counter,"CinematicProfile");float saved=Get<float>(profile,"parryCounterCameraBridgeSeconds");
+            try
+            {
+                Set(profile,"parryCounterCameraBridgeSeconds",10f);Set(Get<object>(feedback,"Settings"),"shake",1f);
+                Vector3 original=Camera.main.transform.position;BeginAuthoredAdaptiveParry(1);Call(player,"RequestAction",PlayerActionRequest.Attack);
+                Until(()=>Get<bool>(counter,"IsActive"));Until(()=>!Get<bool>(counter,"IsActive"));Frames(24);
+                Assert.That(Camera.main.transform.position,Is.EqualTo(original));AssertClean();
+            }
+            finally{Call(arena,"ResetActionsOnly");Set(profile,"parryCounterCameraBridgeSeconds",saved);}
+        }
         [TestCase(1)] [TestCase(-1)]
         public void ExpressiveCameraPositionArrivesBeforeItsZoomWithoutMovingTheBody(int direction)
         {

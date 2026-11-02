@@ -384,6 +384,8 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     }
     private void OnFinished(bool _)
     {
+        // A tuning value longer than the action must not leave a custom focus override holding its lease.
+        if (counterCameraBridgeActive && counter.LastEndReason == "Complete") FocusCounterCamera();
         counterCameraBridgeActive = false;
         RestoreBody(); OnRelease();
         counterLightReady = false; counterLight?.ResetLight();
