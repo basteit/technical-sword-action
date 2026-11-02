@@ -83,6 +83,15 @@
   },
   "media": [
     {
+      "path": "docs/video/previews/parry-shockwave-mobile-20261102.mp4",
+      "resolution": [480, 648], "fps": 30, "frames": 189, "seconds": 6.3, "audio": false,
+      "bytes": 636194,
+      "sha256": "0366B683E0728510E9B928CCD9C9D25C67BF78BC719CB2EFF651269F0C15AB01",
+      "codec": "H.264 Constrained Baseline, Level 3.1, yuv420p, faststart",
+      "fullDecodePassed": true,
+      "physicalMobilePlaybackConfirmed": false
+    },
+    {
       "path": "docs/video/previews/parry-shockwave-on-20261102.mp4",
       "resolution": [1920, 1080], "fps": 60, "frames": 210, "seconds": 3.5, "audio": false,
       "bytes": 683541,

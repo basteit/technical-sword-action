@@ -27,12 +27,17 @@
 
 ## 比較動画
 
+- [スマホ用軽量MP4](video/previews/parry-shockwave-mobile-20261102.mp4): 480×648、30fps、189枚、6.3秒、無音、636194bytes。H.264 Constrained Baseline / Level 3.1 / yuv420p / faststart。上下比較の内容と時間は保持する。
 - [通常速度・追加あり](video/previews/parry-shockwave-on-20261102.mp4): 1920×1080、60fps、210枚、3.5秒、無音。
 - [上下比較](video/previews/parry-shockwave-comparison-20261102.mp4): 960×1296、60fps、378枚、6.3秒、無音。上=OFF、下=ON。最初3.5秒は1倍、後半2.8秒は接触付近を1/4速度にしている。
 - [拡大スローGIF](video/previews/parry-shockwave-close-20261102.gif): 800×540、20fps、56枚。
 - [同フレーム静止比較](video/previews/parry-shockwave-comparison-20261102.png)。
 
 全てUnityの実描画から取得し、後付けの動画歪み加工ではない。操作版の実AIによる成功パリィ1回と、90ダメージの反撃1回を収録。実物パッドの操作感やDevelopment Buildの性能確認を代替しない。
+
+### スマホへの共有
+
+GitHubの `blob` ページは端末によって動画を表示できず、raw配信も `application/octet-stream` でダウンロード扱いになる場合がある。共有には公開済みコミットを固定した `https://cdn.jsdelivr.net/gh/basteit/technical-sword-action@<commit>/docs/video/previews/<file>.mp4` の直接リンクを使う。今回の公開ファイルについて `Content-Type: video/mp4` と `Accept-Ranges: bytes` を確認した。追加の公開範囲変更は行わない。実際のスマホ端末での再生は未確認なので、再生できない場合に備えて拡大スローGIFも添える。
 
 ## 再収録と比較条件
 
