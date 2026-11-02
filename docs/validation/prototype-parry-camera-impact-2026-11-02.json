@@ -1,0 +1,74 @@
+{
+  "dateJst": "2026-11-02", "issue": 33, "branch": "issue/33-parry-shockwave",
+  "baselineCommit": "efc0c232afc049682ea3fbac880720054480891c",
+  "implementationCommit": "7f7405e", "mediaCommit": "6be7e0416f9fcec5bf7f735bb3c229ec6b18d8c7",
+  "draftPullRequest": 98, "dependencyPullRequests": [81],
+  "userRequests": ["Slightly shorter hitstop", "Much stronger new glow and slightly darker surroundings", "Camera approaches the parry effect during preparation, maximum zoom at impact, large short shake, delayed return", "Player renders in front of enemy"],
+  "settingsAreTrialValues": true,
+  "settings": {
+    "hitstopTicks": 30, "previousHitstopTicks": 36, "backgroundDim": 0.4, "previousBackgroundDim": 0.3,
+    "glowAlpha": 0.8, "glowRgbGain": 3, "glowRadius": 1.6, "glowSeconds": 0.18,
+    "legacyWhiteHalo": 0, "legacyWhiteActorLight": 0.08,
+    "cameraNormalSize": 5.625, "cameraPreparationSize": 4.75, "cameraImpactSize": 4.25,
+    "cameraPreparationSeconds": 0.1, "cameraPostParryHoldSeconds": 0.2, "cameraReturnSeconds": 0.18,
+    "impactShakeSeconds": 0.1, "impactShakeStrength": 0.32,
+    "playerMinimumSortingOrder": 20, "enemyBodySortingOrder": 8,
+    "preservedApproachTicks": 8, "preservedFollowThroughTicks": 8,
+    "preservedActorJitterMaximumVirtualPixels": 2
+  },
+  "cameraRules": {
+    "preparationInterpretation": "The existing eight-tick deflection preparation after logical success; no camera approach for empty/failed parry",
+    "soleCameraWriter": "CombatFeedback2D", "focusPoint": "Fixed world position of the authored spark contact",
+    "counterTransition": "Transfer owner without replacing the saved normal camera baseline",
+    "shakeZero": "No approach, camera shake or actor jitter; same combat success and hitstop",
+    "pause": "Freeze camera phases and hold timer; zero settings can still clear effects",
+    "interruptions": "Restore original position/size and clear owned shake on hit, death, target loss, reset, disable or scene change"
+  },
+  "preservedReceivedArtAndCompletedFilmingScenes": true,
+  "compile": {"errors": 0, "warnings": 0},
+  "editMode": {"total": 293, "passed": 293, "failed": 0, "completedAtUtc": "2026-11-02T10:49:27.4257141Z"},
+  "focusedParryCounterPlayMode": {"total": 149, "passed": 149, "failed": 0, "completedAtUtc": "2026-11-02T10:50:27.6047897Z"},
+  "playerArtIntegrationPlayMode": {"total": 7, "passed": 7, "failed": 0, "completedAtUtc": "2026-11-02T10:51:37.5529394Z"},
+  "fullPlayMode": {
+    "status": "Completed with existing failures", "total": 817, "passed": 804, "failed": 13, "skipped": 0,
+    "durationSeconds": 204.881, "completedAtUtc": "2026-11-02T11:00:17Z",
+    "localXml": ".uloop/outputs/TestResults/20261102_200017.xml",
+    "previousXml": ".uloop/outputs/TestResults/20261102_193317.xml",
+    "allFailureFullNamesMatchPrevious": true, "newFailures": [],
+    "knownFailureGroups": {"videoKickHeight": 2, "videoChargeTiming": 3, "fourStageDefenseCancelVideo": 7, "legacyJustBoundaryExpectation": 1},
+    "focusedParryCounterTestsInFullRun": 149, "focusedParryCounterFailuresInFullRun": 0,
+    "cliTimedOutAt180Seconds": true, "recoveredFinalXmlWithoutDuplicateRun": true
+  },
+  "capture": {
+    "localRawDirectory": ".uloop/outputs/video/adaptive-parry-20261102-camera-v1/adaptive",
+    "comparisonSource": ".uloop/outputs/video/adaptive-parry-20261102-orange-v1/adaptive",
+    "frameCount": 180, "fps": 60, "durationSeconds": 3,
+    "successFrame": 17, "impactFrame": 25, "staggerFrame": 63,
+    "cameraPreparationFrame": 17, "cameraHoldFrame": 63, "cameraReturnFrame": 75, "cameraRestoredFrame": 86,
+    "impactEnemySprite": "EnemySample_attack_14", "minimumCameraSize": 4.25, "impactCameraSize": 4.25,
+    "maximumCameraShake": 0.326259583234787, "maximumBackgroundAlpha": 0.4000000059604645,
+    "orangeSparkSampleFrames": 20, "orangeGlowSampleFrames": 11, "actorJitterSampleFrames": 30, "jitterSignChanges": 14,
+    "maximumStoppedPlayerRootDrift": 0, "maximumStoppedEnemyRootDrift": 0,
+    "playerSortingOrder": 20, "enemySortingOrder": 8, "legacyHaloSeen": false,
+    "successes": 1, "playerHp": 100, "enemyHp": 30, "damageHits": 0, "counters": 0,
+    "cameraAndEffectResidueAtEnd": false, "originalCameraPosition": [0,3,-10], "originalCameraSize": 5.625,
+    "postProductionCropOrZoom": false, "actualGameplayCameraMotionRecorded": true, "cameraRenderingNotHudCapture": true
+  },
+  "media": [
+    {"file": "parry-adaptive-20261102-camera-on.mp4", "size": [1280,720], "fps": 30, "seconds": 3, "bytes": 273315, "sha256": "508B73155139A6CB36BB04B02C31135AD4C7FF37CE71CF5E5D6B2464B039BDFE"},
+    {"file": "parry-adaptive-20261102-camera-comparison.mp4", "size": [640,720], "fps": 30, "seconds": 3, "bytes": 232584, "sha256": "B477A116253C5EC90027F4E344A97EA439387212F059042B126BCB2BCB9F5ABA"},
+    {"file": "parry-adaptive-20261102-camera-detail.mp4", "size": [1280,720], "fps": 30, "seconds": 2.0666667, "bytes": 323319, "sha256": "2FAE39EBF34637A6CEC8B69E33AA23B9034DCEDAA9F1CA7DA1B01F8B248343B7", "inspectionSpeed": 0.5},
+    {"file": "parry-adaptive-20261102-camera-detail.gif", "size": [640,360], "fps": 20, "seconds": 2.05, "bytes": 527011, "sha256": "AC2F51B51363BA701866CBFDFB28A902CEB95B79BBF197C3C44A4A8B4C3C4835", "inspectionSpeed": 0.5}
+  ],
+  "mediaVerification": {
+    "encoding": "H.264 Constrained Baseline, Level3.1, yuv420p, faststart, 30fps, no audio",
+    "allFourFilesFullyDecoded": true, "rawImpactAndDeliveredContactSheetVisuallyInspected": true,
+    "cdnBase": "https://cdn.jsdelivr.net/gh/basteit/technical-sword-action@6be7e0416f9fcec5bf7f735bb3c229ec6b18d8c7/docs/video/previews/",
+    "onMp4HttpStatus": 200, "onMp4Mime": "video/mp4", "rangeStatus": 206, "contentRange": "bytes 0-1023/273315",
+    "downloadedSha256Matches": true, "comparisonAndGifHeadStatus": 200, "physicalPhonePlayback": "Not tested"
+  },
+  "finalUnityState": {"scene": "Assets/Scenes/PrototypeCombatValidation.unity", "dirty": false, "playing": false, "paused": false, "playerSortingOrder": 20, "missingScripts": 0, "counterValidationErrors": 0, "commonValidationErrors": 0, "consoleErrors": 0, "consoleWarnings": 0},
+  "requirementsStaging": "Only the new eight-line section staged; existing unrelated 645 additions / 171 deletions preserved",
+  "humanChecksStillRequired": ["Strong light and short large shake comfort", "Camera framing with multiple enemies and counter chaining", "Keyboard and physical gamepad 15 minutes each", "Minimum-hardware Development/Release Build performance"],
+  "newBuildOrZipCreated": false
+}
