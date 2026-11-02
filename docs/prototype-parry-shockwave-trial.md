@@ -1,6 +1,6 @@
 # パリィ衝撃波の画面屈折試作（#33）
 
-最新のプロトタイプ既定は[同期後の再調整（36F・背景30%・8F待ち）](prototype-parry-impact-sync-retune.md)。[初回の40F同期版](prototype-parry-impact-sync-trial.md)と本書の0.24秒の波・成功直後の強い暗転は比較履歴として残す。既存完成動画側の表示は変更していない。
+最新のプロトタイプ追加演出は[オレンジ火花・発光と停止中の表示振動](prototype-parry-orange-impact.md)。[同期後の再調整（36F・背景30%・8F待ち）](prototype-parry-impact-sync-retune.md)、[初回の40F同期版](prototype-parry-impact-sync-trial.md)と本書の0.24秒の波・成功直後の強い暗転は比較履歴として残す。既存完成動画側の表示は変更していない。
 
 ## 体験目的と範囲
 
