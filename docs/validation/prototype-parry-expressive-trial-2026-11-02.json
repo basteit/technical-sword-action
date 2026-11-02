@@ -1,0 +1,99 @@
+{
+  "dateJst": "2026-11-02", "issue": 33, "branch": "issue/33-parry-shockwave",
+  "baselineCommit": "a63b8eb5a91854f4a626457c552316316786f189",
+  "implementationCommit": "fb44305", "mediaCommit": "f1e6338cb7508fda608ccbbc357083f0f5d01401",
+  "draftPullRequest": 98, "dependencyPullRequests": [81],
+  "userRequest": "Implement curved camera timing and make light/sparks as dramatic as the supplied ZZZ reference",
+  "reference": {
+    "durationSeconds": 5.23, "fps": 30, "size": [1918,1078],
+    "sha256": "96CC6DB7D52635D72E4A0650904E0B2754C04A34F08AD7E9634591AB0C4C8D2F",
+    "use": "Visual analysis only; translate a short bright core, long horizontal flare, unequal streaks and rapid camera motion into orange 2D effects",
+    "sourceOrExtractedFramesPublished": false, "sourceAssetsOrAudioReused": false
+  },
+  "settingsAreTrialValues": true,
+  "settings": {
+    "expressiveCamera": true, "arcHeightUnits": 0.2,
+    "positionLeadCombatFrames": 2, "zoomDelayCombatFrames": 2,
+    "positionCurve": "smoothstep", "zoomCurve": "quadratic acceleration after delay", "returnCurve": "cubic ease-out",
+    "cameraNormalSize": 5.625, "cameraImpactSize": 4.25,
+    "cameraPostParryHoldSeconds": 0.2, "cameraReturnSeconds": 0.18, "cameraRollDegrees": 0,
+    "referenceAccent": true, "sparks": 32, "previousSparks": 14,
+    "sparkRadiusSetting": 3.2, "previousSparkRadiusSetting": 1.2, "sparkSeconds": 0.32,
+    "flareLengthSetting": 10.5, "flareSeconds": 0.1, "flareRays": 3,
+    "preservedHitstopTicks": 30, "preservedBackgroundDim": 0.4,
+    "preservedGlowAlpha": 0.8, "preservedGlowRgbGain": 3, "preservedGlowRadius": 1.6, "preservedGlowSeconds": 0.18,
+    "preservedLegacyWhiteHalo": 0, "preservedLegacyWhiteActorLight": 0.08,
+    "preservedImpactShakeSeconds": 0.1, "preservedImpactShakeStrength": 0.32,
+    "preservedApproachTicks": 8, "preservedFollowThroughTicks": 8,
+    "preservedActorJitterMaximumVirtualPixels": 2, "preservedPlayerMinimumSortingOrder": 20
+  },
+  "rollback": {
+    "linearCamera": "parryExpressiveCamera=false", "fourteenSparksWithoutFlare": "parryReferenceAccent=false",
+    "independentCombinationsTested": 4, "previousCaptureRetained": "20261102-camera-v1",
+    "gameplayValuesChanged": false, "resetEncounterBeforeRuntimeSettingsChange": true
+  },
+  "accessibilityAndLifecycle": {
+    "shakeZero": "Disable camera movement/shake and actor jitter without changing combat timing",
+    "flashZero": "Remove glow and flare; suppression remains sticky even while paused",
+    "vfxZero": "Remove additional sparks, glow and flare",
+    "pause": "Freeze visual timing and camera return",
+    "interruptions": "Restore the normal camera and drawing offsets on hit, death, target loss, reset, disable or scene change",
+    "counterTransition": "Transfer camera ownership with the original baseline intact",
+    "soleCameraWriter": "CombatFeedback2D"
+  },
+  "preservedReceivedArtAndCompletedFilmingScenes": true,
+  "compile": {"errors": 0, "warnings": 0},
+  "editMode": {"total": 304, "passed": 304, "failed": 0, "completedAtUtc": "2026-11-02T12:50:37.0874770Z"},
+  "focusedParryCounterPlayMode": {"total": 156, "passed": 156, "failed": 0, "completedAtUtc": "2026-11-02T12:53:19.9422346Z"},
+  "fullPlayMode": {
+    "status": "Completed with unchanged existing failures", "total": 824, "passed": 811, "failed": 13, "skipped": 0,
+    "durationSeconds": 244.535, "completedAtUtc": "2026-11-02T13:04:41Z",
+    "localXml": ".uloop/outputs/TestResults/20261102_220441.xml",
+    "previousXml": ".uloop/outputs/TestResults/20261102_200017.xml",
+    "allFailureFullNamesMatchPrevious": true, "allFailureMessagesMatchPrevious": true, "newFailures": [],
+    "knownFailureGroups": {"videoKickHeight": 2, "videoChargeTiming": 3, "fourStageDefenseCancelVideo": 7, "legacyJustBoundaryExpectation": 1},
+    "focusedParryCounterTestsInFullRun": 156, "focusedParryCounterFailuresInFullRun": 0,
+    "cliTimedOutAt180Seconds": true, "recoveredFinalXmlWithoutDuplicateRun": true
+  },
+  "capture": {
+    "localRawDirectory": ".uloop/outputs/video/adaptive-parry-20261102-expressive-v1/adaptive",
+    "comparisonSource": ".uloop/outputs/video/adaptive-parry-20261102-camera-v1/adaptive",
+    "frameCount": 180, "fps": 60, "durationSeconds": 3,
+    "successFrame": 17, "impactFrame": 25, "staggerFrame": 63,
+    "cameraPreparationFrame": 17, "cameraPositionArrivedFrame": 23, "cameraMaximumZoomFrame": 25,
+    "cameraHoldFrame": 63, "cameraReturnFrame": 75, "cameraRestoredFrame": 86,
+    "cameraSamplesWithoutShake": [
+      {"frame": 17, "size": 5.625, "position": [0,3]},
+      {"frame": 19, "size": 5.625, "position": [0.3645834,2.687616]},
+      {"frame": 20, "size": 5.586805, "position": [0.703125,2.30125]},
+      {"frame": 23, "size": 5.013889, "position": [1.40625,1.2025]},
+      {"frame": 25, "size": 4.25, "position": [1.40625,1.2025]}
+    ],
+    "impactEnemySprite": "EnemySample_attack_14", "maximumStopTicks": 30,
+    "maximumCameraShake": 0.326259583234787, "maximumBackgroundAlpha": 0.4000000059604645,
+    "referenceFlareSampleFrames": 6, "peakParryParticles": 32,
+    "orangeSparkSampleFrames": 20, "orangeGlowSampleFrames": 11, "actorJitterSampleFrames": 30, "jitterSignChanges": 14,
+    "maximumStoppedPlayerRootDrift": 0, "maximumStoppedEnemyRootDrift": 0,
+    "playerSortingOrder": 20, "enemySortingOrder": 8, "legacyHaloSeen": false,
+    "successes": 1, "playerHp": 100, "enemyHp": 30, "damageHits": 0, "counters": 0,
+    "cameraAndEffectResidueAtEnd": false, "originalCameraPosition": [0,3,-10], "originalCameraSize": 5.625,
+    "postProductionCropOrZoom": false, "actualGameplayCameraMotionRecorded": true, "cameraRenderingNotHudCapture": true
+  },
+  "media": [
+    {"file": "parry-adaptive-20261102-expressive-on.mp4", "size": [1280,720], "fps": 30, "seconds": 3, "bytes": 293954, "sha256": "CE388CD939B4EB2C72A6D2B777559232D1C55D0B260A12A9B3BD2CD8D2B437E5"},
+    {"file": "parry-adaptive-20261102-expressive-comparison.mp4", "size": [640,720], "fps": 30, "seconds": 3, "bytes": 255277, "sha256": "1DE8E7EEB243B5F80F8FD6622293B49568C416239AB2E2C96B42934AAE020517"},
+    {"file": "parry-adaptive-20261102-expressive-detail.mp4", "size": [1280,720], "fps": 30, "seconds": 2.0666667, "bytes": 374539, "sha256": "BB201C2CC50CBE581807D70FBA0897E45D7EACBB3225E464C2590E71D0AC0B3A", "inspectionSpeed": 0.5},
+    {"file": "parry-adaptive-20261102-expressive-detail.gif", "size": [640,360], "fps": 20, "seconds": 2.05, "bytes": 582699, "sha256": "29264302FF9777567D8B94FBF03F881D8684710DC5E8E408AC2C6D4C59309AE4", "inspectionSpeed": 0.5}
+  ],
+  "mediaVerification": {
+    "encoding": "H.264 Constrained Baseline, Level3.1, yuv420p, faststart, 30fps, no audio",
+    "allFourFilesFullyDecoded": true, "rawImpactAndDeliveredContactSheetVisuallyInspected": true,
+    "cdnBase": "https://cdn.jsdelivr.net/gh/basteit/technical-sword-action@f1e6338cb7508fda608ccbbc357083f0f5d01401/docs/video/previews/",
+    "onMp4HttpStatus": 200, "onMp4Mime": "video/mp4", "rangeStatus": 206, "contentRange": "bytes 0-1023/293954",
+    "downloadedSha256Matches": true, "comparisonDetailAndGifHeadStatus": 200, "physicalPhonePlayback": "Not tested"
+  },
+  "finalUnityState": {"scene": "Assets/Scenes/PrototypeCombatValidation.unity", "dirty": false, "playing": false, "paused": false, "playerSortingOrder": 20, "missingScripts": 0, "counterValidationErrors": 0, "commonValidationErrors": 0, "consoleErrors": 0, "consoleWarnings": 0},
+  "requirementsStaging": "Only the new seven-line section staged; existing unrelated 645 additions / 171 deletions preserved",
+  "humanChecksStillRequired": ["Dramatic flare and camera comfort at real speed", "Repeated parries and multiple-enemy readability", "Air/wall/counter chaining feel", "Keyboard and physical gamepad 15 minutes each", "Minimum-hardware Development/Release Build performance"],
+  "newBuildOrZipCreated": false, "issueClosedOrPullRequestMerged": false
+}
