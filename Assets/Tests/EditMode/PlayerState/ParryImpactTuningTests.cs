@@ -27,7 +27,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(value,Is.InRange(0f,1f));peak=Mathf.Max(peak,value);
                 bool rising=value>previous+.0001f;if(rising&&!wasRising)rises++;
                 wasRising=rising;previous=value;
-                Assert.That(value*Get<float>(p,"parryBackgroundDim"),Is.LessThanOrEqualTo(.2f));
+                Assert.That(value*Get<float>(p,"parryBackgroundDim"),Is.LessThanOrEqualTo(.3f));
             }
             Assert.That(peak,Is.EqualTo(1).Within(.001f));Assert.That(rises,Is.EqualTo(1));
             Assert.That(Call(p,"SampleParryLight",-1f),Is.EqualTo(0f));
@@ -70,6 +70,20 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Set(motion,"frames",new Sprite[2]);Set(motion,"durations",new[]{12,12});
             Set(motion,"hasParryImpact",true);Set(motion,"parryImpactFrame",12);
             Assert.That(T("PrototypeEnemyArtPresentation").GetMethod("ParryImpactDelayFrames").Invoke(null,new[]{motion,(object)active,recovery,elapsed}),Is.EqualTo(expected));
+        }
+        [TestCase(0,15,8,0,0)] [TestCase(0,15,8,4,7)] [TestCase(0,15,8,7,13)]
+        [TestCase(0,15,8,8,15)] [TestCase(0,15,8,10,17)]
+        [TestCase(2,13,8,8,15)] [TestCase(0,15,0,0,15)] [TestCase(0,15,30,15,15)]
+        public void ShorterApproachReachesTheSameEnemyPeakAndThenResumesNormalDrawing(int captured,int natural,int display,int elapsed,int expected)
+        {
+            Assert.That(T("PrototypeEnemyArtPresentation").GetMethod("SampleParryDeflectionFrame").Invoke(null,new object[]{captured,natural,display,elapsed}),Is.EqualTo(expected));
+        }
+        [Test] public void LatestTrialDefaultsHaveAThirtyPercentDimAndAShorterStopAndApproach()
+        {
+            var p=Profile();Assert.That(Get<int>(p,"parryTrialHitstopFrames"),Is.EqualTo(36));
+            Assert.That(Get<int>(p,"parryApproachMaxFrames"),Is.EqualTo(8));
+            Assert.That(Get<float>(p,"parryBackgroundDim"),Is.EqualTo(.3f));
+            Set(p,"parryApproachMaxFrames",-1);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);
         }
     }
 }

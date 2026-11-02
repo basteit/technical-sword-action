@@ -30,7 +30,9 @@ public static class PrototypeCounterCinematicInstaller
         profile.parrySuccessStartNormalized = parry.hitFrame/(float)parry.TotalFrames;
         profile.cameraFocusOffset = new Vector2(.8f,profile.cameraFocusOffset.y);
         profile.parryHitstopFrames = 9; profile.justParryHitstopFrames = 10; profile.hitstopFrames = 16;
-        profile.parryTrialHitstopFrames = 40;
+        profile.parryTrialHitstopFrames = 36;
+        profile.parryApproachMaxFrames = 8;
+        profile.parryBackgroundDim = .3f;
         profile.synchronizedParryImpact = true;
         var snapshot = new VideoArtLibrary.Motion { name = "ParrySuccessLight", provisional = parry.provisional,
             includesParryEffect = parry.includesParryEffect, hasParryContact = parry.hasParryContact,

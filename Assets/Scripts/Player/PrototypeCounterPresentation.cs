@@ -97,7 +97,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
             parrySource = target; parryVisualResult = result; parryStartTick = CombatTimeController.TickCount;
             parrySequenceActive = true; parryImpactPresented = false; parryLeadFrames = 0;
             parryEnemyArt = target.GetComponent<PrototypeEnemyArtPresentation>();
-            if (parryEnemyArt != null && !parryEnemyArt.TryBeginParryDeflection(this, out parryLeadFrames)) parryEnemyArt = null;
+            if (parryEnemyArt != null && !parryEnemyArt.TryBeginParryDeflection(this, Profile.parryApproachMaxFrames, out parryLeadFrames)) parryEnemyArt = null;
             parry.EnsureSuccessLockFrames(parryLeadFrames + Profile.parryFollowThroughFrames + 1);
             SampleAdaptiveParry(); return true;
         }

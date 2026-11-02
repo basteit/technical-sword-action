@@ -45,9 +45,10 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(0)] public int justParryHitstopFrames = 10;
     [Header("Adaptive parry impact trial (gameplay only)")]
     public bool synchronizedParryImpact;
-    [Min(0)] public int parryTrialHitstopFrames = 40;
+    [Min(0)] public int parryTrialHitstopFrames = 36;
+    [Min(0)] public int parryApproachMaxFrames = 8;
     [Min(1)] public int parryFollowThroughFrames = 8;
-    [Range(0, .5f)] public float parryBackgroundDim = .2f;
+    [Range(0, .5f)] public float parryBackgroundDim = .3f;
     [Range(0, 1)] public float parryActorLight = .4f;
     [Min(.001f)] public float parryLightRiseSeconds = 2f / 60f;
     [Min(0)] public float parryLightHoldSeconds = 2f / 60f;
@@ -58,7 +59,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(0)] public float parryWavePixels = 32;
     public VideoArtLibrary.Motion ParryReaction => art != null ? art.Find("ParrySuccessLight") : null;
     public float ParryLightSeconds => parryLightRiseSeconds + parryLightHoldSeconds + parryLightFadeSeconds;
-    public bool IsParryTuningValid => parryTrialHitstopFrames >= 0 && parryFollowThroughFrames > 0 && Finite(ParryLightSeconds) &&
+    public bool IsParryTuningValid => parryTrialHitstopFrames >= 0 && parryApproachMaxFrames >= 0 && parryFollowThroughFrames > 0 && Finite(ParryLightSeconds) &&
         Finite(parryBackgroundDim) && parryBackgroundDim >= 0 && parryBackgroundDim <= .5f &&
         Finite(parryActorLight) && parryActorLight >= 0 && parryActorLight <= 1 &&
         Finite(parryLightRiseSeconds) && parryLightRiseSeconds > 0 &&

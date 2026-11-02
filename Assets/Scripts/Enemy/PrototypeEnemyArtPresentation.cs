@@ -17,6 +17,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private object parryDrawingOwner;
     private bool capturedAttackForParry;
     private int capturedAttackFrame, parryDrawingFrame;
+    private int parryNaturalLeadFrames, parryDrawingLeadFrames;
     public int ParryImpactSourceFrame => library?.Find("Enemy_Attack")?.parryImpactFrame ?? 0;
     public int CombatTickOrder => 320;
     public string MotionName { get; private set; } = "Idle";
@@ -63,21 +64,23 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         capturedAttackFrame = Mathf.Max(0, attackElapsed - 1);
         parried = true; hitRemaining = 0; attackRecoveryVisible = false; Show();
     }
-    public bool TryBeginParryDeflection(object owner, out int delayFrames)
+    public bool TryBeginParryDeflection(object owner, int maxApproachFrames, out int delayFrames)
     {
         delayFrames = 0;
         var motion = library?.Find("Enemy_Attack");
         if (owner == null || !capturedAttackForParry || motion == null || !motion.HasValidParryImpact ||
             !isActiveAndEnabled || health == null || !health.IsParryStaggered) return false;
-        parryDrawingOwner = owner; parryDrawingFrame = capturedAttackFrame;
-        delayFrames = ParryImpactDelayFrames(motion, ai.AttackActiveFrames, ai.AttackRecoveryFrames, capturedAttackFrame);
+        parryNaturalLeadFrames = ParryImpactDelayFrames(motion, ai.AttackActiveFrames, ai.AttackRecoveryFrames, capturedAttackFrame);
+        delayFrames = parryDrawingLeadFrames = Mathf.Min(parryNaturalLeadFrames, Mathf.Max(0, maxApproachFrames));
+        parryDrawingOwner = owner;
+        parryDrawingFrame = SampleParryDeflectionFrame(capturedAttackFrame, parryNaturalLeadFrames, parryDrawingLeadFrames, 0);
         Show(); return true;
     }
     public bool IsParryDeflectionOwnedBy(object owner) => ReferenceEquals(parryDrawingOwner, owner) && parryDrawingOwner != null;
     public void SampleParryDeflection(object owner, int elapsedFrames)
     {
         if (!IsParryDeflectionOwnedBy(owner)) return;
-        parryDrawingFrame = capturedAttackFrame + Mathf.Max(0, elapsedFrames); Show();
+        parryDrawingFrame = SampleParryDeflectionFrame(capturedAttackFrame, parryNaturalLeadFrames, parryDrawingLeadFrames, elapsedFrames); Show();
     }
     public void ReleaseParryDeflection(object owner)
     { if (IsParryDeflectionOwnedBy(owner)) { parryDrawingOwner = null; Show(); } }
@@ -85,6 +88,15 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     {
         if (motion == null || !motion.HasValidParryImpact) return 0;
         return Mathf.Max(0, Mathf.Max(1, active) + Mathf.CeilToInt(motion.parryImpactFrame * Mathf.Max(1, recovery) / (float)motion.TotalFrames) - Mathf.Max(0, elapsedAttack));
+    }
+    /// <summary>Compress only the already-parried attack drawing, reaching the same authored peak sooner.</summary>
+    public static int SampleParryDeflectionFrame(int captured, int naturalLead, int displayLead, int elapsed)
+    {
+        captured = Mathf.Max(0, captured); naturalLead = Mathf.Max(0, naturalLead);
+        displayLead = Mathf.Clamp(displayLead, 0, naturalLead); elapsed = Mathf.Max(0, elapsed);
+        if (displayLead == 0 || elapsed >= displayLead)
+            return captured + naturalLead + elapsed - displayLead;
+        return captured + (int)System.Math.Floor(elapsed * (double)naturalLead / displayLead);
     }
     private void OnDied(Damageable2D _, Vector2 direction)
     {

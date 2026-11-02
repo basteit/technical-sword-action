@@ -49,9 +49,10 @@ MonoBehaviour:
   parryHitstopFrames: 9
   justParryHitstopFrames: 10
   synchronizedParryImpact: 1
-  parryTrialHitstopFrames: 40
+  parryTrialHitstopFrames: 36
+  parryApproachMaxFrames: 8
   parryFollowThroughFrames: 8
-  parryBackgroundDim: 0.2
+  parryBackgroundDim: 0.3
   parryActorLight: 0.4
   parryLightRiseSeconds: 0.033333335
   parryLightHoldSeconds: 0.033333335

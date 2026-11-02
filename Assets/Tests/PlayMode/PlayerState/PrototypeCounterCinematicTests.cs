@@ -461,12 +461,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [TestCase(30,1,false)] [TestCase(60,1,false)] [TestCase(120,1,false)]
         [TestCase(30,-1,true)] [TestCase(60,-1,true)] [TestCase(120,-1,true)]
-        public void GameplayParryUsesFiniteSoftBacklightDuringFortyFrameImpact(int fps,int direction,bool just)
+        public void GameplayParryUsesFiniteSoftBacklightDuringThirtySixFrameImpact(int fps,int direction,bool just)
         {
             Set(Get<object>(feedback,"Settings"),"shake",1f);var target=BeginActualParry(direction,just);
             RenderAt(fps);var profile=Get<object>(counter,"CinematicProfile");
             Assert.That(player.GetComponent<SpriteRenderer>().sprite,Is.SameAs(Get<Sprite>(profile,"parryContactSprite")));
-            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.InRange(40-Mathf.CeilToInt(60f/fps),40));
+            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.InRange(36-Mathf.CeilToInt(60f/fps),36));
             Assert.That(Get<int>(feedback,"ActiveEffectCount"),Is.Zero,"The authored spark replaces the procedural glyph.");
             Assert.That(Get<Vector3>(feedback,"ShakeOffset").magnitude,Is.InRange(.18f,.25f));
             long tick=TimeValue<long>("TickCount");var sprite=player.GetComponent<SpriteRenderer>().sprite;int lit=0;
@@ -559,7 +559,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(player.GetComponent(T("PlayerDamageReceiver2D")),"TryReceiveContextHit",1,(Vector2)target.transform.position,0f,context);
             Assert.That(Get<int>(presentation,"ParryImpactCount"),Is.EqualTo(impacts+1));
             Assert.That(Get<long>(presentation,"ParryImpactTick"),Is.EqualTo(TimeValue<long>("TickCount")));
-            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(40));
+            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(36));
             var profile=Get<object>(counter,"CinematicProfile");Assert.That(player.GetComponent<SpriteRenderer>().sprite,Is.SameAs(Get<Sprite>(profile,"parryContactSprite")));
             Frames(11);Assert.That(player.GetComponent<SpriteRenderer>().sprite.name,Is.Not.EqualTo("ParrySuccessLight_01"));
         }
@@ -610,7 +610,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Set(Get<object>(feedback,"Settings"),"vfx",vfx);
             BeginActualParry(1,true);
             Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.EqualTo(shockwave*vfx>0));
-            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(40));
+            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(36));
             Assert.That(Get<long>(presentation,"ParryImpactTick"),Is.EqualTo(TimeValue<long>("TickCount")));
             Assert.That(player.GetComponent<SpriteRenderer>().sprite,Is.SameAs(Get<Sprite>(Get<object>(counter,"CinematicProfile"),"parryContactSprite")));
         }
@@ -663,7 +663,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var drawing=Get<SpriteRenderer>(enemyArt,"Artwork");
             int delay=Get<int>(presentation,"ParryImpactDelayFrames"),impacts=Get<int>(presentation,"ParryImpactCount");
             long success=TimeValue<long>("TickCount");
-            Assert.That(delay,Is.GreaterThan(0));Assert.That(Get<bool>(target,"IsParryStaggered"),Is.True);
+            Assert.That(delay,Is.EqualTo(8));Assert.That(Get<bool>(target,"IsParryStaggered"),Is.True);
             Assert.That(Get<string>(enemyArt,"MotionName"),Is.EqualTo("ParryApproach"));
             int guard=0;while(Get<bool>(presentation,"IsParryImpactPending")&&guard++<fps*2)RenderAt(fps);
             Assert.That(Get<bool>(presentation,"IsParryImpactPending"),Is.False);
@@ -671,7 +671,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(presentation,"ParryImpactCount"),Is.EqualTo(impacts+1));
             Assert.That(drawing.sprite.name,Is.EqualTo("EnemySample_attack_14"));
             Assert.That(Get<string>(enemyArt,"MotionName"),Is.EqualTo("ParryImpact"));
-            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.InRange(39,40));
+            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.InRange(35,36));
             long contact=TimeValue<long>("TickCount");var contactSprite=drawing.sprite;
             int held=0;while(TimeValue<bool>("IsHitStopped")&&held++<fps*2)
             {
@@ -680,7 +680,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 else Assert.That(TimeValue<long>("TickCount"),Is.InRange(contact,contact+Mathf.CeilToInt(60f/fps)-1),
                     "A 30fps render may use its remaining 1/60s for the first post-stop combat tick.");
             }
-            Assert.That(held/(float)fps,Is.EqualTo(40f/60).Within(1.01f/fps));
+            Assert.That(held/(float)fps,Is.EqualTo(36f/60).Within(1.01f/fps));
             Assert.That(Get<bool>(presentation,"IsParrySequenceActive"),Is.True);
             Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));
             Assert.That(Get<string>(enemyArt,"MotionName"),Is.EqualTo("Parried"));
@@ -724,10 +724,25 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Set(Get<object>(feedback,"Settings"),"flash",flash);BeginAuthoredAdaptiveParry(-1);
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
-            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(40));Frames(2);Call(presentation,"AdvanceVisuals",0f);
+            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(36));Frames(2);Call(presentation,"AdvanceVisuals",0f);
             var light=Camera.main.GetComponent(T("VideoParryBacklight"));
-            Assert.That(Get<float>(light,"BackgroundAlpha"),Is.EqualTo(.2f*flash).Within(.001f));
+            Assert.That(Get<float>(light,"BackgroundAlpha"),Is.EqualTo(.3f*flash).Within(.001f));
             Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.EqualTo(flash>0));
+        }
+        [TestCase(4,4)] [TestCase(8,8)] [TestCase(15,15)] [TestCase(30,15)]
+        public void AdaptiveParryApproachCanBeRetimedWithoutMovingItsAuthoredImpact(int limit,int expectedDelay)
+        {
+            var profile=Get<object>(counter,"CinematicProfile");int original=Get<int>(profile,"parryApproachMaxFrames");
+            try
+            {
+                Set(profile,"parryApproachMaxFrames",limit);var target=BeginAuthoredAdaptiveParry(1);
+                long success=TimeValue<long>("TickCount");Assert.That(Get<int>(presentation,"ParryImpactDelayFrames"),Is.EqualTo(expectedDelay));
+                Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
+                Assert.That(Get<long>(presentation,"ParryImpactTick")-success,Is.EqualTo(expectedDelay));
+                Assert.That(Get<SpriteRenderer>(target.GetComponent(T("PrototypeEnemyArtPresentation")),"Artwork").sprite.name,Is.EqualTo("EnemySample_attack_14"));
+                Assert.That(Get<int>(counter,"StockCount"),Is.EqualTo(1));Assert.That(Get<int>(target,"HitCount"),Is.Zero);
+            }
+            finally{Call(arena,"ResetActionsOnly");Set(profile,"parryApproachMaxFrames",original);}
         }
         [Test] public void AdaptiveParryRetainsAnAttackStillBufferedImmediatelyBeforeSuccess()
         {
