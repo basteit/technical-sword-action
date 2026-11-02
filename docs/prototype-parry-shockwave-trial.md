@@ -27,6 +27,8 @@
 
 ## 比較動画
 
+- [接触の1/10速度・追加あり拡大](video/previews/parry-impact-slow-on-20261102.mp4): 720×486、30fps、150枚、5秒、無音、116004bytes。接触付近のみを1/10速度とし、歪みが見える元49枚目を途中で1.5秒保持する。
+- [接触の1/10速度・上下比較](video/previews/parry-impact-slow-comparison-20261102.mp4): 720×972、30fps、150枚、5秒、無音、200536bytes。上OFF/下ON、同じ元フレームと停止区間。[GIF版](video/previews/parry-impact-slow-20261102.gif)も保存。
 - [スマホ用軽量MP4](video/previews/parry-shockwave-mobile-20261102.mp4): 480×648、30fps、189枚、6.3秒、無音、636194bytes。H.264 Constrained Baseline / Level 3.1 / yuv420p / faststart。上下比較の内容と時間は保持する。
 - [通常速度・追加あり](video/previews/parry-shockwave-on-20261102.mp4): 1920×1080、60fps、210枚、3.5秒、無音。
 - [上下比較](video/previews/parry-shockwave-comparison-20261102.mp4): 960×1296、60fps、378枚、6.3秒、無音。上=OFF、下=ON。最初3.5秒は1倍、後半2.8秒は接触付近を1/4速度にしている。
@@ -34,6 +36,8 @@
 - [同フレーム静止比較](video/previews/parry-shockwave-comparison-20261102.png)。
 
 全てUnityの実描画から取得し、後付けの動画歪み加工ではない。操作版の実AIによる成功パリィ1回と、90ダメージの反撃1回を収録。実物パッドの操作感やDevelopment Buildの性能確認を代替しない。
+
+1/10速度版は既存の元連番40〜60枚目を6fpsとして読み、30fpsへコマを反復した観察用編集である。フレーム補間や新しい動きを合成せず、途中の `DETAIL HOLD` 表示中だけ元49枚目を追加で1.5秒保持する。ゲーム内の速度、Hitstop、歪み、暗転は変更していない。暗転のチカつき改善は提案段階であり、この動画へ適用済みとは扱わない。再生成は `Tools/Video/encode-parry-impact-slow.ps1`。既存プレビューがある場合は停止し、過去の動画を上書きしない。[追加プレビューの検証記録](validation/parry-impact-slow-preview-2026-11-02.json)を参照。
 
 ### スマホへの共有
 
