@@ -81,6 +81,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
             Assert.That(Get<string>(presentation,"CounterLightPhase"),Is.EqualTo("None"));
             Assert.That(Get<float>(feedback,"ImpactZoom"),Is.Zero);
+            Assert.That(Get<int>(presentation,"OrangeParryEffectCount"),Is.Zero);
+            Assert.That(Get<bool>(presentation,"IsParryActorJitterActive"),Is.False);
+            Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);
         }
 
         [UnitySetUp] public IEnumerator Setup()
@@ -778,6 +781,108 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Set(Get<object>(feedback,"Settings"),"flash",1f);Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
             Static("SetPaused",false);Frames(10);Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
+        }
+        [TestCase(1)] [TestCase(-1)]
+        public void OrangeParryAddsNewSparksAndGlowWhileSuppressingTheOldWhiteHalo(int direction)
+        {
+            var target=BeginAuthoredAdaptiveParry(direction);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
+            Assert.That(Get<int>(presentation,"OrangeParryEffectCount"),Is.EqualTo(2));
+            var accent=Get<Component>(presentation,"orangeImpact");var mesh=Get<Mesh>(accent,"sparkMesh");
+            Assert.That(mesh.name,Is.EqualTo("ParryOrangeSparks"));
+            Assert.That(Array.Exists(mesh.colors,c=>c.r>.9f&&c.g>.2f&&c.g<.5f&&c.b<.1f),Is.True);
+            var wave=T("ParryShockwaveFeature").GetMethod("GetSample").Invoke(null,new object[]{Camera.main});
+            Assert.That((Vector2)Get<Vector3>(wave,"worldCenter"),Is.EqualTo(Get<Vector2>(accent,"WorldCenter")));
+            var light=Camera.main.GetComponent(T("VideoParryBacklight"));
+            Assert.That(Get<bool>(light,"IsHaloVisible"),Is.False);Assert.That(Get<float>(light,"ActorLightStrength"),Is.EqualTo(.08f));
+            Assert.That(Get<float>(light,"BloomStrength"),Is.Zero);
+            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(36));
+            Assert.That(Get<int>(target,"HitCount"),Is.Zero);
+            Frames(24);Assert.That(Get<int>(presentation,"OrangeParryEffectCount"),Is.Zero);
+            Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));AssertClean();
+        }
+        [TestCase(30,1)] [TestCase(60,1)] [TestCase(120,1)]
+        [TestCase(30,-1)] [TestCase(60,-1)] [TestCase(120,-1)]
+        public void HitstopJittersBothDrawingsInOppositeDirectionsWithoutMovingBodiesOrColliders(int fps,int direction)
+        {
+            Set(Get<object>(feedback,"Settings"),"shake",1f);
+            var target=BeginAuthoredAdaptiveParry(direction);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
+            var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
+            Vector2 playerRoot=body.position,enemyRoot=target.transform.position;
+            Vector3 playerCollider=player.GetComponent<Collider2D>().bounds.center,enemyCollider=target.GetComponent<Collider2D>().bounds.center;
+            bool positive=false,negative=false;int samples=0;
+            while(TimeValue<bool>("IsHitStopped")&&samples++<fps)
+            {
+                float p=Get<float>(art,"ImpactOffsetX"),e=Get<float>(enemyArt,"ImpactOffsetX");
+                Assert.That(p+e,Is.Zero.Within(.00001f));Assert.That(Mathf.Abs(p),Is.LessThanOrEqualTo(2f/32));
+                positive|=p>0;negative|=p<0;
+                Assert.That(body.position,Is.EqualTo(playerRoot));Assert.That((Vector2)target.transform.position,Is.EqualTo(enemyRoot));
+                Assert.That(player.GetComponent<Collider2D>().bounds.center,Is.EqualTo(playerCollider));
+                Assert.That(target.GetComponent<Collider2D>().bounds.center,Is.EqualTo(enemyCollider));
+                Assert.That(Camera.main.orthographicSize,Is.EqualTo(5.625f));
+                Assert.That(Get<SpriteRenderer>(art,"Artwork").transform.position.x-playerRoot.x,Is.EqualTo(p).Within(.00001f));
+                Assert.That(Get<SpriteRenderer>(enemyArt,"Artwork").transform.position.x-enemyRoot.x,Is.EqualTo(e).Within(.00001f));
+                RenderAt(fps);
+            }
+            Assert.That(positive&&negative,Is.True);Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);Assert.That(Get<bool>(presentation,"IsParryActorJitterActive"),Is.False);
+            Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));AssertClean();
+        }
+        [TestCase(0f,1f,1f,false,false,true)] [TestCase(1f,0f,1f,true,false,true)]
+        [TestCase(1f,1f,0f,true,true,false)] [TestCase(.5f,.5f,.5f,true,true,true)] [TestCase(0f,0f,0f,false,false,false)]
+        public void OrangeParryVisualSettingsDoNotChangeTheImpactStopOrStock(float vfx,float flash,float shake,bool sparks,bool glow,bool jitter)
+        {
+            var settings=Get<object>(feedback,"Settings");Set(settings,"vfx",vfx);Set(settings,"flash",flash);Set(settings,"shake",shake);
+            BeginAuthoredAdaptiveParry(1);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
+            Assert.That(Get<bool>(presentation,"IsOrangeParrySparkVisible"),Is.EqualTo(sparks));
+            Assert.That(Get<bool>(presentation,"IsOrangeParryGlowVisible"),Is.EqualTo(glow));
+            Assert.That(Get<bool>(presentation,"IsParryActorJitterActive"),Is.EqualTo(jitter));
+            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(36));Assert.That(Get<int>(counter,"StockCount"),Is.EqualTo(1));
+            Assert.That(Get<int>(presentation,"ParryImpactDelayFrames"),Is.EqualTo(8));
+            Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));AssertClean();
+        }
+        [Test] public void OrangeAccentAndActorJitterPauseThenZeroSettingsCannotResurrectOldEffects()
+        {
+            var settings=Get<object>(feedback,"Settings");Set(settings,"shake",1f);
+            BeginAuthoredAdaptiveParry(1);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));Frames(3);
+            float offset=Get<float>(art,"ImpactOffsetX");var accent=Get<Component>(presentation,"orangeImpact");float age=Get<float>(accent,"Elapsed");
+            Static("SetPaused",true);Frames(20);
+            Assert.That(Get<float>(art,"ImpactOffsetX"),Is.EqualTo(offset));Assert.That(Get<float>(accent,"Elapsed"),Is.EqualTo(age));
+            Set(settings,"shake",0f);Set(settings,"flash",0f);Call(presentation,"AdvanceVisuals",0f);
+            Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);Assert.That(Get<bool>(presentation,"IsOrangeParryGlowVisible"),Is.False);
+            Set(settings,"shake",1f);Set(settings,"flash",1f);Call(presentation,"AdvanceVisuals",0f);
+            Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);Assert.That(Get<bool>(presentation,"IsOrangeParryGlowVisible"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsOrangeParrySparkVisible"),Is.True);
+            Set(settings,"vfx",0f);Call(presentation,"AdvanceVisuals",0f);Set(settings,"vfx",1f);Call(presentation,"AdvanceVisuals",0f);
+            Assert.That(Get<int>(presentation,"OrangeParryEffectCount"),Is.Zero);
+            Static("SetPaused",false);Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));AssertClean();
+        }
+        [TestCase("Reset")] [TestCase("Disable")] [TestCase("TargetLost")] [TestCase("Hit")]
+        [TestCase("SessionReset")] [TestCase("PlayerArtDisable")] [TestCase("EnemyArtDisable")]
+        public void OrangeImpactInterruptionClearsBothDrawingOffsetsAndAdditionalEffects(string operation)
+        {
+            Set(Get<object>(feedback,"Settings"),"shake",1f);
+            var target=BeginAuthoredAdaptiveParry(1);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
+            var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
+            Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Not.Zero);Assert.That(Get<int>(presentation,"OrangeParryEffectCount"),Is.EqualTo(2));
+            if(operation=="Reset")Call(arena,"ResetActionsOnly");
+            else if(operation=="Disable")((Behaviour)presentation).enabled=false;
+            else if(operation=="TargetLost")target.gameObject.SetActive(false);
+            else if(operation=="Hit")Call(player,"ForceHit","OrangeParryTestHit");
+            else if(operation=="PlayerArtDisable")((Behaviour)art).enabled=false;
+            else if(operation=="EnemyArtDisable")((Behaviour)enemyArt).enabled=false;
+            else Static("ResetSession");
+            Call(presentation,"AdvanceVisuals",0f);
+            Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
+            Assert.That(Get<int>(presentation,"OrangeParryEffectCount"),Is.Zero);Assert.That(Get<bool>(presentation,"IsParryActorJitterActive"),Is.False);
+            Frames(80);Assert.That(Get<int>(presentation,"OrangeParryEffectCount"),Is.Zero);
+        }
+        [Test] public void PlaceholderEnemyDrawingAlsoJittersWithoutMovingItsRoot()
+        {
+            Set(Get<object>(feedback,"Settings"),"shake",1f);var target=BeginActualParry(1,true);
+            var cue=target.GetComponent(T("EnemyCombatCue2D"));Vector3 root=target.transform.position;
+            Assert.That(Get<float>(cue,"ImpactOffsetX"),Is.EqualTo(-Get<float>(art,"ImpactOffsetX")));
+            Frames(5);Assert.That(Get<float>(cue,"ImpactOffsetX"),Is.Not.Zero);Assert.That(target.transform.position,Is.EqualTo(root));
+            Until(()=>!TimeValue<bool>("IsHitStopped"));Assert.That(Get<float>(cue,"ImpactOffsetX"),Is.Zero);
         }
         [UnityTest] public IEnumerator ActiveSceneChangeRestoresCounterAndLaunchOwnership()
         {

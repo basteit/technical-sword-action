@@ -10,9 +10,19 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour
     [SerializeField] private PrototypePlayerArtSet artSet;
     private bool originalForceRenderingOff;
     private bool ownsVisibility;
+    private object impactOffsetOwner;
+    private float impactOffsetX;
 
     public SpriteRenderer Artwork => artwork;
     public PrototypePlayerArtSet ArtSet => artSet;
+    public float ImpactOffsetX => impactOffsetX;
+    public void SetImpactOffset(object owner, float worldX)
+    {
+        if (owner == null || !float.IsFinite(worldX) || impactOffsetOwner != null && !ReferenceEquals(impactOffsetOwner, owner)) return;
+        impactOffsetOwner = owner; impactOffsetX = worldX; RefreshVisual();
+    }
+    public void ReleaseImpactOffset(object owner)
+    { if (ReferenceEquals(impactOffsetOwner, owner)) { impactOffsetOwner = null; impactOffsetX = 0; RefreshVisual(); } }
 
     public void Configure(SpriteRenderer sourceRenderer, SpriteRenderer artworkRenderer, BoxCollider2D collider, PrototypePlayerArtSet set)
     {
@@ -48,11 +58,14 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour
         artwork.transform.localScale = new Vector3(scale, scale, 1f);
         float feetY = body.offset.y - body.size.y * .5f;
         artwork.transform.localPosition = new Vector3(0,
-            feetY + (artSet.IsFeetPivot(source.sprite) ? 0 : artSet.commonFeetBelowPivot), 0);
+            feetY + (artSet.IsFeetPivot(source.sprite) ? 0 : artSet.commonFeetBelowPivot), 0) +
+            artwork.transform.parent.InverseTransformVector(Vector3.right * impactOffsetX);
     }
 
     private void OnDisable()
     {
+        impactOffsetOwner = null; impactOffsetX = 0;
+        RefreshVisual();
         ReleaseVisibility();
         if (artwork != null) artwork.enabled = false;
     }

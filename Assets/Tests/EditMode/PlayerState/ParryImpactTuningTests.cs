@@ -9,10 +9,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
 {
     public sealed class ParryImpactTuningTests
     {
+        private const BindingFlags Flags=BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic;
         private readonly List<Object> owned = new();
         private static Type T(string name) => Type.GetType(name + ", Assembly-CSharp", true);
-        private static object Call(object target, string name, params object[] args) => target.GetType().GetMethod(name).Invoke(target,args);
-        private static V Get<V>(object target,string name) => (V)(target.GetType().GetProperty(name)?.GetValue(target) ?? target.GetType().GetField(name).GetValue(target));
+        private static object Call(object target, string name, params object[] args) => target.GetType().GetMethod(name,Flags).Invoke(target,args);
+        private static V Get<V>(object target,string name) => (V)(target.GetType().GetProperty(name,Flags)?.GetValue(target) ?? target.GetType().GetField(name,Flags).GetValue(target));
         private static void Set(object target,string name,object value) => target.GetType().GetField(name).SetValue(target,value);
         private ScriptableObject Profile() {var p=ScriptableObject.CreateInstance(T("CounterCinematicProfile"));owned.Add(p);return p;}
         [TearDown] public void Cleanup(){foreach(var o in owned)if(o!=null)Object.DestroyImmediate(o);owned.Clear();}
@@ -36,6 +37,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [TestCase("parryWaveSeconds",0f)] [TestCase("parryWavePixels",float.NaN)]
         [TestCase("parryBackgroundDim",.9f)] [TestCase("parryLightFadeSeconds",-1f)]
+        [TestCase("parrySparkSeconds",0f)] [TestCase("parryGlowSeconds",float.NaN)]
+        [TestCase("parrySparkRadius",-1f)] [TestCase("parryActorJitterPixels",5f)] [TestCase("parryLegacyBloomStrength",2f)]
         public void InvalidTuningIsRejected(string field,float value)
         {var p=Profile();Set(p,field,value);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);}
 
@@ -85,5 +88,56 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<float>(p,"parryBackgroundDim"),Is.EqualTo(.3f));
             Set(p,"parryApproachMaxFrames",-1);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);
         }
+        [TestCase(30)] [TestCase(60)] [TestCase(120)]
+        public void ActorJitterAlternatesOnRealTimePixelStepsAndHasAFiniteEnvelope(int fps)
+        {
+            var p=Profile();bool positive=false,negative=false;
+            for(int i=0;i<fps;i++)
+            {
+                float age=i/(float)fps,value=(float)Call(p,"SampleParryJitter",age,1f);
+                Assert.That(Mathf.Abs(value),Is.LessThanOrEqualTo(2f/32));
+                Assert.That(value*32,Is.EqualTo(Mathf.Round(value*32)));
+                if(age>=.6f)Assert.That(value,Is.Zero);else{positive|=value>0;negative|=value<0;}
+            }
+            Assert.That(positive&&negative,Is.True);Assert.That(Call(p,"SampleParryJitter",0f,.5f),Is.EqualTo(1f/32));
+            Assert.That(Call(p,"SampleParryJitter",0f,0f),Is.EqualTo(0f));
+            Assert.That(Call(p,"SampleParryJitter",float.NaN,1f),Is.EqualTo(0f));
+            Assert.That(Call(p,"SampleParryJitter",-1f,1f),Is.EqualTo(0f));
+        }
+        [Test] public void InvalidAccentColorOrJitterStepIsRejected()
+        {
+            var p=Profile();Set(p,"parrySparkColor",new Color(float.NaN,0,0,1));
+            Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);Set(p,"parrySparkColor",new Color(1,.36f,.035f,1));
+            Set(p,"parryActorJitterStepFrames",0);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);
+        }
+        [Test] public void AdditionalOrangeGeometryMirrorsWithoutChangingItsWorldContactOrLeakingToAnotherCamera()
+        {
+            var go=new GameObject("OrangeParryCamera");owned.Add(go);var camera=go.AddComponent<Camera>();camera.enabled=false;
+            var other=new GameObject("OtherParryCamera");owned.Add(other);var otherCamera=other.AddComponent<Camera>();otherCamera.enabled=false;
+            var material=new Material(Shader.Find("TechnicalSwordAction/VideoPixelGlow"));owned.Add(material);
+            var accent=go.AddComponent(T("ParryOrangeImpact"));Call(accent,"Configure",camera,material);
+            var p=Profile();var contact=new Vector2(2,3);
+            Call(accent,"Begin",contact,1,p);Call(accent,"Advance",0f,1f,1f);
+            var mesh=Get<Mesh>(accent,"sparkMesh");var right=mesh.vertices;
+            Assert.That(Get<int>(accent,"ActiveRendererCount"),Is.EqualTo(2));
+            Assert.That(Array.Exists(mesh.colors,c=>c.r>.9f&&c.g>.2f&&c.g<.5f&&c.b<.1f),Is.True);
+            Call(accent,"BeforeCamera",default(UnityEngine.Rendering.ScriptableRenderContext),otherCamera);
+            Assert.That(Get<MeshRenderer>(accent,"sparks").enabled,Is.False);
+            Call(accent,"BeforeCamera",default(UnityEngine.Rendering.ScriptableRenderContext),camera);
+            Assert.That(Get<MeshRenderer>(accent,"sparks").enabled,Is.True);
+            Assert.That((Vector2)Get<MeshRenderer>(accent,"sparks").transform.position,Is.EqualTo(contact));
+            Call(accent,"AfterCamera",default(UnityEngine.Rendering.ScriptableRenderContext),camera);
+            Assert.That(Get<MeshRenderer>(accent,"sparks").enabled,Is.False);
+            Call(accent,"Begin",contact,-1,p);Call(accent,"Advance",0f,1f,1f);var left=mesh.vertices;
+            for(int i=0;i<right.Length;i++)
+            {
+                // Mirroring reverses quad winding too, so compare corresponding end-pair bounds.
+                Assert.That(float.IsFinite(left[i].x)&&float.IsFinite(left[i].y),Is.True);
+            }
+            Assert.That(mesh.bounds.center.x,Is.EqualTo(-BoundsOf(right).center.x).Within(1f/64));
+            Call(accent,"Advance",.4f,1f,1f);Assert.That(Get<int>(accent,"ActiveRendererCount"),Is.Zero);
+        }
+        private static Bounds BoundsOf(Vector3[] points)
+        {var bounds=new Bounds(points[0],Vector3.zero);foreach(var point in points)bounds.Encapsulate(point);return bounds;}
     }
 }

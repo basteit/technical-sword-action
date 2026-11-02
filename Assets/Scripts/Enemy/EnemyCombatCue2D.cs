@@ -13,12 +13,23 @@ public sealed class EnemyCombatCue2D : MonoBehaviour, ICombatTickListener, IComb
     private Vector3 silhouetteScale;
     private Quaternion silhouetteRotation, weaponRotation;
     private Vector3 weaponPosition;
+    private Vector3 silhouettePosition;
+    private object impactOffsetOwner;
+    private float impactOffsetX;
+    public float ImpactOffsetX => impactOffsetX;
+    public void SetImpactOffset(object owner, float worldX)
+    {
+        if (owner == null || !float.IsFinite(worldX) || impactOffsetOwner != null && !ReferenceEquals(impactOffsetOwner, owner)) return;
+        impactOffsetOwner = owner; impactOffsetX = worldX; ApplyPose();
+    }
+    public void ReleaseImpactOffset(object owner)
+    { if (ReferenceEquals(impactOffsetOwner, owner)) { impactOffsetOwner = null; impactOffsetX = 0; ApplyPose(); } }
     public int CombatTickOrder => 290;
     private void Awake()
     {
         enemy = GetComponent<EnemyMeleeChaser2D>(); health = GetComponent<Damageable2D>();
         artwork = GetComponent<PrototypeEnemyArtPresentation>();
-        if (silhouette != null) { silhouetteScale = silhouette.localScale; silhouetteRotation = silhouette.localRotation; }
+        if (silhouette != null) { silhouetteScale = silhouette.localScale; silhouetteRotation = silhouette.localRotation; silhouettePosition = silhouette.localPosition; }
         if (weapon != null) { weaponPosition = weapon.localPosition; weaponRotation = weapon.localRotation; }
     }
     private void OnEnable()
@@ -38,7 +49,8 @@ public sealed class EnemyCombatCue2D : MonoBehaviour, ICombatTickListener, IComb
     public void CombatTickTimers() => ApplyPose();
     private void RestorePose()
     {
-        if (silhouette != null) { silhouette.localScale = silhouetteScale; silhouette.localRotation = silhouetteRotation; }
+        impactOffsetOwner = null; impactOffsetX = 0;
+        if (silhouette != null) { silhouette.localScale = silhouetteScale; silhouette.localRotation = silhouetteRotation; silhouette.localPosition = silhouettePosition; }
         if (weapon != null) { weapon.localPosition = weaponPosition; weapon.localRotation = weaponRotation; }
         if (cue != null) cue.enabled = false;
     }
@@ -57,13 +69,15 @@ public sealed class EnemyCombatCue2D : MonoBehaviour, ICombatTickListener, IComb
             (20 + 6 * Mathf.Sin(health.ParryStaggerElapsedFrames * .28f)) : 0;
         if (silhouette != null)
         {
+            silhouette.localPosition = silhouettePosition + silhouette.parent.InverseTransformVector(Vector3.right * impactOffsetX);
             silhouette.localScale = Vector3.Scale(silhouetteScale, staggering ? new Vector3(1.08f, .9f, 1) :
                 winding ? new Vector3(lowSweep ? 1.35f : 1.2f, lowSweep ? .65f : .8f, 1) : Vector3.one);
             silhouette.localRotation = silhouetteRotation * Quaternion.Euler(0, 0, staggering ? -direction * sway : stunned ? -direction * 25 : winding ? direction * 12 : 0);
         }
         if (weapon != null)
         {
-            weapon.localPosition = new Vector3(direction * (active && !staggering ? .85f : .45f), staggering ? -.25f : lowSweep ? -.45f : winding ? .55f : .1f);
+            weapon.localPosition = new Vector3(direction * (active && !staggering ? .85f : .45f), staggering ? -.25f : lowSweep ? -.45f : winding ? .55f : .1f) +
+                weapon.parent.InverseTransformVector(Vector3.right * impactOffsetX);
             weapon.localRotation = Quaternion.Euler(0, 0, direction * (staggering ? 60 - sway : lowSweep ? winding ? -35 : 0 : winding ? 65 : active ? -10 : 90));
         }
         if (cue != null)

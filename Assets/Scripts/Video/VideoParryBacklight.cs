@@ -19,8 +19,9 @@ public sealed class VideoParryBacklight : MonoBehaviour
     // Legacy filming stays unchanged; gameplay may opt into a soft background and restrained actor light.
     public float BackgroundStrength {get;set;}=.99f;
     public float ActorLightStrength {get;set;}=1;
+    public float BloomStrength {get;set;}=1;
     public float BackgroundAlpha=>Mathf.Clamp01(BackgroundStrength)*Mathf.Clamp01(Intensity);
-    public bool IsHaloVisible=>IsVisible&&haloAllowed;
+    public bool IsHaloVisible=>IsVisible&&haloAllowed&&BloomStrength>0;
     public Damageable2D Target=>IsVisible?target:null;
     private void Awake()=>properties=new MaterialPropertyBlock();
     public void Configure(Camera camera,SpriteRenderer source,Material shared)
@@ -84,7 +85,7 @@ public sealed class VideoParryBacklight : MonoBehaviour
         backdrop.color=new Color(0,0,0,BackgroundAlpha);
         bloom.transform.position=new Vector3(contact.x,contact.y,0);bloom.transform.rotation=Quaternion.identity;
         bloom.transform.localScale=new Vector3(3.6f,2.4f,1);
-        bloom.color=new Color(1,1,1,Mathf.Clamp01(Intensity));
+        bloom.color=new Color(1,1,1,Mathf.Clamp01(Intensity)*Mathf.Clamp01(BloomStrength));
         properties.Clear();properties.SetFloat(Bloom,1);bloom.SetPropertyBlock(properties);
         Match(litPlayer,player);Match(litEnemy,enemy);
     }
@@ -101,7 +102,7 @@ public sealed class VideoParryBacklight : MonoBehaviour
     private void SetRenderers(bool visible)
     {
         if(backdrop!=null)backdrop.enabled=visible;
-        if(bloom!=null)bloom.enabled=visible&&haloAllowed;
+        if(bloom!=null)bloom.enabled=visible&&haloAllowed&&BloomStrength>0;
         if(litPlayer!=null)litPlayer.enabled=visible&&player!=null&&player.enabled;
         if(litEnemy!=null)litEnemy.enabled=visible&&enemy!=null&&enemy.enabled;
     }

@@ -53,7 +53,8 @@ MonoBehaviour:
   parryApproachMaxFrames: 8
   parryFollowThroughFrames: 8
   parryBackgroundDim: 0.3
-  parryActorLight: 0.4
+  parryActorLight: 0.08
+  parryLegacyBloomStrength: 0
   parryLightRiseSeconds: 0.033333335
   parryLightHoldSeconds: 0.033333335
   parryLightFadeSeconds: 0.2
@@ -61,3 +62,11 @@ MonoBehaviour:
   parryWaveSeconds: 0.4
   parryWaveGain: 1.55
   parryWavePixels: 32
+  parryOrangeAccent: 1
+  parrySparkColor: {r: 1, g: 0.36, b: 0.035, a: 1}
+  parryGlowColor: {r: 1, g: 0.25, b: 0.025, a: 0.45}
+  parrySparkSeconds: 0.32
+  parryGlowSeconds: 0.18
+  parrySparkRadius: 1.2
+  parryActorJitterPixels: 2
+  parryActorJitterStepFrames: 2

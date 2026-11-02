@@ -18,6 +18,8 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private bool capturedAttackForParry;
     private int capturedAttackFrame, parryDrawingFrame;
     private int parryNaturalLeadFrames, parryDrawingLeadFrames;
+    private object impactOffsetOwner;
+    private float impactOffsetX;
     public int ParryImpactSourceFrame => library?.Find("Enemy_Attack")?.parryImpactFrame ?? 0;
     public int CombatTickOrder => 320;
     public string MotionName { get; private set; } = "Idle";
@@ -25,6 +27,14 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     public VideoArtLibrary Library => library;
     public bool UsesDownParryPose => useDownParryPose;
     public bool IsCounterFacingHeld => counterFacingHeld;
+    public float ImpactOffsetX => impactOffsetX;
+    public void SetImpactOffset(object owner, float worldX)
+    {
+        if (owner == null || !float.IsFinite(worldX) || impactOffsetOwner != null && !ReferenceEquals(impactOffsetOwner, owner)) return;
+        impactOffsetOwner = owner; impactOffsetX = worldX; Show();
+    }
+    public void ReleaseImpactOffset(object owner)
+    { if (ReferenceEquals(impactOffsetOwner, owner)) { impactOffsetOwner = null; impactOffsetX = 0; Show(); } }
     public bool HasAuthoredParryCue => isActiveAndEnabled && artwork != null && artwork.enabled &&
         library != null && library.Find("Enemy_Windup") is { HasValidParryCue: true };
     public int WindupSourceFrame { get; private set; } = -1;
@@ -54,6 +64,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private void OnAttack() { attackElapsed = 0; attackRecoveryVisible = true; Show(); }
     private void OnHit(Damageable2D _, int damage, Vector2 direction)
     {
+        impactOffsetOwner = null; impactOffsetX = 0;
         parryDrawingOwner = null;
         hitRemaining = library?.Find("Enemy_Hit")?.TotalFrames ?? 6;
         parried = attackRecoveryVisible = false; Show();
@@ -100,6 +111,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     }
     private void OnDied(Damageable2D _, Vector2 direction)
     {
+        impactOffsetOwner = null; impactOffsetX = 0;
         parryDrawingOwner = null;
         deathElapsed = 0; deathFacingLeft = counterFacingHeld ? counterFacingLeft : ai.Facing.x < 0;
         // Keep only the drawing alive. HP, colliders and combat participation already ended.
@@ -108,6 +120,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     }
     private void OnCounterLaunch(int direction)
     {
+        impactOffsetOwner = null; impactOffsetX = 0;
         parryDrawingOwner = null;
         // The kick travels away from its attacker. Keep the drawing facing back toward them,
         // without changing the AI direction that determined the rear approach.
@@ -118,6 +131,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private void OnReset(Damageable2D _) => ResetDrawing();
     private void ResetDrawing()
     {
+        impactOffsetOwner = null; impactOffsetX = 0;
         parryDrawingOwner = null; capturedAttackForParry = false;
         elapsed = attackElapsed = hitRemaining = deathElapsed = 0;
         parried = attackRecoveryVisible = false;
@@ -220,7 +234,8 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         if (sprite != null) artwork.sprite = sprite;
         artwork.flipX = counterFacingHeld ? counterFacingLeft : !health.IsAlive ? deathFacingLeft : ai.Facing.x < 0;
         bool down = MotionName == "Death" || (MotionName == "Parried" && useDownParryPose);
-        artwork.transform.localPosition = restPosition + (down ? Vector3.down * (2f / 32f) : Vector3.zero);
+        artwork.transform.localPosition = restPosition + (down ? Vector3.down * (2f / 32f) : Vector3.zero) +
+            artwork.transform.parent.InverseTransformVector(Vector3.right * impactOffsetX);
     }
 
     /// <summary>Retime only gameplay drawing. Keep the authored large flash readable and the AI contact tick unchanged.</summary>
@@ -245,6 +260,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
 
     private void OnDisable()
     {
+        impactOffsetOwner = null; impactOffsetX = 0;
         parryDrawingOwner = null;
         counterFacingHeld = false;
         CombatTimeController.Unregister(this);

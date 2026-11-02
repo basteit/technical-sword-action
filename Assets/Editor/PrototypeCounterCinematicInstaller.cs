@@ -33,6 +33,8 @@ public static class PrototypeCounterCinematicInstaller
         profile.parryTrialHitstopFrames = 36;
         profile.parryApproachMaxFrames = 8;
         profile.parryBackgroundDim = .3f;
+        profile.parryActorLight = .08f; profile.parryLegacyBloomStrength = 0;
+        profile.parryOrangeAccent = true;
         profile.synchronizedParryImpact = true;
         var snapshot = new VideoArtLibrary.Motion { name = "ParrySuccessLight", provisional = parry.provisional,
             includesParryEffect = parry.includesParryEffect, hasParryContact = parry.hasParryContact,
