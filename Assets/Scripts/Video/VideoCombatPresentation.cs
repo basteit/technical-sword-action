@@ -21,6 +21,8 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     [SerializeField, Range(.5f,1.5f)] private float chargeRealSeconds=1.1f;
     [SerializeField,Min(0)] private int kickHitstopFrames=DefaultKickHitstopFrames;
     [SerializeField,Range(0,4)] private int parryInversionFrames=4;
+    [SerializeField,Range(0,1)] private float parryShockwaveStrength=.65f;
+    private readonly ParryShockwavePulse parryShockwave=new();
     [SerializeField] private bool parryBacklight=true;
     [SerializeField] private bool preserveParrySparkColor=true;
     [SerializeField] private Material parryBacklightMaterial;
@@ -69,6 +71,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     public int ActiveShakeCount=>impulses.Count;
     public float FlashAlpha=>flashRenderer!=null&&flashRenderer.enabled?flashRenderer.color.a:0;
     public bool IsParryInverted=>VideoParryInversionFeature.IsVisible(captureCamera);
+    public bool IsParryShockwaveVisible=>parryShockwave.IsActive;
     public bool IsParryBacklit=>backlight!=null&&backlight.IsVisible;
     public bool IsParryImpactVisible=>IsParryBacklit||IsParryInverted;
     public Damageable2D BacklitEnemy=>backlight!=null?backlight.Target:null;
@@ -171,6 +174,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
             ResetParryInversion();
             flashRemaining=flashDuration=3/60f;flashStrength=.18f;flashTint=Color.black;
         }
+        parryShockwave.Begin(captureCamera,contact,vfx.HybridGlow?parryShockwaveStrength:0);
     }
     private void AdvanceParryInversion(float realSeconds)
     {
@@ -180,7 +184,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
         parryInversionAge=visible?parryInversionAge+realSeconds:-1;
     }
     private void ResetParryInversion()
-    { parryInversionAge=-1;parryInversionDuration=0;VideoParryInversionFeature.SetVisible(captureCamera,false);backlight?.ResetLight();counterLighting?.ResetLight();counterLightReady=false; }
+    { parryShockwave.Reset();parryInversionAge=-1;parryInversionDuration=0;VideoParryInversionFeature.SetVisible(captureCamera,false);backlight?.ResetLight();counterLighting?.ResetLight();counterLightReady=false; }
     public void ShakeDirectional(float realSeconds,float strength,Vector2 direction,float cycles=3)
     {
         if(realSeconds<=0||strength<=0) return;
@@ -188,6 +192,7 @@ public sealed class VideoCombatPresentation : MonoBehaviour
     }
     public void AdvanceVisuals(float realSeconds)
     {
+        parryShockwave.Advance(realSeconds,parryShockwaveStrength>0&&vfx.HybridGlow);
         if(CombatTimeController.IsPaused || captureCamera==null) return;
         AdvanceParryInversion(realSeconds);
         if(charged && !CombatTimeController.IsHitStopped) ChargeRealElapsed+=realSeconds;

@@ -576,6 +576,44 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(held,Is.InRange(25,28));
             Assert.That(Get<int>(feedback,"EmissionCount")-emissions,Is.LessThanOrEqualTo(1),"Only the existing miss cue may occur.");
         }
+        [TestCase(1)] [TestCase(-1)]
+        public void ParryShockwaveStartsAtTheAuthoredContactAndFreezesOnPause(int direction)
+        {
+            BeginActualParry(direction,true);
+            Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.True);
+            var sample=T("ParryShockwaveFeature").GetMethod("GetSample").Invoke(null,new object[]{Camera.main});
+            var profile=Get<object>(counter,"CinematicProfile");var drawing=Get<Component>(art,"Artwork");
+            Vector2 offset=Get<Vector2>(profile,"parryContactOffset");
+            var expected=drawing.transform.TransformPoint(new Vector3(direction*offset.x,offset.y));
+            Assert.That(Get<Vector3>(sample,"worldCenter"),Is.EqualTo(expected));
+            var pulse=Get<object>(feedback,"parryShockwave");float age=Get<float>(pulse,"Elapsed");
+            Static("SetPaused",true);Frames(20);
+            Assert.That(Get<float>(pulse,"Elapsed"),Is.EqualTo(age));
+            Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.True);
+            Static("SetPaused",false);Frames(20);
+            Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.False);
+        }
+        [TestCase(0f,1f)] [TestCase(.65f,0f)] [TestCase(.65f,1f)]
+        public void ParryShockwaveIntensityNeverChangesTheSuccessfulParry(float shockwave,float vfx)
+        {
+            Set(Get<object>(feedback,"Settings"),"parryShockwave",shockwave);
+            Set(Get<object>(feedback,"Settings"),"vfx",vfx);
+            BeginActualParry(1,true);
+            Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.EqualTo(shockwave*vfx>0));
+            Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(10));
+            Assert.That(Get<long>(presentation,"ParryImpactTick"),Is.EqualTo(TimeValue<long>("TickCount")));
+            Assert.That(player.GetComponent<SpriteRenderer>().sprite,Is.SameAs(Get<Sprite>(Get<object>(counter,"CinematicProfile"),"parryContactSprite")));
+        }
+        [TestCase("Reset")] [TestCase("Disable")] [TestCase("IntensityZero")]
+        public void ParryShockwaveClearsWithoutAStaleRenderPass(string operation)
+        {
+            BeginActualParry(1,true);Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.True);
+            if(operation=="Reset")Call(arena,"ResetActionsOnly");
+            else if(operation=="Disable"){((Behaviour)feedback).enabled=false;((Behaviour)feedback).enabled=true;}
+            else{Set(Get<object>(feedback,"Settings"),"parryShockwave",0f);Call(feedback,"AdvanceVisuals",0f);}
+            Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.False);
+            Frames(20);Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.False);
+        }
         [UnityTest] public IEnumerator ActiveSceneChangeRestoresCounterAndLaunchOwnership()
         {
             Set(Get<object>(feedback, "Settings"), "shake", 1f);

@@ -35,6 +35,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     private readonly List<Flash> flashes = new();
     private readonly List<DirectionalImpulse> directionalImpulses = new();
     private readonly Dictionary<AudioSource, float> audioVolumes = new();
+    private readonly ParryShockwavePulse parryShockwave = new();
     private PlayerAttack2D attack;
     private PlayerParryCounter2D counter;
     private PlayerParry2D parry;
@@ -90,6 +91,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     public bool HasCameraFocus => hasCameraFocus;
     public float CameraFocusBlend => cameraFocusBlend;
     public float ImpactZoom { get; private set; }
+    public bool IsParryShockwaveVisible => parryShockwave.IsActive;
     public static bool IsManaging(GameObject target)
     {
         var feedback = target != null ? target.GetComponent<CombatFeedback2D>() : null;
@@ -166,7 +168,8 @@ public sealed class CombatFeedback2D : MonoBehaviour
             target != null ? ((Vector2)target.transform.position + (Vector2)transform.position) * .5f : (Vector2)transform.position, null);
     }
     private void OnParryMiss() => Present(CombatFeedbackKind.ParryMiss, transform.position, null);
-    private void OnPlayerHit(int amount, string source, long sequence) => Present(CombatFeedbackKind.PlayerHit, transform.position, null);
+    private void OnPlayerHit(int amount, string source, long sequence)
+    { parryShockwave.Reset(); Present(CombatFeedbackKind.PlayerHit, transform.position, null); }
     private void OnSpecial(Damageable2D target, int amount) => Present(CombatFeedbackKind.HeavyHit, target.transform.position, target);
     private void OnDefeat(Damageable2D target, Vector2 direction) => Present(CombatFeedbackKind.Defeat, target.transform.position, null);
 
@@ -179,6 +182,8 @@ public sealed class CombatFeedback2D : MonoBehaviour
     {
         if (!IsReady || CombatTimeController.IsPaused) return;
         var entry = profile.Find(kind);
+        if (kind == CombatFeedbackKind.Parry || kind == CombatFeedbackKind.JustParry)
+            parryShockwave.Begin(feedbackCamera, position, Mathf.Clamp01(Settings.parryShockwave) * Mathf.Clamp01(Settings.vfx));
         LastKind = kind; LastEmissionTick = CombatTimeController.TickCount;
         EmissionCount++; EssentialGlyphCount++;
         int stopFrames = attackStopOverride >= 0 ? attackStopOverride : entry.hitstopFrames;
@@ -299,6 +304,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     }
     public void AdvanceVisuals(float realSeconds)
     {
+        parryShockwave.Advance(realSeconds, Settings != null && Settings.parryShockwave > 0 && Settings.vfx > 0);
         if (CombatTimeController.IsPaused || realSeconds < 0) return;
         foreach (var e in pool)
         {
@@ -370,6 +376,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     }
     public void ResetPresentation()
     {
+        parryShockwave.Reset();
         foreach (var e in pool) if (e.root != null) e.root.SetActive(false);
         foreach (var f in flashes) if (f.renderer != null) f.renderer.color = f.original;
         flashes.Clear();

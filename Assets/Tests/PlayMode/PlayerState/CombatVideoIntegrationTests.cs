@@ -56,6 +56,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [UnityTearDown] public IEnumerator Teardown()
         { Call(director,"ResetTake",2);Set(clock,"ManualAdvanceOnly",false);yield return null; }
+        [TestCase(0f)] [TestCase(.65f)]
+        public void ParryShockwaveVideoPulseUsesTheRealImpactAndClearsOnReset(float strength)
+        {
+            presentation.GetType().GetField("parryShockwaveStrength",Flags).SetValue(presentation,strength);Call(director,"StartTake",2,true);
+            var animation=state.GetComponent(Type.GetType("VideoPlayerAnimationDriver, Assembly-CSharp",true));
+            for(int i=0;i<240&&Get<int>(animation,"ParryImpactCount")==0;i++)Step();
+            Assert.That(Get<int>(animation,"ParryImpactCount"),Is.EqualTo(1));
+            Assert.That(Get<bool>(presentation,"IsParryShockwaveVisible"),Is.EqualTo(strength>0));
+            Call(director,"ResetTake",2);
+            Assert.That(Get<bool>(presentation,"IsParryShockwaveVisible"),Is.False);
+        }
         [Test] public void TwoAndFourStagesAndBothDirectionsResetTenTimesEach()
         {
             var utility=Type.GetType("VideoCaptureUtility, Assembly-CSharp-Editor",true);
