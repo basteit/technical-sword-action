@@ -19,9 +19,8 @@ Shader "TechnicalSwordAction/ParryShockwave"
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
                 float2 center = _ShockwaveCenter.xy;
-                #if UNITY_UV_STARTS_AT_TOP
-                    center.y = 1.0 - center.y;
-                #endif
+                // URP's blit already handles the render-target orientation. An
+                // additional API-origin flip mirrors the wave away from contact.
                 float aspect = _ScreenParams.x / max(1.0, _ScreenParams.y);
                 float2 delta = (input.texcoord - center) * float2(aspect, 1.0);
                 float distance = length(delta);

@@ -16,6 +16,7 @@ public sealed class ParryShockwaveFeature : FullScreenPassRendererFeature
     }
     private static readonly Dictionary<Camera, Sample> samples = new();
     private readonly Dictionary<Camera, Material> cameraMaterials = new();
+    private readonly List<Camera> expiredCameras = new();
     private static readonly int CenterId = Shader.PropertyToID("_ShockwaveCenter");
     private static readonly int PulseId = Shader.PropertyToID("_ShockwavePulse");
 
@@ -39,6 +40,12 @@ public sealed class ParryShockwaveFeature : FullScreenPassRendererFeature
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
+        foreach(var pair in cameraMaterials) if(pair.Key == null) expiredCameras.Add(pair.Key);
+        foreach(var expired in expiredCameras)
+        {
+            CoreUtils.Destroy(cameraMaterials[expired]);cameraMaterials.Remove(expired);samples.Remove(expired);
+        }
+        expiredCameras.Clear();
         var camera = renderingData.cameraData.camera;
         if (renderingData.cameraData.cameraType != CameraType.Game || passMaterial == null ||
             !samples.TryGetValue(camera, out var sample) || sample.strength <= 0) return;

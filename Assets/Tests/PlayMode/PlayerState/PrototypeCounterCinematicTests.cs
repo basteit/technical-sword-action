@@ -576,6 +576,15 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(held,Is.InRange(25,28));
             Assert.That(Get<int>(feedback,"EmissionCount")-emissions,Is.LessThanOrEqualTo(1),"Only the existing miss cue may occur.");
         }
+        [Test] public void ParryShockwaveGpuProjectionAndResetPixelsMatch()
+        {
+            if(SystemInfo.graphicsDeviceType==UnityEngine.Rendering.GraphicsDeviceType.Null)Assert.Ignore("GPU rendering required.");
+            var utility=Type.GetType("ParryShockwaveCaptureUtility, Assembly-CSharp-Editor",true);
+            string report=(string)utility.GetMethod("ValidateProjection").Invoke(null,null);
+            Assert.That(report,Does.Contain("\"mirroredCenterPixels\": 0"));
+            Assert.That(report,Does.Contain("\"residualPixels\": 0"));
+            Assert.That(report,Does.Contain("\"otherCameraChangedPixels\": 0"));
+        }
         [TestCase(1)] [TestCase(-1)]
         public void ParryShockwaveStartsAtTheAuthoredContactAndFreezesOnPause(int direction)
         {

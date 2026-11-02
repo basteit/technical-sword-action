@@ -367,6 +367,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(false,true,true)] [TestCase(true,true,true)] [TestCase(false,false,true)] [TestCase(false,true,false)]
         public void ParryBacklightWhitensBothActorsKeepsGoldAndLeavesOtherCamerasUntouched(bool mirrored,bool hybrid,bool keepGold)
         {
+            // This contract compares source-color pixels at fixed coordinates.
+            // Refraction has its own GPU/camera-isolation test, not a lighting-color change.
+            presentation.GetType().GetField("parryShockwaveStrength",Flags).SetValue(presentation,0f);
             presentation.GetType().GetField("preserveParrySparkColor",Flags).SetValue(presentation,keepGold);
             Set(director,"MirrorLayout",mirrored);Call(director,"StartTake",2,hybrid);
             for(int i=0;i<180&&!Get<bool>(presentation,"IsParryBacklit");i++)Step();
