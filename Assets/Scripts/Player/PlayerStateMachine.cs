@@ -575,6 +575,17 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
             return;
         }
 
+        // Preserve an Attack still inside its original 6F buffer when success
+        // acquired an adaptive presentation lead after that input was sampled.
+        if ((requests & PlayerActionRequest.Attack) != 0 &&
+            GetComponent<PrototypeCounterPresentation>() is { } parryPresentation && parryPresentation.TryQueueParryCounter())
+        {
+            pendingRequests &= ~PlayerActionRequest.Attack;
+            requests &= ~PlayerActionRequest.Attack;
+            for (int i = 0; i < bufferedRequestFrames.Length; i++)
+                if ((PlayerActionRequest)(1 << i) == PlayerActionRequest.Attack) bufferedRequestFrames[i] = 0;
+            if (requests == PlayerActionRequest.None) return;
+        }
         PlayerActionRequest legalRequests = BuildLegalRequests();
         PlayerAttackCancelWindow cancelWindows = attack != null
             ? attack.OpenCancelWindows

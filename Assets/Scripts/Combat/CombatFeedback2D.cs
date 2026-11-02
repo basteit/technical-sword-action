@@ -92,6 +92,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     public float CameraFocusBlend => cameraFocusBlend;
     public float ImpactZoom { get; private set; }
     public bool IsParryShockwaveVisible => parryShockwave.IsActive;
+    public void CancelParryShockwave() => parryShockwave.Reset();
     public static bool IsManaging(GameObject target)
     {
         var feedback = target != null ? target.GetComponent<CombatFeedback2D>() : null;

@@ -624,7 +624,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.False);
             Frames(20);Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.False);
         }
-        private Component BeginAuthoredAdaptiveParry(int direction)
+        private Component BeginAuthoredAdaptiveParry(int direction,bool expectAdaptive=true,bool bufferAttackBeforeSuccess=false)
         {
             body.position=new Vector2(0,.81f);player.transform.position=body.position;body.linearVelocity=Vector2.zero;
             Call(motor,"SetFacing",direction);Call(motor,"SetMoveInput",Vector2.zero);
@@ -634,10 +634,25 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Until(()=>Get<int>(ai,"WindupRemainingFrames")<=2);
             var parry=player.GetComponent(T("PlayerParry2D"));int successes=Get<int>(parry,"SuccessCount");
             Assert.That((bool)Call(player,"RequestAction",PlayerActionRequest.Parry),Is.True);
+            if(bufferAttackBeforeSuccess){Frames(1);Assert.That((bool)Call(player,"RequestAction",PlayerActionRequest.Attack),Is.True);}
             Until(()=>Get<int>(parry,"SuccessCount")>successes);
-            Assert.That(Get<bool>(presentation,"IsParryImpactPending"),Is.True);
-            Assert.That(TimeValue<bool>("IsHitStopped"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsParryImpactPending"),Is.EqualTo(expectAdaptive));
+            Assert.That(TimeValue<bool>("IsHitStopped"),Is.EqualTo(!expectAdaptive));
             return target;
+        }
+        [TestCase(1)] [TestCase(-1)]
+        public void AdaptiveParryCanBeDisabledToRestoreThePreviousImmediateTenFramePresentation(int direction)
+        {
+            var profile=Get<object>(counter,"CinematicProfile");bool original=Get<bool>(profile,"synchronizedParryImpact");
+            try
+            {
+                Set(profile,"synchronizedParryImpact",false);var target=BeginAuthoredAdaptiveParry(direction,false);
+                Assert.That(Get<int>(presentation,"ParryImpactDelayFrames"),Is.Zero);
+                Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(10));
+                Assert.That(Get<string>(target.GetComponent(T("PrototypeEnemyArtPresentation")),"MotionName"),Is.EqualTo("Parried"));
+                Assert.That(Get<bool>(presentation,"IsParrySequenceActive"),Is.False);
+            }
+            finally{Set(profile,"synchronizedParryImpact",original);}
         }
         [TestCase(30,1)] [TestCase(60,1)] [TestCase(120,1)]
         [TestCase(30,-1)] [TestCase(60,-1)] [TestCase(120,-1)]
@@ -713,6 +728,41 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var light=Camera.main.GetComponent(T("VideoParryBacklight"));
             Assert.That(Get<float>(light,"BackgroundAlpha"),Is.EqualTo(.2f*flash).Within(.001f));
             Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.EqualTo(flash>0));
+        }
+        [Test] public void AdaptiveParryRetainsAnAttackStillBufferedImmediatelyBeforeSuccess()
+        {
+            var target=BeginAuthoredAdaptiveParry(1,true,true);Frames(1);
+            Assert.That(Get<bool>(presentation,"HasQueuedParryCounter"),Is.True);
+            Assert.That(Get<int>(counter,"StockCount"),Is.EqualTo(1));Assert.That(Get<bool>(counter,"IsActive"),Is.False);
+            Until(()=>Get<bool>(counter,"IsActive"));Until(()=>!Get<bool>(counter,"IsActive"));Frames(20);
+            Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));Assert.That(Get<int>(counter,"ConsumedCount"),Is.EqualTo(1));AssertClean();
+        }
+        [TestCase("TargetLost")] [TestCase("Disable")] [TestCase("Hit")] [TestCase("SessionReset")]
+        public void AdaptiveParryInterruptedDuringImpactImmediatelyClearsTheWaveAndQueuedInput(string operation)
+        {
+            var target=BeginAuthoredAdaptiveParry(1);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
+            Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.True);Call(player,"RequestAction",PlayerActionRequest.Attack);
+            int starts=Get<int>(counter,"StartCount"),impacts=Get<int>(presentation,"ParryImpactCount");
+            if(operation=="TargetLost")target.gameObject.SetActive(false);
+            else if(operation=="Disable")((Behaviour)presentation).enabled=false;
+            else if(operation=="Hit")Call(player,"ForceHit","AdaptiveParryTestHit");
+            else Static("ResetSession");
+            Call(presentation,"AdvanceVisuals",0f);
+            Assert.That(Get<bool>(feedback,"IsParryShockwaveVisible"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsParrySequenceActive"),Is.False);
+            Assert.That(Get<bool>(presentation,"HasQueuedParryCounter"),Is.False);
+            Assert.That(TimeValue<int>("HitstopOwnerCount"),Is.Zero);Frames(100);
+            Assert.That(Get<int>(counter,"StartCount"),Is.EqualTo(starts));Assert.That(Get<int>(presentation,"ParryImpactCount"),Is.EqualTo(impacts));
+        }
+        [Test] public void AdaptiveParryFlashZeroDuringPauseCannotResurrectTheOldLight()
+        {
+            BeginAuthoredAdaptiveParry(1);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));Frames(2);
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.True);Static("SetPaused",true);
+            Set(Get<object>(feedback,"Settings"),"flash",0f);Call(presentation,"AdvanceVisuals",0f);
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
+            Set(Get<object>(feedback,"Settings"),"flash",1f);Call(presentation,"AdvanceVisuals",0f);
+            Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
+            Static("SetPaused",false);Frames(10);Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
         }
         [UnityTest] public IEnumerator ActiveSceneChangeRestoresCounterAndLaunchOwnership()
         {

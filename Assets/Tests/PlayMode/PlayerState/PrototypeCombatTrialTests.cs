@@ -220,6 +220,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var counter = player.GetComponent(T("PlayerParryCounter2D"));
             Until(() => Get<int>(counter, "StockCount") == 1, fps);
             Assert.That(Get<bool>(health, "IsParryStaggered"), Is.True);
+            var presentation=player.GetComponent(T("PrototypeCounterPresentation"));
+            Assert.That(Get<bool>(presentation,"IsParrySequenceActive"),Is.True);
+            Assert.That(Drawing.sprite,Is.Not.SameAs(First("Death")),"Logical stun must not skip the enemy attack before the synchronized peak.");
+            Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"),fps);
             Assert.That(Drawing.sprite, Is.SameAs(First("Death")));
             Until(() => Get<PlayerActionState>(player, "ActionState") == PlayerActionState.Neutral, fps);
             Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);

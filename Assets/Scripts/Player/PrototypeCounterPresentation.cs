@@ -101,6 +101,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
             parry.EnsureSuccessLockFrames(parryLeadFrames + Profile.parryFollowThroughFrames + 1);
             SampleAdaptiveParry(); return true;
         }
+        parryLeadFrames = 0;
         parrySource = target; ParryImpactCount++; ParryImpactTick = CombatTimeController.TickCount;
         source.sprite = Profile.parryContactSprite;
         playerArt.RefreshVisual();int facing = GetComponent<PlayerMotor2D>().FacingSign;
@@ -158,7 +159,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         parryEnemyArt?.ReleaseParryDeflection(this); parryEnemyArt = null;
         parrySequenceActive = parryImpactPresented = queuedParryCounter = false;
         CombatTimeController.ReleaseOwner(this);
-        if (clearLight) { parryLightAge = -1; parryLight?.ResetLight(); }
+        if (clearLight) { parryLightAge = -1; parryLight?.ResetLight(); feedback?.CancelParryShockwave(); }
     }
     private void SampleCounter()
     {
