@@ -42,6 +42,8 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     private Damageable2D parryCameraTarget;
     private bool parryCameraActive, parryCameraImpacted, parryCameraReturning, parryCameraHoldFresh;
     private float parryCameraHoldRemaining = -1;
+    private Vector3 parryCameraStartPosition;
+    private float parryCameraStartSize, parryCameraReturnAge;
     private CounterCinematicProfile Profile => counter != null ? counter.CinematicProfile : null;
     private float FlashStrength => feedback != null && feedback.Settings != null ? Mathf.Clamp01(feedback.Settings.flash) : 1;
     private float VfxStrength => feedback != null && feedback.Settings != null ? Mathf.Clamp01(feedback.Settings.vfx) : 1;
@@ -66,6 +68,8 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     public int OrangeParryEffectCount => orangeImpact != null ? orangeImpact.ActiveRendererCount : 0;
     public bool IsOrangeParryGlowVisible => orangeImpact != null && orangeImpact.IsGlowVisible;
     public bool IsOrangeParrySparkVisible => orangeImpact != null && orangeImpact.IsSparkVisible;
+    public bool IsParryFlareVisible => orangeImpact != null && orangeImpact.IsFlareVisible;
+    public int ParryParticleCount => orangeImpact != null ? orangeImpact.ParticleCount : 0;
     public bool IsParryCameraActive => parryCameraActive;
     public string ParryCameraPhase => !parryCameraActive ? "None" : parryCameraReturning ? "Returning" :
         parryCameraHoldRemaining >= 0 ? "Hold" : parryCameraImpacted ? "Impact" : "Preparation";
@@ -160,6 +164,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         source.sprite = motion.At(frame);
         parryEnemyArt?.SampleParryDeflection(this, age);
         playerArt.RefreshVisual();
+        if (parryCameraActive && !parryImpactPresented && Profile.parryExpressiveCamera) SampleExpressiveParryPreparation();
         if (!parryImpactPresented && age >= parryLeadFrames)
         {
             parryImpactPresented = true; ParryImpactCount++; ParryImpactTick = CombatTimeController.TickCount;
@@ -206,22 +211,51 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         CancelParryCamera(true);
         if (!Profile.parryCameraEnabled || ShakeStrength <= 0 || parryCameraAnchor == null || feedback == null) return;
         playerArt.RefreshVisual(); int facing = GetComponent<PlayerMotor2D>().FacingSign;
+        parryCameraStartPosition = gameplayCamera.transform.position - feedback.ShakeOffset;
+        parryCameraStartSize = gameplayCamera.orthographicSize;
         parryCameraAnchor.position = playerArt.Artwork.transform.TransformPoint(new Vector3(facing * Profile.parryContactOffset.x, Profile.parryContactOffset.y));
         parryCameraActive = feedback.FocusCamera(orangeImpact, parryCameraAnchor, Vector2.zero, Profile.parryCameraPrepareSize, Profile.parryCameraApproachSeconds);
         parryCameraImpacted = parryCameraReturning = false; parryCameraHoldRemaining = -1; parryCameraTarget = parrySource;
+        if (parryCameraActive && Profile.parryExpressiveCamera) SampleExpressiveParryPreparation();
+    }
+    private void SampleExpressiveParryPreparation()
+    {
+        int elapsed = Mathf.Max(0, (int)(CombatTimeController.TickCount - parryStartTick));
+        var position = Profile.SampleParryCameraPosition(parryCameraStartPosition, parryCameraAnchor.position, elapsed, parryLeadFrames);
+        float size = Profile.SampleParryCameraSize(parryCameraStartSize, elapsed, parryLeadFrames);
+        feedback.SetCameraFocusPose(orangeImpact, position, size);
     }
     private void AdvanceParryCamera(float seconds)
     {
         if (!parryCameraActive) return;
         if (feedback == null || !feedback.IsCameraFocusOwnedBy(orangeImpact))
         { parryCameraActive = false; parryCameraTarget = null; return; }
-        if (parryCameraReturning || parrySequenceActive || parryCameraHoldRemaining < 0) return;
+        if (parryCameraReturning)
+        {
+            if (Profile.parryExpressiveCamera)
+            {
+                parryCameraReturnAge += seconds;
+                float t = Profile.SampleParryCameraReturn(parryCameraReturnAge / Profile.parryCameraReturnSeconds);
+                feedback.SetCameraFocusPose(orangeImpact, Vector3.Lerp(parryCameraAnchor.position, parryCameraStartPosition, t),
+                    Mathf.Lerp(Profile.parryCameraImpactSize, parryCameraStartSize, t));
+                if (parryCameraReturnAge >= Profile.parryCameraReturnSeconds)
+                { feedback.ReleaseCameraFocus(orangeImpact, true); parryCameraActive = false; parryCameraTarget = null; }
+            }
+            return;
+        }
+        if (parrySequenceActive || parryCameraHoldRemaining < 0) return;
         if (parryCameraHoldFresh && parryCameraHoldRemaining > 0) { parryCameraHoldFresh = false; return; }
         parryCameraHoldRemaining = Mathf.Max(0, parryCameraHoldRemaining - seconds);
         if (parryCameraHoldRemaining <= .000001f)
         {
-            feedback.FocusCamera(orangeImpact, parryCameraAnchor, Vector2.zero, Profile.parryCameraImpactSize, Profile.parryCameraReturnSeconds);
-            feedback.ReleaseCameraFocus(orangeImpact, false); parryCameraReturning = true;
+            parryCameraReturnAge = 0; parryCameraReturning = true;
+            if (Profile.parryExpressiveCamera)
+                feedback.SetCameraFocusPose(orangeImpact, parryCameraAnchor.position, Profile.parryCameraImpactSize);
+            else
+            {
+                feedback.FocusCamera(orangeImpact, parryCameraAnchor, Vector2.zero, Profile.parryCameraImpactSize, Profile.parryCameraReturnSeconds);
+                feedback.ReleaseCameraFocus(orangeImpact, false);
+            }
         }
     }
     private void CancelParryCamera(bool immediate)

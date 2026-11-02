@@ -41,6 +41,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(profile,"parryCameraEnabled"),Is.True);
             Assert.That(Get<float>(profile,"parryCameraImpactSize"),Is.EqualTo(4.25f));
             Assert.That(Get<float>(profile,"parryGlowGain"),Is.EqualTo(3));
+            Assert.That(Get<bool>(profile,"parryExpressiveCamera"),Is.True);
+            Assert.That(Get<bool>(profile,"parryReferenceAccent"),Is.True);
+            Assert.That(Get<int>(profile,"parryCameraZoomDelayFrames"),Is.EqualTo(2));
+            Assert.That(Get<float>(profile,"parryCameraArcHeight"),Is.EqualTo(.2f));
             Assert.That(Get<Material>(profile,"parryBacklightMaterial"),Is.Not.Null);
             Assert.That(Get<Material>(profile,"counterLightingMaterial"),Is.Not.Null);
             var art = Get<Object>(profile, "art"); Assert.That(AssetDatabase.GetAssetPath(art), Is.EqualTo(Folder + "CounterCinematicArt.asset"));

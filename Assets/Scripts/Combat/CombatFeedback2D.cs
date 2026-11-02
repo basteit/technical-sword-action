@@ -50,6 +50,9 @@ public sealed class CombatFeedback2D : MonoBehaviour
     private Vector2 cameraFocusOffset;
     private float baseCameraSize, cameraFocusSize, cameraFocusBlend, cameraBlendSeconds;
     private bool hasCameraFocus, cameraFocusRequested;
+    private bool focusPoseOverride;
+    private Vector3 focusOverridePosition;
+    private float focusOverrideSize;
     private float impactZoomAge = -1;
     private float shakeAge, shakeDuration, shakeMagnitude;
     private long lastAudioTick = -1;
@@ -249,10 +252,18 @@ public sealed class CombatFeedback2D : MonoBehaviour
             cameraFocusBlend = 0; hasCameraFocus = true;
         }
         cameraFocusOwner = owner; cameraSubject = subject; cameraFocusOffset = offset;
+        focusPoseOverride = false;
         cameraFocusSize = size; cameraBlendSeconds = blendSeconds; cameraFocusRequested = true;
         return true;
     }
     public bool IsCameraFocusOwnedBy(UnityEngine.Object owner) => hasCameraFocus && cameraFocusOwner == owner;
+    public bool SetCameraFocusPose(UnityEngine.Object owner, Vector3 position, float size)
+    {
+        if (!IsReady || !IsCameraFocusOwnedBy(owner) || !float.IsFinite(position.x) || !float.IsFinite(position.y) ||
+            !float.IsFinite(position.z) || !float.IsFinite(size) || size <= 0) return false;
+        focusPoseOverride = true; focusOverridePosition = position; focusOverridePosition.z = baseCameraPosition.z;
+        focusOverrideSize = size; return true;
+    }
     public bool FocusCameraAtImpact(UnityEngine.Object owner, Transform subject, float size, float returnSeconds)
     {
         if (!FocusCamera(owner, subject, Vector2.zero, size, returnSeconds)) return false;
@@ -299,6 +310,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
             feedbackCamera.orthographicSize = baseCameraSize;
         }
         hasCameraFocus = cameraFocusRequested = false; cameraFocusBlend = 0;
+        focusPoseOverride = false;
         cameraFocusOwner = null; cameraSubject = null;
     }
     private Effect CreateEffect(int index)
@@ -380,13 +392,13 @@ public sealed class CombatFeedback2D : MonoBehaviour
             if (hasCameraFocus)
             {
                 float focusStrength = Mathf.Clamp01(Settings.shake);
-                cameraFocusBlend = focusStrength <= 0 ? 0 : Mathf.MoveTowards(cameraFocusBlend,
+                cameraFocusBlend = focusPoseOverride ? focusStrength : focusStrength <= 0 ? 0 : Mathf.MoveTowards(cameraFocusBlend,
                     cameraFocusRequested ? focusStrength : 0, realSeconds / cameraBlendSeconds);
                 if (cameraFocusBlend < .00001f) cameraFocusBlend = 0;
                 Vector3 subject = cameraSubject.position + (Vector3)cameraFocusOffset;
                 subject.z = baseCameraPosition.z;
-                cameraPosition = Vector3.Lerp(baseCameraPosition, subject, cameraFocusBlend);
-                feedbackCamera.orthographicSize = Mathf.Lerp(baseCameraSize, cameraFocusSize*(1-.06f*ImpactZoom), cameraFocusBlend);
+                cameraPosition = Vector3.Lerp(baseCameraPosition, focusPoseOverride ? focusOverridePosition : subject, cameraFocusBlend);
+                feedbackCamera.orthographicSize = Mathf.Lerp(baseCameraSize, focusPoseOverride ? focusOverrideSize : cameraFocusSize*(1-.06f*ImpactZoom), cameraFocusBlend);
                 if (!cameraFocusRequested && cameraFocusBlend == 0) RestoreCameraFocus();
             }
             else

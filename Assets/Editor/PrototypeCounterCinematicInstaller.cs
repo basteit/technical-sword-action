@@ -14,6 +14,27 @@ public static class PrototypeCounterCinematicInstaller
     private const string ClipPath = "Assets/Animations/Player/Submitted/PlayerPrototype_ParryCounter.anim";
     private static readonly EditorCurveBinding SpriteBinding = EditorCurveBinding.PPtrCurve("", typeof(SpriteRenderer), "m_Sprite");
 
+    [MenuItem("Tools/Technical Sword Action/Prototype/Apply Expressive Parry Trial")]
+    public static void ApplyExpressiveParryTrial()
+    {
+        if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode before configuring the trial.");
+        foreach (string path in new[] { ProfilePath, "Assets/Settings/PrototypeCombat/CounterLaunch_ReferenceTrial.asset" })
+        {
+            var profile = AssetDatabase.LoadAssetAtPath<CounterCinematicProfile>(path);
+            if (profile == null) throw new InvalidOperationException("Missing profile: " + path);
+            Undo.RecordObject(profile, "Configure expressive parry trial");
+            profile.parryExpressiveCamera = true; profile.parryCameraArcHeight = .2f;
+            profile.parryCameraPositionLeadFrames = profile.parryCameraZoomDelayFrames = 2;
+            profile.parryCameraPositionCurve = CounterCinematicProfile.CreateParryPositionCurve();
+            profile.parryCameraZoomCurve = CounterCinematicProfile.CreateParryZoomCurve();
+            profile.parryCameraReturnCurve = CounterCinematicProfile.CreateParryReturnCurve();
+            profile.parryReferenceAccent = true; profile.parryReferenceSparkRadius = 3.2f;
+            profile.parryFlareLength = 10.5f; profile.parryFlareSeconds = .1f;
+            if (!profile.IsValid) throw new InvalidOperationException("Invalid expressive parry trial: " + path);
+            EditorUtility.SetDirty(profile); AssetDatabase.SaveAssetIfDirty(profile);
+        }
+    }
+
     [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Impact Presentation")]
     public static void RefreshImpactPresentation()
     {

@@ -41,6 +41,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("parrySparkRadius",-1f)] [TestCase("parryActorJitterPixels",5f)] [TestCase("parryLegacyBloomStrength",2f)]
         [TestCase("parryGlowGain",float.NaN)] [TestCase("parryGlowRadius",0f)]
         [TestCase("parryCameraImpactSize",5f)] [TestCase("parryCameraHoldSeconds",-1f)] [TestCase("parryCameraReturnSeconds",0f)]
+        [TestCase("parryFlareLength",0f)] [TestCase("parryFlareSeconds",float.NaN)] [TestCase("parryReferenceSparkRadius",-1f)]
+        [TestCase("parryCameraArcHeight",-1f)]
         public void InvalidTuningIsRejected(string field,float value)
         {var p=Profile();Set(p,field,value);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);}
 
@@ -121,7 +123,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var p=Profile();var contact=new Vector2(2,3);
             Call(accent,"Begin",contact,1,p);Call(accent,"Advance",0f,1f,1f);
             var mesh=Get<Mesh>(accent,"sparkMesh");var right=mesh.vertices;
-            Assert.That(Get<int>(accent,"ActiveRendererCount"),Is.EqualTo(2));
+            Assert.That(Get<int>(accent,"ActiveRendererCount"),Is.EqualTo(3));
+            Assert.That(Get<int>(accent,"ParticleCount"),Is.EqualTo(32));
             Assert.That(Array.Exists(mesh.colors,c=>c.r>.9f&&c.g>.2f&&c.g<.5f&&c.b<.1f),Is.True);
             Call(accent,"BeforeCamera",default(UnityEngine.Rendering.ScriptableRenderContext),otherCamera);
             Assert.That(Get<MeshRenderer>(accent,"sparks").enabled,Is.False);
@@ -141,5 +144,35 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         private static Bounds BoundsOf(Vector3[] points)
         {var bounds=new Bounds(points[0],Vector3.zero);foreach(var point in points)bounds.Encapsulate(point);return bounds;}
+        [TestCase(1)] [TestCase(-1)]
+        public void ExpressiveCameraUsesAnArcAndDelayedZoomButStillEndsExactlyOnContact(int direction)
+        {
+            var p=Profile();var from=new Vector3(0,3,-10);var to=new Vector3(1.4f*direction,1.2f,-10);
+            Assert.That(Call(p,"SampleParryCameraPosition",from,to,0,8),Is.EqualTo(from));
+            Assert.That(Call(p,"SampleParryCameraSize",5.625f,0,8),Is.EqualTo(5.625f));
+            Assert.That(Call(p,"SampleParryCameraSize",5.625f,2,8),Is.EqualTo(5.625f));
+            var middle=(Vector3)Call(p,"SampleParryCameraPosition",from,to,3,8);
+            Assert.That(middle.x,Is.EqualTo(.7f*direction).Within(.0001f));
+            Assert.That(middle.y,Is.EqualTo(Vector3.Lerp(from,to,.5f).y+.2f).Within(.0001f));
+            Assert.That(Call(p,"SampleParryCameraPosition",from,to,6,8),Is.EqualTo(to));
+            Assert.That((float)Call(p,"SampleParryCameraSize",5.625f,6,8),Is.GreaterThan(4.25f));
+            Assert.That(Call(p,"SampleParryCameraSize",5.625f,8,8),Is.EqualTo(4.25f));
+            Assert.That((float)Call(p,"SampleParryCameraReturn",.5f),Is.EqualTo(.875f).Within(.0001f));
+            Assert.That(Call(p,"SampleParryCameraReturn",1f),Is.EqualTo(1f));
+        }
+        [TestCase(0)] [TestCase(1)] [TestCase(2)] [TestCase(4)]
+        public void ShortOrMissingPreparationStillHasFiniteExactCameraEndpoints(int duration)
+        {
+            var p=Profile();var from=new Vector3(0,3,-10);var to=new Vector3(1,1,-10);
+            Assert.That(Call(p,"SampleParryCameraPosition",from,to,duration,duration),Is.EqualTo(to));
+            Assert.That(Call(p,"SampleParryCameraSize",5.625f,duration,duration),Is.EqualTo(4.25f));
+        }
+        [Test] public void InvalidCameraCurveIsRejectedWithoutReturningANonfinitePose()
+        {
+            var p=Profile();Set(p,"parryCameraPositionCurve",new AnimationCurve(new Keyframe(0,0),new Keyframe(1,float.NaN)));
+            Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);
+            var value=(Vector3)Call(p,"SampleParryCameraPosition",Vector3.zero,Vector3.one,4,8);
+            Assert.That(float.IsFinite(value.x)&&float.IsFinite(value.y)&&float.IsFinite(value.z),Is.True);
+        }
     }
 }

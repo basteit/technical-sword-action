@@ -78,6 +78,39 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(.001f)] public float parryCameraReturnSeconds = .18f;
     [Min(.001f)] public float parryImpactShakeSeconds = .1f;
     [Min(0)] public float parryImpactShakeStrength = .32f;
+    [Header("Expressive parry trial; previous presentation is retained")]
+    public bool parryExpressiveCamera = true;
+    [Min(0)] public float parryCameraArcHeight = .2f;
+    [Min(0)] public int parryCameraPositionLeadFrames = 2;
+    [Min(0)] public int parryCameraZoomDelayFrames = 2;
+    public AnimationCurve parryCameraPositionCurve = CreateParryPositionCurve();
+    public AnimationCurve parryCameraZoomCurve = CreateParryZoomCurve();
+    public AnimationCurve parryCameraReturnCurve = CreateParryReturnCurve();
+    public bool parryReferenceAccent = true;
+    [Min(.01f)] public float parryReferenceSparkRadius = 3.2f;
+    [Min(.01f)] public float parryFlareLength = 10.5f;
+    [Min(.01f)] public float parryFlareSeconds = .1f;
+    public static AnimationCurve CreateParryPositionCurve() => AnimationCurve.EaseInOut(0, 0, 1, 1);
+    public static AnimationCurve CreateParryZoomCurve() => new AnimationCurve(new Keyframe(0, 0, 0, 0), new Keyframe(1, 1, 2, 2));
+    public static AnimationCurve CreateParryReturnCurve() => new AnimationCurve(new Keyframe(0, 0, 3, 3), new Keyframe(1, 1, 0, 0));
+    public Vector3 SampleParryCameraPosition(Vector3 from, Vector3 to, int elapsed, int duration)
+    {
+        float t = duration <= 0 ? 1 : Mathf.Clamp01(elapsed / (float)Mathf.Max(1, duration - parryCameraPositionLeadFrames));
+        float p = EvaluateCameraCurve(parryCameraPositionCurve, t);
+        return Vector3.Lerp(from, to, p) + Vector3.up * (4 * p * (1 - p) * parryCameraArcHeight);
+    }
+    public float SampleParryCameraSize(float from, int elapsed, int duration)
+    {
+        int delay = Mathf.Min(parryCameraZoomDelayFrames, Mathf.Max(0, duration - 1));
+        float t = duration <= 0 ? 1 : Mathf.Clamp01((elapsed - delay) / (float)Mathf.Max(1, duration - delay));
+        return Mathf.Lerp(from, parryCameraImpactSize, EvaluateCameraCurve(parryCameraZoomCurve, t));
+    }
+    public float SampleParryCameraReturn(float progress) => EvaluateCameraCurve(parryCameraReturnCurve, Mathf.Clamp01(progress));
+    private static float EvaluateCameraCurve(AnimationCurve curve, float progress)
+    {
+        float value = curve != null && curve.length > 0 ? curve.Evaluate(progress) : progress;
+        return float.IsFinite(value) ? Mathf.Clamp01(value) : Mathf.Clamp01(progress);
+    }
     public VideoArtLibrary.Motion ParryReaction => art != null ? art.Find("ParrySuccessLight") : null;
     public float ParryLightSeconds => parryLightRiseSeconds + parryLightHoldSeconds + parryLightFadeSeconds;
     public bool IsParryTuningValid => parryTrialHitstopFrames >= 0 && parryApproachMaxFrames >= 0 && parryFollowThroughFrames > 0 && Finite(ParryLightSeconds) &&
@@ -93,6 +126,10 @@ public sealed class CounterCinematicProfile : ScriptableObject
         Finite(parryCameraReturnSeconds) && parryCameraReturnSeconds > 0 &&
         Finite(parryImpactShakeSeconds) && parryImpactShakeSeconds > 0 &&
         Finite(parryImpactShakeStrength) && parryImpactShakeStrength >= 0 &&
+        Finite(parryCameraArcHeight) && parryCameraArcHeight >= 0 && parryCameraPositionLeadFrames >= 0 && parryCameraZoomDelayFrames >= 0 &&
+        ValidCameraCurve(parryCameraPositionCurve) && ValidCameraCurve(parryCameraZoomCurve) && ValidCameraCurve(parryCameraReturnCurve) &&
+        Finite(parryReferenceSparkRadius) && parryReferenceSparkRadius > 0 && Finite(parryFlareLength) && parryFlareLength > 0 &&
+        Finite(parryFlareSeconds) && parryFlareSeconds > 0 &&
         Finite(parrySparkSeconds) && parrySparkSeconds > 0 && Finite(parryGlowSeconds) && parryGlowSeconds > 0 &&
         Finite(parrySparkRadius) && parrySparkRadius > 0 &&
         Finite(parryActorJitterPixels) && parryActorJitterPixels >= 0 && parryActorJitterPixels <= 4 && parryActorJitterStepFrames > 0 &&
@@ -147,6 +184,19 @@ public sealed class CounterCinematicProfile : ScriptableObject
         (!synchronizedParryImpact || IsParryTuningValid && Valid(ParryReaction) && ParryReaction.hitFrame > 0 && ParryReaction.hitFrame < ParryReaction.TotalFrames);
     public Sprite Sample(int frame) => frame < BlinkArrivalFrame ? Transfer.At(frame) : Kick.At(frame - BlinkArrivalFrame);
     private static bool Finite(float value) => float.IsFinite(value);
+    private static bool ValidCameraCurve(AnimationCurve curve)
+    {
+        if (curve == null || curve.length < 2 || curve.length > 32) return false;
+        if (Mathf.Abs(curve[0].time) > .0001f || Mathf.Abs(curve[0].value) > .0001f ||
+            Mathf.Abs(curve[curve.length - 1].time - 1) > .0001f || Mathf.Abs(curve[curve.length - 1].value - 1) > .0001f) return false;
+        for (int i = 0; i < curve.length; i++)
+        {
+            var key = curve[i];
+            if (!Finite(key.time) || !Finite(key.value) || !Finite(key.inTangent) || !Finite(key.outTangent) ||
+                key.time < 0 || key.time > 1 || key.value < 0 || key.value > 1 || i > 0 && key.time <= curve[i - 1].time) return false;
+        }
+        return true;
+    }
     private static bool ValidColor(Color value) => Finite(value.r) && Finite(value.g) && Finite(value.b) && Finite(value.a) &&
         value.r >= 0 && value.r <= 1 && value.g >= 0 && value.g <= 1 && value.b >= 0 && value.b <= 1 && value.a >= 0 && value.a <= 1;
     private static bool Valid(VideoArtLibrary.Motion motion) => motion != null && motion.frames != null &&
