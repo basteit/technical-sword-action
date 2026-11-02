@@ -71,6 +71,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(1)] public int parryActorJitterStepFrames = 2;
     [Header("Parry contact camera (gameplay only)")]
     public bool parryCameraEnabled = true;
+    public bool parryCameraReturnOnHitstopEnd = true;
     [Min(.01f)] public float parryCameraPrepareSize = 4.75f;
     [Min(.01f)] public float parryCameraImpactSize = 4.25f;
     [Min(.001f)] public float parryCameraApproachSeconds = .1f;

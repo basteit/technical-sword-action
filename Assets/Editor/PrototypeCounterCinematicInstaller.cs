@@ -24,6 +24,7 @@ public static class PrototypeCounterCinematicInstaller
             if (profile == null) throw new InvalidOperationException("Missing profile: " + path);
             Undo.RecordObject(profile, "Configure expressive parry trial");
             profile.parryExpressiveCamera = true; profile.parryCameraArcHeight = .2f;
+            profile.parryCameraReturnOnHitstopEnd = true;
             profile.parryCameraPositionLeadFrames = profile.parryCameraZoomDelayFrames = 2;
             profile.parryCameraPositionCurve = CounterCinematicProfile.CreateParryPositionCurve();
             profile.parryCameraZoomCurve = CounterCinematicProfile.CreateParryZoomCurve();

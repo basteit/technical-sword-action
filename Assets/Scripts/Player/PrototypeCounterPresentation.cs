@@ -204,7 +204,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         CombatTimeController.ReleaseOwner(this);
         if (clearLight)
         { CancelParryCamera(true); parryLightAge = -1; parryLight?.ResetLight(); feedback?.CancelParryShockwave(); orangeImpact?.ResetAccent(); }
-        else if (parryCameraActive) { parryCameraHoldRemaining = Profile.parryCameraHoldSeconds; parryCameraHoldFresh = true; }
+        else if (parryCameraActive && !parryCameraReturning) { parryCameraHoldRemaining = Profile.parryCameraHoldSeconds; parryCameraHoldFresh = true; }
     }
     private void BeginParryCamera()
     {
@@ -230,6 +230,8 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         if (!parryCameraActive) return;
         if (feedback == null || !feedback.IsCameraFocusOwnedBy(orangeImpact))
         { parryCameraActive = false; parryCameraTarget = null; return; }
+        if (!parryCameraReturning && Profile.parryCameraReturnOnHitstopEnd && parryCameraImpacted && !CombatTimeController.IsHitStopped)
+            BeginParryCameraReturn();
         if (parryCameraReturning)
         {
             if (Profile.parryExpressiveCamera)
@@ -243,19 +245,20 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
             }
             return;
         }
-        if (parrySequenceActive || parryCameraHoldRemaining < 0) return;
+        if (Profile.parryCameraReturnOnHitstopEnd || parrySequenceActive || parryCameraHoldRemaining < 0) return;
         if (parryCameraHoldFresh && parryCameraHoldRemaining > 0) { parryCameraHoldFresh = false; return; }
         parryCameraHoldRemaining = Mathf.Max(0, parryCameraHoldRemaining - seconds);
-        if (parryCameraHoldRemaining <= .000001f)
+        if (parryCameraHoldRemaining <= .000001f) BeginParryCameraReturn();
+    }
+    private void BeginParryCameraReturn()
+    {
+        parryCameraReturnAge = 0; parryCameraReturning = true;
+        if (Profile.parryExpressiveCamera)
+            feedback.SetCameraFocusPose(orangeImpact, parryCameraAnchor.position, Profile.parryCameraImpactSize);
+        else
         {
-            parryCameraReturnAge = 0; parryCameraReturning = true;
-            if (Profile.parryExpressiveCamera)
-                feedback.SetCameraFocusPose(orangeImpact, parryCameraAnchor.position, Profile.parryCameraImpactSize);
-            else
-            {
-                feedback.FocusCamera(orangeImpact, parryCameraAnchor, Vector2.zero, Profile.parryCameraImpactSize, Profile.parryCameraReturnSeconds);
-                feedback.ReleaseCameraFocus(orangeImpact, false);
-            }
+            feedback.FocusCamera(orangeImpact, parryCameraAnchor, Vector2.zero, Profile.parryCameraImpactSize, Profile.parryCameraReturnSeconds);
+            feedback.ReleaseCameraFocus(orangeImpact, false);
         }
     }
     private void CancelParryCamera(bool immediate)
