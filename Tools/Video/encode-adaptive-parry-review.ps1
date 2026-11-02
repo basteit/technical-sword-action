@@ -1,4 +1,4 @@
-param([string]$Revision='20261102-sync-v2',[string]$OutputTag='20261102-v2',[string]$ComparisonRevision='20261102-sync-v1',[string]$FfmpegPath)
+param([string]$Revision='20261102-orange-v1',[string]$OutputTag='20261102-orange',[string]$ComparisonRevision='20261102-sync-v2',[string]$FfmpegPath)
 $ErrorActionPreference='Stop'
 $root=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 Push-Location $root
@@ -9,7 +9,7 @@ try {
     $after=".uloop/outputs/video/adaptive-parry-$Revision/adaptive"
     $a=Get-Content -LiteralPath (Join-Path $before 'events.json') -Raw | ConvertFrom-Json
     $b=Get-Content -LiteralPath (Join-Path $after 'events.json') -Raw | ConvertFrom-Json
-    if($a.legacy -or $b.legacy -or $a.frameCount -ne 180 -or $b.frameCount -ne 180 -or $a.maximumStopTicks -ne 40 -or $b.maximumStopTicks -ne 36 -or $b.leadCombatFrames -ne 8 -or $b.impactEnemySprite -ne 'EnemySample_attack_14' -or $b.reactionFrame -le $b.impactFrame -or [Math]::Abs($b.maximumBackgroundAlpha-.3) -gt .001 -or [Math]::Abs($b.cameraOrthographicSize-5.625) -gt .001){throw 'Unexpected capture invariant.'}
+    if($a.legacy -or $b.legacy -or $a.frameCount -ne 180 -or $b.frameCount -ne 180 -or $a.maximumStopTicks -ne 36 -or $b.maximumStopTicks -ne 36 -or $a.impactFrame -ne $b.impactFrame -or $a.reactionFrame -ne $b.reactionFrame -or $b.leadCombatFrames -ne 8 -or $b.impactEnemySprite -ne 'EnemySample_attack_14' -or $b.reactionFrame -le $b.impactFrame -or [Math]::Abs($b.maximumBackgroundAlpha-.3) -gt .001 -or [Math]::Abs($b.cameraOrthographicSize-5.625) -gt .001 -or $b.maximumPlayerJitterPixels -ne 2 -or $b.maximumEnemyJitterPixels -ne 2 -or $b.orangeSparkFrames -le 0 -or $b.orangeGlowFrames -le 0 -or $b.legacyHaloSeen){throw 'Unexpected capture invariant.'}
     for($i=0;$i -lt 180;$i++){
         foreach($dir in @($before,$after)){if(-not(Test-Path -LiteralPath (Join-Path $dir ('frame-{0:D4}.png' -f $i)))){throw "Missing frame $i in $dir"}}
     }
