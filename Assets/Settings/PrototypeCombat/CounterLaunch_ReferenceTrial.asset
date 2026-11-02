@@ -49,10 +49,10 @@ MonoBehaviour:
   parryHitstopFrames: 9
   justParryHitstopFrames: 10
   synchronizedParryImpact: 1
-  parryTrialHitstopFrames: 36
+  parryTrialHitstopFrames: 30
   parryApproachMaxFrames: 8
   parryFollowThroughFrames: 8
-  parryBackgroundDim: 0.3
+  parryBackgroundDim: 0.4
   parryActorLight: 0.08
   parryLegacyBloomStrength: 0
   parryLightRiseSeconds: 0.033333335
@@ -64,9 +64,19 @@ MonoBehaviour:
   parryWavePixels: 32
   parryOrangeAccent: 1
   parrySparkColor: {r: 1, g: 0.36, b: 0.035, a: 1}
-  parryGlowColor: {r: 1, g: 0.25, b: 0.025, a: 0.45}
+  parryGlowColor: {r: 1, g: 0.25, b: 0.025, a: 0.8}
+  parryGlowGain: 3
+  parryGlowRadius: 1.6
   parrySparkSeconds: 0.32
   parryGlowSeconds: 0.18
   parrySparkRadius: 1.2
   parryActorJitterPixels: 2
   parryActorJitterStepFrames: 2
+  parryCameraEnabled: 1
+  parryCameraPrepareSize: 4.75
+  parryCameraImpactSize: 4.25
+  parryCameraApproachSeconds: 0.1
+  parryCameraHoldSeconds: 0.2
+  parryCameraReturnSeconds: 0.18
+  parryImpactShakeSeconds: 0.1
+  parryImpactShakeStrength: 0.32

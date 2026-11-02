@@ -32,6 +32,8 @@ public sealed class PrototypePlayerArtSet : ScriptableObject
     [Tooltip("Common source art has its feet one unit below its pivot. Only the visual child is offset.")]
     public float commonFeetBelowPivot = 1f;
     public float pixelsPerUnit = 32f;
+    [Tooltip("Keep the player body/hair ahead of enemy artwork; impact VFX may still overlay both.")]
+    public int foregroundSortingOrder = 20;
 
     public Entry Find(string action) => Array.Find(entries, entry => entry.action == action);
     public bool IsFeetPivot(Sprite sprite) => Array.IndexOf(feetPivotSprites, sprite) >= 0;

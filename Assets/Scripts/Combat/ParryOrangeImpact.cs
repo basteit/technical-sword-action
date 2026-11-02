@@ -118,7 +118,8 @@ public sealed class ParryOrangeImpact : MonoBehaviour
     {
         float progress = Mathf.Clamp01(age / profile.parryGlowSeconds);
         Color color = profile.parryGlowColor; color.a *= strength * (1 - progress) * (1 - progress);
-        float radius = profile.parrySparkRadius * Mathf.Lerp(.6f, 1, progress);
+        color.r *= profile.parryGlowGain; color.g *= profile.parryGlowGain; color.b *= profile.parryGlowGain;
+        float radius = profile.parryGlowRadius * Mathf.Lerp(.6f, 1, progress);
         glowVertices[0] = Vector3.zero; glowColors[0] = color;
         for (int i = 0; i < RingSegments; i++)
         {

@@ -48,7 +48,7 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour
         artwork.color = source.color;
         artwork.flipX = source.flipX; artwork.flipY = source.flipY;
         artwork.sortingLayerID = source.sortingLayerID;
-        artwork.sortingOrder = source.sortingOrder;
+        artwork.sortingOrder = Mathf.Max(source.sortingOrder, artSet.foregroundSortingOrder);
         artwork.sharedMaterial = source.sharedMaterial;
         if (source.sprite == null) return;
 

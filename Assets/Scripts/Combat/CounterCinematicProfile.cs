@@ -45,10 +45,10 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(0)] public int justParryHitstopFrames = 10;
     [Header("Adaptive parry impact trial (gameplay only)")]
     public bool synchronizedParryImpact;
-    [Min(0)] public int parryTrialHitstopFrames = 36;
+    [Min(0)] public int parryTrialHitstopFrames = 30;
     [Min(0)] public int parryApproachMaxFrames = 8;
     [Min(1)] public int parryFollowThroughFrames = 8;
-    [Range(0, .5f)] public float parryBackgroundDim = .3f;
+    [Range(0, .5f)] public float parryBackgroundDim = .4f;
     [Range(0, 1)] public float parryActorLight = .08f;
     [Range(0, 1)] public float parryLegacyBloomStrength;
     [Min(.001f)] public float parryLightRiseSeconds = 2f / 60f;
@@ -61,12 +61,23 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Header("Additional orange parry accent (gameplay only)")]
     public bool parryOrangeAccent = true;
     public Color parrySparkColor = new Color(1, .36f, .035f, 1);
-    public Color parryGlowColor = new Color(1, .25f, .025f, .45f);
+    public Color parryGlowColor = new Color(1, .25f, .025f, .8f);
+    [Min(0)] public float parryGlowGain = 3;
+    [Min(.01f)] public float parryGlowRadius = 1.6f;
     [Min(.01f)] public float parrySparkSeconds = .32f;
     [Min(.01f)] public float parryGlowSeconds = .18f;
     [Min(.01f)] public float parrySparkRadius = 1.2f;
     [Range(0, 4)] public float parryActorJitterPixels = 2;
     [Min(1)] public int parryActorJitterStepFrames = 2;
+    [Header("Parry contact camera (gameplay only)")]
+    public bool parryCameraEnabled = true;
+    [Min(.01f)] public float parryCameraPrepareSize = 4.75f;
+    [Min(.01f)] public float parryCameraImpactSize = 4.25f;
+    [Min(.001f)] public float parryCameraApproachSeconds = .1f;
+    [Min(0)] public float parryCameraHoldSeconds = .2f;
+    [Min(.001f)] public float parryCameraReturnSeconds = .18f;
+    [Min(.001f)] public float parryImpactShakeSeconds = .1f;
+    [Min(0)] public float parryImpactShakeStrength = .32f;
     public VideoArtLibrary.Motion ParryReaction => art != null ? art.Find("ParrySuccessLight") : null;
     public float ParryLightSeconds => parryLightRiseSeconds + parryLightHoldSeconds + parryLightFadeSeconds;
     public bool IsParryTuningValid => parryTrialHitstopFrames >= 0 && parryApproachMaxFrames >= 0 && parryFollowThroughFrames > 0 && Finite(ParryLightSeconds) &&
@@ -74,6 +85,14 @@ public sealed class CounterCinematicProfile : ScriptableObject
         Finite(parryActorLight) && parryActorLight >= 0 && parryActorLight <= 1 &&
         Finite(parryLegacyBloomStrength) && parryLegacyBloomStrength >= 0 && parryLegacyBloomStrength <= 1 &&
         ValidColor(parrySparkColor) && ValidColor(parryGlowColor) &&
+        Finite(parryGlowGain) && parryGlowGain >= 0 && Finite(parryGlowRadius) && parryGlowRadius > 0 &&
+        Finite(parryCameraPrepareSize) && parryCameraPrepareSize > 0 && Finite(parryCameraImpactSize) &&
+        parryCameraImpactSize > 0 && parryCameraImpactSize <= parryCameraPrepareSize &&
+        Finite(parryCameraApproachSeconds) && parryCameraApproachSeconds > 0 &&
+        Finite(parryCameraHoldSeconds) && parryCameraHoldSeconds >= 0 &&
+        Finite(parryCameraReturnSeconds) && parryCameraReturnSeconds > 0 &&
+        Finite(parryImpactShakeSeconds) && parryImpactShakeSeconds > 0 &&
+        Finite(parryImpactShakeStrength) && parryImpactShakeStrength >= 0 &&
         Finite(parrySparkSeconds) && parrySparkSeconds > 0 && Finite(parryGlowSeconds) && parryGlowSeconds > 0 &&
         Finite(parrySparkRadius) && parrySparkRadius > 0 &&
         Finite(parryActorJitterPixels) && parryActorJitterPixels >= 0 && parryActorJitterPixels <= 4 && parryActorJitterStepFrames > 0 &&

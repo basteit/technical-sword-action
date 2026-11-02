@@ -75,6 +75,19 @@ namespace TechnicalSwordAction.PlayerState.Tests
             source.color = original; source.flipX = false; Refresh();
             Assert.That(source.forceRenderingOff, Is.True); Assert.That(artwork.enabled, Is.True);
         }
+        [Test] public void PlayerArtworkStaysAheadOfAllPrototypeEnemyBodies()
+        {
+            Refresh();Assert.That(artwork.sortingOrder,Is.GreaterThanOrEqualTo(20));
+            foreach(var root in player.gameObject.scene.GetRootGameObjects())
+            {
+                if(root.GetComponent(T("Damageable2D"))==null)continue;
+                foreach(var renderer in root.GetComponentsInChildren<SpriteRenderer>(true))
+                    if(renderer.name=="CommonEnemyArtwork"||renderer.name=="HeavySilhouette")
+                        Assert.That(artwork.sortingOrder,Is.GreaterThan(renderer.sortingOrder));
+            }
+            int original=source.sortingOrder;source.sortingOrder=50;Refresh();Assert.That(artwork.sortingOrder,Is.EqualTo(50));
+            source.sortingOrder=original;Refresh();
+        }
 
         [Test] public void JumpSampleNormalizesDrawingOnlyAndKeepsPixelsAndFeetAligned()
         {

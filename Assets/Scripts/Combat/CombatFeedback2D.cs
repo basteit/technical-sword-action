@@ -23,7 +23,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
         public float remaining;
     }
     private sealed class DirectionalImpulse
-    { public Vector2 direction; public float age, duration, strength, cycles; }
+    { public Vector2 direction; public float age, duration, strength, cycles; public UnityEngine.Object owner; }
     [SerializeField] private CombatFeedbackProfile profile;
     [SerializeField] private PlayerAttackImpactProfile attackImpactProfile;
     [SerializeField] private CombatFeedbackSettings settings;
@@ -251,6 +251,37 @@ public sealed class CombatFeedback2D : MonoBehaviour
         cameraFocusOwner = owner; cameraSubject = subject; cameraFocusOffset = offset;
         cameraFocusSize = size; cameraBlendSeconds = blendSeconds; cameraFocusRequested = true;
         return true;
+    }
+    public bool IsCameraFocusOwnedBy(UnityEngine.Object owner) => hasCameraFocus && cameraFocusOwner == owner;
+    public bool FocusCameraAtImpact(UnityEngine.Object owner, Transform subject, float size, float returnSeconds)
+    {
+        if (!FocusCamera(owner, subject, Vector2.zero, size, returnSeconds)) return false;
+        cameraFocusBlend = Mathf.Clamp01(Settings.shake);
+        AdvanceVisuals(0); return true;
+    }
+    public bool TransferCameraFocus(UnityEngine.Object previousOwner, UnityEngine.Object nextOwner)
+    {
+        if (!IsCameraFocusOwnedBy(previousOwner) || nextOwner == null) return false;
+        cameraFocusOwner = nextOwner; return true;
+    }
+    public void ShakeOwned(UnityEngine.Object owner, float seconds, float strength, Vector2 direction, float cycles)
+    {
+        if (owner == null) return;
+        int before = directionalImpulses.Count;
+        ShakeDirectional(seconds, strength, direction, cycles);
+        if (directionalImpulses.Count > before) directionalImpulses[^1].owner = owner;
+    }
+    public void CancelOwnedCameraEffects(UnityEngine.Object owner, bool immediate)
+    {
+        if (owner == null) return;
+        bool removed = directionalImpulses.RemoveAll(impulse => impulse.owner == owner) > 0;
+        ReleaseCameraFocus(owner, immediate);
+        if (immediate && removed)
+        {
+            // Remaining owners are recomposed on the next visual sample, including when unpausing.
+            if (feedbackCamera != null) feedbackCamera.transform.position -= appliedShake;
+            appliedShake = Vector3.zero;
+        }
     }
     public void ReleaseCameraFocus(UnityEngine.Object owner, bool immediate)
     {

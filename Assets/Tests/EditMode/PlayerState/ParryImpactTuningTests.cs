@@ -28,7 +28,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(value,Is.InRange(0f,1f));peak=Mathf.Max(peak,value);
                 bool rising=value>previous+.0001f;if(rising&&!wasRising)rises++;
                 wasRising=rising;previous=value;
-                Assert.That(value*Get<float>(p,"parryBackgroundDim"),Is.LessThanOrEqualTo(.3f));
+                Assert.That(value*Get<float>(p,"parryBackgroundDim"),Is.LessThanOrEqualTo(.4f));
             }
             Assert.That(peak,Is.EqualTo(1).Within(.001f));Assert.That(rises,Is.EqualTo(1));
             Assert.That(Call(p,"SampleParryLight",-1f),Is.EqualTo(0f));
@@ -39,6 +39,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("parryBackgroundDim",.9f)] [TestCase("parryLightFadeSeconds",-1f)]
         [TestCase("parrySparkSeconds",0f)] [TestCase("parryGlowSeconds",float.NaN)]
         [TestCase("parrySparkRadius",-1f)] [TestCase("parryActorJitterPixels",5f)] [TestCase("parryLegacyBloomStrength",2f)]
+        [TestCase("parryGlowGain",float.NaN)] [TestCase("parryGlowRadius",0f)]
+        [TestCase("parryCameraImpactSize",5f)] [TestCase("parryCameraHoldSeconds",-1f)] [TestCase("parryCameraReturnSeconds",0f)]
         public void InvalidTuningIsRejected(string field,float value)
         {var p=Profile();Set(p,field,value);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);}
 
@@ -81,11 +83,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Assert.That(T("PrototypeEnemyArtPresentation").GetMethod("SampleParryDeflectionFrame").Invoke(null,new object[]{captured,natural,display,elapsed}),Is.EqualTo(expected));
         }
-        [Test] public void LatestTrialDefaultsHaveAThirtyPercentDimAndAShorterStopAndApproach()
+        [Test] public void LatestTrialDefaultsHaveAFortyPercentDimAndAShorterStopAndApproach()
         {
-            var p=Profile();Assert.That(Get<int>(p,"parryTrialHitstopFrames"),Is.EqualTo(36));
+            var p=Profile();Assert.That(Get<int>(p,"parryTrialHitstopFrames"),Is.EqualTo(30));
             Assert.That(Get<int>(p,"parryApproachMaxFrames"),Is.EqualTo(8));
-            Assert.That(Get<float>(p,"parryBackgroundDim"),Is.EqualTo(.3f));
+            Assert.That(Get<float>(p,"parryBackgroundDim"),Is.EqualTo(.4f));
             Set(p,"parryApproachMaxFrames",-1);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);
         }
         [TestCase(30)] [TestCase(60)] [TestCase(120)]
@@ -97,7 +99,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 float age=i/(float)fps,value=(float)Call(p,"SampleParryJitter",age,1f);
                 Assert.That(Mathf.Abs(value),Is.LessThanOrEqualTo(2f/32));
                 Assert.That(value*32,Is.EqualTo(Mathf.Round(value*32)));
-                if(age>=.6f)Assert.That(value,Is.Zero);else{positive|=value>0;negative|=value<0;}
+                if(age>=.5f)Assert.That(value,Is.Zero);else{positive|=value>0;negative|=value<0;}
             }
             Assert.That(positive&&negative,Is.True);Assert.That(Call(p,"SampleParryJitter",0f,.5f),Is.EqualTo(1f/32));
             Assert.That(Call(p,"SampleParryJitter",0f,0f),Is.EqualTo(0f));

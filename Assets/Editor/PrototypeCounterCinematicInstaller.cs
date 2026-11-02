@@ -30,9 +30,11 @@ public static class PrototypeCounterCinematicInstaller
         profile.parrySuccessStartNormalized = parry.hitFrame/(float)parry.TotalFrames;
         profile.cameraFocusOffset = new Vector2(.8f,profile.cameraFocusOffset.y);
         profile.parryHitstopFrames = 9; profile.justParryHitstopFrames = 10; profile.hitstopFrames = 16;
-        profile.parryTrialHitstopFrames = 36;
+        profile.parryTrialHitstopFrames = 30;
         profile.parryApproachMaxFrames = 8;
-        profile.parryBackgroundDim = .3f;
+        profile.parryBackgroundDim = .4f;
+        profile.parryGlowColor = new Color(1,.25f,.025f,.8f); profile.parryGlowGain = 3; profile.parryGlowRadius = 1.6f;
+        profile.parryCameraEnabled = true;
         profile.parryActorLight = .08f; profile.parryLegacyBloomStrength = 0;
         profile.parryOrangeAccent = true;
         profile.synchronizedParryImpact = true;

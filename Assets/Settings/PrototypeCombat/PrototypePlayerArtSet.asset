@@ -814,6 +814,7 @@ MonoBehaviour:
   - {fileID: -8402897093334649978, guid: e113841a56162a14ea8443f4e4726440, type: 3}
   commonFeetBelowPivot: 1
   pixelsPerUnit: 32
+  foregroundSortingOrder: 20
 --- !u!213 &2679726605003706969
 Sprite:
   m_ObjectHideFlags: 0

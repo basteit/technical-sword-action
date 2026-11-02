@@ -31,13 +31,16 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(profile,"parryHitstopFrames"),Is.EqualTo(9));
             Assert.That(Get<int>(profile,"justParryHitstopFrames"),Is.EqualTo(10));
             Assert.That(Get<bool>(profile,"synchronizedParryImpact"),Is.True);
-            Assert.That(Get<int>(profile,"parryTrialHitstopFrames"),Is.EqualTo(36));
+            Assert.That(Get<int>(profile,"parryTrialHitstopFrames"),Is.EqualTo(30));
             Assert.That(Get<int>(profile,"parryApproachMaxFrames"),Is.EqualTo(8));
-            Assert.That(Get<float>(profile,"parryBackgroundDim"),Is.EqualTo(.3f));
+            Assert.That(Get<float>(profile,"parryBackgroundDim"),Is.EqualTo(.4f));
             Assert.That(Get<float>(profile,"parryActorLight"),Is.EqualTo(.08f));
             Assert.That(Get<float>(profile,"parryLegacyBloomStrength"),Is.Zero);
             Assert.That(Get<bool>(profile,"parryOrangeAccent"),Is.True);
             Assert.That(Get<float>(profile,"parryActorJitterPixels"),Is.EqualTo(2));
+            Assert.That(Get<bool>(profile,"parryCameraEnabled"),Is.True);
+            Assert.That(Get<float>(profile,"parryCameraImpactSize"),Is.EqualTo(4.25f));
+            Assert.That(Get<float>(profile,"parryGlowGain"),Is.EqualTo(3));
             Assert.That(Get<Material>(profile,"parryBacklightMaterial"),Is.Not.Null);
             Assert.That(Get<Material>(profile,"counterLightingMaterial"),Is.Not.Null);
             var art = Get<Object>(profile, "art"); Assert.That(AssetDatabase.GetAssetPath(art), Is.EqualTo(Folder + "CounterCinematicArt.asset"));
