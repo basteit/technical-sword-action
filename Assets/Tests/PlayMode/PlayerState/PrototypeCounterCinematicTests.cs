@@ -85,6 +85,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(presentation,"IsParryActorJitterActive"),Is.False);
             Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);
             Assert.That(Get<bool>(presentation,"IsParryCameraActive"),Is.False);
+            Assert.That(Get<bool>(presentation,"IsCounterCameraBridgeActive"),Is.False);
         }
 
         [UnitySetUp] public IEnumerator Setup()
@@ -998,6 +999,76 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));Until(()=>!Get<bool>(presentation,"IsParryCameraActive"));AssertClean();
             }
             finally{Call(arena,"ResetActionsOnly");Set(profile,"parryExpressiveCamera",originalCamera);Set(profile,"parryReferenceAccent",originalEffects);}
+        }
+        [TestCase(30,1)] [TestCase(60,1)] [TestCase(120,1)]
+        [TestCase(30,-1)] [TestCase(60,-1)] [TestCase(120,-1)]
+        public void QueuedCounterCameraMovesDirectlyFromParryToChargeWithoutWidening(int fps,int direction)
+        {
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Vector3 original=Camera.main.transform.position;
+            var target=BeginAuthoredAdaptiveParry(direction);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
+            Assert.That((bool)Call(player,"RequestAction",PlayerActionRequest.Attack),Is.True);
+            int guard=0;while(!Get<bool>(counter,"IsActive")&&guard++<fps*2)
+            {RenderAt(fps);Assert.That(Camera.main.orthographicSize,Is.LessThanOrEqualTo(4.25001f));}
+            Assert.That(guard,Is.LessThan(fps*2));Assert.That(Get<bool>(presentation,"IsCounterCameraBridgeActive"),Is.True);
+            float previous=Camera.main.orthographicSize;
+            while(Get<bool>(presentation,"IsCounterCameraBridgeActive")&&guard++<fps*3)
+            {RenderAt(fps);Assert.That(Camera.main.orthographicSize,Is.LessThanOrEqualTo(previous+.0001f));previous=Camera.main.orthographicSize;}
+            Assert.That(guard,Is.LessThan(fps*3));Assert.That(Camera.main.orthographicSize,Is.EqualTo(3.75f).Within(.0001f));
+            Until(()=>!Get<bool>(counter,"IsActive"));Frames(24);
+            Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));Assert.That(Camera.main.transform.position,Is.EqualTo(original));AssertClean();
+        }
+        [TestCase(1f,1)] [TestCase(.5f,1)] [TestCase(.5f,-1)]
+        public void CounterInputDuringCameraReturnContinuesFromItsCurrentPose(float strength,int direction)
+        {
+            Set(Get<object>(feedback,"Settings"),"shake",strength);BeginAuthoredAdaptiveParry(direction);
+            Until(()=>Get<string>(presentation,"ParryCameraPhase")=="Returning");Frames(2);
+            Vector3 pose=Camera.main.transform.position;float size=Camera.main.orthographicSize;
+            Call(player,"RequestAction",PlayerActionRequest.Attack);Call(presentation,"AdvanceVisuals",0f);Call(feedback,"AdvanceVisuals",0f);
+            Assert.That(Camera.main.transform.position,Is.EqualTo(pose));Assert.That(Camera.main.orthographicSize,Is.EqualTo(size));
+            Assert.That(Get<string>(presentation,"ParryCameraPhase"),Is.EqualTo("CounterLink"));
+            Until(()=>Get<bool>(counter,"IsActive"));
+            Assert.That(Vector3.Distance(Camera.main.transform.position,pose),Is.LessThan(.1f));
+            Assert.That(Camera.main.orthographicSize,Is.LessThanOrEqualTo(size));
+            Until(()=>!Get<bool>(presentation,"IsCounterCameraBridgeActive"));
+            Assert.That(Camera.main.orthographicSize,Is.EqualTo(Mathf.Lerp(5.625f,3.75f,strength)).Within(.0001f));
+            Until(()=>!Get<bool>(counter,"IsActive"));Frames(24);AssertClean();
+        }
+        [TestCase("Reset")] [TestCase("TargetLost")] [TestCase("Disable")] [TestCase("Death")]
+        public void CounterCameraBridgeRestoresTheOriginalBaselineWhenInterrupted(string operation)
+        {
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Vector3 original=Camera.main.transform.position;
+            var target=BeginAuthoredAdaptiveParry(1);Call(player,"RequestAction",PlayerActionRequest.Attack);
+            Until(()=>Get<bool>(counter,"IsActive"));Assert.That(Get<bool>(presentation,"IsCounterCameraBridgeActive"),Is.True);
+            if(operation=="Reset")Call(arena,"ResetActionsOnly");
+            else if(operation=="TargetLost"){target.gameObject.SetActive(false);Frames(1);}
+            else if(operation=="Disable"){player.gameObject.SetActive(false);player.gameObject.SetActive(true);}
+            else Call(player,"SetDead","CameraBridgeTest");
+            Assert.That(Get<bool>(presentation,"IsCounterCameraBridgeActive"),Is.False);
+            Assert.That(Camera.main.transform.position,Is.EqualTo(original));Assert.That(Get<bool>(feedback,"HasCameraFocus"),Is.False);
+        }
+        [Test] public void CounterCameraBridgeFreezesOnPauseAndZeroStrengthClearsItImmediately()
+        {
+            var settings=Get<object>(feedback,"Settings");Set(settings,"shake",1f);Vector3 original=Camera.main.transform.position;
+            BeginAuthoredAdaptiveParry(1);Call(player,"RequestAction",PlayerActionRequest.Attack);Until(()=>Get<bool>(counter,"IsActive"));
+            Frames(2);Static("SetPaused",true);Vector3 pose=Camera.main.transform.position;float size=Camera.main.orthographicSize;Frames(20);
+            Assert.That(Camera.main.transform.position,Is.EqualTo(pose));Assert.That(Camera.main.orthographicSize,Is.EqualTo(size));
+            Set(settings,"shake",0f);Call(presentation,"AdvanceVisuals",0f);
+            Assert.That(Get<bool>(presentation,"IsCounterCameraBridgeActive"),Is.False);Assert.That(Camera.main.transform.position,Is.EqualTo(original));
+            Set(settings,"shake",1f);Call(presentation,"AdvanceVisuals",0f);Assert.That(Camera.main.transform.position,Is.EqualTo(original));
+            Static("SetPaused",false);Until(()=>!Get<bool>(counter,"IsActive"));Frames(24);AssertClean();
+        }
+        [Test] public void CounterCameraBridgeCanBeDisabledWithoutChangingTheCounter()
+        {
+            var profile=Get<object>(counter,"CinematicProfile");bool saved=Get<bool>(profile,"parryCounterCameraBridge");
+            try
+            {
+                Set(profile,"parryCounterCameraBridge",false);Set(Get<object>(feedback,"Settings"),"shake",1f);
+                BeginAuthoredAdaptiveParry(1);Call(player,"RequestAction",PlayerActionRequest.Attack);Until(()=>Get<bool>(counter,"IsActive"));
+                Assert.That(Get<bool>(presentation,"IsCounterCameraBridgeActive"),Is.False);Assert.That(Camera.main.orthographicSize,Is.GreaterThan(4.25f));
+                ToFrame(14);Assert.That(Camera.main.orthographicSize,Is.EqualTo(3.75f));
+                Until(()=>!Get<bool>(counter,"IsActive"));Frames(24);AssertClean();
+            }
+            finally{Call(arena,"ResetActionsOnly");Set(profile,"parryCounterCameraBridge",saved);}
         }
         [TestCase(1)] [TestCase(-1)]
         public void ExpressiveCameraPositionArrivesBeforeItsZoomWithoutMovingTheBody(int direction)

@@ -44,6 +44,10 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     private float parryCameraHoldRemaining = -1;
     private Vector3 parryCameraStartPosition;
     private float parryCameraStartSize, parryCameraReturnAge;
+    private bool counterCameraBridgeActive;
+    private Vector3 counterCameraBridgeFrom;
+    private float counterCameraBridgeFromSize, counterCameraBridgeAge;
+    private long parryCounterCameraPendingUntilTick = -1;
     private CounterCinematicProfile Profile => counter != null ? counter.CinematicProfile : null;
     private float FlashStrength => feedback != null && feedback.Settings != null ? Mathf.Clamp01(feedback.Settings.flash) : 1;
     private float VfxStrength => feedback != null && feedback.Settings != null ? Mathf.Clamp01(feedback.Settings.vfx) : 1;
@@ -71,7 +75,12 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     public bool IsParryFlareVisible => orangeImpact != null && orangeImpact.IsFlareVisible;
     public int ParryParticleCount => orangeImpact != null ? orangeImpact.ParticleCount : 0;
     public bool IsParryCameraActive => parryCameraActive;
-    public string ParryCameraPhase => !parryCameraActive ? "None" : parryCameraReturning ? "Returning" :
+    public bool IsCounterCameraBridgeActive => counterCameraBridgeActive;
+    private bool CanBridgeQueuedCounter => Profile != null && Profile.parryCounterCameraBridge && counter != null &&
+        ((queuedParryCounter && ParrySourceIsValid && counter.EligibilityReason(parrySource) == "Eligible") ||
+        (CombatTimeController.TickCount < parryCounterCameraPendingUntilTick && parryCameraTarget != null &&
+        parryCameraTarget.IsParryStaggered && counter.EligibilityReason(parryCameraTarget) == "Eligible"));
+    public string ParryCameraPhase => !parryCameraActive ? "None" : CanBridgeQueuedCounter ? "CounterLink" : parryCameraReturning ? "Returning" :
         parryCameraHoldRemaining >= 0 ? "Hold" : parryCameraImpacted ? "Impact" : "Preparation";
     public Vector2 ParryCameraCenter => parryCameraAnchor != null ? (Vector2)parryCameraAnchor.position : Vector2.zero;
     public string ParryPresentationPhase => !parrySequenceActive ? "None" : !parryImpactPresented ? "Preparation" :
@@ -99,8 +108,22 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     }
     private void OnStarted()
     {
+        parryCounterCameraPendingUntilTick = -1;
+        counterCameraBridgeActive = false;
         if (parryCameraActive && feedback != null && feedback.TransferCameraFocus(orangeImpact, this))
-        { parryCameraActive = false; parryCameraTarget = null; parryCameraHoldRemaining = -1; }
+        {
+            if (Profile.parryCounterCameraBridge && ShakeStrength > 0)
+            {
+                float strength = ShakeStrength;
+                // Undo accessibility scaling here; shared feedback applies it exactly once to the bridge pose.
+                counterCameraBridgeFrom = parryCameraStartPosition +
+                    (gameplayCamera.transform.position - feedback.ShakeOffset - parryCameraStartPosition) / strength;
+                counterCameraBridgeFromSize = parryCameraStartSize + (gameplayCamera.orthographicSize - parryCameraStartSize) / strength;
+                counterCameraBridgeAge = 0; counterCameraBridgeActive = true;
+                feedback.SetCameraFocusPose(this, counterCameraBridgeFrom, counterCameraBridgeFromSize);
+            }
+            parryCameraActive = false; parryCameraTarget = null; parryCameraHoldRemaining = -1;
+        }
         else CancelParryCamera(true);
         launchedEnemies.RemoveAll(enemy => enemy == null || !enemy.IsActive); SampleCounter();
     }
@@ -192,8 +215,14 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         if (parryImpactPresented && age >= parryLeadFrames + Profile.parryFollowThroughFrames)
         {
             bool request = queuedParryCounter && ParrySourceIsValid;
+            bool bridge = request && CanBridgeQueuedCounter;
             ClearParrySequence(false);
-            if (request) state.RequestAction(TechnicalSwordAction.PlayerState.PlayerActionRequest.Attack);
+            if (request)
+            {
+                // The action resolver starts this request next tick; do not insert a normal-return frame in that gap.
+                if (bridge) parryCounterCameraPendingUntilTick = CombatTimeController.TickCount + 1;
+                if (!state.RequestAction(TechnicalSwordAction.PlayerState.PlayerActionRequest.Attack)) parryCounterCameraPendingUntilTick = -1;
+            }
         }
     }
     private void ClearParrySequence(bool clearLight = true)
@@ -230,6 +259,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         if (!parryCameraActive) return;
         if (feedback == null || !feedback.IsCameraFocusOwnedBy(orangeImpact))
         { parryCameraActive = false; parryCameraTarget = null; return; }
+        if (CanBridgeQueuedCounter) return;
         if (!parryCameraReturning && Profile.parryCameraReturnOnHitstopEnd && parryCameraImpacted && !CombatTimeController.IsHitStopped)
             BeginParryCameraReturn();
         if (parryCameraReturning)
@@ -263,6 +293,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     }
     private void CancelParryCamera(bool immediate)
     {
+        parryCounterCameraPendingUntilTick = -1;
         if (feedback != null && orangeImpact != null) feedback.CancelOwnedCameraEffects(orangeImpact, immediate);
         parryCameraActive = parryCameraImpacted = parryCameraReturning = false;
         parryCameraTarget = null; parryCameraHoldRemaining = -1;
@@ -313,9 +344,24 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     {
         RestoreBody(); charged = true; counterLightReady = true; chargeRealElapsed = 0;
         CombatTimeController.RequestSlow(counter, Profile.chargeScale, Profile.chargeRealSeconds);
-        feedback?.FocusCamera(this, transform,
-            new Vector2(Profile.cameraFocusOffset.x * counter.KickFacingSign, Profile.cameraFocusOffset.y),
-            Profile.cameraOrthographicSize, Profile.cameraBlendSeconds);
+        if (!counterCameraBridgeActive) FocusCounterCamera();
+    }
+    private void FocusCounterCamera() => feedback?.FocusCamera(this, transform,
+        new Vector2(Profile.cameraFocusOffset.x * counter.KickFacingSign, Profile.cameraFocusOffset.y),
+        Profile.cameraOrthographicSize, Profile.cameraBlendSeconds);
+    private void AdvanceCounterCameraBridge(float seconds)
+    {
+        if (!counterCameraBridgeActive) return;
+        if (!counter.IsActive || feedback == null || !feedback.IsCameraFocusOwnedBy(this)) { counterCameraBridgeActive = false; return; }
+        if (ShakeStrength <= 0) { counterCameraBridgeActive = false; feedback.ReleaseCameraFocus(this, true); return; }
+        counterCameraBridgeAge += seconds;
+        float t = Mathf.SmoothStep(0, 1, counterCameraBridgeAge / Profile.parryCounterCameraBridgeSeconds);
+        Vector3 target = counter.HoverPosition + new Vector2(Profile.cameraFocusOffset.x * counter.KickFacingSign, Profile.cameraFocusOffset.y);
+        target.z = counterCameraBridgeFrom.z;
+        feedback.SetCameraFocusPose(this, Vector3.Lerp(counterCameraBridgeFrom, target, t),
+            Mathf.Lerp(counterCameraBridgeFromSize, Profile.cameraOrthographicSize, t));
+        if (counterCameraBridgeAge >= Profile.parryCounterCameraBridgeSeconds && counter.ElapsedFrames >= Profile.chargeFrame)
+        { counterCameraBridgeActive = false; FocusCounterCamera(); }
     }
     private void OnRelease() { charged = false; CombatTimeController.ReleaseSlow(counter); }
     private void OnHit(Damageable2D target, Vector2 contact)
@@ -338,6 +384,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     }
     private void OnFinished(bool _)
     {
+        counterCameraBridgeActive = false;
         RestoreBody(); OnRelease();
         counterLightReady = false; counterLight?.ResetLight();
         feedback?.ReleaseCameraFocus(this, counter.LastEndReason != "Complete");
@@ -347,6 +394,8 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     {
         if (parryLight != null && FlashStrength <= 0) { parryLightAge = -1; parryLight.ResetLight(); }
         if (ShakeStrength <= 0) ClearParryJitter();
+        if (counterCameraBridgeActive && ShakeStrength <= 0)
+        { counterCameraBridgeActive = false; feedback?.ReleaseCameraFocus(this, true); }
         if (parryCameraActive && (ShakeStrength <= 0 || Profile == null || !Profile.parryCameraEnabled ||
             parryCameraTarget == null || !parryCameraTarget.IsAlive || !parryCameraTarget.gameObject.activeInHierarchy ||
             state == null || state.LifeState != TechnicalSwordAction.PlayerState.PlayerLifeState.Alive ||
@@ -360,6 +409,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         { ResetPresentation(); return; }
         AdvanceParryJitter(realSeconds);
         AdvanceParryCamera(realSeconds);
+        AdvanceCounterCameraBridge(realSeconds);
         orangeImpact?.Advance(realSeconds, VfxStrength, FlashStrength);
         bool soft = Profile.synchronizedParryImpact;
         bool parryVisible = UsesEnhancedPresentation && parryLightAge >= 0 && parryLightAge < (soft ? Profile.ParryLightSeconds : 4f/60)-.000001f;
@@ -447,6 +497,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     }
     public void ResetPresentation()
     {
+        counterCameraBridgeActive = false;
         ClearParrySequence(); parryRealTime = nextParryLightTime = 0;
         RestoreBody(); charged = false; dimBlend = trailAge = 0;
         counterLightReady = false; parrySource = null; parryLightAge = -1; chargeRealElapsed = 0;

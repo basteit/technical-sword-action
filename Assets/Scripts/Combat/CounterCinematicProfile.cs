@@ -72,6 +72,8 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Header("Parry contact camera (gameplay only)")]
     public bool parryCameraEnabled = true;
     public bool parryCameraReturnOnHitstopEnd = true;
+    public bool parryCounterCameraBridge = true;
+    [Min(.001f)] public float parryCounterCameraBridgeSeconds = .2f;
     [Min(.01f)] public float parryCameraPrepareSize = 4.75f;
     [Min(.01f)] public float parryCameraImpactSize = 4.25f;
     [Min(.001f)] public float parryCameraApproachSeconds = .1f;
@@ -125,6 +127,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
         Finite(parryCameraApproachSeconds) && parryCameraApproachSeconds > 0 &&
         Finite(parryCameraHoldSeconds) && parryCameraHoldSeconds >= 0 &&
         Finite(parryCameraReturnSeconds) && parryCameraReturnSeconds > 0 &&
+        Finite(parryCounterCameraBridgeSeconds) && parryCounterCameraBridgeSeconds > 0 &&
         Finite(parryImpactShakeSeconds) && parryImpactShakeSeconds > 0 &&
         Finite(parryImpactShakeStrength) && parryImpactShakeStrength >= 0 &&
         Finite(parryCameraArcHeight) && parryCameraArcHeight >= 0 && parryCameraPositionLeadFrames >= 0 && parryCameraZoomDelayFrames >= 0 &&

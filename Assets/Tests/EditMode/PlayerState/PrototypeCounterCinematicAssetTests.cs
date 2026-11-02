@@ -40,6 +40,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<float>(profile,"parryActorJitterPixels"),Is.EqualTo(2));
             Assert.That(Get<bool>(profile,"parryCameraEnabled"),Is.True);
             Assert.That(Get<bool>(profile,"parryCameraReturnOnHitstopEnd"),Is.True);
+            Assert.That(Get<bool>(profile,"parryCounterCameraBridge"),Is.True);
+            Assert.That(Get<float>(profile,"parryCounterCameraBridgeSeconds"),Is.EqualTo(.2f));
             Assert.That(Get<float>(profile,"parryCameraImpactSize"),Is.EqualTo(4.25f));
             Assert.That(Get<float>(profile,"parryGlowGain"),Is.EqualTo(3));
             Assert.That(Get<bool>(profile,"parryExpressiveCamera"),Is.True);

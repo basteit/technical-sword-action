@@ -43,6 +43,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("parryCameraImpactSize",5f)] [TestCase("parryCameraHoldSeconds",-1f)] [TestCase("parryCameraReturnSeconds",0f)]
         [TestCase("parryFlareLength",0f)] [TestCase("parryFlareSeconds",float.NaN)] [TestCase("parryReferenceSparkRadius",-1f)]
         [TestCase("parryCameraArcHeight",-1f)]
+        [TestCase("parryCounterCameraBridgeSeconds",0f)] [TestCase("parryCounterCameraBridgeSeconds",float.NaN)]
         public void InvalidTuningIsRejected(string field,float value)
         {var p=Profile();Set(p,field,value);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);}
 

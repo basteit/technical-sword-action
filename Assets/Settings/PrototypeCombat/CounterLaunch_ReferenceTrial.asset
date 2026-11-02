@@ -74,6 +74,8 @@ MonoBehaviour:
   parryActorJitterStepFrames: 2
   parryCameraEnabled: 1
   parryCameraReturnOnHitstopEnd: 1
+  parryCounterCameraBridge: 1
+  parryCounterCameraBridgeSeconds: 0.2
   parryCameraPrepareSize: 4.75
   parryCameraImpactSize: 4.25
   parryCameraApproachSeconds: 0.1
