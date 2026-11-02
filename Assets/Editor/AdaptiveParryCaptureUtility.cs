@@ -11,14 +11,16 @@ using UnityEngine.Rendering.Universal;
 public static class AdaptiveParryCaptureUtility
 {
     public static string Prepare() => PrototypeImpactCaptureUtility.Prepare();
+    public static string CaptureParryOnly() => Capture(fullWindup: true);
     public static string CaptureCounterSequence() => Capture(false, "20261103-camera-link-v1", true);
     public static string CapturePreviousCounterSequence() => Capture(false, "20261103-camera-link-v1", true, true);
-    public static string Capture(bool legacy = false, string revision = "20261103-camera-link-v1", bool counterSequence = false, bool previousCounterBridge = false)
+    public static string Capture(bool legacy = false, string revision = "20261103-camera-link-v1", bool counterSequence = false, bool previousCounterBridge = false, bool fullWindup = false)
     {
         Check(Application.isPlaying, "PlayMode required.");
         Check(!string.IsNullOrEmpty(revision) && revision.All(c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-'), "Use an ASCII revision.");
         Check(!legacy || !counterSequence, "Counter recording uses the current synchronized presentation.");
-        string folder = Path.GetFullPath(".uloop/outputs/video/adaptive-parry-" + revision + (counterSequence ? previousCounterBridge ? "/counter-before" : "/counter" : legacy ? "/legacy" : "/adaptive"));
+        bool recordWindup = counterSequence || fullWindup;
+        string folder = Path.GetFullPath(".uloop/outputs/video/adaptive-parry-" + revision + (counterSequence ? previousCounterBridge ? "/counter-before" : "/counter" : legacy ? "/legacy" : fullWindup ? "/parry-only" : "/adaptive"));
         Check(!Directory.Exists(folder), "Preserve earlier captures; use a new revision.");
         var player = UnityEngine.Object.FindFirstObjectByType<PlayerStateMachine>();
         Check(player != null && player.gameObject.scene.path == PrototypeCombatSceneBuilder.ScenePath && player.CanCollectGameplayInput, "Open the prototype and call Prepare one Editor frame before Capture.");
@@ -61,9 +63,9 @@ public static class AdaptiveParryCaptureUtility
             body.position=new Vector2(0,.81f);player.transform.position=body.position;body.linearVelocity=Vector2.zero;
             motor.SetFacing(1);motor.SetMoveInput(Vector2.zero);
             enemy.ResetForCapture(new Vector3(1.15f,.81f,0),30);ai.ResetForCapture(player.transform,false);Physics2D.SyncTransforms();
-            for(int warm=0;!counterSequence&&warm<180;warm++)
+            for(int warm=0;!recordWindup&&warm<180;warm++)
             {if(ai.IsWindingUp&&ai.WindupRemainingFrames<=18)break;Advance();}
-            Check(counterSequence||ai.IsWindingUp, "Real enemy windup was not reached.");
+            Check(recordWindup||ai.IsWindingUp, "Real enemy windup was not reached.");
             Directory.CreateDirectory(folder); bool requested=false,requestedCounter=false;
             for(int frame=0;frame<report.frameCount;frame++)
             {
@@ -131,13 +133,13 @@ public static class AdaptiveParryCaptureUtility
             report.finalEnemyHp=enemy.CurrentHp;report.finalPlayerHp=player.GetComponent<PlayerDamageReceiver2D>().CurrentHp;report.enemyDamageHits=enemy.HitCount;
             Check(parry.SuccessCount==successes+1&&presentation.ParryImpactCount==impacts+1&&report.finalPlayerHp==100,"Expected one real parry without player damage.");
             Check(counterSequence?requestedCounter&&report.counterDamage==90&&report.enemyDamageHits==1&&report.finalEnemyHp==0:
-                report.enemyDamageHits==0&&report.finalEnemyHp==30,"Unexpected counter damage or duplicate hit.");
+                report.counterStartFrame<0&&report.enemyDamageHits==0&&report.finalEnemyHp==30,"Unexpected counter or enemy damage.");
             Check(!presentation.IsParrySequenceActive&&!presentation.IsParryBacklit&&!feedback.IsParryShockwaveVisible&&!CombatTimeController.IsHitStopped,"Presentation residue at capture end.");
             Check(!presentation.IsParryActorJitterActive&&presentation.OrangeParryEffectCount==0&&playerArt.ImpactOffsetX==0&&art.ImpactOffsetX==0,"Additional effect/drawing-offset residue at capture end.");
             Check(!presentation.IsParryCameraActive&&!feedback.HasCameraFocus&&Mathf.Abs(camera.orthographicSize-report.cameraOrthographicSize)<.0001f,"Camera residue at capture end.");
             Check(!counter.IsActive&&!launch.IsActive&&CombatTimeController.SlowScale==1,"Counter/launch/time residue at capture end.");
             Check(counterSequence&&profile.parryCounterCameraBridge||legacy||!profile.parryCameraReturnOnHitstopEnd||report.cameraReturnFrame==report.firstHitstopReleaseFrame,"Unqueued camera must return on the first hitstop release frame.");
-            Check(!counterSequence||report.maximumCapturedWindupFrames==96&&report.windupSampleFrames>=96,"The entire authored enemy windup must be recorded.");
+            Check(!recordWindup||report.windupStartFrame>=0&&report.windupStartFrame<=1&&report.maximumCapturedWindupFrames==96&&report.windupSampleFrames>=96,"The entire authored enemy windup must be recorded.");
             Check(!counterSequence||!profile.parryCounterCameraBridge||report.cameraReturnFrame<0&&report.cameraBridgeFrame>=0&&report.maximumCameraSizeBetweenStopAndCharge<=profile.parryCameraImpactSize+.0001f,"Counter camera must not widen via the normal view.");
             Check(!counterSequence||report.counterInheritedCamera&&report.counterHitFrame>report.counterChargeFrame&&report.counterLaunchEndFrame>report.counterHitFrame&&report.counterFinishedFrame>report.counterHitFrame,"Counter sequence or camera handoff missing.");
             report.playerSortingOrder=playerArt.Artwork.sortingOrder;report.enemySortingOrder=art.Artwork.sortingOrder;
