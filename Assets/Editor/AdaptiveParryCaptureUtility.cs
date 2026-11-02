@@ -11,7 +11,7 @@ using UnityEngine.Rendering.Universal;
 public static class AdaptiveParryCaptureUtility
 {
     public static string Prepare() => PrototypeImpactCaptureUtility.Prepare();
-    public static string Capture(bool legacy = false, string revision = "20261102-orange-v1")
+    public static string Capture(bool legacy = false, string revision = "20261102-camera-v1")
     {
         Check(Application.isPlaying, "PlayMode required.");
         Check(!string.IsNullOrEmpty(revision) && revision.All(c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-'), "Use an ASCII revision.");
@@ -34,9 +34,11 @@ public static class AdaptiveParryCaptureUtility
         var report = new Report {legacy=legacy, cameraOrthographicSize=camera.orthographicSize, cameraAspect=camera.aspect,
             cameraPosition=camera.transform.position, configuredStopTicks=profile.parryTrialHitstopFrames,
             configuredApproachMaxFrames=profile.parryApproachMaxFrames, configuredBackgroundDim=profile.parryBackgroundDim,
-            configuredActorLight=profile.parryActorLight, configuredLegacyBloom=profile.parryLegacyBloomStrength};
+            configuredActorLight=profile.parryActorLight, configuredLegacyBloom=profile.parryLegacyBloomStrength,
+            minimumCameraSize=camera.orthographicSize, configuredGlowGain=profile.parryGlowGain,
+            configuredGlowAlpha=profile.parryGlowColor.a, configuredGlowRadius=profile.parryGlowRadius};
         var playerArt=player.GetComponent<PrototypePlayerArtPresentation>();
-        var rows = new List<string>{"frame,tick,playerSprite,enemySprite,enemyMotion,successes,impactCount,phase,hitstop,backgroundAlpha,wave,enemyHp,playerHp,orangeSparks,orangeGlow,playerJitter,enemyJitter,playerRootX,enemyRootX"};
+        var rows = new List<string>{"frame,tick,playerSprite,enemySprite,enemyMotion,successes,impactCount,phase,hitstop,backgroundAlpha,wave,enemyHp,playerHp,orangeSparks,orangeGlow,playerJitter,enemyJitter,playerRootX,enemyRootX,cameraSize,cameraX,cameraY,cameraPhase"};
         int successes = parry.SuccessCount, impacts = presentation.ParryImpactCount;
         bool anchored=false;Vector2 playerAnchor=default,enemyAnchor=default;int lastJitterSign=0;
         void Advance() {clock.AdvanceFrame(1d/60);presentation.AdvanceVisuals(1f/60);feedback.AdvanceVisuals(1f/60);}
@@ -58,7 +60,7 @@ public static class AdaptiveParryCaptureUtility
                 Advance();
                 if(report.successFrame<0&&parry.SuccessCount>successes)report.successFrame=frame;
                 if(report.impactFrame<0&&presentation.ParryImpactCount>impacts)
-                {report.impactFrame=frame;report.impactEnemySprite=art.Artwork.sprite.name;report.leadCombatFrames=legacy?0:presentation.ParryImpactDelayFrames;}
+                {report.impactFrame=frame;report.impactEnemySprite=art.Artwork.sprite.name;report.leadCombatFrames=legacy?0:presentation.ParryImpactDelayFrames;report.impactCameraSize=camera.orthographicSize;}
                 if(report.successFrame>=0&&report.reactionFrame<0&&art.MotionName=="Parried")report.reactionFrame=frame;
                 var light=camera.GetComponent<VideoParryBacklight>();
                 report.maximumBackgroundAlpha=Mathf.Max(report.maximumBackgroundAlpha,light.BackgroundAlpha);
@@ -79,15 +81,23 @@ public static class AdaptiveParryCaptureUtility
                     report.maximumStoppedPlayerRootDrift=Mathf.Max(report.maximumStoppedPlayerRootDrift,Vector2.Distance(playerAnchor,body.position));
                     report.maximumStoppedEnemyRootDrift=Mathf.Max(report.maximumStoppedEnemyRootDrift,Vector2.Distance(enemyAnchor,enemy.transform.position));
                 }
-                Check(Mathf.Abs(camera.orthographicSize-report.cameraOrthographicSize)<.0001f,"Parry preview must keep the real gameplay camera size.");
+                report.minimumCameraSize=Mathf.Min(report.minimumCameraSize,camera.orthographicSize);
+                report.maximumCameraShake=Mathf.Max(report.maximumCameraShake,feedback.ShakeOffset.magnitude);
+                if(report.cameraPreparationFrame<0&&presentation.ParryCameraPhase=="Preparation")report.cameraPreparationFrame=frame;
+                if(report.cameraHoldFrame<0&&presentation.ParryCameraPhase=="Hold")report.cameraHoldFrame=frame;
+                if(report.cameraReturnFrame<0&&presentation.ParryCameraPhase=="Returning")report.cameraReturnFrame=frame;
+                if(report.cameraRestoredFrame<0&&report.cameraReturnFrame>=0&&!presentation.IsParryCameraActive&&!feedback.HasCameraFocus)report.cameraRestoredFrame=frame;
                 RenderPipeline.SubmitRenderRequest(camera,new UniversalRenderPipeline.SingleCameraRequest{destination=target});
                 RenderTexture.active=target;image.ReadPixels(new Rect(0,0,1920,1080),0,0,false);image.Apply(false);
                 File.WriteAllBytes(Path.Combine(folder,$"frame-{frame:D4}.png"),image.EncodeToPNG());
-                rows.Add(FormattableString.Invariant($"{frame},{CombatTimeController.TickCount},{player.GetComponent<SpriteRenderer>().sprite.name},{art.Artwork.sprite.name},{art.MotionName},{parry.SuccessCount-successes},{presentation.ParryImpactCount-impacts},{presentation.ParryPresentationPhase},{CombatTimeController.HitstopRemainingTicks},{light.BackgroundAlpha},{feedback.IsParryShockwaveVisible},{enemy.CurrentHp},{player.GetComponent<PlayerDamageReceiver2D>().CurrentHp},{presentation.IsOrangeParrySparkVisible},{presentation.IsOrangeParryGlowVisible},{playerArt.ImpactOffsetX},{art.ImpactOffsetX},{body.position.x},{enemy.transform.position.x}"));
+                rows.Add(FormattableString.Invariant($"{frame},{CombatTimeController.TickCount},{player.GetComponent<SpriteRenderer>().sprite.name},{art.Artwork.sprite.name},{art.MotionName},{parry.SuccessCount-successes},{presentation.ParryImpactCount-impacts},{presentation.ParryPresentationPhase},{CombatTimeController.HitstopRemainingTicks},{light.BackgroundAlpha},{feedback.IsParryShockwaveVisible},{enemy.CurrentHp},{player.GetComponent<PlayerDamageReceiver2D>().CurrentHp},{presentation.IsOrangeParrySparkVisible},{presentation.IsOrangeParryGlowVisible},{playerArt.ImpactOffsetX},{art.ImpactOffsetX},{body.position.x},{enemy.transform.position.x},{camera.orthographicSize},{camera.transform.position.x},{camera.transform.position.y},{presentation.ParryCameraPhase}"));
             }
             Check(parry.SuccessCount==successes+1&&presentation.ParryImpactCount==impacts+1&&enemy.HitCount==0&&enemy.CurrentHp==30&&player.GetComponent<PlayerDamageReceiver2D>().CurrentHp==100,"Expected one real parry without damage/counter.");
             Check(!presentation.IsParrySequenceActive&&!presentation.IsParryBacklit&&!feedback.IsParryShockwaveVisible&&!CombatTimeController.IsHitStopped,"Presentation residue at capture end.");
             Check(!presentation.IsParryActorJitterActive&&presentation.OrangeParryEffectCount==0&&playerArt.ImpactOffsetX==0&&art.ImpactOffsetX==0,"Additional effect/drawing-offset residue at capture end.");
+            Check(!presentation.IsParryCameraActive&&!feedback.HasCameraFocus&&Mathf.Abs(camera.orthographicSize-report.cameraOrthographicSize)<.0001f,"Camera residue at capture end.");
+            report.playerSortingOrder=playerArt.Artwork.sortingOrder;report.enemySortingOrder=art.Artwork.sortingOrder;
+            Check(report.playerSortingOrder>report.enemySortingOrder,"Player must render ahead of the enemy body.");
             Check(legacy || report.impactEnemySprite=="EnemySample_attack_14"&&report.maximumStopTicks==profile.parryTrialHitstopFrames&&
                 report.leadCombatFrames<=profile.parryApproachMaxFrames&&report.reactionFrame>report.impactFrame&&
                 Mathf.Abs(report.maximumBackgroundAlpha-profile.parryBackgroundDim)<.001f,"Adaptive peak/stop/lighting invariant failed.");
@@ -116,5 +126,7 @@ public static class AdaptiveParryCaptureUtility
         public bool legacyHaloSeen;
         public float configuredActorLight,configuredLegacyBloom,maximumPlayerJitterPixels,maximumEnemyJitterPixels;
         public float maximumStoppedPlayerRootDrift,maximumStoppedEnemyRootDrift;
+        public int cameraPreparationFrame=-1,cameraHoldFrame=-1,cameraReturnFrame=-1,cameraRestoredFrame=-1,playerSortingOrder,enemySortingOrder;
+        public float minimumCameraSize,impactCameraSize,maximumCameraShake,configuredGlowGain,configuredGlowAlpha,configuredGlowRadius;
     }
 }
