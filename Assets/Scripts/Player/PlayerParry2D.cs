@@ -97,6 +97,10 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     }
 
     public int CombatTickOrder => -100;
+    // A presentation lead-in must not return control before its authored contact/deflection.
+    // Does not widen the acceptance window, alter damage or change the enemy's logical stun.
+    public void EnsureSuccessLockFrames(int frames)
+    { if (parryResolved && LastParryResult != ParryResult.None) successLockTimer = Mathf.Max(successLockTimer, Mathf.Max(0, frames) / 60f); }
 
     private void OnEnable()
     {

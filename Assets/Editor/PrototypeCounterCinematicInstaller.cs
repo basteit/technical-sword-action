@@ -30,6 +30,14 @@ public static class PrototypeCounterCinematicInstaller
         profile.parrySuccessStartNormalized = parry.hitFrame/(float)parry.TotalFrames;
         profile.cameraFocusOffset = new Vector2(.8f,profile.cameraFocusOffset.y);
         profile.parryHitstopFrames = 9; profile.justParryHitstopFrames = 10; profile.hitstopFrames = 16;
+        profile.parryTrialHitstopFrames = 40;
+        profile.synchronizedParryImpact = true;
+        var snapshot = new VideoArtLibrary.Motion { name = "ParrySuccessLight", provisional = parry.provisional,
+            includesParryEffect = parry.includesParryEffect, hasParryContact = parry.hasParryContact,
+            parryContactOffset = parry.parryContactOffset, hitFrame = parry.hitFrame,
+            frames = (Sprite[])parry.frames.Clone(), durations = (int[])parry.durations.Clone() };
+        profile.art.motions = profile.art.motions.Where(m => m.name != snapshot.name).Append(snapshot).ToArray();
+        EditorUtility.SetDirty(profile.art); AssetDatabase.SaveAssetIfDirty(profile.art);
         if (!profile.IsValid) throw new InvalidOperationException("Invalid impact presentation references.");
         EditorUtility.SetDirty(profile); AssetDatabase.SaveAssetIfDirty(profile);
         var timing=AssetDatabase.LoadAssetAtPath<ParryTimingDefinition>("Assets/Settings/PrototypeCombat/ParryTiming.asset");
@@ -97,12 +105,13 @@ public static class PrototypeCounterCinematicInstaller
         var art = AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(ArtPath);
         if (art == null) { art = ScriptableObject.CreateInstance<VideoArtLibrary>(); AssetDatabase.CreateAsset(art, ArtPath); }
         art.playerArtworkIsRough = source.playerArtworkIsRough; art.fourStageArtworkIsRough = source.fourStageArtworkIsRough;
-        art.motions = new[] { "CounterTransfer", "CounterKick", "Fx_ElectricKick", "CounterKickEffect" }.Where(name=>source.Find(name)!=null).Select(name =>
+        art.motions = new[] { "CounterTransfer", "CounterKick", "Fx_ElectricKick", "CounterKickEffect", "ParrySuccessLight" }.Where(name=>source.Find(name)!=null).Select(name =>
         {
             var motion = source.Find(name); if (motion == null) throw new InvalidOperationException("Missing counter source: " + name);
             return new VideoArtLibrary.Motion
             {
                 name = motion.name, provisional = motion.provisional, includesCounterTrail = motion.includesCounterTrail,
+                includesParryEffect = motion.includesParryEffect, hasParryContact = motion.hasParryContact, parryContactOffset = motion.parryContactOffset,
                 counterContactOffset = motion.counterContactOffset,
                 frames = (Sprite[])motion.frames.Clone(), eyeFrames = motion.eyeFrames != null ? (Sprite[])motion.eyeFrames.Clone() : null,
                 durations = (int[])motion.durations.Clone(), hitFrame = motion.hitFrame, chargeFrame = motion.chargeFrame,
@@ -152,7 +161,7 @@ public static class PrototypeCounterCinematicInstaller
         var errors = new List<string>();
         var profile = AssetDatabase.LoadAssetAtPath<CounterCinematicProfile>(ProfilePath);
         if (profile == null || !profile.IsValid) return new[] { "Missing/invalid prototype counter cinematic profile." };
-        int expectedMotions=profile.art.Find("CounterKickEffect")!=null?4:3;
+        int expectedMotions=(profile.art.Find("CounterKickEffect")!=null?4:3)+(profile.art.Find("ParrySuccessLight")!=null?1:0);
         if (AssetDatabase.GetAssetPath(profile.art) != ArtPath || profile.art.motions.Length != expectedMotions)
             errors.Add("Prototype counter must use its own minimal art snapshot, not the full mutable filming library.");
         var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(ClipPath);

@@ -16,6 +16,23 @@ MonoBehaviour:
   fourStageArtworkIsRough: 1
   background: {fileID: 0}
   motions:
+  - name: ParrySuccessLight
+    provisional: 1
+    includesParryEffect: 1
+    hasParryContact: 1
+    parryContactOffset: {x: 1.40625, y: 0.1875}
+    frames:
+    - {fileID: 21300000, guid: ef97ab5844ca9614c92a760075ce3819, type: 3}
+    - {fileID: 21300000, guid: 510892de17b573141aff56f091655dd0, type: 3}
+    - {fileID: 21300000, guid: 1e988b5e1f4e8f24babc07aa67ea253b, type: 3}
+    - {fileID: 21300000, guid: 676fdba497e5c6a43aa13dac2f159a93, type: 3}
+    - {fileID: 21300000, guid: 47d17ab7c723a164f81da7fc05bca6b4, type: 3}
+    - {fileID: 21300000, guid: 9e85f259dc852844f8211be86bf1696e, type: 3}
+    - {fileID: 21300000, guid: 0d48b122c78de584e89db0c1b400b0b0, type: 3}
+    - {fileID: 21300000, guid: c141e1bb62dc50a4fabf11fa452b12ba, type: 3}
+    eyeFrames: []
+    durations: 0200000001000000010000000100000001000000010000000100000002000000
+    hitFrame: 3
   - name: CounterTransfer
     provisional: 1
     includesSlashTrail: 0

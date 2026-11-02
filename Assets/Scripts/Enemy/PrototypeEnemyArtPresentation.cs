@@ -14,6 +14,10 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private int elapsed, attackElapsed, hitRemaining, deathElapsed;
     private bool parried, attackRecoveryVisible, deathFacingLeft;
     private bool counterFacingHeld, counterFacingLeft;
+    private object parryDrawingOwner;
+    private bool capturedAttackForParry;
+    private int capturedAttackFrame, parryDrawingFrame;
+    public int ParryImpactSourceFrame => library?.Find("Enemy_Attack")?.parryImpactFrame ?? 0;
     public int CombatTickOrder => 320;
     public string MotionName { get; private set; } = "Idle";
     public SpriteRenderer Artwork => artwork;
@@ -49,15 +53,42 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private void OnAttack() { attackElapsed = 0; attackRecoveryVisible = true; Show(); }
     private void OnHit(Damageable2D _, int damage, Vector2 direction)
     {
+        parryDrawingOwner = null;
         hitRemaining = library?.Find("Enemy_Hit")?.TotalFrames ?? 6;
         parried = attackRecoveryVisible = false; Show();
     }
     private void OnParried(Damageable2D _, ParryResult result)
     {
+        capturedAttackForParry = attackRecoveryVisible;
+        capturedAttackFrame = Mathf.Max(0, attackElapsed - 1);
         parried = true; hitRemaining = 0; attackRecoveryVisible = false; Show();
+    }
+    public bool TryBeginParryDeflection(object owner, out int delayFrames)
+    {
+        delayFrames = 0;
+        var motion = library?.Find("Enemy_Attack");
+        if (owner == null || !capturedAttackForParry || motion == null || !motion.HasValidParryImpact ||
+            !isActiveAndEnabled || health == null || !health.IsParryStaggered) return false;
+        parryDrawingOwner = owner; parryDrawingFrame = capturedAttackFrame;
+        delayFrames = ParryImpactDelayFrames(motion, ai.AttackActiveFrames, ai.AttackRecoveryFrames, capturedAttackFrame);
+        Show(); return true;
+    }
+    public bool IsParryDeflectionOwnedBy(object owner) => ReferenceEquals(parryDrawingOwner, owner) && parryDrawingOwner != null;
+    public void SampleParryDeflection(object owner, int elapsedFrames)
+    {
+        if (!IsParryDeflectionOwnedBy(owner)) return;
+        parryDrawingFrame = capturedAttackFrame + Mathf.Max(0, elapsedFrames); Show();
+    }
+    public void ReleaseParryDeflection(object owner)
+    { if (IsParryDeflectionOwnedBy(owner)) { parryDrawingOwner = null; Show(); } }
+    public static int ParryImpactDelayFrames(VideoArtLibrary.Motion motion, int active, int recovery, int elapsedAttack)
+    {
+        if (motion == null || !motion.HasValidParryImpact) return 0;
+        return Mathf.Max(0, Mathf.Max(1, active) + Mathf.CeilToInt(motion.parryImpactFrame * Mathf.Max(1, recovery) / (float)motion.TotalFrames) - Mathf.Max(0, elapsedAttack));
     }
     private void OnDied(Damageable2D _, Vector2 direction)
     {
+        parryDrawingOwner = null;
         deathElapsed = 0; deathFacingLeft = counterFacingHeld ? counterFacingLeft : ai.Facing.x < 0;
         // Keep only the drawing alive. HP, colliders and combat participation already ended.
         health.HoldDeathPresentation(this, 2 * CombatTimeController.StepSeconds);
@@ -65,6 +96,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     }
     private void OnCounterLaunch(int direction)
     {
+        parryDrawingOwner = null;
         // The kick travels away from its attacker. Keep the drawing facing back toward them,
         // without changing the AI direction that determined the rear approach.
         counterFacingHeld = true; counterFacingLeft = direction > 0;
@@ -74,6 +106,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private void OnReset(Damageable2D _) => ResetDrawing();
     private void ResetDrawing()
     {
+        parryDrawingOwner = null; capturedAttackForParry = false;
         elapsed = attackElapsed = hitRemaining = deathElapsed = 0;
         parried = attackRecoveryVisible = false;
         counterFacingHeld = false;
@@ -131,6 +164,16 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
             artwork.color = color;
         }
         else if (hitRemaining > 0) { MotionName = "Hit"; sprite = library.Find("Enemy_Hit")?.At(0); }
+        else if (parryDrawingOwner != null && health.IsParryStaggered)
+        {
+            var attack = library.Find("Enemy_Attack");
+            int active = ai.AttackActiveFrames;
+            int frame = Mathf.Max(0, parryDrawingFrame - active);
+            int peak = ParryImpactDelayFrames(attack, active, ai.AttackRecoveryFrames, 0);
+            MotionName = parryDrawingFrame >= peak ? "ParryImpact" : "ParryApproach";
+            sprite = parryDrawingFrame < active ? library.Find("Enemy_Windup")?.At(int.MaxValue) :
+                attack?.At(Mathf.FloorToInt(frame * attack.TotalFrames / (float)ai.AttackRecoveryFrames));
+        }
         else if (health.IsParryStaggered || (parried && health.IsStunned))
         { MotionName = "Parried"; sprite = library.Find(useDownParryPose ? "Enemy_Death" : "Enemy_Parried")?.At(0); }
         else if (ai.IsWindingUp)
@@ -190,6 +233,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
 
     private void OnDisable()
     {
+        parryDrawingOwner = null;
         counterFacingHeld = false;
         CombatTimeController.Unregister(this);
         if (health != null)

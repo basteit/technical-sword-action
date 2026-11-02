@@ -75,6 +75,8 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     public bool IsParryCueActive => damageable != null && damageable.IsAlive && !damageable.IsStunned &&
         IsWindingUp && AttackKind == "Parryable" && WindupRemainingFrames > 0 && WindupRemainingFrames <= ParryCueLeadFrames;
     public int ActiveRemainingFrames => currentState == State.Active ? activeRemaining : 0;
+    public int AttackActiveFrames => configuredActiveFrames;
+    public int AttackRecoveryFrames => Mathf.Max(1, Mathf.RoundToInt(recoveryDuration * 60));
     public Vector2 Facing => facing;
     public string CurrentStateName => damageable != null && !damageable.IsAlive ? "Dead" :
         damageable != null && damageable.IsStunned ? "Stunned" : currentState.ToString();

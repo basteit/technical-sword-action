@@ -89,6 +89,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public int CombatTickOrder => 210;
     public float LockRemaining => active ? Mathf.Max(0, Mathf.Max(endFrame, hitFrame) - elapsed) * CombatTimeController.StepSeconds : 0f;
     public bool CanStartAction => isActiveAndEnabled && !active && state != null &&
+        !(GetComponent<PrototypeCounterPresentation>() is { IsParrySequenceActive: true }) &&
         (cinematicProfile == null || (definition != null && cinematicProfile.IsValid)) &&
         state.LifeState == PlayerLifeState.Alive &&
         (state.ActionState == PlayerActionState.ParrySuccess || state.ActionState == PlayerActionState.Neutral) && FindEligible() != null;

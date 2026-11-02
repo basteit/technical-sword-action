@@ -63,5 +63,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Call(pulse,"BeginTuned",camera,Vector3.zero,1f,.4f,pixels),Is.False);
             Assert.That(Get<bool>(pulse,"IsActive"),Is.False);
         }
+        [TestCase(3,24,0,15)] [TestCase(3,24,2,13)] [TestCase(3,30,0,18)] [TestCase(3,24,30,0)]
+        public void EnemyPeakDelayFollowsItsOwnRecoveryTiming(int active,int recovery,int elapsed,int expected)
+        {
+            var motion=Activator.CreateInstance(T("VideoArtLibrary+Motion"));
+            Set(motion,"frames",new Sprite[2]);Set(motion,"durations",new[]{12,12});
+            Set(motion,"hasParryImpact",true);Set(motion,"parryImpactFrame",12);
+            Assert.That(T("PrototypeEnemyArtPresentation").GetMethod("ParryImpactDelayFrames").Invoke(null,new[]{motion,(object)active,recovery,elapsed}),Is.EqualTo(expected));
+        }
     }
 }

@@ -35,6 +35,11 @@ public sealed class VideoArtLibrary : ScriptableObject
                 return 0;
             }
         }
+        [Tooltip("Source-frame peak used only by adaptive gameplay parry presentation. EnemySample closes its mouth here.")]
+        public bool hasParryImpact;
+        [Min(0)] public int parryImpactFrame;
+        public bool HasValidParryImpact => hasParryImpact && frames != null && durations != null &&
+            frames.Length > 0 && frames.Length == durations.Length && parryImpactFrame >= 0 && parryImpactFrame < TotalFrames;
         public int TotalFrames { get { int n=0; foreach(int duration in durations) n+=duration; return n; } }
         public Sprite At(int gameFrame, bool loop = false)
         {

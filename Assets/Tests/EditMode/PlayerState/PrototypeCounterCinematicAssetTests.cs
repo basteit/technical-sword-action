@@ -30,11 +30,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(profile,"hitstopFrames"),Is.EqualTo(16));
             Assert.That(Get<int>(profile,"parryHitstopFrames"),Is.EqualTo(9));
             Assert.That(Get<int>(profile,"justParryHitstopFrames"),Is.EqualTo(10));
+            Assert.That(Get<bool>(profile,"synchronizedParryImpact"),Is.True);
+            Assert.That(Get<int>(profile,"parryTrialHitstopFrames"),Is.EqualTo(40));
             Assert.That(Get<Material>(profile,"parryBacklightMaterial"),Is.Not.Null);
             Assert.That(Get<Material>(profile,"counterLightingMaterial"),Is.Not.Null);
             var art = Get<Object>(profile, "art"); Assert.That(AssetDatabase.GetAssetPath(art), Is.EqualTo(Folder + "CounterCinematicArt.asset"));
             var motions = Get<Array>(art, "motions").Cast<object>().ToArray();
-            Assert.That(motions.Select(m => Get<string>(m, "name")), Is.EquivalentTo(new[] { "CounterTransfer", "CounterKick", "Fx_ElectricKick", "CounterKickEffect" }));
+            Assert.That(motions.Select(m => Get<string>(m, "name")), Is.EquivalentTo(new[] { "CounterTransfer", "CounterKick", "Fx_ElectricKick", "CounterKickEffect", "ParrySuccessLight" }));
             var kick = Call(art, "Find", "CounterKick");
             var effect = Call(art, "Find", "CounterKickEffect");
             Assert.That(Get<int[]>(effect, "durations"), Is.EqualTo(Get<int[]>(kick, "durations")), "Both submissions must show the same cel during slow motion and hitstop.");

@@ -257,6 +257,12 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
             return false;
         }
 
+        if ((normalized & PlayerActionRequest.Attack) != 0 &&
+            GetComponent<PrototypeCounterPresentation>() is { } parryPresentation && parryPresentation.TryQueueParryCounter())
+        {
+            normalized &= ~PlayerActionRequest.Attack;
+            if (normalized == PlayerActionRequest.None) return true;
+        }
         pendingRequests |= normalized;
         for (int index = 0; index < bufferedRequestFrames.Length; index++)
         {
@@ -649,6 +655,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
             legal |= PlayerActionRequest.Heal;
         }
 
+        if (GetComponent<PrototypeCounterPresentation>() is { IsParrySequenceActive: true }) legal &= ~PlayerActionRequest.Attack;
         return legal;
     }
 

@@ -47,3 +47,15 @@ MonoBehaviour:
   parryContactOffset: {x: 1.40625, y: 0.1875}
   parryHitstopFrames: 9
   justParryHitstopFrames: 10
+  synchronizedParryImpact: 1
+  parryTrialHitstopFrames: 40
+  parryFollowThroughFrames: 8
+  parryBackgroundDim: 0.2
+  parryActorLight: 0.4
+  parryLightRiseSeconds: 0.033333335
+  parryLightHoldSeconds: 0.033333335
+  parryLightFadeSeconds: 0.2
+  parryLightRepeatSeconds: 0.4
+  parryWaveSeconds: 0.4
+  parryWaveGain: 1.55
+  parryWavePixels: 32

@@ -111,6 +111,8 @@ MonoBehaviour:
     landingFrame: 0
     recoveryFrame: 0
   - name: Enemy_Attack
+    hasParryImpact: 1
+    parryImpactFrame: 12
     provisional: 0
     includesSlashTrail: 0
     includesParryEffect: 0

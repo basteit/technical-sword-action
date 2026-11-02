@@ -25,6 +25,12 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     private Damageable2D parrySource;
     private bool counterLightReady;
     private float parryLightAge = -1, chargeRealElapsed;
+    private bool parrySequenceActive, parryImpactPresented, queuedParryCounter;
+    private long parryStartTick;
+    private int parryLeadFrames;
+    private ParryResult parryVisualResult;
+    private PrototypeEnemyArtPresentation parryEnemyArt;
+    private float parryRealTime, nextParryLightTime;
     private CounterCinematicProfile Profile => counter != null ? counter.CinematicProfile : null;
     private float FlashStrength => feedback != null && feedback.Settings != null ? Mathf.Clamp01(feedback.Settings.flash) : 1;
     private float VfxStrength => feedback != null && feedback.Settings != null ? Mathf.Clamp01(feedback.Settings.vfx) : 1;
@@ -39,6 +45,12 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     public int ParryImpactCount { get; private set; }
     public long ParryImpactTick { get; private set; } = -1;
     public bool IsParryBacklit => parryLight != null && parryLight.IsVisible;
+    public bool IsParrySequenceActive => parrySequenceActive;
+    public bool IsParryImpactPending => parrySequenceActive && !parryImpactPresented;
+    public bool HasQueuedParryCounter => queuedParryCounter;
+    public int ParryImpactDelayFrames => parryLeadFrames;
+    public string ParryPresentationPhase => !parrySequenceActive ? "None" : !parryImpactPresented ? "Preparation" :
+        CombatTimeController.TickCount == ParryImpactTick ? "Impact" : "Deflection";
     public string CounterLightPhase => counterLight != null ? counterLight.Phase : "None";
     public int CounterLightFrame => counterLight != null ? counterLight.ImpactFrame : -1;
     public float CounterRimPulse => counterLight != null ? counterLight.RimPulse : 0;
@@ -66,6 +78,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     {
         SampleCounter();
         if (!UsesEnhancedPresentation || source == null || state == null) return;
+        if (parrySequenceActive) { SampleAdaptiveParry(); return; }
         if (state.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.Parry ||
             state.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.ParryFail)
             source.sprite = Profile.parryWaitSprite;
@@ -78,6 +91,16 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         if (!UsesEnhancedPresentation || Profile.parryContactSprite == null || parry == null ||
             parry.LastReactionWeight != ParryReactionWeight.Light || target == null || feedback == null || !feedback.IsReady)
             return false;
+        if (Profile.synchronizedParryImpact && Profile.ParryReaction != null)
+        {
+            ClearParrySequence(false);
+            parrySource = target; parryVisualResult = result; parryStartTick = CombatTimeController.TickCount;
+            parrySequenceActive = true; parryImpactPresented = false; parryLeadFrames = 0;
+            parryEnemyArt = target.GetComponent<PrototypeEnemyArtPresentation>();
+            if (parryEnemyArt != null && !parryEnemyArt.TryBeginParryDeflection(this, out parryLeadFrames)) parryEnemyArt = null;
+            parry.EnsureSuccessLockFrames(parryLeadFrames + Profile.parryFollowThroughFrames + 1);
+            SampleAdaptiveParry(); return true;
+        }
         parrySource = target; ParryImpactCount++; ParryImpactTick = CombatTimeController.TickCount;
         source.sprite = Profile.parryContactSprite;
         playerArt.RefreshVisual();int facing = GetComponent<PlayerMotor2D>().FacingSign;
@@ -87,6 +110,55 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         feedback.ShakeDirectional(9f/60,.22f,new Vector2(-facing,-.3f),1);
         parryLight?.Begin(parrySource,contact);parryLightAge = 0;
         return true;
+    }
+    public bool TryQueueParryCounter()
+    {
+        if (!parrySequenceActive || state == null || state.LifeState != TechnicalSwordAction.PlayerState.PlayerLifeState.Alive ||
+            parrySource == null || !parrySource.IsParryStaggered || counter == null || counter.IsActive || counter.StockCount == 0) return false;
+        queuedParryCounter = true; return true;
+    }
+    private bool ParrySourceIsValid => parrySource != null && parrySource.isActiveAndEnabled && parrySource.IsAlive &&
+        parrySource.IsParryStaggered && (parryEnemyArt == null || parryEnemyArt.IsParryDeflectionOwnedBy(this));
+    private void SampleAdaptiveParry()
+    {
+        if (!parrySequenceActive) return;
+        if (!ParrySourceIsValid) { ClearParrySequence(); return; }
+        int age = Mathf.Max(0, (int)(CombatTimeController.TickCount - parryStartTick));
+        var motion = Profile.ParryReaction;
+        int frame = age < parryLeadFrames ? Mathf.Min(motion.hitFrame - 1, Mathf.FloorToInt(age * motion.hitFrame / (float)parryLeadFrames)) :
+            motion.hitFrame + Mathf.FloorToInt(Mathf.Min(Profile.parryFollowThroughFrames, age - parryLeadFrames) *
+                (motion.TotalFrames - motion.hitFrame - 1) / (float)Profile.parryFollowThroughFrames);
+        source.sprite = motion.At(frame);
+        parryEnemyArt?.SampleParryDeflection(this, age);
+        playerArt.RefreshVisual();
+        if (!parryImpactPresented && age >= parryLeadFrames)
+        {
+            parryImpactPresented = true; ParryImpactCount++; ParryImpactTick = CombatTimeController.TickCount;
+            source.sprite = Profile.parryContactSprite; playerArt.RefreshVisual();
+            int facing = GetComponent<PlayerMotor2D>().FacingSign;
+            Vector2 contact = playerArt.Artwork.transform.TransformPoint(new Vector3(facing * Profile.parryContactOffset.x, Profile.parryContactOffset.y));
+            CombatTimeController.RequestHitstop(this, Profile.parryTrialHitstopFrames / 60f);
+            feedback.PresentSynchronizedParryImpact(parryVisualResult == ParryResult.Just ? CombatFeedbackKind.JustParry : CombatFeedbackKind.Parry, contact, parrySource, Profile);
+            feedback.ShakeDirectional(9f / 60, .22f, new Vector2(-facing, -.3f), 1);
+            if (parryRealTime >= nextParryLightTime)
+            {
+                parryLight?.Begin(parrySource, contact); parryLightAge = 0;
+                nextParryLightTime = parryRealTime + Profile.parryLightRepeatSeconds;
+            }
+        }
+        if (parryImpactPresented && age >= parryLeadFrames + Profile.parryFollowThroughFrames)
+        {
+            bool request = queuedParryCounter && ParrySourceIsValid;
+            ClearParrySequence(false);
+            if (request) state.RequestAction(TechnicalSwordAction.PlayerState.PlayerActionRequest.Attack);
+        }
+    }
+    private void ClearParrySequence(bool clearLight = true)
+    {
+        parryEnemyArt?.ReleaseParryDeflection(this); parryEnemyArt = null;
+        parrySequenceActive = parryImpactPresented = queuedParryCounter = false;
+        CombatTimeController.ReleaseOwner(this);
+        if (clearLight) { parryLightAge = -1; parryLight?.ResetLight(); }
     }
     private void SampleCounter()
     {
@@ -144,15 +216,25 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     }
     public void AdvanceVisuals(float realSeconds)
     {
-        if (CombatTimeController.IsPaused || Profile == null || realSeconds < 0) return;
+        if (parryLight != null && FlashStrength <= 0) { parryLightAge = -1; parryLight.ResetLight(); }
+        if (CombatTimeController.IsPaused || Profile == null || !float.IsFinite(realSeconds) || realSeconds < 0) return;
+        parryRealTime += realSeconds;
         if (state != null && state.LifeState == TechnicalSwordAction.PlayerState.PlayerLifeState.Dead)
         { ResetPresentation(); return; }
-        bool parryVisible = UsesEnhancedPresentation && parryLightAge >= 0 && parryLightAge < 4f/60-.000001f;
-        if (parryLight != null) parryLight.Intensity = FlashStrength;
+        if (parrySequenceActive && (!ParrySourceIsValid || feedback == null || !feedback.isActiveAndEnabled ||
+            state.ActionState != TechnicalSwordAction.PlayerState.PlayerActionState.ParrySuccess)) ClearParrySequence();
+        bool soft = Profile.synchronizedParryImpact;
+        bool parryVisible = UsesEnhancedPresentation && parryLightAge >= 0 && parryLightAge < (soft ? Profile.ParryLightSeconds : 4f/60)-.000001f;
+        if (parryLight != null)
+        {
+            parryLight.Intensity = FlashStrength * (soft ? Profile.SampleParryLight(parryLightAge) : 1);
+            parryLight.BackgroundStrength = soft ? Profile.parryBackgroundDim : .99f;
+            parryLight.ActorLightStrength = soft ? Profile.parryActorLight : 1;
+        }
         if (counterLight != null) counterLight.Intensity = FlashStrength;
         parryLight?.Sample(parryVisible && FlashStrength > 0,VfxStrength > 0,true);
         parryLightAge = parryVisible ? parryLightAge+realSeconds : -1;
-        if (!parryVisible) parrySource = null;
+        if (!parryVisible && !parrySequenceActive) parrySource = null;
         if (charged && !CombatTimeController.IsHitStopped) chargeRealElapsed += realSeconds;
         bool dimming = charged && counter.IsActive && CombatTimeController.SlowScale < 1;
         dimBlend = Mathf.MoveTowards(dimBlend, dimming ? 1 : 0, realSeconds / Profile.dimFadeSeconds);
@@ -223,6 +305,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     }
     public void ResetPresentation()
     {
+        ClearParrySequence(); parryRealTime = nextParryLightTime = 0;
         RestoreBody(); charged = false; dimBlend = trailAge = 0;
         counterLightReady = false; parrySource = null; parryLightAge = -1; chargeRealElapsed = 0;
         ParryImpactTick = -1;
