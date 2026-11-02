@@ -16,6 +16,10 @@ public sealed class VideoParryBacklight : MonoBehaviour
     private static readonly int LightWorld=Shader.PropertyToID("_LightWorld"),Bloom=Shader.PropertyToID("_Bloom"),KeepGold=Shader.PropertyToID("_KeepGold");
     public bool IsVisible {get;private set;}
     public float Intensity {get;set;}=1;
+    // Legacy filming stays unchanged; gameplay may opt into a soft background and restrained actor light.
+    public float BackgroundStrength {get;set;}=.99f;
+    public float ActorLightStrength {get;set;}=1;
+    public float BackgroundAlpha=>Mathf.Clamp01(BackgroundStrength)*Mathf.Clamp01(Intensity);
     public bool IsHaloVisible=>IsVisible&&haloAllowed;
     public Damageable2D Target=>IsVisible?target:null;
     private void Awake()=>properties=new MaterialPropertyBlock();
@@ -77,7 +81,7 @@ public sealed class VideoParryBacklight : MonoBehaviour
         float height=captureCamera.orthographicSize*2;
         backdrop.transform.localPosition=new Vector3(0,0,captureCamera.nearClipPlane+.01f);
         backdrop.transform.localScale=new Vector3(height*Mathf.Max(captureCamera.aspect,16/9f),height,1);
-        backdrop.color=new Color(0,0,0,.99f*Mathf.Clamp01(Intensity));
+        backdrop.color=new Color(0,0,0,BackgroundAlpha);
         bloom.transform.position=new Vector3(contact.x,contact.y,0);bloom.transform.rotation=Quaternion.identity;
         bloom.transform.localScale=new Vector3(3.6f,2.4f,1);
         bloom.color=new Color(1,1,1,Mathf.Clamp01(Intensity));
@@ -88,7 +92,7 @@ public sealed class VideoParryBacklight : MonoBehaviour
     {
         destination.sprite=lightSprites.For(source);destination.flipX=source.flipX;destination.flipY=source.flipY;
         destination.drawMode=source.drawMode;destination.size=source.size;destination.tileMode=source.tileMode;
-        destination.color=new Color(1,1,1,source.color.a*Mathf.Clamp01(Intensity));
+        destination.color=new Color(1,1,1,source.color.a*Mathf.Clamp01(Intensity)*Mathf.Clamp01(ActorLightStrength));
         destination.transform.localPosition=Vector3.zero;destination.transform.localRotation=Quaternion.identity;destination.transform.localScale=Vector3.one;
         properties.Clear();properties.SetVector(LightWorld,new Vector4(contact.x,contact.y,0,0));properties.SetFloat(Bloom,0);
         properties.SetFloat(KeepGold,keepGold?1:0);

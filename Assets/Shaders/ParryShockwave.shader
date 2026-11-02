@@ -14,6 +14,7 @@ Shader "TechnicalSwordAction/ParryShockwave"
             #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
             float4 _ShockwaveCenter;
             float4 _ShockwavePulse;
+            float _ShockwavePixels;
 
             half4 Frag(Varyings input) : SV_Target
             {
@@ -31,7 +32,7 @@ Shader "TechnicalSwordAction/ParryShockwave"
                 float ring = sin(band * PI * 1.5) * exp(-band * band * 2.0);
                 // No new flash, color inversion, zoom or blur. Leave the contact core stable.
                 float amplitude = ring * (1.0 - t) * (1.0 - t) * smoothstep(.02, .075, distance);
-                amplitude *= _ShockwavePulse.y * 22.0 / max(1.0, _ScreenParams.y);
+                amplitude *= _ShockwavePulse.y * _ShockwavePixels / max(1.0, _ScreenParams.y);
                 float2 offset = delta / max(distance, .0001) * amplitude / float2(aspect, 1.0);
                 float2 uv = clamp(input.texcoord + offset, .5 * abs(_BlitTexture_TexelSize.xy),
                     1.0 - .5 * abs(_BlitTexture_TexelSize.xy));

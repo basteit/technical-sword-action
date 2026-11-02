@@ -43,6 +43,36 @@ public sealed class CounterCinematicProfile : ScriptableObject
     public Vector2 parryContactOffset;
     [Min(0)] public int parryHitstopFrames = 9;
     [Min(0)] public int justParryHitstopFrames = 10;
+    [Header("Adaptive parry impact trial (gameplay only)")]
+    public bool synchronizedParryImpact;
+    [Min(1)] public int parryFollowThroughFrames = 8;
+    [Range(0, .5f)] public float parryBackgroundDim = .2f;
+    [Range(0, 1)] public float parryActorLight = .4f;
+    [Min(.001f)] public float parryLightRiseSeconds = 2f / 60f;
+    [Min(0)] public float parryLightHoldSeconds = 2f / 60f;
+    [Min(.001f)] public float parryLightFadeSeconds = .2f;
+    [Min(0)] public float parryLightRepeatSeconds = .4f;
+    [Min(.01f)] public float parryWaveSeconds = .4f;
+    [Min(0)] public float parryWaveGain = 1.55f;
+    [Min(0)] public float parryWavePixels = 32;
+    public VideoArtLibrary.Motion ParryReaction => art != null ? art.Find("ParrySuccessLight") : null;
+    public float ParryLightSeconds => parryLightRiseSeconds + parryLightHoldSeconds + parryLightFadeSeconds;
+    public bool IsParryTuningValid => parryFollowThroughFrames > 0 &&
+        Finite(parryBackgroundDim) && parryBackgroundDim >= 0 && parryBackgroundDim <= .5f &&
+        Finite(parryActorLight) && parryActorLight >= 0 && parryActorLight <= 1 &&
+        Finite(parryLightRiseSeconds) && parryLightRiseSeconds > 0 &&
+        Finite(parryLightHoldSeconds) && parryLightHoldSeconds >= 0 &&
+        Finite(parryLightFadeSeconds) && parryLightFadeSeconds > 0 &&
+        Finite(parryLightRepeatSeconds) && parryLightRepeatSeconds >= 0 &&
+        Finite(parryWaveSeconds) && parryWaveSeconds > 0 && Finite(parryWaveGain) && parryWaveGain >= 0 &&
+        Finite(parryWavePixels) && parryWavePixels >= 0;
+    public float SampleParryLight(float age)
+    {
+        if (!IsParryTuningValid || !float.IsFinite(age) || age < 0 || age >= ParryLightSeconds) return 0;
+        if (age < parryLightRiseSeconds) return Mathf.SmoothStep(0, 1, age / parryLightRiseSeconds);
+        float fade = age - parryLightRiseSeconds - parryLightHoldSeconds;
+        return fade <= 0 ? 1 : 1 - Mathf.SmoothStep(0, 1, fade / parryLightFadeSeconds);
+    }
     public int BlinkArrivalFrame => blinkStartFrame + blinkTravelFrames;
     public VideoArtLibrary.Motion Transfer => art != null ? art.Find("CounterTransfer") : null;
     public VideoArtLibrary.Motion Kick => art != null ? art.Find("CounterKick") : null;
@@ -69,7 +99,8 @@ public sealed class CounterCinematicProfile : ScriptableObject
             parryContactSprite != null && parryWaitSprite != null && Finite(parrySuccessStartNormalized) &&
             parrySuccessStartNormalized >= 0 && parrySuccessStartNormalized < 1 &&
             Finite(parryContactOffset.x) && Finite(parryContactOffset.y) &&
-            parryHitstopFrames >= 0 && justParryHitstopFrames >= 0);
+            parryHitstopFrames >= 0 && justParryHitstopFrames >= 0) &&
+        (!synchronizedParryImpact || IsParryTuningValid && Valid(ParryReaction) && ParryReaction.hitFrame > 0 && ParryReaction.hitFrame < ParryReaction.TotalFrames);
     public Sprite Sample(int frame) => frame < BlinkArrivalFrame ? Transfer.At(frame) : Kick.At(frame - BlinkArrivalFrame);
     private static bool Finite(float value) => float.IsFinite(value);
     private static bool Valid(VideoArtLibrary.Motion motion) => motion != null && motion.frames != null &&

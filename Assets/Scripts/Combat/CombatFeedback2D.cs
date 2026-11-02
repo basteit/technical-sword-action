@@ -178,12 +178,19 @@ public sealed class CombatFeedback2D : MonoBehaviour
     // Authored sprites carry the information shape; their presenter owns the timed impact stop.
     public void PresentAuthoredImpact(CombatFeedbackKind kind, Vector2 position, Damageable2D target)
         => PresentFeedback(kind, position, target, true);
-    private void PresentFeedback(CombatFeedbackKind kind, Vector2 position, Damageable2D target, bool authored, int attackStopOverride = -1)
+    public void PresentSynchronizedParryImpact(CombatFeedbackKind kind, Vector2 position, Damageable2D target, CounterCinematicProfile tuning)
+        => PresentFeedback(kind, position, target, true, -1, tuning);
+    private void PresentFeedback(CombatFeedbackKind kind, Vector2 position, Damageable2D target, bool authored, int attackStopOverride = -1, CounterCinematicProfile parryTuning = null)
     {
         if (!IsReady || CombatTimeController.IsPaused) return;
         var entry = profile.Find(kind);
         if (kind == CombatFeedbackKind.Parry || kind == CombatFeedbackKind.JustParry)
-            parryShockwave.Begin(feedbackCamera, position, Mathf.Clamp01(Settings.parryShockwave) * Mathf.Clamp01(Settings.vfx));
+        {
+            float strength = Mathf.Clamp01(Settings.parryShockwave) * Mathf.Clamp01(Settings.vfx);
+            if (parryTuning != null && parryTuning.synchronizedParryImpact)
+                parryShockwave.BeginTuned(feedbackCamera, position, strength * parryTuning.parryWaveGain, parryTuning.parryWaveSeconds, parryTuning.parryWavePixels);
+            else parryShockwave.Begin(feedbackCamera, position, strength);
+        }
         LastKind = kind; LastEmissionTick = CombatTimeController.TickCount;
         EmissionCount++; EssentialGlyphCount++;
         int stopFrames = attackStopOverride >= 0 ? attackStopOverride : entry.hitstopFrames;
