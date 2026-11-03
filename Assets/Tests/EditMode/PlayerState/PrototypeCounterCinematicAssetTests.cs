@@ -84,7 +84,6 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(profile,"IsParryTuningValid"),Is.True);
             Assert.That(Get<float>(profile,"parryEnemyReleasePixels"),Is.EqualTo(32));
             Assert.That(Get<float>(profile,"parryEnemyReleaseLeanDegrees"),Is.EqualTo(20));
-            Assert.That(Get<int>(profile,"parryEnemyReleaseSettleFrames"),Is.EqualTo(8));
         }
 
         [Test] public void TransferAndKickClipMatchesClockWithoutChangingLegacyDataOrEvents()

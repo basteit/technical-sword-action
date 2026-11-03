@@ -50,12 +50,6 @@ namespace TechnicalSwordAction.PlayerState.Tests
         public void InvalidTuningIsRejected(string field,float value)
         {var p=Profile();Set(p,field,value);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);}
 
-        [TestCase(-1)] [TestCase(31)]
-        public void InvalidEnemyRecoilSettleDurationIsRejected(int frames)
-        {
-            var p=Profile();Set(p,"parryEnemyReleaseSettleFrames",frames);
-            Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);
-        }
 
         [Test] public void TunedWaveIsStrongerAndSlowerWithoutChangingTheLegacyDefaults()
         {

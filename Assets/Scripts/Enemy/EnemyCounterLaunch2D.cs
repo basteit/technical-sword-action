@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// <summary>One collision-aware, combat-clock owner for a counter's enemy launch, including a lethal hit.</summary>
+/// <summary>Collision-aware combat response movement: parry retreat and counter launch, including a lethal hit.</summary>
 [DisallowMultipleComponent, RequireComponent(typeof(Damageable2D))]
 public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
 {
@@ -34,6 +34,19 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
         if (health == null) health = GetComponent<Damageable2D>();
         health.ResetPerformed += OnReset; CombatTimeController.Register(this);
     }
+
+    internal bool TryPrepareParryRetreat() => isActiveAndEnabled && !active &&
+        shape != null && shape.enabled && health != null && health.TryPrepareParryRetreat();
+
+    internal void MoveParryRetreat(float worldX)
+    {
+        if (!isActiveAndEnabled || active || !float.IsFinite(worldX) || shape == null || !shape.enabled ||
+            health == null || !health.IsParryStaggered || health.MotionOwnerCount != 0) return;
+        float beforeX = transform.position.x;
+        MoveAxis(Vector2.right * worldX);
+        health.RecordParryRetreat(transform.position.x - beforeX);
+    }
+
     public void BeginLaunch(CounterCinematicProfile settings, int sign)
     {
         if (launchOverride != null) settings = launchOverride;

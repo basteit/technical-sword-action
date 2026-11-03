@@ -835,90 +835,109 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             Assert.That(positive&&negative,Is.True);Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);
             Assert.That(Get<bool>(presentation,"IsParryActorJitterActive"),Is.False);
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(direction*4f/32));
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
             float previous=0;int outwardSteps=0,retreatSamples=0;
             while(Get<bool>(presentation,"IsParrySequenceActive")&&retreatSamples++<fps)
             {
-                float offset=Get<float>(enemyArt,"ImpactOffsetX");
-                Assert.That(offset*direction,Is.InRange(previous,1f));
-                if(offset*direction>previous)outwardSteps++;previous=offset*direction;
+                float offset=target.transform.position.x-enemyRoot.x;
+                Assert.That(offset*direction,Is.InRange(previous-.0001f,1.0001f));
+                if(offset*direction>previous+.0001f)outwardSteps++;previous=offset*direction;
                 Assert.That(renderer.sprite,Is.SameAs(contactSprite));
                 Assert.That(Mathf.DeltaAngle(baseAngle,drawing.localEulerAngles.z),Is.EqualTo(-direction*20).Within(.001f));
                 Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);
-                Assert.That((Vector2)target.transform.position,Is.EqualTo(enemyRoot));
-                Assert.That(enemyBox.bounds.center,Is.EqualTo(enemyCollider));
+                Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
+                Assert.That(Vector3.Distance(enemyBox.bounds.center,enemyCollider+Vector3.right*offset),Is.LessThan(.0001f));
                 Assert.That(Vector3.Distance(drawing.TransformPoint(footPivot),enemyFoot+Vector3.right*offset),Is.LessThan(.0001f));
                 RenderAt(fps);
             }
             Assert.That(Get<bool>(presentation,"IsParrySequenceActive"),Is.False);
             Assert.That(outwardSteps,Is.GreaterThanOrEqualTo(3),"Multiple outward steps must be visible even at 30fps.");
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(direction*1f));
+            Vector3 finalRoot=enemyRoot+Vector2.right*direction;
+            Assert.That(Vector3.Distance(target.transform.position,finalRoot),Is.LessThan(.0001f));
+            Assert.That(Get<float>(target,"ParryRetreatDisplacementX"),Is.EqualTo(direction).Within(.0001f));
             Assert.That(renderer.sprite.name,Does.Contain("down"));
-            previous=1;
-            for(int i=0;i<=fps/4;i++)
-            {
-                float offset=Get<float>(enemyArt,"ImpactOffsetX")*direction;
-                Assert.That(offset,Is.InRange(0f,previous));previous=offset;
-                Assert.That((Vector2)target.transform.position,Is.EqualTo(enemyRoot));
-                Assert.That(enemyBox.bounds.center,Is.EqualTo(enemyCollider));
-                RenderAt(fps);
-            }
+            Frames(24);
+            Assert.That(Vector3.Distance(target.transform.position,finalRoot),Is.LessThan(.0001f));
+            Assert.That(Vector3.Distance(enemyBox.bounds.center,enemyCollider+Vector3.right*direction),Is.LessThan(.0001f));
             Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
             Assert.That(Mathf.DeltaAngle(baseAngle,drawing.localEulerAngles.z),Is.Zero.Within(.001f));
-            Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));Frames(24);AssertClean();
+            AssertClean();
         }
-        [TestCase(false)] [TestCase(true)]
-        public void EnemyReleaseDrawingFreezesInPauseAndDoesNotReturnAfterZeroShake(bool duringSettle)
+        [TestCase(0f)] [TestCase(.5f)] [TestCase(1f)]
+        public void EnemyRetreatPausesButKeepsTheSameDistanceAtEveryShakeSetting(float shake)
         {
-            var settings=Get<object>(feedback,"Settings");Set(settings,"shake",.5f);
+            var settings=Get<object>(feedback,"Settings");Set(settings,"shake",shake);
             var target=BeginAuthoredAdaptiveParry(1);
+            Vector3 initial=target.transform.position;
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));Until(()=>!TimeValue<bool>("IsHitStopped"));
-            if(duringSettle)Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));
+            Frames(3);
             var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
             var drawing=Get<SpriteRenderer>(enemyArt,"Artwork").transform;
-            float expectedOffset=duringSettle?16f/32:2f/32,expectedLean=duringSettle?0:-10;
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(expectedOffset));
-            Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(expectedLean).Within(.001f));
+            Vector3 pausedAt=target.transform.position;
+            Assert.That(pausedAt.x-initial.x,Is.InRange(.01f,.99f));
+            Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(-20*shake).Within(.001f));
             Static("SetPaused",true);Frames(12);
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(expectedOffset));
-            Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(expectedLean).Within(.001f));
-            Set(settings,"shake",0f);Call(presentation,"AdvanceVisuals",0f);
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
-            Set(settings,"shake",1f);Static("SetPaused",false);Frames(2);
+            Assert.That(target.transform.position,Is.EqualTo(pausedAt));
+            Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(-20*shake).Within(.001f));
+            Static("SetPaused",false);Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));
+            Assert.That(target.transform.position.x-initial.x,Is.EqualTo(1).Within(.0001f));
             Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
             Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.Zero.Within(.001f));
         }
         [TestCase(false)] [TestCase(true)]
-        public void EnemyRetreatClearsWhenTheCounterStarts(bool queued)
+        public void EnemyRetreatDoesNotCostTheQueuedOrDelayedCounter(bool queued)
         {
             Set(Get<object>(feedback,"Settings"),"shake",1f);
             var target=BeginAuthoredAdaptiveParry(1);
+            float initialX=target.transform.position.x;
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
             var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
             if(!queued)
             {
                 Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));
-                Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Not.Zero);
+                Assert.That(Vector2.Distance(target.transform.position,player.transform.position),Is.GreaterThan(1.9f));
+                Assert.That(Call(counter,"EligibilityReason",target),Is.EqualTo("Eligible"));
             }
             Assert.That((bool)Call(player,"RequestAction",PlayerActionRequest.Attack),Is.True);
             Until(()=>Get<bool>(counter,"IsActive"));
             Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
             Assert.That(Get<int>(counter,"ConsumedCount"),Is.EqualTo(1));
+            Assert.That(target.transform.position.x-initialX,Is.EqualTo(1).Within(.0001f));
         }
         [TestCase("Reset")] [TestCase("Hit")] [TestCase("TargetDisabled")]
-        public void EnemyRetreatSettleCannotReappearAfterInterruption(string operation)
+        public void EnemyRetreatStopsWithoutResumingAfterInterruption(string operation)
         {
             Set(Get<object>(feedback,"Settings"),"shake",1f);
             var target=BeginAuthoredAdaptiveParry(1);
-            Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));
+            Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));Until(()=>!TimeValue<bool>("IsHitStopped"));
+            Frames(3);
             var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Not.Zero);
+            Assert.That(Get<float>(target,"ParryRetreatDisplacementX"),Is.InRange(.01f,.99f));
             if(operation=="Reset")Call(arena,"ResetActionsOnly");
-            else if(operation=="Hit")Call(player,"ForceHit","EnemyRetreatSettle");
+            else if(operation=="Hit")Call(player,"ForceHit","EnemyRetreat");
             else target.gameObject.SetActive(false);
             Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
-            Frames(5);Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
+            Vector3 stoppedAt=target.transform.position;
+            Frames(12);
+            Assert.That(target.transform.position,Is.EqualTo(stoppedAt));
+        }
+        [TestCase(1)] [TestCase(-1)]
+        public void EnemyRetreatClampsToTheWallAndKeepsThatPosition(int direction)
+        {
+            var target=BeginAuthoredAdaptiveParry(direction);
+            var shape=target.GetComponent<BoxCollider2D>();
+            float initialX=target.transform.position.x;
+            float edge=shape.bounds.center.x+shape.bounds.extents.x*direction;
+            var wall=Wall(edge+.45f*direction).GetComponent<BoxCollider2D>();
+            Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));
+            float wallEdge=wall.bounds.center.x-wall.bounds.extents.x*direction;
+            float enemyEdge=shape.bounds.center.x+shape.bounds.extents.x*direction;
+            Assert.That((wallEdge-enemyEdge)*direction,Is.InRange(0f,.02f));
+            float stoppedAt=target.transform.position.x;
+            Assert.That((stoppedAt-initialX)*direction,Is.InRange(.3f,.35f));
+            Assert.That(Get<float>(target,"ParryRetreatDisplacementX"),Is.EqualTo(stoppedAt-initialX).Within(.0001f));
+            Frames(24);Assert.That(target.transform.position.x,Is.EqualTo(stoppedAt));
         }
         [TestCase(0f,1f,1f,false,false,true)] [TestCase(1f,0f,1f,true,false,true)]
         [TestCase(1f,1f,0f,true,true,false)] [TestCase(.5f,.5f,.5f,true,true,true)] [TestCase(0f,0f,0f,false,false,false)]

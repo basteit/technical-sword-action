@@ -72,8 +72,6 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(1)] public int parryActorJitterStepFrames = 2;
     [Range(0, MaxParryEnemyReleasePixels)] public float parryEnemyReleasePixels;
     [Range(0, 30)] public float parryEnemyReleaseLeanDegrees;
-    [Range(0, 30)] public int parryEnemyReleaseSettleFrames;
-    public bool UsesMovingParryEnemyRecoil => parryEnemyReleasePixels > 0 && parryEnemyReleaseSettleFrames > 0;
     [Header("Parry contact camera (gameplay only)")]
     public bool parryCameraEnabled = true;
     public bool parryCameraReturnOnHitstopEnd = true;
@@ -145,7 +143,6 @@ public sealed class CounterCinematicProfile : ScriptableObject
         Finite(parryActorJitterPixels) && parryActorJitterPixels >= 0 && parryActorJitterPixels <= 4 && parryActorJitterStepFrames > 0 &&
         Finite(parryEnemyReleasePixels) && parryEnemyReleasePixels >= 0 && parryEnemyReleasePixels <= MaxParryEnemyReleasePixels &&
         Finite(parryEnemyReleaseLeanDegrees) && parryEnemyReleaseLeanDegrees >= 0 && parryEnemyReleaseLeanDegrees <= 30 &&
-        parryEnemyReleaseSettleFrames >= 0 && parryEnemyReleaseSettleFrames <= 30 &&
         Finite(parryLightRiseSeconds) && parryLightRiseSeconds > 0 &&
         Finite(parryLightHoldSeconds) && parryLightHoldSeconds >= 0 &&
         Finite(parryLightFadeSeconds) && parryLightFadeSeconds > 0 &&

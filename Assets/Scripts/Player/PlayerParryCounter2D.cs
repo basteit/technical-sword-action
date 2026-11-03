@@ -164,7 +164,11 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         if (enemy == null || !enemy.ParticipatingInCombat) return "TargetLost";
         if (!enemy.IsParryStaggered) return "ParryWindowExpired";
         Vector2 delta = enemy.transform.position - transform.position;
-        if (delta.magnitude > 1.9f) return "OutOfRange";
+        // Do not make a successful parry invalidate its follow-up solely by pushing its target away.
+        // Use the real positions for facing, height, walls and the rear approach.
+        float retreatAway = Mathf.Max(0, Mathf.Sign(delta.x) * enemy.ParryRetreatDisplacementX);
+        Vector2 reach = new Vector2(Mathf.Max(0, Mathf.Abs(delta.x) - retreatAway), delta.y);
+        if (reach.magnitude > 1.9f) return "OutOfRange";
         if (Mathf.Abs(delta.y) > 1.25f) return "Height";
         int direction = motor != null ? motor.FacingSign : 1;
         if (delta.sqrMagnitude > .0001f && Vector2.Dot(delta.normalized, Vector2.right * direction) < .5f) return "Behind";

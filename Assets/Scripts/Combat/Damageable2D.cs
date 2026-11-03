@@ -57,6 +57,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     private int parryStaggerRemainingFrames;
     private int activeParryStaggerFrames;
     private long parryStaggerStartedTick = -1;
+    private float parryRetreatDisplacementX;
     private float currentBreak;
     private float breakResistTimer;
     private float deathTimer;
@@ -88,6 +89,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     public int ParryStaggerRemainingFrames => IsParryStaggered ? parryStaggerRemainingFrames : 0;
     public int ParryStaggerElapsedFrames => IsParryStaggered ? activeParryStaggerFrames - parryStaggerRemainingFrames : 0;
     public bool IsParryStaggered => ParticipatingInCombat && parryStaggerRemainingFrames > 0;
+    public float ParryRetreatDisplacementX => IsParryStaggered ? parryRetreatDisplacementX : 0;
     public string LastHitReaction { get; private set; } = "None";
     private float lightResistanceTimer;
     private CombatFeedback2D feedbackOwner;
@@ -136,12 +138,23 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         if (!ParticipatingInCombat || (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick)) return;
         activeParryStaggerFrames = parryStaggerRemainingFrames = ConfiguredParryStaggerFrames;
         parryStaggerStartedTick = CombatTimeController.TickCount;
+        parryRetreatDisplacementX = 0;
     }
     public void EndParryStagger()
     {
         parryStaggerRemainingFrames = activeParryStaggerFrames = 0;
         parryStaggerStartedTick = -1;
+        parryRetreatDisplacementX = 0;
     }
+
+    internal bool TryPrepareParryRetreat()
+    {
+        if (!IsParryStaggered || MotionOwnerCount != 0) return false;
+        knockbackVelocity = Vector2.zero;
+        return true;
+    }
+
+    internal void RecordParryRetreat(float worldX) => parryRetreatDisplacementX += worldX;
 
     public string IndividualId => string.IsNullOrEmpty(individualId) ? GetInstanceID().ToString() : individualId;
     public bool IsAlive => isActiveAndEnabled && currentHp > 0;
