@@ -1,0 +1,62 @@
+{
+  "validatedAtUtc": "2026-10-15T20:15:54.746495+00:00",
+  "video": "studio-idle-walk-game-scale.mp4",
+  "scene": "Assets/Scenes/CombatVideoStudio.unity",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "fps": 60,
+  "durationSeconds": 6,
+  "decodedFrames": 360,
+  "audioStreams": 0,
+  "cameraSize": 5,
+  "cameraMatches": [
+    "Assets/Scenes/SampleScene.unity",
+    "Assets/Scenes/BasicActionValidation.unity"
+  ],
+  "walkSpeed": 3,
+  "previousWalkSpeed": 2,
+  "measuredWalkSpeedFromRenderedPixels": 2.806712962962963,
+  "previousMeasuredWalkSpeedFromRenderedPixels": 1.8046875,
+  "measuredSpeedRatio": 1.555234888568222,
+  "motionUsesExistingFloorFriction": true,
+  "pointSampleScale": 3.375,
+  "renderedPngFramesCheckedAgainstSourcePointSampling": 360,
+  "pointSamplingExactMatches": 317,
+  "pointSamplingMaxColorMismatchRate": 0.012085838934087961,
+  "pointSamplingComparisonTolerance": 0.03,
+  "idleFramesSeen": 6,
+  "walkFramesSeen": 8,
+  "allCharacterFramesInsideCamera": true,
+  "returnedToStartingPosition": true,
+  "sourceFileSha256": {
+    "idle": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
+    "walk": "92FC9E07636331D2D6B5AAC363DC3AC6A53E030608DB1533D9CAE1505AE5F107"
+  },
+  "previousVideoSha256": "5203D31444F1593F4359ADECBA143CACABDB35E5D553E012BC99FF0BD5960352",
+  "unityCompile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "unityPostCaptureConsole": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "restored": {
+    "cameraSize": 2.109375,
+    "followCamera": true,
+    "moveSpeed": 6.5,
+    "manualAdvanceOnly": false,
+    "animationDriver": true,
+    "recovery": true,
+    "inputRouter": true,
+    "enemyActive": true,
+    "customContentActive": true,
+    "action": "Neutral",
+    "slowScale": 1,
+    "slowOwners": 0,
+    "hitstopOwners": 0,
+    "activeVfx": 0
+  }
+}

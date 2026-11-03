@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bedd1ff9438c1644498ee3af7dac279e, type: 3}
+  m_Name: NormalMelee
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombatDefinition
+  rank: 0
+  maxHp: 30
+  parryStaggerFrames: 180
+  moveSpeed: 2.2
+  windupFrames: 30
+  parryCueLeadFrames: 14
+  activeFrames: 3
+  recoveryFrames: 30
+  cooldownFrames: 32
+  damage: 10
+  knockback: 4.5
+  parryable: 1
+  hitOffset: {x: 0.7, y: 0}
+  hitSize: {x: 1.4, y: 1.3}
+  attackRange: 1.45
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 8
+  allowOffscreenStart: 0
+  countermeasure: Parry or Dash; punish recovery

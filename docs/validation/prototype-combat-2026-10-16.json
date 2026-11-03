@@ -1,0 +1,17 @@
+{
+  "issues": [30, 42, 43, 44, 49],
+  "branch": "issue/30-42-43-44-49-prototype",
+  "codeCommit": "3ea74469f067d375dca1170e1083cd7c3edccdc5",
+  "baseCommit": "d8fc5e83f3615460508edf6fb3ee1032d4b2a4ef",
+  "startedAt": "2026-10-16T01:49:54.5817950Z",
+  "completedAt": "2026-10-16T01:51:05.7266325Z",
+  "compile": { "success": true, "errors": 0, "warnings": 0 },
+  "definitionClipAndSceneValidation": { "success": true },
+  "editMode": { "total": 186, "passed": 186, "failed": 0, "skipped": 0 },
+  "playMode": { "total": 274, "passed": 274, "failed": 0, "skipped": 0 },
+  "consoleErrors": 0,
+  "manualAcceptance": "Pending",
+  "windowsDevelopmentBuild": "NotRun",
+  "scene": "Assets/Scenes/PrototypeCombatValidation.unity",
+  "localDetailedReport": ".uloop/outputs/PrototypeValidation/20261016-104954.json"
+}

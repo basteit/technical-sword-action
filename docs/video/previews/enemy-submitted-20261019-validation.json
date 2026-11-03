@@ -1,0 +1,127 @@
+{
+  "date": "2026-10-19",
+  "sources": [
+    {
+      "name": "idle",
+      "path": "ArtSource/Enemy/Submissions/20261019/EnemySample_idle.aseprite",
+      "sha256": "e1761ceafa1b2a50af2d9dc4c960854575ce6b36862fc235f858fda95d639a17"
+    },
+    {
+      "name": "walk",
+      "path": "ArtSource/Enemy/Submissions/20261019/EnemySample_walk.aseprite",
+      "sha256": "002165de0ae29c44c4df9fa58a6fe6dc4d43bb1b14e6f46da67bec3fbd71bb6a"
+    },
+    {
+      "name": "attack",
+      "path": "ArtSource/Enemy/Submissions/20261019/EnemySample_attack.aseprite",
+      "sha256": "4791d63fcf957a068a25a0cd3270c23a98d6b770cd027e1654200241a24ee5b6"
+    },
+    {
+      "name": "chance",
+      "path": "ArtSource/Enemy/Submissions/20261019/EnemySample_chance.aseprite",
+      "sha256": "f8daca59b86025cb020187986a519024774602e1f85702a16112437f992b61aa"
+    },
+    {
+      "name": "down",
+      "path": "ArtSource/Enemy/Submissions/20261019/EnemySample_down.aseprite",
+      "sha256": "e70e0e51edb18906e4dc0d4fae37b9413569e6d0702dfb5533d8a15ecb4f46e7"
+    }
+  ],
+  "applied": [
+    {
+      "name": "Enemy_Attack",
+      "frames": 7,
+      "ticks": 16,
+      "first": "EnemySample_attack_08",
+      "last": "EnemySample_attack_14"
+    },
+    {
+      "name": "Enemy_Death",
+      "frames": 1,
+      "ticks": 39,
+      "first": "EnemySample_down_01",
+      "last": "EnemySample_down_01"
+    },
+    {
+      "name": "Enemy_Hit",
+      "frames": 1,
+      "ticks": 6,
+      "first": "EnemySample_chance_01",
+      "last": "EnemySample_chance_01"
+    },
+    {
+      "name": "Enemy_Idle",
+      "frames": 10,
+      "ticks": 60,
+      "first": "EnemySample_idle_01",
+      "last": "EnemySample_idle_10"
+    },
+    {
+      "name": "Enemy_Move",
+      "frames": 10,
+      "ticks": 60,
+      "first": "EnemySample_walk_01",
+      "last": "EnemySample_walk_10"
+    },
+    {
+      "name": "Enemy_Parried",
+      "frames": 1,
+      "ticks": 10,
+      "first": "EnemySample_chance_01",
+      "last": "EnemySample_chance_01"
+    },
+    {
+      "name": "Enemy_Windup",
+      "frames": 7,
+      "ticks": 30,
+      "first": "EnemySample_attack_01",
+      "last": "EnemySample_attack_07"
+    }
+  ],
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "limitedPlayModeTests": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-18T22:20:16.2875740Z",
+    "TestCount": 6,
+    "PassedCount": 6,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "fullSuiteRerun": false,
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 100,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": {
+    "scene": "Assets/Scenes/PrototypeCombatValidation.unity",
+    "dirty": false,
+    "playing": false
+  },
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-enemy-submitted-20261019.mp4",
+    "sha256": "b5836ea4cfe21ab7b989953ce7bdcd9a4f6b14309a839fb644153a414da8ed24",
+    "decodedFrames": 242,
+    "durationSeconds": 4.033333333333333,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0
+  },
+  "previewCrf": 22,
+  "attackEffectsInFront": true,
+  "overallVideoAccepted": false
+}

@@ -332,17 +332,6 @@
                 },
                 {
                     "name": "",
-                    "id": "0d8b54d3-b3cb-40b8-96c8-19d808f7d8a7",
-                    "path": "<Gamepad>/buttonEast",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Interact",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "f5905c56-292d-4f07-89eb-3147e529e991",
                     "path": "<Keyboard>/escape",
                     "interactions": "",

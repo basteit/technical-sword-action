@@ -1,0 +1,190 @@
+{
+  "date": "2026-10-25",
+  "trial": "spark-backlight-with-yellow-spark",
+  "default": "gold",
+  "backlight": {
+    "realVideoFrames": 4,
+    "realSeconds": 0.06666666666666667,
+    "captureFramesOneBased": [
+      132,
+      133,
+      134,
+      135
+    ],
+    "ptsSeconds": [
+      2.183333333333333,
+      2.2,
+      2.216666666666667,
+      2.2333333333333334
+    ],
+    "actualEnemyId": "Enemy_B",
+    "actorSilhouettesAndSourceAlphaPreserved": true,
+    "sparkColorOnlyDifferenceBetweenComparisons": true,
+    "changedRawPixelsBetweenGoldAndWhite": 8625,
+    "localizedHaloInHybridOnly": true,
+    "wholeFrameNegativeDisabled": true,
+    "cameraScopedPixelTestsPassed": true
+  },
+  "hitstop": {
+    "parry": 9,
+    "just": 10,
+    "counter": 16,
+    "parryContactCelVideoFrames": 10,
+    "kickContactCelVideoFrames": 17,
+    "unchanged": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "shaderDiagnostics": "{ playing = False, scenes = Assets/Scenes/CombatVideo.unity:False, shaderMessages = 0, materialShader = TechnicalSwordAction/VideoParryBacklight }",
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T21:58:42.7420077Z",
+    "TestCount": 34,
+    "PassedCount": 34,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "uniquePlayModeCasesPassed": 34,
+  "mirroredTenResetRunsPassed": 20,
+  "fullSuiteRerun": false,
+  "legacyEightyResetSweepRerun": false,
+  "editModeRerun": false,
+  "initialPixelTestAttempt": {
+    "passed": 0,
+    "failed": 3,
+    "cause": "MaterialPropertyBlock construction in a MonoBehaviour field initializer was moved into Awake; the final 34-case run passed."
+  },
+  "eventsAndNormalizedTraceUnchanged": true,
+  "absoluteSessionClockTickOffset": 2030,
+  "counterCelVideoFrames": {
+    "CounterKick_01": 14,
+    "CounterKick_02": 6,
+    "CounterKick_03": 7,
+    "CounterKick_04": 7,
+    "CounterKick_05": 6,
+    "CounterKick_06": 7,
+    "CounterKick_07": 7,
+    "CounterKick_08": 7,
+    "CounterKick_09": 17,
+    "CounterKick_10": 4,
+    "CounterKick_11": 4,
+    "CounterKick_12": 4,
+    "CounterKick_13": 4,
+    "CounterKick_14": 4,
+    "CounterKick_15": 4
+  },
+  "sourceArtworkAndLibraryByteUnchanged": true,
+  "cameraFramingAndShakeUnchanged": true,
+  "sceneChangeScope": "Only the serialized backlight material reference in each of the three filming scenes.",
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 30,
+    "SearchText": "",
+    "IncludeStackTrace": true,
+    "Logs": []
+  },
+  "postTestConsoleBeforeClearingRunnerInfo": {
+    "TotalCount": 2,
+    "DisplayedCount": 2,
+    "LogType": "All",
+    "MaxCount": 30,
+    "SearchText": "",
+    "IncludeStackTrace": true,
+    "Logs": [
+      {
+        "Type": "Log",
+        "Message": "Executing IPostBuildCleanup for: Unity.PerformanceTesting.Editor.TestRunBuilder.",
+        "StackTrace": "UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()"
+      },
+      {
+        "Type": "Log",
+        "Message": "Saving results to: C:/Users/hirot/AppData/LocalLow/DefaultCompany/technical-sword-action\\TestResults.xml",
+        "StackTrace": ""
+      }
+    ]
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movies": [
+    {
+      "variant": "gold",
+      "path": "docs/video/previews/combat-2stage-hybrid-parry-backlight-gold-20261025.mp4",
+      "sha256": "9026a0476d29d640e31d5da24e738084a648d0c47b97698c88d7bfb4ca2814ba",
+      "decodedFrames": 275,
+      "durationSeconds": 4.583333333333333,
+      "fps": 60,
+      "width": 1920,
+      "height": 1080,
+      "audioStreams": 0
+    },
+    {
+      "variant": "white",
+      "path": "docs/video/previews/combat-2stage-hybrid-parry-backlight-white-20261025.mp4",
+      "sha256": "3ea33715c6b3e84ba63142f301e2b4ffeb0aab5f5da979a5d67e613aea848dd0",
+      "decodedFrames": 275,
+      "durationSeconds": 4.583333333333333,
+      "fps": 60,
+      "width": 1920,
+      "height": 1080,
+      "audioStreams": 0
+    }
+  ],
+  "previews": [
+    {
+      "variant": "gold",
+      "path": "C:\\Users\\hirot\\.codex\\visualizations\\2026\\10\\12\\01a12de9-62c0-72d1-8001-9b40d2eb7a55\\parry-backlight-gold-20261025.html",
+      "bytes": 879010,
+      "crf": 22,
+      "nativeVideoControls": true,
+      "decodedFrames": 275
+    },
+    {
+      "variant": "white",
+      "path": "C:\\Users\\hirot\\.codex\\visualizations\\2026\\10\\12\\01a12de9-62c0-72d1-8001-9b40d2eb7a55\\parry-backlight-white-20261025.html",
+      "bytes": 877620,
+      "crf": 22,
+      "nativeVideoControls": true,
+      "decodedFrames": 275
+    }
+  ],
+  "endState": {
+    "bothEnemiesHidden": true,
+    "vfxActive": 0,
+    "hitstop": 0,
+    "slowScale": 1,
+    "cameraSize": 3.375,
+    "shake": [
+      0,
+      0
+    ],
+    "backlight": false,
+    "inversion": false,
+    "player": "submitted idle"
+  },
+  "baselineAudit": {
+    "files": 2437,
+    "unchanged": 2428,
+    "intentionalChanges": [
+      "Assets/Editor/CombatVideoSceneBuilder.cs",
+      "Assets/Scenes/CombatVideo.unity",
+      "Assets/Scenes/CombatVideoDefenseCancel.unity",
+      "Assets/Scenes/CombatVideoStudio.unity",
+      "Assets/Scripts/Video/CombatVideoDirector.cs",
+      "Assets/Scripts/Video/CombatVideoStudio.cs",
+      "Assets/Scripts/Video/VideoCombatPresentation.cs",
+      "Assets/Tests/PlayMode/PlayerState/CombatVideoIntegrationTests.cs",
+      "docs/video/capture-guide.md"
+    ],
+    "existingUncommittedChangesPreserved": true
+  },
+  "overallVideoAccepted": false
+}

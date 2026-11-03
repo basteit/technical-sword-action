@@ -1,0 +1,107 @@
+{
+  "revision": "defense-cancel-dash-return-showcase",
+  "recommendedEndingStages": 4,
+  "compile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "playMode": {
+    "passed": 158,
+    "total": 158,
+    "completedAt": "2026-10-13T16:38:25.8436951Z",
+    "newCases": 17
+  },
+  "editMode": {
+    "passed": 181,
+    "total": 181,
+    "completedAt": "2026-10-13T16:40:19.2057244Z"
+  },
+  "newSceneResetRuns": 40,
+  "originalSceneResetRunsInSuite": 40,
+  "console": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "renderRates": [
+    30,
+    60,
+    120
+  ],
+  "mirroredLayouts": true,
+  "actualAttackCancel": true,
+  "kickHitsParriedSource": true,
+  "landingReleasesInvulnerabilityBeforeDash": true,
+  "dashUsesGameplayPhysics": true,
+  "returnComboUsesAnimationEvents": true,
+  "pauseAtDashTested": true,
+  "interruptedCounterDoesNotReturnDash": [
+    "TargetLost",
+    "CounterDisabled",
+    "PlayerDead"
+  ],
+  "mobilityAuthoring": {
+    "reopened": true,
+    "tagRangesChecked": true,
+    "layers": 8,
+    "tags": 2,
+    "frames": 7,
+    "sourceFilesModified": false,
+    "actionPixelsRedrawn": true,
+    "referencePixelsOnlyInHiddenReference": true
+  },
+  "originalArtifacts": [
+    {
+      "file": "Assets/Art/Player/VideoRough/Player_actions_rough.aseprite",
+      "sha256": "d9890e846903cc024cb6f2b56459a163d2cb2e036aa2b77acfb2e1334a29d7c3",
+      "identicalToPreviousCommit": true
+    },
+    {
+      "file": "Assets/Art/Player/Player_idle.aseprite",
+      "sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
+      "identicalToPreviousCommit": true
+    },
+    {
+      "file": "Assets/Art/Player/Player_walk.aseprite",
+      "sha256": "92fc9e07636331d2d6b5aac363dc3ac6a53e030608db1533d9cae1505ae5f107",
+      "identicalToPreviousCommit": true
+    },
+    {
+      "file": "docs/video/previews/combat-2stage-rough-hybrid.mp4",
+      "sha256": "e8e170fd34702f4054f10ad91ac3345370e389ef75a8a1a7605c0f729467f076",
+      "identicalToPreviousCommit": true
+    },
+    {
+      "file": "docs/video/previews/combat-4stage-rough-hybrid.mp4",
+      "sha256": "5323189081725111ee808bcc0da3b00e3b961e30c7f7ee1363372e1ccc225e36",
+      "identicalToPreviousCommit": true
+    },
+    {
+      "file": "docs/video/previews/combat-4stage-rough-pixel.mp4",
+      "sha256": "efb3cf70d48a3c4f6904b90e8bc0528c5e00fc5a6c930385561fe7a71d2b678e",
+      "identicalToPreviousCommit": true
+    }
+  ],
+  "videos": [
+    {
+      "file": "combat-defense-cancel-2stage-rough-hybrid.mp4",
+      "width": 1920,
+      "height": 1080,
+      "fps": 60.0,
+      "decodedFrames": 225,
+      "duration": 3.75,
+      "audioStreams": 0,
+      "rough": true
+    },
+    {
+      "file": "combat-defense-cancel-4stage-rough-hybrid.mp4",
+      "width": 1920,
+      "height": 1080,
+      "fps": 60.0,
+      "decodedFrames": 283,
+      "duration": 4.716666666666667,
+      "audioStreams": 0,
+      "rough": true
+    }
+  ],
+  "humanCleanupReceived": false
+}

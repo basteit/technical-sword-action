@@ -1,0 +1,145 @@
+{
+  "contact": {
+    "frame": 9,
+    "x": 83,
+    "y": 86
+  },
+  "gameFrames": 24,
+  "guideHidden": true,
+  "kind": "kick",
+  "nativeFrames": [
+    {
+      "durationMs": 100,
+      "frame": 1
+    },
+    {
+      "durationMs": 100,
+      "frame": 2
+    },
+    {
+      "durationMs": 100,
+      "frame": 3
+    },
+    {
+      "durationMs": 100,
+      "frame": 4
+    },
+    {
+      "durationMs": 100,
+      "frame": 5
+    },
+    {
+      "durationMs": 100,
+      "frame": 6
+    },
+    {
+      "durationMs": 100,
+      "frame": 7
+    },
+    {
+      "durationMs": 100,
+      "frame": 8
+    },
+    {
+      "durationMs": 100,
+      "frame": 9
+    },
+    {
+      "durationMs": 100,
+      "frame": 10
+    },
+    {
+      "durationMs": 60,
+      "frame": 11
+    },
+    {
+      "durationMs": 60,
+      "frame": 12
+    },
+    {
+      "durationMs": 60,
+      "frame": 13
+    },
+    {
+      "durationMs": 60,
+      "frame": 14
+    },
+    {
+      "durationMs": 60,
+      "frame": 15
+    }
+  ],
+  "pivot": {
+    "x": 32,
+    "y": 38
+  },
+  "removedIsolatedGuidePixels": 0,
+  "reviewCopyReopened": true,
+  "silhouetteSampleOnly": false,
+  "sourceUnmodified": true,
+  "submittedBodyAndEffect": true,
+  "sourceSha256": "cc6f4b47f49f1ddaaa86a242269f0a45b9b38c462dcfd94ea599af9c5c2dcbc5",
+  "eyeMasks": [
+    {
+      "file": "CounterKick_01",
+      "pixels": 14
+    },
+    {
+      "file": "CounterKick_02",
+      "pixels": 19
+    },
+    {
+      "file": "CounterKick_03",
+      "pixels": 31
+    },
+    {
+      "file": "CounterKick_04",
+      "pixels": 39
+    },
+    {
+      "file": "CounterKick_05",
+      "pixels": 144
+    },
+    {
+      "file": "CounterKick_06",
+      "pixels": 71
+    },
+    {
+      "file": "CounterKick_07",
+      "pixels": 42
+    },
+    {
+      "file": "CounterKick_08",
+      "pixels": 42
+    },
+    {
+      "file": "CounterKick_09",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_10",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_11",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_12",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_13",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_14",
+      "pixels": 0
+    },
+    {
+      "file": "CounterKick_15",
+      "pixels": 0
+    }
+  ],
+  "exporterMatchesActiveManifest": true
+}

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using TechnicalSwordAction.PlayerState;
+using System.Collections.Generic;
 
 public class PlayerSpecialSkill2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener, ICombatHitListener
 {
@@ -35,6 +36,8 @@ public class PlayerSpecialSkill2D : MonoBehaviour, ICombatTickListener, ICombatT
     private float lockTimer;
     private bool damageApplied;
     private float reservedGauge;
+    private readonly HashSet<Damageable2D> damagedTargets = new();
+    public event System.Action<Damageable2D, int> HitConfirmed;
 
     public bool IsUsingSkill => isUsingSkill;
     public float LockRemaining => Mathf.Max(0f, lockTimer);
@@ -141,10 +144,12 @@ public class PlayerSpecialSkill2D : MonoBehaviour, ICombatTickListener, ICombatT
         }
 
         bool hitSomething = false;
+        damagedTargets.Clear();
         Collider2D[] hits = Physics2D.OverlapCircleAll(skillPoint.position, skillRadius, targetLayers);
         for (int i = 0; i < hits.Length; i++)
         {
-            if (hits[i].TryGetComponent(out Damageable2D damageable))
+            Damageable2D damageable = hits[i].GetComponentInParent<Damageable2D>();
+            if (damageable != null && damageable.IsAlive && damagedTargets.Add(damageable))
             {
                 Vector2 dir = (hits[i].transform.position - transform.position).normalized;
                 if (dir.sqrMagnitude < 0.01f)
@@ -152,8 +157,11 @@ public class PlayerSpecialSkill2D : MonoBehaviour, ICombatTickListener, ICombatT
                     dir = transform.right;
                 }
 
-                damageable.TakeHit(skillDamage, dir);
-                hitSomething = true;
+                if (damageable.TryTakeCombatHit(skillDamage, dir, EnemyHitStrength.Strong))
+                {
+                    HitConfirmed?.Invoke(damageable, damageable.LastDamageTaken);
+                    hitSomething = true;
+                }
             }
         }
 

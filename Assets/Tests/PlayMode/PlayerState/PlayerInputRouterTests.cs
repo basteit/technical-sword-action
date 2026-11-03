@@ -24,6 +24,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private Mouse mouse;
         private Gamepad pad;
         private InputActionAsset actions;
+        private readonly List<Behaviour> disabledSceneRouters=new();
+        private readonly List<InputDevice> disabledNativeDevices=new();
+        private InputSettings.EditorInputBehaviorInPlayMode previousEditorInputBehavior;
+        private InputSettings.BackgroundBehavior previousBackgroundBehavior;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -32,6 +36,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
             clock = (Component)Object.FindFirstObjectByType(clockType);
             savedManual = Get<bool>(clock, "ManualAdvanceOnly");
             clockType.GetProperty("ManualAdvanceOnly").SetValue(clock, true);
+            var routerType=Type.GetType("PlayerInputRouter, Assembly-CSharp",true);
+            foreach(Behaviour sceneRouter in Object.FindObjectsByType(routerType,FindObjectsSortMode.None))
+                if(sceneRouter.enabled) { sceneRouter.enabled=false;disabledSceneRouters.Add(sceneRouter); }
+            // This fixture owns virtual devices. A filming panel can hold editor focus,
+            // and a real held key must not seed the router's initial Held snapshot.
+            previousEditorInputBehavior=InputSystem.settings.editorInputBehaviorInPlayMode;
+            previousBackgroundBehavior=InputSystem.settings.backgroundBehavior;
+            InputSystem.settings.editorInputBehaviorInPlayMode=InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+            InputSystem.settings.backgroundBehavior=InputSettings.BackgroundBehavior.IgnoreFocus;
+            foreach(var device in InputSystem.devices)
+                if(device.native&&device.enabled) { InputSystem.DisableDevice(device);disabledNativeDevices.Add(device); }
             keyboard = InputSystem.AddDevice<Keyboard>();
             mouse = InputSystem.AddDevice<Mouse>();
             pad = InputSystem.AddDevice<Gamepad>();
@@ -74,6 +89,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
             InputSystem.RemoveDevice(keyboard);
             InputSystem.RemoveDevice(mouse);
             InputSystem.RemoveDevice(pad);
+            foreach(var device in disabledNativeDevices)if(device.added)InputSystem.EnableDevice(device);
+            disabledNativeDevices.Clear();
+            InputSystem.settings.editorInputBehaviorInPlayMode=previousEditorInputBehavior;
+            InputSystem.settings.backgroundBehavior=previousBackgroundBehavior;
+            foreach(var sceneRouter in disabledSceneRouters) if(sceneRouter!=null) sceneRouter.enabled=true;
+            disabledSceneRouters.Clear();
             clockType.GetProperty("ManualAdvanceOnly").SetValue(clock, savedManual);
             yield return null;
         }
@@ -115,7 +136,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [Test]
-        public void BRemainsInteractOnlyAndNeverTriggersDash()
+        public void BResolvesInteractWithTargetAndDashWithoutTargetTenTimes()
         {
             int startCount = Get<int>(counter, "Count");
             int sharedBefore = Get<int>(router, "SharedPressCount");
@@ -126,12 +147,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<int>(counter, "Count"), Is.EqualTo(startCount + i + 1));
                 Assert.That(Get<bool>(motor, "IsDashing"), Is.False);
                 Release(); Reset(); Exclude(); Pad(GamepadButton.East); Resolve();
-                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.None));
+                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Dash));
                 Assert.That(Get<int>(counter, "Count"), Is.EqualTo(startCount + i + 1));
-                Assert.That(Get<bool>(motor, "IsDashing"), Is.False);
+                Assert.That(Get<bool>(motor, "IsDashing"), Is.True);
                 Release();
             }
-            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(sharedBefore));
+            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(sharedBefore + 20));
         }
 
         [Test]
@@ -176,7 +197,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Keys(Key.E, Key.LeftShift); Resolve();
             int before = Get<int>(router, "SharedPressCount");
             Pad(GamepadButton.East);
-            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(before));
+            Assert.That(Get<int>(router, "SharedPressCount"), Is.EqualTo(before + 1));
             Assert.That(Get<int>(counter, "Count"), Is.EqualTo(1));
         }
 
@@ -331,7 +352,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Call(interactor, "OnTriggerExit2D", target.GetComponent<Collider2D>());
                 Call(interactor, "SelectCurrentInteractable");
                 Pad(GamepadButton.East); Resolve();
-                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.None), "Outside boundary");
+                Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Dash), "Outside boundary");
                 Release();
             }
             GameObject other = new GameObject("CloserCounter");
@@ -353,6 +374,24 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         private PlayerActionRequest Accepted => Get<PlayerActionRequest>(state, "LastAcceptedRequest");
+        [Test]
+        public void TeleportRefreshDropsOldContextAndRebuildsCurrentOverlapBeforePhysicsCallbacks()
+        {
+            target.transform.position = new Vector3(.4f, 0);
+            Include();
+            Assert.That(Get<object>(interactor, "CurrentInteractable"), Is.Not.Null);
+            player.transform.position = new Vector3(10, 0);
+            Call(interactor, "RefreshAfterTeleport");
+            Assert.That(Get<object>(interactor, "CurrentInteractable"), Is.Null);
+            Pad(GamepadButton.East); Resolve();
+            Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Dash));
+            Release(); Reset();
+            Call(interactor, "RefreshAfterTeleport");
+            Assert.That(Get<object>(interactor, "CurrentInteractable"), Is.SameAs(counter));
+            Pad(GamepadButton.East); Resolve();
+            Assert.That(Accepted, Is.EqualTo(PlayerActionRequest.Interact));
+        }
+
         private void RestrictDevices() { actions = Get<InputActionAsset>(router, "Actions"); actions.devices = new InputDevice[] { keyboard, mouse, pad }; }
         private void Reset()
         {

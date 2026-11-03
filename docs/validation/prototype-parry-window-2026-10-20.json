@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-20",
+  "issues": [33, 49],
+  "branch": "issue/33-52-38-combat-polish",
+  "baseCommit": "8297463",
+  "implementationCommit": "b5ca5df",
+  "unity": "6000.3.9f1",
+  "uloop": "2.1.3",
+  "environment": "Existing dirty workspace; unrelated scene, art, animation, input, editor and requirement changes preserved. Not a clean-checkout run.",
+  "specification": {
+    "parryStaggerFrames": 180,
+    "secondsAt60Hz": 3,
+    "normalAndJustUseSameStagger": true,
+    "enemyDefinitionAndInstanceTuning": true,
+    "repeatParryRefreshesWithoutDuplicateOrReorder": true,
+    "pauseAndHitstopFreezeWindow": true,
+    "expiredOpportunityFallsBackToNormalAttack": true,
+    "startedCounterUsesIndependentTargetLease": true,
+    "placeholderVisual": "Existing silhouette and sword sway; no new or completed enemy source art",
+    "normalCameraSize": 5.625,
+    "counterCameraSize": 2.8125
+  },
+  "automated": {
+    "compile": { "success": true, "errors": 0, "warnings": 0 },
+    "fullEditMode": { "total": 209, "passed": 209, "failed": 0, "skipped": 0 },
+    "fullPlayMode": { "total": 486, "passed": 486, "failed": 0, "skipped": 0 },
+    "focusedPlayMode": { "total": 383, "passed": 383, "failed": 0, "skipped": 0 },
+    "coverage": [
+      "179/180/400 tick counter eligibility and normal-attack fallback",
+      "Last-tick counter completes and hits once after consuming stagger",
+      "Per-enemy expiry, refresh, deduplication and order",
+      "Normal/Just duration, enemy and instance overrides, pause and hitstop",
+      "Ordinary stun cannot revive an expired opportunity",
+      "Death, disable, reset and combat exit cleanup",
+      "Same-tick secondary enemies also stagger without replacing player reaction",
+      "Sway does not move collider/root or overwrite launch visual",
+      "Camera focus, return, accessibility settings and interruption",
+      "Four-step attacks, movement, platforms, common combat, filming and studio regression"
+    ],
+    "initialAttempts": "One old camera expectation failed in the initial 172/383 runs. Updated the expectation, forced assembly reload, confirmed the single test and reran all relevant and full suites successfully. No skipped failures."
+  },
+  "visualInspection": {
+    "method": "Game View, action/receiver APIs and manual combat-clock stepping; not human input-feel acceptance",
+    "resolution": [1920, 1080],
+    "justParry": { "acceptFrame": 5, "initialWindow": 180, "observedRemaining": 120, "stocks": 1, "enemyHp": 120 },
+    "charge": { "counterFrame": 14, "consumedWindow": 0, "stocks": 0, "cameraSize": 2.8125, "dimAlpha": 0.965, "focus": true },
+    "counterComplete": { "hits": 1, "enemyHp": 30, "cameraSize": 5.625, "focus": false, "dimAlpha": 0, "motionOwners": 0, "deathPresentationOwners": 0, "slowOwners": 0 },
+    "normalParryExpired": { "acceptFrame": 12, "initialWindow": 180, "remaining": 0, "stocks": 0, "attackAccepted": true, "action": "Attack", "additionalCounters": 0 },
+    "screenshots": [
+      "prototype-parry-window-2026-10-20/Rendering_20261020_032017_276.png",
+      "prototype-parry-window-2026-10-20/Rendering_20261020_032035_504.png"
+    ],
+    "captureSetupNote": "The first scripted input was suppressed by the existing same-Editor-frame reset guard. Retried on the next Editor frame successfully; discarded only that failed setup image."
+  },
+  "cleanup": {
+    "inputRouterEnabled": true,
+    "manualClock": false,
+    "activeEnemies": 0,
+    "stocks": 0,
+    "dimAlpha": 0,
+    "slowOwners": 0,
+    "cameraSize": 5.625,
+    "consoleErrors": 0,
+    "consoleWarnings": 0,
+    "editMode": true,
+    "scene": "Assets/Scenes/PrototypeCombatValidation.unity",
+    "sceneDirty": false
+  },
+  "uloopRecovery": "Initial launch wait timed out. Opening Window > Unity CLI Loop > Server showed Running on port 8701 and restored CLI access. No package, CLI, security or permission-setting changes.",
+  "humanPending": [
+    "3-second stagger readability and naturalness during actual combat",
+    "2x counter close-up comfort and framing, both directions",
+    "15-minute feel test, physical gamepad and Development Build"
+  ]
+}

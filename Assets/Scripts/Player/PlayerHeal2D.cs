@@ -7,6 +7,11 @@ public sealed class PlayerHeal2D : MonoBehaviour, IPlayerActionStateHandler, ICo
     [SerializeField, Min(1)] private int healAmount = 2;
     [SerializeField, Min(1)] private int applyFrame = 30;
     [SerializeField, Min(1)] private int endFrame = 48;
+    [SerializeField, Range(0f, 1f)] private float moveMultiplier = .4f;
+    public float MoveMultiplier => moveMultiplier;
+    public int ElapsedFrames => elapsed;
+    public int ApplyFrame => applyFrame;
+    public bool HasApplied => applied;
     private PlayerStateMachine state;
     private PlayerDamageReceiver2D health;
     private int elapsed;

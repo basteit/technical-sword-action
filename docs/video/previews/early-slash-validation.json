@@ -1,0 +1,481 @@
+{
+  "date": "2026-10-17",
+  "branch": "issue/33-52-38-combat-polish",
+  "previousBranchFrame": 34,
+  "branchFrame": 29,
+  "recoveryFrame": 34,
+  "nativeAttack1Frames": 38,
+  "hitFrame": 17,
+  "branchAdvanceFrames": 5,
+  "branchAdvanceSeconds": 0.08333333333333333,
+  "queuedInputOnly": true,
+  "singleSlashFollowThroughPreserved": true,
+  "originalAsepriteAndAll9CelsPreserved": true,
+  "reexportReopenedAndPixelsCompared": true,
+  "runtimeTests": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-17T09:31:37.7922594Z",
+    "TestCount": 324,
+    "PassedCount": 324,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "editorTests": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-17T09:31:56.9680355Z",
+    "TestCount": 186,
+    "PassedCount": 186,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "compileErrors": 0,
+  "compileWarnings": 0,
+  "consoleErrors": 0,
+  "consoleWarnings": 0,
+  "resetRuns": {
+    "runsPassed": 40,
+    "runs": [
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.149999999999991,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.166666666666654,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      }
+    ]
+  },
+  "video": "docs/video/previews/combat-2stage-hybrid-submitted-attacks-1-2-early-branch.mp4",
+  "frames": 249,
+  "duration": 4.15,
+  "fps": 60,
+  "width": 1920,
+  "height": 1080,
+  "audioStreams": 0,
+  "allFramesDecoded": true,
+  "videoSha256": "8ecf674a1b464ba97f2e1b9b350b9c06d6101dc213ef41a82dbc5dcc591d4a3f",
+  "sameParryCounterTarget": true,
+  "frontDeathOnSecondHitTick": true,
+  "laterStagesAbsent": true,
+  "oldVideosPreserved": true,
+  "preexistingChangesPreserved": true,
+  "originalSceneRestored": "Assets/Scenes/PrototypeCombatValidation.unity",
+  "originalSceneDirty": false,
+  "events": [
+    {
+      "kind": "Slash1",
+      "target": "Enemy_A",
+      "realSeconds": 0.5833333333333335,
+      "tick": 35
+    },
+    {
+      "kind": "Death",
+      "target": "Enemy_A",
+      "realSeconds": 1.0500000000000012,
+      "tick": 61
+    },
+    {
+      "kind": "Slash2",
+      "target": "Enemy_A",
+      "realSeconds": 1.0500000000000012,
+      "tick": 61
+    },
+    {
+      "kind": "RecoveryStart:PlayerVideo_Recovery_HorizontalSlash",
+      "target": "",
+      "realSeconds": 1.3666666666666667,
+      "tick": 78
+    },
+    {
+      "kind": "RearWindup",
+      "target": "Enemy_B",
+      "realSeconds": 1.566666666666666,
+      "tick": 90
+    },
+    {
+      "kind": "RecoveryEnd:PlayerVideo_Recovery_HorizontalSlash",
+      "target": "",
+      "realSeconds": 1.6166666666666658,
+      "tick": 93
+    },
+    {
+      "kind": "Parry",
+      "target": "Enemy_B",
+      "realSeconds": 2.0499999999999976,
+      "tick": 119
+    },
+    {
+      "kind": "CounterStart",
+      "target": "Enemy_B",
+      "realSeconds": 2.2666666666666635,
+      "tick": 129
+    },
+    {
+      "kind": "ChargeStart",
+      "target": "Enemy_B",
+      "realSeconds": 2.549999999999996,
+      "tick": 146
+    },
+    {
+      "kind": "ChargeRelease",
+      "target": "Enemy_B",
+      "realSeconds": 3.21666666666666,
+      "tick": 152
+    },
+    {
+      "kind": "Death",
+      "target": "Enemy_B",
+      "realSeconds": 3.2833333333333266,
+      "tick": 156
+    },
+    {
+      "kind": "Kick",
+      "target": "Enemy_B",
+      "realSeconds": 3.2833333333333266,
+      "tick": 156
+    },
+    {
+      "kind": "Landing",
+      "target": "Enemy_B",
+      "realSeconds": 3.5499999999999923,
+      "tick": 164
+    },
+    {
+      "kind": "RecoveryStart:PlayerVideo_Recovery_AirRoundhouse",
+      "target": "",
+      "realSeconds": 3.566666666666659,
+      "tick": 165
+    },
+    {
+      "kind": "RecoveryEnd:PlayerVideo_Recovery_AirRoundhouse",
+      "target": "",
+      "realSeconds": 4.099999999999991,
+      "tick": 197
+    }
+  ],
+  "implementationCommit": "4886a145a7b944742e27a53a48934bed17fceda1",
+  "preview": {
+    "selfContainedMp4": true,
+    "sameBytesAsEncodedMp4": true,
+    "htmlBytes": 940822,
+    "externalResources": false,
+    "automatedUiPlaybackVerified": false,
+    "uiCheckNote": "IAB could not reach the local QA server (timeout). The embedded MP4 matches the fully decoded 249-frame deliverable byte-for-byte."
+  }
+}

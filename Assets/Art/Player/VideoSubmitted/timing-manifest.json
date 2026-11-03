@@ -1,0 +1,345 @@
+{
+  "actions": [
+    {
+      "name": "VerticalSlash",
+      "provisional": true,
+      "canvasWidth": 128,
+      "canvasHeight": 128,
+      "pivotX": 32,
+      "pivotY": 38,
+      "count": 9,
+      "totalFrames": 38,
+      "hitFrame": 17,
+      "branchFrame": 29,
+      "recoveryFrame": 34,
+      "frames": [
+        {
+          "frames": 4,
+          "start": 0
+        },
+        {
+          "frames": 4,
+          "start": 4
+        },
+        {
+          "frames": 5,
+          "start": 8
+        },
+        {
+          "frames": 4,
+          "start": 13
+        },
+        {
+          "frames": 4,
+          "start": 17
+        },
+        {
+          "frames": 4,
+          "start": 21
+        },
+        {
+          "frames": 4,
+          "start": 25
+        },
+        {
+          "frames": 5,
+          "start": 29
+        },
+        {
+          "frames": 4,
+          "start": 34
+        }
+      ],
+      "includesSlashTrail": true,
+      "hitboxMin": {
+        "x": 0.5625,
+        "y": -1.1875
+      },
+      "hitboxMax": {
+        "x": 2.3125,
+        "y": 1.65625
+      },
+      "hasTrailHitbox": true
+    },
+    {
+      "name": "HorizontalSlash",
+      "provisional": true,
+      "includesSlashTrail": true,
+      "canvasWidth": 128,
+      "canvasHeight": 128,
+      "pivotX": 32,
+      "pivotY": 38,
+      "count": 8,
+      "totalFrames": 34,
+      "hitFrame": 13,
+      "branchFrame": 29,
+      "recoveryFrame": 29,
+      "frames": [
+        {
+          "frames": 4,
+          "start": 0
+        },
+        {
+          "frames": 4,
+          "start": 4
+        },
+        {
+          "frames": 5,
+          "start": 8
+        },
+        {
+          "frames": 4,
+          "start": 13
+        },
+        {
+          "frames": 4,
+          "start": 17
+        },
+        {
+          "frames": 4,
+          "start": 21
+        },
+        {
+          "frames": 4,
+          "start": 25
+        },
+        {
+          "frames": 5,
+          "start": 29
+        }
+      ],
+      "hitboxMin": {
+        "x": 0,
+        "y": -1.0625
+      },
+      "hitboxMax": {
+        "x": 2.65625,
+        "y": 0.15625
+      },
+      "hasTrailHitbox": true
+    },
+    {
+      "branchFrame": 0,
+      "canvasHeight": 64,
+      "canvasWidth": 64,
+      "count": 8,
+      "frames": [
+        {
+          "frames": 2,
+          "start": 0
+        },
+        {
+          "frames": 2,
+          "start": 2
+        },
+        {
+          "frames": 6,
+          "start": 4
+        },
+        {
+          "frames": 6,
+          "start": 10
+        },
+        {
+          "frames": 6,
+          "start": 16
+        },
+        {
+          "frames": 6,
+          "start": 22
+        },
+        {
+          "frames": 6,
+          "start": 28
+        },
+        {
+          "frames": 6,
+          "start": 34
+        }
+      ],
+      "hitFrame": 0,
+      "name": "ParryReady",
+      "pivotX": 32,
+      "pivotY": 38,
+      "totalFrames": 40
+    },
+    {
+      "branchFrame": 0,
+      "canvasHeight": 128,
+      "canvasWidth": 128,
+      "count": 8,
+      "frames": [
+        {
+          "frames": 2,
+          "start": 0
+        },
+        {
+          "frames": 1,
+          "start": 2
+        },
+        {
+          "frames": 1,
+          "start": 3
+        },
+        {
+          "frames": 1,
+          "start": 4
+        },
+        {
+          "frames": 1,
+          "start": 5
+        },
+        {
+          "frames": 1,
+          "start": 6
+        },
+        {
+          "frames": 1,
+          "start": 7
+        },
+        {
+          "frames": 2,
+          "start": 8
+        }
+      ],
+      "hasParryContact": true,
+      "hitFrame": 3,
+      "includesParryEffect": true,
+      "name": "ParrySuccessLight",
+      "parryContactOffset": {
+        "x": 1.40625,
+        "y": 0.1875
+      },
+      "pivotX": 32,
+      "pivotY": 38,
+      "provisional": true,
+      "totalFrames": 10
+    },
+    {
+      "canvasHeight": 64,
+      "canvasWidth": 64,
+      "count": 8,
+      "frames": [
+        {
+          "frames": 1,
+          "start": 0
+        },
+        {
+          "frames": 1,
+          "start": 1
+        },
+        {
+          "frames": 2,
+          "start": 2
+        },
+        {
+          "frames": 2,
+          "start": 4
+        },
+        {
+          "frames": 2,
+          "start": 6
+        },
+        {
+          "frames": 1,
+          "start": 8
+        },
+        {
+          "frames": 1,
+          "start": 9
+        },
+        {
+          "frames": 2,
+          "start": 10
+        }
+      ],
+      "name": "CounterTransfer",
+      "pivotX": 32,
+      "pivotY": 38,
+      "provisional": true,
+      "totalFrames": 12
+    },
+    {
+      "canvasHeight": 128,
+      "canvasWidth": 128,
+      "chargeFrame": 0,
+      "count": 15,
+      "counterContactOffset": {
+        "x": 1.59375,
+        "y": 0.125
+      },
+      "frames": [
+        {
+          "frames": 2,
+          "start": 0
+        },
+        {
+          "frames": 1,
+          "start": 2
+        },
+        {
+          "frames": 1,
+          "start": 3
+        },
+        {
+          "frames": 1,
+          "start": 4
+        },
+        {
+          "frames": 1,
+          "start": 5
+        },
+        {
+          "frames": 1,
+          "start": 6
+        },
+        {
+          "frames": 1,
+          "start": 7
+        },
+        {
+          "frames": 1,
+          "start": 8
+        },
+        {
+          "frames": 1,
+          "start": 9
+        },
+        {
+          "frames": 4,
+          "start": 10
+        },
+        {
+          "frames": 4,
+          "start": 14
+        },
+        {
+          "frames": 4,
+          "start": 18
+        },
+        {
+          "frames": 4,
+          "start": 22
+        },
+        {
+          "frames": 4,
+          "start": 26
+        },
+        {
+          "frames": 3,
+          "start": 30
+        }
+      ],
+      "hitFrame": 9,
+      "includesCounterTrail": true,
+      "landingFrame": 33,
+      "name": "CounterKick",
+      "pivotX": 32,
+      "pivotY": 38,
+      "provisional": false,
+      "recoveryFrame": 33,
+      "releaseFrame": 8,
+      "totalFrames": 33
+    }
+  ]
+}

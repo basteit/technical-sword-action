@@ -1,0 +1,151 @@
+{
+  "revision": "stable-light-parry-contact-and-impact",
+  "compile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "editMode": {
+    "passed": 181,
+    "total": 181,
+    "completedAt": "2026-10-13T03:12:49.1710808Z",
+    "rerunThisArtRevision": true
+  },
+  "playMode": {
+    "passed": 141,
+    "total": 141,
+    "completedAt": "2026-10-13T03:10:32.3046450Z"
+  },
+  "newPlayCases": 6,
+  "resetRuns": 40,
+  "authoring": {
+    "frames": 119,
+    "cleanExporterTags": 14,
+    "layers": 8,
+    "humanArtworkReceived": false,
+    "eyeMasks": 119,
+    "cleanExporterFrames": 91,
+    "reopened": true,
+    "tags": 18,
+    "tagRangesChecked": true,
+    "actionPixelsRedrawn": true,
+    "referencePixelsOnlyInHiddenReference": true,
+    "roughNeutralMatchesRecovery": true,
+    "cleanExporterRerunThisRevision": true,
+    "partialExporterTags": 2,
+    "partialExporterFrames": 12,
+    "partialEmptyTagRejected": true,
+    "partialUnknownTagRejected": true
+  },
+  "sourceHashes": {
+    "idle": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
+    "walk": "92FC9E07636331D2D6B5AAC363DC3AC6A53E030608DB1533D9CAE1505AE5F107"
+  },
+  "console": {
+    "warnings": 0,
+    "errors": 0
+  },
+  "visual": {
+    "slowDimStrength": 0.965,
+    "normalBackgroundRGB": [
+      250,
+      251,
+      253
+    ],
+    "slowBackgroundRGB": [
+      52,
+      52,
+      53
+    ],
+    "roundhouse": "19 poses: six slow inverted scissor poses, four fast downward release poses, contact, follow-through and low hand-plant landing.",
+    "sword": "Deep head/shoulder pitch, low hips and wider planted stance; low combo connections; exact contact poses held during hitstop.",
+    "parry": "Stable feet/hips, immediate blade contact, a short outward/upward beat, restrained torso recoil. Weapon separation and directed sparks start at contact.",
+    "kickVfx": "Hollow expanding ring, small contact spark; two short body afterimages at release."
+  },
+  "floor": {
+    "worldTopY": 0,
+    "backgroundRow": 156,
+    "backgroundLayers": 2,
+    "rgba": [
+      164,
+      179,
+      199,
+      255
+    ],
+    "coloursBelowContact": 1,
+    "pattern": false,
+    "allBelowContactFilled": true,
+    "captureVariants": 3,
+    "resetRuns": 40
+  },
+  "counterSpriteSynchronization": {
+    "phase": "After counter timer events and Animator.Update",
+    "chargeFrame": 18,
+    "chargePose": 6,
+    "releaseFrame": 24,
+    "releasePose": 12,
+    "hitFrame": 28,
+    "hitPose": 16,
+    "renderRates": [
+      30,
+      60,
+      120
+    ],
+    "mirroredLayouts": true,
+    "hitstopHoldsContact": true,
+    "slowPoses": 6,
+    "release30FpsFirstObservedPose": 13
+  },
+  "impactDirection": [
+    0.35,
+    -1
+  ],
+  "camera": {
+    "normalOrthographicSize": 2.109375,
+    "closeOrthographicSize": 1.6875,
+    "focusY": 1.05,
+    "pixelScaleAt1080p": [
+      8,
+      10
+    ]
+  },
+  "footContact": {
+    "canvasPixels": [
+      54,
+      48
+    ],
+    "worldOffsetFacingRight": [
+      0.6875,
+      -0.6875
+    ],
+    "insideTargetBeforeHitback": true,
+    "bothDirectionsTested": true
+  },
+  "swordContactPoses": [
+    "VerticalSlash_04",
+    "HorizontalSlash_04",
+    "RapidSheathe_05",
+    "IaiSlash_03"
+  ],
+  "lightParry": {
+    "weight": "Light",
+    "normalHitstopFrames": 2,
+    "justHitstopFrames": 3,
+    "contactCanvasPixels": [
+      51,
+      18
+    ],
+    "effectScale": 1.1,
+    "immediateSuccessPose": 3,
+    "cameraStrength": 0.135,
+    "cameraSeconds": 0.11666666666666667,
+    "cameraCycles": 1.25,
+    "darkFlashAt60fps": [
+      0.12,
+      0.06,
+      0
+    ],
+    "mirroredAndRenderRatesTested": true,
+    "pauseAndResetTested": true,
+    "heavyParryArtworkImplemented": false
+  }
+}

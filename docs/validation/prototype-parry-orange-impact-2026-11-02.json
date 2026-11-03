@@ -1,0 +1,79 @@
+{
+  "dateJst": "2026-11-02",
+  "issue": 33,
+  "branch": "issue/33-parry-shockwave",
+  "baselineCommit": "e5be916dfa6fa09bd7ea4241509456d998771703",
+  "implementationCommit": "3bd3044",
+  "mediaCommit": "788880b32ab150f6a456b37cda7da3694206a281",
+  "draftPullRequest": 98,
+  "dependencyPullRequests": [81],
+  "scope": "Additional gameplay-only orange sparks/light and actor-drawing jitter during synchronized light-parry hitstop",
+  "newEffectsRatherThanRecoloredOriginals": true,
+  "receivedArtworkAndCompletedFilmingAssetsPreserved": true,
+  "settings": {
+    "additionalSparkColor": [1, 0.36, 0.035, 1], "additionalGlowColor": [1, 0.25, 0.025, 0.45],
+    "sparkCount": 14, "sparkSeconds": 0.32, "sparkSpreadParameter": 1.2, "glowSeconds": 0.18,
+    "oldWhiteHaloStrength": 0, "oldWhiteActorLightPrevious": 0.4, "oldWhiteActorLightNow": 0.08,
+    "actorJitterMaximumVirtualPixels": 2, "virtualPixelsPerUnit": 32, "jitterStepSeconds": 0.0333333333,
+    "oppositeActorPhases": true, "jitterDecaysDuringStop": true,
+    "preservedHitstopTicks": 36, "preservedApproachMaxTicks": 8, "preservedBackgroundDim": 0.3,
+    "preservedWaveSeconds": 0.4, "preservedWavePixelsParameter": 32
+  },
+  "visualSettings": {
+    "vfxZero": "Disables and clears new sparks and glow",
+    "flashZero": "Suppresses new glow without erasing the colored spark information; old glow does not resurrect on toggle back",
+    "shakeZero": "Clears actor offsets without changing stop, timing or stock",
+    "pause": "Freezes particles and drawing offsets; turning a setting to zero still clears it",
+    "interruption": "Reset, hit, death, target loss, component disable and scene change release effects and owned offsets"
+  },
+  "compile": {"errors": 0, "warnings": 0},
+  "editMode": {"total": 288, "passed": 288, "failed": 0, "completedAtUtc": "2026-11-02T10:24:11.0966060Z"},
+  "focusedPrototypePlayMode": {"total": 130, "passed": 130, "failed": 0, "completedAtUtc": "2026-11-02T10:25:05.4965039Z"},
+  "fullPlayMode": {
+    "status": "Completed with existing failures", "total": 797, "passed": 784, "failed": 13, "skipped": 0,
+    "durationSeconds": 197.933, "completedAtUtc": "2026-11-02T10:33:17Z",
+    "localXml": ".uloop/outputs/TestResults/20261102_193317.xml",
+    "previousXml": ".uloop/outputs/TestResults/20261102_185744.xml",
+    "baselineXml": ".uloop/outputs/TestResults/20261026_195251.xml",
+    "allFailureFullNamesMatchPreviousAndBaseline": true, "newFailures": [],
+    "knownFailureGroups": {"videoKickHeight": 2, "videoChargeTiming": 3, "fourStageDefenseCancelVideo": 7, "legacyJustBoundaryExpectation": 1},
+    "focusedCounterTestsInFullRun": 130, "focusedCounterFailuresInFullRun": 0,
+    "cliTimedOutAt180Seconds": true, "recoveredFinalXmlWithoutDuplicateRun": true
+  },
+  "capture": {
+    "localRawDirectory": ".uloop/outputs/video/adaptive-parry-20261102-orange-v1/adaptive",
+    "comparisonSource": ".uloop/outputs/video/adaptive-parry-20261102-sync-v2/adaptive",
+    "rawFrameCount": 180, "fps": 60, "durationSeconds": 3,
+    "successFrame": 17, "impactFrame": 25, "visibleStaggerFrame": 69, "timingMatchesPreviousTake": true,
+    "impactEnemySprite": "EnemySample_attack_14", "maximumStopTicks": 36,
+    "orangeSparkSampleFrames": 20, "orangeGlowSampleFrames": 11,
+    "actorJitterSampleFrames": 36, "jitterSignChanges": 17,
+    "maximumPlayerJitterPixels": 2, "maximumEnemyJitterPixels": 2,
+    "maximumStoppedPlayerRootDrift": 0, "maximumStoppedEnemyRootDrift": 0,
+    "legacyWhiteHaloSeen": false, "maximumBackgroundAlpha": 0.30000001192092898,
+    "cameraOrthographicSize": 5.625, "cameraAspect": 1.7777777910232545, "cameraBasePosition": [0,3,-10],
+    "cropOrAddedZoom": false, "cameraRenderingNotHudCapture": true,
+    "parrySuccesses": 1, "damageHits": 0, "counters": 0, "playerHp": 100, "enemyHp": 30,
+    "additionalEffectAndOffsetResidueAtEnd": false
+  },
+  "media": [
+    {"file": "parry-adaptive-20261102-orange-on.mp4", "size": [1280,720], "fps": 30, "seconds": 3, "bytes": 218548, "sha256": "0AD04221AB3948EF2DAD02BE33B597A6D49641ADBF68660A77E271FA1A05B2ED"},
+    {"file": "parry-adaptive-20261102-orange-comparison.mp4", "size": [640,720], "fps": 30, "seconds": 3, "bytes": 196422, "sha256": "7263DEF2F8239B5C1456AE200A0FAB51BF92D78A35339B15C9452E97194D0E5F"},
+    {"file": "parry-adaptive-20261102-orange-detail.mp4", "size": [1280,720], "fps": 30, "seconds": 2.2666667, "bytes": 274459, "sha256": "C5DD310F1637E42E8AE53CF8738774E8478CE6B30D65C41F000DF1658205F434", "inspectionSpeed": 0.5},
+    {"file": "parry-adaptive-20261102-orange-detail.gif", "size": [640,360], "fps": 20, "seconds": 2.25, "bytes": 432206, "sha256": "D9B46737B3D6F018A631BCCFA9CBD0D122DD4AA72F4D825D8F973DF16C8F47A7", "inspectionSpeed": 0.5}
+  ],
+  "mediaVerification": {
+    "mp4Encoding": "H.264 Constrained Baseline, Level3.1, yuv420p, 30fps, no audio",
+    "allMp4Atoms": ["ftyp", "moov", "free", "mdat"], "allFourFilesFullyDecoded": true,
+    "rawImpactFrameAndDeliveredContactSheetVisuallyInspected": true,
+    "cdnBase": "https://cdn.jsdelivr.net/gh/basteit/technical-sword-action@788880b32ab150f6a456b37cda7da3694206a281/docs/video/previews/",
+    "onMp4HttpStatus": 200, "onMp4Mime": "video/mp4", "onMp4RangeStatus": 206,
+    "onMp4ContentRange": "bytes 0-1023/218548", "onMp4DownloadedSha256Matches": true,
+    "comparisonAndInspectionAndGifHeadStatus": 200, "physicalPhonePlayback": "Not tested"
+  },
+  "finalUnityState": {"scene": "Assets/Scenes/PrototypeCombatValidation.unity", "dirty": false, "playing": false, "paused": false, "missingScripts": 0, "counterValidationErrors": 0, "commonValidationErrors": 0, "consoleErrors": 0, "consoleWarnings": 0},
+  "requirementsStaging": "Only the new eight-line section and one related line staged; existing 645 additions / 171 deletions remain untouched",
+  "rollback": "Reset encounter with parryOrangeAccent=false, parryActorJitterPixels=0, parryActorLight=0.4 and parryLegacyBloomStrength=1",
+  "humanChecksStillRequired": ["Spark/light strength and jitter amplitude at gameplay distance", "Multiple enemies and repeated parry readability", "Keyboard and physical gamepad 15 minutes each", "Minimum-hardware Development/Release Build performance"],
+  "newBuildOrZipCreated": false
+}

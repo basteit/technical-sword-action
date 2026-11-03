@@ -1,0 +1,184 @@
+{
+  "date": "2026-10-24",
+  "sources": [
+    {
+      "id": "counter_kick",
+      "sha256": "170a5732e08d1cd3fe7626451c0ed85e7ebbdc07ca6803230466fcebdac4d4c5",
+      "revisions": 5
+    },
+    {
+      "id": "counter_kick_effect",
+      "sha256": "e1b72bf36cca4c8decfb18725e2db3b367f336be5fee481ca1af74d57fc6dfd8",
+      "revisions": 2
+    }
+  ],
+  "sourceAlignment": {
+    "bodyOffset": {
+      "x": 89,
+      "y": 43
+    },
+    "bodyReferenceMatchesAllFrames": true,
+    "effectBodyAndEyeExcluded": true,
+    "effectPivot": {
+      "x": 121,
+      "y": 123
+    },
+    "nativeDurations": {
+      "CounterKick": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "CounterKickEffect": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ]
+    },
+    "pairedGameTicks": [
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      4,
+      4,
+      4,
+      4,
+      4,
+      3
+    ],
+    "playerEffectExcluded": true,
+    "sourceUnmodified": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "editMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T00:43:06.6136472Z",
+    "TestCount": 3,
+    "PassedCount": 3,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T00:43:30.0436159Z",
+    "TestCount": 10,
+    "PassedCount": 10,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "fullSuiteRerun": false,
+  "repeatedResetSweepRerun": false,
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 5,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "comparisonCameraRestored": "{ folder = C:\\Users\\hirot\\GitHub\\technical-sword-action\\.uloop\\outputs\\video\\2stage-hybrid, normalRestored = 2.8125, closeRestored = 2.410714, zoom = 0, backgroundReleased = True }",
+  "gameCameraReference": {
+    "scene": "Assets/Scenes/PrototypeCombatValidation.unity",
+    "orthographicSize": 5.625,
+    "gameplayCameraChanged": false
+  },
+  "movies": [
+    {
+      "name": "close",
+      "path": "docs/video/previews/combat-2stage-hybrid-counter-revision-close-20261024.mp4",
+      "sha256": "8ea2112a601420430e2c10b77a2e10838502dea985916f6c86d842ceeab1ed83",
+      "decodedFrames": 308,
+      "durationSeconds": 5.133333333333334,
+      "fps": 60,
+      "width": 1920,
+      "height": 1080,
+      "audioStreams": 0,
+      "normalCameraSize": 2.8125,
+      "closeCameraSize": 2.4107142857142856,
+      "eventsAndTimingUnchanged": true,
+      "previewCrf": 22,
+      "previewBytes": 950912
+    },
+    {
+      "name": "game-near",
+      "path": "docs/video/previews/combat-2stage-hybrid-counter-revision-game-near-20261024.mp4",
+      "sha256": "13c594ff3b448cb270712322427a0e4fd84cee2805c804e1c28109b8180a77b0",
+      "decodedFrames": 308,
+      "durationSeconds": 5.133333333333334,
+      "fps": 60,
+      "width": 1920,
+      "height": 1080,
+      "audioStreams": 0,
+      "normalCameraSize": 4.21875,
+      "closeCameraSize": 3.375,
+      "eventsAndTimingUnchanged": true,
+      "previewCrf": 22,
+      "previewBytes": 738712
+    }
+  ],
+  "overallVideoAccepted": false,
+  "sourceLibrary": {
+    "valid": true,
+    "errors": [],
+    "pendingUses": 0
+  },
+  "background": {
+    "temporaryExtensionOnly": true,
+    "sourceTextureChanged": false,
+    "gridPitchPixels": 16,
+    "coverageWidth": 48,
+    "coverageAboveAndBelowGround": 32,
+    "floorFullWidthMatchesOriginalColor": true,
+    "releasedAfterCapture": true
+  },
+  "preservation": {
+    "baselineFiles": 2264,
+    "changedIntentionally": 18,
+    "byteIdentical": 2246,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 27
+  }
+}

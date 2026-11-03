@@ -1,0 +1,607 @@
+{
+  "date": "2026-10-17",
+  "branch": "issue/33-52-38-combat-polish",
+  "implementationCommit": "d3b674283086966c045a7274ce0493296adda516",
+  "layout": {
+    "frontX": 1.85,
+    "rearX": -1.6,
+    "outwardDeltaEach": 0.5,
+    "backgroundCellPixels": 16,
+    "pixelsPerUnit": 32,
+    "savedSceneResetAndBuilderMatch": true,
+    "mirroredTested": true,
+    "openingApproachSeconds": 0.1333333333333333,
+    "rearApproachSeconds": 0.3,
+    "usesGameplayMotorAndEnemyAi": true
+  },
+  "animation": {
+    "idleMotion": "IdleReference",
+    "moveMotion": "WalkReference",
+    "sourceArtworkUnchanged": true,
+    "skipAttackRecovery": true,
+    "directIdleAfterSwordStages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "directIdleAfterHeelLanding": true,
+    "maximumIdleSelectionDelayCombatTicks": 1,
+    "retainedOptionalRecoveryArtAndCancellationTests": true,
+    "landingAndInvincibilityEndUnchanged": true,
+    "queuedFirstBranchFrame": 29
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "phase": "Before final full regression"
+  },
+  "focused": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-17T10:16:11.7175432Z",
+    "TestCount": 10,
+    "PassedCount": 10,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-17T10:17:41.7837377Z",
+    "TestCount": 336,
+    "PassedCount": 336,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "editMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-17T10:18:00.1013339Z",
+    "TestCount": 186,
+    "PassedCount": 186,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "initialFocusedRun": {
+    "passed": 14,
+    "failed": 2,
+    "resolved": [
+      "At 120fps idle selection is asserted after a full combat tick rather than half a tick",
+      "Resume render intentionally suppresses attack input; capture now retries refused opening requests and the test advances one render before resuming"
+    ]
+  },
+  "resetRuns": {
+    "runsPassed": 40,
+    "runs": [
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": false,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 2,
+        "mirrored": true,
+        "duration": 4.583333333333322,
+        "frontHits": 2,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": false,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      },
+      {
+        "stages": 4,
+        "mirrored": true,
+        "duration": 5.733333333333318,
+        "frontHits": 4,
+        "rearHits": 1,
+        "chargeSeconds": 0.6666666865348816
+      }
+    ]
+  },
+  "console": {
+    "error": {
+      "TotalCount": 0,
+      "DisplayedCount": 0,
+      "LogType": "Error",
+      "MaxCount": 20,
+      "SearchText": "",
+      "IncludeStackTrace": false,
+      "Logs": []
+    },
+    "warning": {
+      "TotalCount": 0,
+      "DisplayedCount": 0,
+      "LogType": "Warning",
+      "MaxCount": 20,
+      "SearchText": "",
+      "IncludeStackTrace": false,
+      "Logs": []
+    }
+  },
+  "video": {
+    "path": "docs\\video\\previews\\combat-2stage-hybrid-grid-spacing-direct-idle.mp4",
+    "bytes": 784982,
+    "sha256": "fbafe34a6abbe4312913ec620c28c9554ffed2a0edc64b863b9e143946fc12aa",
+    "decodedFrames": 275,
+    "width": 1920,
+    "height": 1080,
+    "fps": 60.0,
+    "durationSeconds": 4.583333333333333,
+    "audioStreams": 0,
+    "codec": "h264"
+  },
+  "inlinePreview": {
+    "path": ".uloop\\outputs\\grid-spacing-direct-idle-20261017\\inline-preview.mp4",
+    "bytes": 734668,
+    "sha256": "28f6c6f74e03c46c59a45e71cd081b95c81379ffb0df5eb9826b7fcb77af82fd",
+    "decodedFrames": 275,
+    "width": 1920,
+    "height": 1080,
+    "fps": 60.0,
+    "durationSeconds": 4.583333333333333,
+    "audioStreams": 0,
+    "codec": "h264"
+  },
+  "inlineFragment": {
+    "path": "C:\\Users\\hirot\\.codex\\visualizations\\2026\\10\\12\\01a12de9-62c0-72d1-8001-9b40d2eb7a55\\combat-grid-spacing-direct-idle.html",
+    "bytes": 979922,
+    "nativeVideoControls": true,
+    "embeddedMovieBytesMatch": true,
+    "externalResources": false,
+    "playbackUiAutomatedCheck": "not performed; native controls, full MP4 decode and fragment checks passed"
+  },
+  "eventChecks": {
+    "onlyTwoSwordHits": true,
+    "frontDiesOnSecondHit": true,
+    "parryAndKickTarget": "Enemy_B",
+    "offensiveRecoveryEvents": 0,
+    "chargeRealSeconds": 0.6666666666666643,
+    "releaseToHitTicks": 4,
+    "hitToLandingTicks": 8
+  },
+  "events": [
+    {
+      "kind": "OpeningApproach",
+      "target": "Enemy_A",
+      "realSeconds": 0.3,
+      "tick": 18
+    },
+    {
+      "kind": "OpeningApproachEnd",
+      "target": "Enemy_A",
+      "realSeconds": 0.4333333333333333,
+      "tick": 26
+    },
+    {
+      "kind": "Slash1",
+      "target": "Enemy_A",
+      "realSeconds": 0.7166666666666672,
+      "tick": 43
+    },
+    {
+      "kind": "Death",
+      "target": "Enemy_A",
+      "realSeconds": 1.183333333333334,
+      "tick": 69
+    },
+    {
+      "kind": "Slash2",
+      "target": "Enemy_A",
+      "realSeconds": 1.183333333333334,
+      "tick": 69
+    },
+    {
+      "kind": "RearApproach",
+      "target": "Enemy_B",
+      "realSeconds": 1.6999999999999988,
+      "tick": 98
+    },
+    {
+      "kind": "RearWindup",
+      "target": "Enemy_B",
+      "realSeconds": 1.9999999999999978,
+      "tick": 116
+    },
+    {
+      "kind": "Parry",
+      "target": "Enemy_B",
+      "realSeconds": 2.4833333333333294,
+      "tick": 145
+    },
+    {
+      "kind": "CounterStart",
+      "target": "Enemy_B",
+      "realSeconds": 2.6999999999999953,
+      "tick": 155
+    },
+    {
+      "kind": "ChargeStart",
+      "target": "Enemy_B",
+      "realSeconds": 2.9833333333333276,
+      "tick": 172
+    },
+    {
+      "kind": "ChargeRelease",
+      "target": "Enemy_B",
+      "realSeconds": 3.649999999999992,
+      "tick": 178
+    },
+    {
+      "kind": "Death",
+      "target": "Enemy_B",
+      "realSeconds": 3.7166666666666583,
+      "tick": 182
+    },
+    {
+      "kind": "Kick",
+      "target": "Enemy_B",
+      "realSeconds": 3.7166666666666583,
+      "tick": 182
+    },
+    {
+      "kind": "Landing",
+      "target": "Enemy_B",
+      "realSeconds": 3.983333333333324,
+      "tick": 190
+    }
+  ],
+  "visualReview": {
+    "decodedMasterScenesReviewed": 12,
+    "contactSheet": "docs/video/previews/grid-spacing-direct-idle-contact.png",
+    "chargeWholePlayerAndTargetInFrame": true,
+    "nativeIdleAtStartAndEnd": true,
+    "flatFloorAndTrainingGridRetained": true
+  },
+  "preserved": {
+    "count": 1059,
+    "allSha256Match": true
+  },
+  "restoredEditor": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "repositoryImplementationAudit": {
+    "branch": "issue/33-52-38-combat-polish",
+    "base": "",
+    "staged": true,
+    "changedFiles": 11,
+    "attributes": [
+      "Assets/Scenes/PrototypeCombatValidation.unity: merge: unityyamlmerge",
+      "Assets/Art/test.aseprite: merge: unset"
+    ],
+    "problems": [],
+    "success": true
+  },
+  "remaining": [
+    "Human parry-ready/light-success and heel-drop artwork",
+    "Final readability and quality acceptance after artwork integration",
+    "Final full validation and export before closing #69"
+  ],
+  "repositoryArtifactsAudit": {
+    "branch": "issue/33-52-38-combat-polish",
+    "base": "",
+    "staged": true,
+    "changedFiles": 7,
+    "attributes": [
+      "Assets/Scenes/PrototypeCombatValidation.unity: merge: unityyamlmerge",
+      "Assets/Art/test.aseprite: merge: unset"
+    ],
+    "problems": [],
+    "success": true
+  },
+  "repositoryFinalHistoryAudit": {
+    "branch": "issue/33-52-38-combat-polish",
+    "base": "c1a0263",
+    "staged": false,
+    "changedFiles": 18,
+    "attributes": [
+      "Assets/Scenes/PrototypeCombatValidation.unity: merge: unityyamlmerge",
+      "Assets/Art/test.aseprite: merge: unset"
+    ],
+    "problems": [
+      "Commit convention: docs: record spaced direct-idle capture and validation",
+      "Commit convention: feat: widen capture spacing and return attacks directly to idle"
+    ],
+    "success": false,
+    "resolution": "Published history retained. Two nonconforming commit subjects are recorded in Draft PR #78; use compliant scoped subjects with Issue references when integrating by squash."
+  }
+}

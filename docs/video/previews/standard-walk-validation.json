@@ -1,0 +1,433 @@
+{
+  "validatedAtUtc": "2026-10-15T20:57:11.905839+00:00",
+  "adoptedTake": "studio-idle-walk-speed-1p5x.mp4",
+  "standardVideo": "studio-idle-walk-standard.mp4",
+  "configuredStandard": 4.4019,
+  "measuredStandard": 4.205703258514404,
+  "approvedMeasuredSpeed": 4.205703258514404,
+  "sceneValues": {
+    "Assets/Scenes/SampleScene.unity": 4.4019,
+    "Assets/Scenes/BasicActionValidation.unity": 4.4019,
+    "Assets/Scenes/CombatVideo.unity": 4.4019,
+    "Assets/Scenes/CombatVideoDefenseCancel.unity": 4.4019,
+    "Assets/Scenes/CombatVideoStudio.unity": 4.4019
+  },
+  "normalOperationWithoutSpeedOverride": {
+    "runsPassed": 60,
+    "configuredSpeed": 4.4019,
+    "minimumMeasuredSpeed": 4.205703,
+    "maximumMeasuredSpeed": 4.205703,
+    "speedOverriddenForVerification": false,
+    "runs": [
+      {
+        "fps": 30,
+        "direction": -1,
+        "run": 0,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": -1,
+        "run": 1,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": -1,
+        "run": 2,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": -1,
+        "run": 3,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": -1,
+        "run": 4,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": -1,
+        "run": 5,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": -1,
+        "run": 6,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": -1,
+        "run": 7,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": -1,
+        "run": 8,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": -1,
+        "run": 9,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": 1,
+        "run": 0,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": 1,
+        "run": 1,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": 1,
+        "run": 2,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": 1,
+        "run": 3,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": 1,
+        "run": 4,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": 1,
+        "run": 5,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": 1,
+        "run": 6,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": 1,
+        "run": 7,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": 1,
+        "run": 8,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 30,
+        "direction": 1,
+        "run": 9,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": -1,
+        "run": 0,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": -1,
+        "run": 1,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": -1,
+        "run": 2,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": -1,
+        "run": 3,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": -1,
+        "run": 4,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": -1,
+        "run": 5,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": -1,
+        "run": 6,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": -1,
+        "run": 7,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": -1,
+        "run": 8,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": -1,
+        "run": 9,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": 1,
+        "run": 0,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": 1,
+        "run": 1,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": 1,
+        "run": 2,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": 1,
+        "run": 3,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": 1,
+        "run": 4,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": 1,
+        "run": 5,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": 1,
+        "run": 6,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": 1,
+        "run": 7,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": 1,
+        "run": 8,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 60,
+        "direction": 1,
+        "run": 9,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": -1,
+        "run": 0,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": -1,
+        "run": 1,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": -1,
+        "run": 2,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": -1,
+        "run": 3,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": -1,
+        "run": 4,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": -1,
+        "run": 5,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": -1,
+        "run": 6,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": -1,
+        "run": 7,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": -1,
+        "run": 8,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": -1,
+        "run": 9,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": 1,
+        "run": 0,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": 1,
+        "run": 1,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": 1,
+        "run": 2,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": 1,
+        "run": 3,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": 1,
+        "run": 4,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": 1,
+        "run": 5,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": 1,
+        "run": 6,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": 1,
+        "run": 7,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": 1,
+        "run": 8,
+        "measuredSpeed": 4.205703
+      },
+      {
+        "fps": 120,
+        "direction": 1,
+        "run": 9,
+        "measuredSpeed": 4.205703
+      }
+    ]
+  },
+  "preview": {
+    "decodedFrames": 360,
+    "fps": 60,
+    "durationSeconds": 6,
+    "resolution": [
+      1920,
+      1080
+    ],
+    "audioStreams": 0,
+    "sourcePosesChecked": 360,
+    "pointSamplingExactMatches": 321,
+    "pointSamplingMaxMismatchRate": 0.006742769267167445,
+    "pointSamplingComparisonTolerance": 0.03,
+    "animationTimingUnchanged": true,
+    "allFramesInsideCamera": true
+  },
+  "sourceFileSha256": {
+    "idle": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
+    "walk": "92FC9E07636331D2D6B5AAC363DC3AC6A53E030608DB1533D9CAE1505AE5F107"
+  },
+  "preservedVideoSha256": {
+    "studio-idle-walk-original": "5203D31444F1593F4359ADECBA143CACABDB35E5D553E012BC99FF0BD5960352",
+    "studio-idle-walk-game-scale": "7F9A068ECB49CF6386AA86E5BA28DBDB0C83494448892B1B9B3F2F4ED1608FDB",
+    "studio-idle-walk-speed-1p5x": "9E030BC582CA23E4D900639221A962F043946DF3AAA623D1307BA0F7E9662505",
+    "studio-idle-walk-speed-2x": "BDA833BC232898461B563F2653867F2B35D324B320E8A88F797C9FAE13FCC2F5",
+    "studio-idle-walk-speed-comparison": "F62ABD5BB468144AAE180F2A0D11BCC37B1BA97B1CBF985967751DFB9D344D83"
+  },
+  "unityCompile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "editMode": {
+    "passed": 187,
+    "total": 187,
+    "completedAtUtc": "2026-10-15T20:49:59.4530847Z"
+  },
+  "playMode": {
+    "passed": 185,
+    "total": 185,
+    "completedAtUtc": "2026-10-15T20:51:13.7405509Z"
+  },
+  "postCaptureConsole": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "toolingRecovery": {
+    "initialCompileRequest": "timeout",
+    "recovery": "Restarted the clean Editor and removed the temporary server bootstrap; final compile and tests passed."
+  }
+}

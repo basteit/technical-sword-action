@@ -1,0 +1,69 @@
+{
+  "dateJst": "2026-10-18",
+  "issues": [49, 30],
+  "branch": "issue/33-52-38-combat-polish",
+  "implementationCommit": "ce57c7fdafa8f9b7a1996313e174f2bb7c4c0b0a",
+  "unity": "6000.3.9f1",
+  "uloop": "2.1.3",
+  "reproducedBeforeFix": {
+    "animationEventError": "Failed to call AnimationEvent OnAttackHit of class PlayerCombatTelemetry",
+    "horizontalSideCollision": true,
+    "localReport": ".uloop/outputs/TestResults/20261018_172240.xml"
+  },
+  "focusedPlayMode": {
+    "success": true,
+    "tests": 19,
+    "passed": 19,
+    "failed": 0,
+    "skipped": 0,
+    "completedAtUtc": "2026-10-18T08:25:19.4868904Z",
+    "newTests": 12,
+    "newCoverage": ["Real Animator ground and air four-step attacks with and without target", "Per-step single hit and telemetry equality", "Two platforms, both side directions, movement and Dash"]
+  },
+  "keyboardSmoke": {
+    "key": "J",
+    "presses": 10,
+    "attackAttempts": 10,
+    "finalActionState": "Neutral",
+    "finalAttacking": false,
+    "totalDamageWithoutTarget": 0,
+    "activeEnemies": 0,
+    "onAttackHitAnimationEventErrors": 0,
+    "allConsoleErrorsWereZero": false,
+    "toolOverlayErrors": 10,
+    "toolOverlayError": "InputVisualizationCanvas component not found on prefab",
+    "toolOverlaySource": "io.github.hatayama.uLoopMCP/Editor/Api/McpTools/Core/OverlayCanvasFactory.cs:61",
+    "warningsPresentBeforeConsoleClear": 98,
+    "screenshot": ".uloop/outputs/Screenshots/Rendering_20261018_173255_091.png"
+  },
+  "fullRegressionAttempt": {
+    "startedAtUtc": "2026-10-18T08:34:19.4752934Z",
+    "completedAtUtc": "2026-10-18T08:34:37.3811794Z",
+    "compile": { "success": true, "errors": 0, "warnings": 0 },
+    "completed": false,
+    "assetValidation": "interrupted by Domain Reload",
+    "editMode": "not run",
+    "playMode": "not run",
+    "localReport": ".uloop/outputs/PrototypeValidation/20261018-173419.json",
+    "resumptionDependency": "Apply parallel video submissions, Library, Clips and scenes consistently with the updated video tests before full regression"
+  },
+  "sceneSaveApprovedByUser": true,
+  "subsequentFullRegression": {
+    "implementationCommit": "f071850361b67c1818511dee6447fc5217a5729c",
+    "completed": true,
+    "editModePassed": 196,
+    "playModePassed": 381,
+    "consoleErrors": 0,
+    "consoleWarningsAfterVisualSmoke": 0,
+    "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+  },
+  "parallelVideoDefaultsPreservedUncommitted": ["blinkStartFrame = 0", "behindTarget = 0"],
+  "preExistingAndParallelChangesPreserved": true,
+  "cleanCheckoutValidated": false,
+  "unityOperationsReleasedToVideoWork": true,
+  "playModeStopped": true,
+  "humanAcceptanceCompleted": false,
+  "humanChecklist": "docs/prototype-action-stage.md",
+  "draftPullRequest": "https://github.com/basteit/technical-sword-action/pull/78",
+  "merged": false
+}

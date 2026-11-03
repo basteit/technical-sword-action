@@ -1,0 +1,50 @@
+{
+  "dateJst": "2026-10-26",
+  "issue": 34,
+  "branch": "issue/34-reference-combat-trial",
+  "implementationCommit": "d87c8af",
+  "pullRequest": 81,
+  "compile": {"errors": 0, "warnings": 0},
+  "editMode": {"total": 225, "passed": 225},
+  "focusedPlayMode": {"total": 165, "passed": 165, "newCases": 14, "trialFixtureCases": 36},
+  "spacing": {
+    "originalRootGap": 1.8125,
+    "currentRootGap": 2.125,
+    "addedDistance": 0.3125,
+    "targetContactOffsetBefore": 0.21875,
+    "targetContactOffsetAfter": 0.53125,
+    "authoredContactOffsetUnchanged": [1.59375, 0.325],
+    "hitRadiusUnchanged": 0.5
+  },
+  "facing": {
+    "turnsOnConfirmedCounterHit": true,
+    "turnsDuringApproachOrMiss": false,
+    "changesAiFacing": false,
+    "heldDuringHitstopLaunchAndDeathFade": true,
+    "returnsToAiAfterLivingStun": true,
+    "releasedOnResetAndDisable": true,
+    "testedRenderRates": [30, 60, 120],
+    "testedInitialHp": [30, 120],
+    "testedDirections": [-1, 1]
+  },
+  "gameView": {
+    "resolution": [1920, 1080],
+    "realParryThenCounter": true,
+    "measuredChargeAndContactGap": 2.125,
+    "launchFrame": 5,
+    "launchGap": 3.122257,
+    "heroRightEnemyFlipX": false,
+    "heroLeftEnemyFlipX": true,
+    "cleanShotsUseFlashAndVfxZeroTemporarily": true,
+    "effectsRestoredToOne": true,
+    "screenshots": [
+      "prototype-counter-spacing-2026-10-26/Rendering_20261026_033754_380.png",
+      "prototype-counter-spacing-2026-10-26/Rendering_20261026_033854_181.png",
+      "prototype-counter-spacing-2026-10-26/Rendering_20261026_034005_079.png"
+    ]
+  },
+  "preserved": ["received art", "shared PNGs", "clips", "normal attack speeds", "damage and gauge", "parry acceptance and stagger", "camera", "counter timing", "launch distance and height", "filming settings", "unrelated uncommitted changes"],
+  "finalEditorState": {"isPlaying": false, "isPaused": false, "sceneDirty": false, "missingScripts": 0, "validationErrors": 0, "consoleErrors": 0, "consoleWarnings": 0},
+  "notPerformed": ["full PlayMode rerun", "physical keys/gamepad", "15-minute human comparison", "new distribution Build/ZIP", "merge or issue close"],
+  "knownPriorFailures": "The 13 failures recorded by the full 2026-10-25 suite remain unresolved; this run does not claim full-suite acceptance."
+}

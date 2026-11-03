@@ -1,0 +1,388 @@
+{
+  "sourceSha256": "CCDB5DA3908F8DC0FD730291036964C5B6C2380991CF1DEF238E13A5FA5CE781",
+  "sourceCopyByteIdentical": true,
+  "attack1ExportBackwardCompatible": true,
+  "attack1PixelsPreserved": 9,
+  "attack2PixelsPreservedExceptBlackGuide": true,
+  "removedBlackGuidePixels": 1857,
+  "nativeDurationsMs": [
+    70,
+    70,
+    70,
+    70,
+    70,
+    70,
+    70,
+    70
+  ],
+  "nativeDurationMs": 560,
+  "gameFrames": 34,
+  "contactCel": 4,
+  "contactFrame": 13,
+  "pivot": [
+    32,
+    38
+  ],
+  "canvas": [
+    128,
+    128
+  ],
+  "pixelsPerUnit": 32,
+  "date": "2026-10-17",
+  "branch": "issue/33-52-38-combat-polish",
+  "implementationCommit": "01fc867d030c86f8845c8c96bd78f8e10650b718",
+  "video": "docs/video/previews/combat-2stage-hybrid-submitted-attacks-1-2.mp4",
+  "durationSeconds": 4.233333333333333,
+  "videoFrames": 254,
+  "fps": 60,
+  "width": 1920,
+  "height": 1080,
+  "audioStreams": 0,
+  "allVideoFramesDecoded": true,
+  "videoSha256": "0c4de64e957b5bb0ac864c7de823a52d5ca94b9c4bdd44560ec6ff8285ad197b",
+  "compileErrors": 0,
+  "compileWarnings": 0,
+  "playMode": {
+    "passed": 318,
+    "failed": 0,
+    "additionalCases": 3
+  },
+  "editMode": {
+    "passed": 186,
+    "failed": 0
+  },
+  "captureSceneResetRuns": 40,
+  "runs": [
+    {
+      "stages": 2,
+      "mirrored": false,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": false,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": false,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": false,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": false,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": false,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": false,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": false,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": false,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": false,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": true,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": true,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": true,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": true,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": true,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": true,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": true,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": true,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": true,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 2,
+      "mirrored": true,
+      "duration": 4.233333333333324,
+      "frontHits": 2,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": false,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": false,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": false,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": false,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": false,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": false,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": false,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": false,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": false,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": false,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": true,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": true,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": true,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": true,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": true,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": true,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": true,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": true,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": true,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    },
+    {
+      "stages": 4,
+      "mirrored": true,
+      "duration": 5.249999999999987,
+      "frontHits": 4,
+      "rearHits": 1,
+      "chargeSeconds": 0.6666666865348816
+    }
+  ],
+  "consoleErrors": 0,
+  "consoleWarnings": 0,
+  "frontEnemyHp": 2,
+  "frontEnemyHits": 2,
+  "frontEnemyDiesAt": "Slash2",
+  "thirdAndFourthStagesInThisVideo": false,
+  "fourStageImplementationPreserved": true,
+  "parryAndCounterArtworkStillRough": true,
+  "approvedUnsavedSceneSaved": true,
+  "approvedSceneFileByteIdentical": true,
+  "existingUserChangesPreserved": true
+}

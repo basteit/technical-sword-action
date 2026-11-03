@@ -1,0 +1,8 @@
+Action,LocalFrame,DocumentFrame,GameFrames,DurationMs,StartGameFrame,Phase,Event
+Dash,1,1,2,33,0,movement,
+Dash,2,2,3,50,2,movement,
+Dash,3,3,3,50,5,movement,
+Dash,4,4,4,67,8,movement,
+Recovery_Dash,1,5,3,50,0,free-recovery,
+Recovery_Dash,2,6,4,67,3,free-recovery,
+Recovery_Dash,3,7,4,67,7,free-recovery,

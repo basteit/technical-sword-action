@@ -1,0 +1,49 @@
+{
+  "dateJst": "2026-11-02",
+  "issue": 33,
+  "branch": "issue/33-parry-shockwave",
+  "pullRequest": 98,
+  "sourceCommit": "82c0627e2f407797d78117f0cbd22e9902ae1035",
+  "purpose": "Inspect parry contact and screen refraction more slowly; no gameplay or lighting changes",
+  "sourceRoot": ".uloop/outputs/video/parry-shockwave-20261102-v2",
+  "sourceFramesInclusive": [40, 60],
+  "sourceFps": 60,
+  "inspectionSpeed": 0.1,
+  "heldSourceFrame": 49,
+  "extraHoldSeconds": 1.5,
+  "timeline": [
+    {"outputSeconds": [0, 1.5], "sourceFramesInclusive": [40, 48], "speed": 0.1},
+    {"outputSeconds": [1.5, 3], "sourceFrame": 49, "mode": "DETAIL HOLD"},
+    {"outputSeconds": [3, 5], "sourceFramesInclusive": [49, 60], "speed": 0.1}
+  ],
+  "frameInterpolation": false,
+  "newRuntimeChanges": false,
+  "darkeningImprovementImplemented": false,
+  "sourceArtOrScenesChanged": false,
+  "unityRerun": "Not needed for this media-only edit; earlier runtime validation remains separately recorded, not rerun or newly claimed.",
+  "verification": {"bothMp4FullDecodePassed": true, "framesEach": 150, "durationSecondsEach": 5, "audio": false, "holdFrameVisuallyInspected": true},
+  "media": [
+    {
+      "path": "docs/video/previews/parry-impact-slow-on-20261102.mp4",
+      "resolution": [720, 486], "fps": 30, "frames": 150, "seconds": 5,
+      "codec": "H.264 Constrained Baseline, Level 3.1, yuv420p, faststart",
+      "bytes": 116004,
+      "sha256": "3B58D9C98EAE2E2433D7DF6FF85B6265907B0D7A18A359A9F3605564179D5130"
+    },
+    {
+      "path": "docs/video/previews/parry-impact-slow-comparison-20261102.mp4",
+      "resolution": [720, 972], "fps": 30, "frames": 150, "seconds": 5,
+      "codec": "H.264 Constrained Baseline, Level 3.1, yuv420p, faststart",
+      "layout": "Top OFF / bottom ON; both share the same source frame and time mapping",
+      "bytes": 200536,
+      "sha256": "75E1F07791D1C6677D23AEB5B82181B5071865A4302E6F8D3A97FABD3FEF5405"
+    },
+    {
+      "path": "docs/video/previews/parry-impact-slow-20261102.gif",
+      "resolution": [640, 432], "seconds": 5,
+      "bytes": 489592,
+      "sha256": "45358EAA837C373A6811107BC2109A867914169FC3472D978098FB6585A8EF2D"
+    }
+  ],
+  "notPerformed": ["physical phone playback", "new Unity tests or Build", "adoption or implementation of reduced-flicker proposals"]
+}

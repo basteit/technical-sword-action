@@ -1,0 +1,28 @@
+{
+  "dateJst": "2026-10-26",
+  "issue": 34,
+  "gameplayCommit": "c0d64c40d124fedf9e0a8728c8c0b68edae63bdd",
+  "video": "prototype-attack-1-2-review-20261026.mp4",
+  "sha256": "90213A69064D37B85AFED13637A82D9379737595E35A6B0A96D7E8D743BF51FF",
+  "bytes": 892857,
+  "frameCount": 900,
+  "fps": 60,
+  "durationSeconds": 15,
+  "resolution": [1280, 720],
+  "codec": "H.264 High / yuv420p / faststart",
+  "audio": false,
+  "playbackSpeed": 1,
+  "source": "PrototypeCombatValidation, actual player actions and combat clock, not the filming director",
+  "framing": "1920x1080 render cropped to 960x540 at 600,360; nearest-neighbor 1280x720 output. Gameplay camera unchanged.",
+  "segments": [
+    {"start": 0, "end": 3, "mode": "SnappyFirstTwo", "target": false, "facing": 1, "pairs": 2, "hitFrames": [9, 7]},
+    {"start": 3, "end": 6, "mode": "SnappyFirstTwo", "target": true, "facing": 1, "pairs": 2, "hitFrames": [9, 7], "actualHits": 4, "hpAfter": 960},
+    {"start": 6, "end": 9, "mode": "SnappyFirstTwo", "target": true, "facing": -1, "pairs": 2, "hitFrames": [9, 7], "actualHits": 4, "hpAfter": 960},
+    {"start": 9, "end": 12, "mode": "FastTrial", "target": false, "facing": 1, "pairs": 2, "hitFrames": [12, 9]},
+    {"start": 12, "end": 15, "mode": "FastTrial", "target": true, "facing": 1, "pairs": 2, "hitFrames": [12, 9], "actualHits": 4, "hpAfter": 960}
+  ],
+  "captureOnlyAdjustments": ["stationary normal enemy with HP1000 for repeated hit review", "temporarily paused AudioListener; no recorded audio"],
+  "gameplayAssetsChanged": false,
+  "validation": {"compileErrors": 0, "compileWarnings": 0, "captureAssertionsPassed": 5, "consoleErrors": 0, "consoleWarnings": 0},
+  "finalState": {"mode": "SnappyFirstTwo", "manualClock": false, "editorPaused": false, "inputEnabled": true, "audioPaused": false, "activeEnemies": 0, "sceneDirty": false, "playModeStopped": true}
+}

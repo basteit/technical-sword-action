@@ -1,0 +1,14 @@
+{
+  "file": "parry-light-before-after.mp4",
+  "beforeCommit": "c7a8b21d4c58bf8a6350b7edb2f0b0ee545b9eb0",
+  "width": 1920,
+  "height": 600,
+  "decodedFrames": 225,
+  "fps": 60,
+  "audioStreams": 0,
+  "duration": 3.75,
+  "normalSpeedRepeats": 3,
+  "halfSpeedRepeats": 3,
+  "sourceFirstFrame": 156,
+  "sourceLastFrame": 180
+}

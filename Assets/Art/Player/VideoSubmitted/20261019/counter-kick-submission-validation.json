@@ -1,0 +1,83 @@
+{
+  "contact": {
+    "frame": 9,
+    "x": 83,
+    "y": 86
+  },
+  "gameFrames": 22,
+  "guideHidden": true,
+  "kind": "kick",
+  "nativeFrames": [
+    {
+      "durationMs": 100,
+      "frame": 1
+    },
+    {
+      "durationMs": 100,
+      "frame": 2
+    },
+    {
+      "durationMs": 100,
+      "frame": 3
+    },
+    {
+      "durationMs": 100,
+      "frame": 4
+    },
+    {
+      "durationMs": 100,
+      "frame": 5
+    },
+    {
+      "durationMs": 100,
+      "frame": 6
+    },
+    {
+      "durationMs": 100,
+      "frame": 7
+    },
+    {
+      "durationMs": 100,
+      "frame": 8
+    },
+    {
+      "durationMs": 100,
+      "frame": 9
+    },
+    {
+      "durationMs": 100,
+      "frame": 10
+    },
+    {
+      "durationMs": 60,
+      "frame": 11
+    },
+    {
+      "durationMs": 60,
+      "frame": 12
+    },
+    {
+      "durationMs": 60,
+      "frame": 13
+    },
+    {
+      "durationMs": 60,
+      "frame": 14
+    },
+    {
+      "durationMs": 60,
+      "frame": 15
+    }
+  ],
+  "pivot": {
+    "x": 32,
+    "y": 38
+  },
+  "removedIsolatedGuidePixels": 0,
+  "reviewCopyReopened": true,
+  "silhouetteSampleOnly": false,
+  "sourceUnmodified": true,
+  "submittedBodyAndEffect": true,
+  "sourceSha256": "a763a95f3ff125bb379c8edee7f2b15c360c8afe6810edc710b1cdfae7898862",
+  "archiveSha256": "a763a95f3ff125bb379c8edee7f2b15c360c8afe6810edc710b1cdfae7898862"
+}

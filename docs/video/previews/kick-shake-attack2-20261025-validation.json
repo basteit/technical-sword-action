@@ -1,0 +1,196 @@
+{
+  "date": "2026-10-25",
+  "revision": "kick-shake-and-attack2-revision2",
+  "shake": {
+    "oldPeak": 0.3800000490565384,
+    "newPeak": 0.4799999999280937,
+    "increasePercent": 26.31577314788105,
+    "durationSeconds": 0.3,
+    "combinedLimit": 0.52,
+    "changedVideoFrames": [
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      234,
+      235,
+      236,
+      237
+    ],
+    "parryAndOrdinarySlashesUnchanged": true,
+    "zoomAndDistanceUnchanged": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "playMode": {
+    "initial": {
+      "Success": false,
+      "Message": "Test execution completed with status: Failed",
+      "CompletedAt": "2026-10-24T23:46:13.7549445Z",
+      "TestCount": 31,
+      "PassedCount": 25,
+      "FailedCount": 6,
+      "SkippedCount": 0,
+      "XmlPath": "C:\\Users\\hirot\\GitHub\\technical-sword-action\\.uloop/outputs\\TestResults\\20261025_084613.xml"
+    },
+    "initialFailureReason": "Old assertion sampled parry success rather than the authored third-cel impact. Corrected only the test sample point; parry behavior unchanged.",
+    "revalidatedSixShakeCases": {
+      "Success": true,
+      "Message": "Test execution completed with status: Passed",
+      "CompletedAt": "2026-10-24T23:47:14.6315134Z",
+      "TestCount": 6,
+      "PassedCount": 6,
+      "FailedCount": 0,
+      "SkippedCount": 0,
+      "XmlPath": null
+    },
+    "uniqueCasesPassed": 31
+  },
+  "editMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T23:47:27.5407757Z",
+    "TestCount": 5,
+    "PassedCount": 5,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "prototypeCheckScope": "Shared PNG/Art Set/Override/legacy Clip timing and events only.",
+  "mirroredTenResetRunsPassed": 20,
+  "fullSuiteRerun": false,
+  "sourceUpdate": {
+    "id": "attack_2",
+    "revision": 2,
+    "sha256": "91cb46e80401ea592beca3b6ee3c61b3d23928771f28fe0312c6d00aee80b6aa",
+    "nativeFrames": 8,
+    "canvas": [
+      128,
+      128
+    ],
+    "nativeDurationMs": 560,
+    "gameTicks": 34,
+    "hitTick": 13,
+    "recoveryTick": 29,
+    "hitboxUnchanged": true,
+    "layerVisibilityPreserved": true,
+    "visibleLayers": [
+      "Body",
+      "Hair"
+    ],
+    "hiddenArtworkLayers": [
+      "Sword",
+      "Effect",
+      "Sample"
+    ],
+    "oldRevisionRetained": true,
+    "downloadCurrentHistoryAndDatedCopyIdentical": true,
+    "allBodyAndEyePngsMatchAsepriteExport": true,
+    "editableReviewCopyReopened": true,
+    "allClipAndControllerBytesUnchanged": true,
+    "usesRecordedAfterValidation": [
+      "video",
+      "prototype"
+    ]
+  },
+  "sourceLibraryValid": true,
+  "pendingSourceUpdates": [],
+  "eventsAndNormalizedTraceExceptKickShakeUnchanged": true,
+  "hitstop": {
+    "parry": 9,
+    "just": 10,
+    "counter": 16,
+    "kickContactCelVideoFrames": 17
+  },
+  "captureConsole": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 10,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 10,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "originalValidationSceneByteUnchanged": true,
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-kick-shake-attack2-20261025.mp4",
+    "sha256": "4b755967791dd0faaf0838b9842abd6d8a6cbb5de112a12df543fe132285677e",
+    "decodedFrames": 275,
+    "durationSeconds": 4.583333333333333,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0
+  },
+  "preview": {
+    "path": "C:\\Users\\hirot\\.codex\\visualizations\\2026\\10\\12\\01a12de9-62c0-72d1-8001-9b40d2eb7a55\\kick-shake-attack2-20261025.html",
+    "bytes": 905579,
+    "crf": 24,
+    "decodedFrames": 275,
+    "nativeVideoControls": true
+  },
+  "endState": {
+    "bothEnemiesHidden": true,
+    "vfxActive": 0,
+    "hitstop": 0,
+    "slowScale": 1,
+    "cameraSize": 3.375,
+    "shake": [
+      0,
+      0
+    ],
+    "parryBacklight": false,
+    "counterLighting": false,
+    "player": "submitted idle"
+  },
+  "baselineAudit": {
+    "files": 2480,
+    "unchanged": 2464,
+    "intentionalChanges": [
+      "ArtSource/Player/Current/Player_attack_2.aseprite",
+      "ArtSource/Player/INDEX.md",
+      "ArtSource/Player/README.md",
+      "ArtSource/Player/catalog.json",
+      "Assets/Art/Player/VideoSubmitted/HorizontalSlash_01.png",
+      "Assets/Art/Player/VideoSubmitted/HorizontalSlash_02.png",
+      "Assets/Art/Player/VideoSubmitted/HorizontalSlash_03.png",
+      "Assets/Art/Player/VideoSubmitted/HorizontalSlash_04.png",
+      "Assets/Art/Player/VideoSubmitted/HorizontalSlash_05.png",
+      "Assets/Art/Player/VideoSubmitted/HorizontalSlash_06.png",
+      "Assets/Art/Player/VideoSubmitted/HorizontalSlash_07.png",
+      "Assets/Art/Player/VideoSubmitted/HorizontalSlash_08.png",
+      "Assets/Editor/CombatVideoArtBuilder.cs",
+      "Assets/Scripts/Video/VideoCombatPresentation.cs",
+      "Assets/Tests/PlayMode/PlayerState/CombatVideoIntegrationTests.cs",
+      "docs/video/capture-guide.md"
+    ],
+    "existingUncommittedChangesPreserved": true
+  },
+  "overallVideoAccepted": false
+}

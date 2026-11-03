@@ -1,0 +1,50 @@
+{
+  "gameFrames": 12,
+  "guideHidden": true,
+  "kind": "transfer",
+  "nativeFrames": [
+    {
+      "durationMs": 100,
+      "frame": 1
+    },
+    {
+      "durationMs": 100,
+      "frame": 2
+    },
+    {
+      "durationMs": 100,
+      "frame": 3
+    },
+    {
+      "durationMs": 100,
+      "frame": 4
+    },
+    {
+      "durationMs": 100,
+      "frame": 5
+    },
+    {
+      "durationMs": 100,
+      "frame": 6
+    },
+    {
+      "durationMs": 100,
+      "frame": 7
+    },
+    {
+      "durationMs": 100,
+      "frame": 8
+    }
+  ],
+  "pivot": {
+    "x": 32,
+    "y": 38
+  },
+  "removedIsolatedGuidePixels": 0,
+  "reviewCopyReopened": true,
+  "silhouetteSampleOnly": false,
+  "sourceUnmodified": true,
+  "source": "C:\\Users\\hirot\\Downloads\\e\\Player_counter_transfer.aseprite",
+  "sourceSha256": "299dc68428aa7653ea56bfad548cbde0f737bbd5a36f10afe964b93261a41b2b",
+  "archiveSha256": "299dc68428aa7653ea56bfad548cbde0f737bbd5a36f10afe964b93261a41b2b"
+}

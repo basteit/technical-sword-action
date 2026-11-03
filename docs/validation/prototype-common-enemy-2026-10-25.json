@@ -1,0 +1,43 @@
+{
+  "dateJst": "2026-10-25",
+  "issue": 43,
+  "branch": "issue/43-prototype-enemy-art",
+  "baselineCommit": "26d3956f17cb647d918b71e48cccd75e07bf472b",
+  "implementationCommits": ["c0a273a", "fc32f93"],
+  "compile": {"errors": 0, "warnings": 0},
+  "editMode": {"total": 220, "passed": 220, "newAssetTests": 3},
+  "focusedPlayMode": {
+    "total": 104,
+    "passed": 104,
+    "newPresentationTests": 13,
+    "fixtures": ["PrototypeEnemyArtTests", "PrototypeCounterCinematicTests", "PrototypeDialogueTests"]
+  },
+  "preserved": {
+    "normalHp": 30,
+    "normalDamage": 10,
+    "normalWindupCombatTicks": 30,
+    "parryStaggerCombatTicks": 180,
+    "playerAttackHitFrames": [15, 12, 15, 38],
+    "playerAttackCancelFrames": [17, 14, 17, 40],
+    "strongEnemyArtUnchanged": true,
+    "receivedSourcesAndSharedSpritesUnchanged": true,
+    "filmingLibraryAndScenesUnchanged": true
+  },
+  "gameView": {
+    "resolution": [1920, 1080],
+    "invokedPreset": "PrototypeCombatArena.ResetArena(false), same handler as F1",
+    "enemyCount": 1,
+    "motion": "Idle",
+    "sprite": "EnemySample_idle_01",
+    "worldFeetY": 0,
+    "screenshot": "prototype-common-enemy-2026-10-25/Rendering_20261025_222003_450.png"
+  },
+  "toolLimitation": {
+    "uloopSimulateKeyboardF1Succeeded": false,
+    "reason": "InputVisualizationCanvas component not found on prefab; missing script warnings in uLoop simulation overlays",
+    "cleanup": "Stopped only the two verification CLI processes, exited PlayMode to discard runtime overlays, reset injected Unity keyboard state. Package files were not changed. Subsequent ordinary PlayMode verification had no errors or warnings."
+  },
+  "finalEditorState": {"isPlaying": false, "sceneDirty": false, "missingScripts": 0, "consoleErrors": 0, "consoleWarnings": 0},
+  "notPerformed": ["physical F1 key confirmation", "physical gamepad playtest", "15-minute human feel test", "full PlayMode suite rerun", "new Development Build or ZIP"],
+  "knownPriorFailures": "The preceding dialogue task recorded 13 mismatches in video/parry fixtures. Those were not re-tested or resolved by this enemy artwork change."
+}
