@@ -5,6 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Technical Sword Action/Counter Cinematic Profile")]
 public sealed class CounterCinematicProfile : ScriptableObject
 {
+    private const int MaxParryEnemyReleasePixels = 16;
     public VideoArtLibrary art;
     public Material glowMaterial;
     public Shader subjectLiftShader;
@@ -69,7 +70,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(.01f)] public float parrySparkRadius = 1.2f;
     [Range(0, 4)] public float parryActorJitterPixels = 2;
     [Min(1)] public int parryActorJitterStepFrames = 2;
-    [Range(0, 8)] public float parryEnemyReleasePixels;
+    [Range(0, MaxParryEnemyReleasePixels)] public float parryEnemyReleasePixels;
     [Range(0, 30)] public float parryEnemyReleaseLeanDegrees;
     [Header("Parry contact camera (gameplay only)")]
     public bool parryCameraEnabled = true;
@@ -140,7 +141,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
         Finite(parrySparkSeconds) && parrySparkSeconds > 0 && Finite(parryGlowSeconds) && parryGlowSeconds > 0 &&
         Finite(parrySparkRadius) && parrySparkRadius > 0 &&
         Finite(parryActorJitterPixels) && parryActorJitterPixels >= 0 && parryActorJitterPixels <= 4 && parryActorJitterStepFrames > 0 &&
-        Finite(parryEnemyReleasePixels) && parryEnemyReleasePixels >= 0 && parryEnemyReleasePixels <= 8 &&
+        Finite(parryEnemyReleasePixels) && parryEnemyReleasePixels >= 0 && parryEnemyReleasePixels <= MaxParryEnemyReleasePixels &&
         Finite(parryEnemyReleaseLeanDegrees) && parryEnemyReleaseLeanDegrees >= 0 && parryEnemyReleaseLeanDegrees <= 30 &&
         Finite(parryLightRiseSeconds) && parryLightRiseSeconds > 0 &&
         Finite(parryLightHoldSeconds) && parryLightHoldSeconds >= 0 &&

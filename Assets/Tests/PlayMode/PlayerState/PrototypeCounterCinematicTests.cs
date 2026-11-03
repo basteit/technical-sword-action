@@ -833,9 +833,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             Assert.That(positive&&negative,Is.True);Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);
             Assert.That(Get<bool>(presentation,"IsParryActorJitterActive"),Is.False);
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(direction*8f/32));
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(direction*16f/32));
             Assert.That(Mathf.DeltaAngle(baseAngle,drawing.localEulerAngles.z),Is.EqualTo(-direction*20).Within(.001f));
-            float previous=8f/32,previousLean=20;
+            float previous=16f/32,previousLean=20;
             for(int i=0;i<=fps/4;i++)
             {
                 float offset=Get<float>(enemyArt,"ImpactOffsetX");
@@ -860,10 +860,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));Until(()=>!TimeValue<bool>("IsHitStopped"));
             var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
             var drawing=Get<SpriteRenderer>(enemyArt,"Artwork").transform;
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(4f/32));
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(8f/32));
             Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(-10).Within(.001f));
             Static("SetPaused",true);Frames(12);
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(4f/32));
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(8f/32));
             Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(-10).Within(.001f));
             Set(settings,"shake",0f);Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);

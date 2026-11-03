@@ -20,7 +20,7 @@
 
 ## 試作設定と戻し方
 
-`CounterCinematic.asset` と `CounterLaunch_ReferenceTrial.asset` で調整する。火花は全32本のうち24本が敵方向、残りは短い返り火。 `parryDirectionalSparks=false` で前の放射状に戻せる。停止解除時の最大反動は `parryEnemyReleasePixels=8`（32PPU）と `parryEnemyReleaseLeanDegrees=20`。足元を軸にした傾きと横への押し出しは弾き切りの8Fに沿って減衰し、停止中の揺れはそのまま。従来の4pxの動きに戻す場合は 4px / 0°、反動だけを無効にする場合は両方0にする。
+`CounterCinematic.asset` と `CounterLaunch_ReferenceTrial.asset` で調整する。火花は全32本のうち24本が敵方向、残りは短い返り火。 `parryDirectionalSparks=false` で前の放射状に戻せる。停止解除時の最大反動は `parryEnemyReleasePixels=16`（32PPU）と `parryEnemyReleaseLeanDegrees=20`。8 → 16pxの変更は横への押し出しだけで、スプライト・傾き・弾き切りの8Fは維持する。前の動きに戻す場合は押し出しを8pxに、反動だけを無効にする場合は両方0にする。
 
 カメラは戻りの開始と長さ（0.18秒）は維持し、`parryCameraReturnCurve` の先頭キーの左右接線を 3 → 0.25 に変更した。前の戻り方が必要なら接線を3に戻す。反撃への引き継ぎは別設定のまま。
 

@@ -38,8 +38,6 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<float>(profile,"parryLegacyBloomStrength"),Is.Zero);
             Assert.That(Get<bool>(profile,"parryOrangeAccent"),Is.True);
             Assert.That(Get<float>(profile,"parryActorJitterPixels"),Is.EqualTo(2));
-            Assert.That(Get<float>(profile,"parryEnemyReleasePixels"),Is.EqualTo(8));
-            Assert.That(Get<float>(profile,"parryEnemyReleaseLeanDegrees"),Is.EqualTo(20));
             Assert.That(Get<bool>(profile,"parryCameraEnabled"),Is.True);
             Assert.That(Get<bool>(profile,"parryCameraReturnOnHitstopEnd"),Is.True);
             Assert.That(Get<bool>(profile,"parryCounterCameraBridge"),Is.True);
@@ -75,6 +73,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<int[]>(motion, "durations"), Is.EqualTo(Get<int[]>(original, "durations")));
                 Assert.That(Get<Sprite[]>(motion, "frames"), Is.Not.SameAs(Get<Sprite[]>(original, "frames")), "Independent timing/reference snapshot.");
             }
+        }
+
+        [TestCase("CounterCinematic.asset")]
+        [TestCase("CounterLaunch_ReferenceTrial.asset")]
+        public void BothGameplayProfilesDoubleTheRecoilDistanceWithoutIncreasingTheLean(string filename)
+        {
+            var profile = AssetDatabase.LoadAssetAtPath<ScriptableObject>(Folder + filename);
+            Assert.That(profile, Is.Not.Null);
+            Assert.That(Get<bool>(profile,"IsParryTuningValid"),Is.True);
+            Assert.That(Get<float>(profile,"parryEnemyReleasePixels"),Is.EqualTo(16));
+            Assert.That(Get<float>(profile,"parryEnemyReleaseLeanDegrees"),Is.EqualTo(20));
         }
 
         [Test] public void TransferAndKickClipMatchesClockWithoutChangingLegacyDataOrEvents()
