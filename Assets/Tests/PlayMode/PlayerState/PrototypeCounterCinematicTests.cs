@@ -804,12 +804,14 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [TestCase(30,1)] [TestCase(60,1)] [TestCase(120,1)]
         [TestCase(30,-1)] [TestCase(60,-1)] [TestCase(120,-1)]
-        public void HitstopJittersBothDrawingsAndReleaseLeansOnlyTheEnemyAroundItsFeet(int fps,int direction)
+        public void HitstopJittersBothDrawingsThenTheEnemyRetreatsInAFixedPose(int fps,int direction)
         {
             Set(Get<object>(feedback,"Settings"),"shake",1f);
             var target=BeginAuthoredAdaptiveParry(direction);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
             var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
-            var drawing=Get<SpriteRenderer>(enemyArt,"Artwork").transform;
+            var renderer=Get<SpriteRenderer>(enemyArt,"Artwork");
+            var contactSprite=renderer.sprite;
+            var drawing=renderer.transform;
             float baseAngle=drawing.localEulerAngles.z;
             Vector2 playerRoot=body.position,enemyRoot=target.transform.position;
             var enemyBox=target.GetComponent<BoxCollider2D>();
@@ -833,43 +835,90 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             Assert.That(positive&&negative,Is.True);Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);
             Assert.That(Get<bool>(presentation,"IsParryActorJitterActive"),Is.False);
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(direction*16f/32));
-            Assert.That(Mathf.DeltaAngle(baseAngle,drawing.localEulerAngles.z),Is.EqualTo(-direction*20).Within(.001f));
-            float previous=16f/32,previousLean=20;
-            for(int i=0;i<=fps/4;i++)
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(direction*4f/32));
+            float previous=0;int outwardSteps=0,retreatSamples=0;
+            while(Get<bool>(presentation,"IsParrySequenceActive")&&retreatSamples++<fps)
             {
                 float offset=Get<float>(enemyArt,"ImpactOffsetX");
-                Assert.That(offset*direction,Is.InRange(0f,previous));previous=offset*direction;
-                float lean=-direction*Mathf.DeltaAngle(baseAngle,drawing.localEulerAngles.z);
-                Assert.That(lean,Is.InRange(-.001f,previousLean+.001f));previousLean=lean;
+                Assert.That(offset*direction,Is.InRange(previous,1f));
+                if(offset*direction>previous)outwardSteps++;previous=offset*direction;
+                Assert.That(renderer.sprite,Is.SameAs(contactSprite));
+                Assert.That(Mathf.DeltaAngle(baseAngle,drawing.localEulerAngles.z),Is.EqualTo(-direction*20).Within(.001f));
                 Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);
                 Assert.That((Vector2)target.transform.position,Is.EqualTo(enemyRoot));
                 Assert.That(enemyBox.bounds.center,Is.EqualTo(enemyCollider));
-                if(Get<bool>(presentation,"IsParrySequenceActive"))
-                    Assert.That(Vector3.Distance(drawing.TransformPoint(footPivot),enemyFoot+Vector3.right*offset),Is.LessThan(.0001f));
+                Assert.That(Vector3.Distance(drawing.TransformPoint(footPivot),enemyFoot+Vector3.right*offset),Is.LessThan(.0001f));
+                RenderAt(fps);
+            }
+            Assert.That(Get<bool>(presentation,"IsParrySequenceActive"),Is.False);
+            Assert.That(outwardSteps,Is.GreaterThanOrEqualTo(3),"Multiple outward steps must be visible even at 30fps.");
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(direction*1f));
+            Assert.That(renderer.sprite.name,Does.Contain("down"));
+            previous=1;
+            for(int i=0;i<=fps/4;i++)
+            {
+                float offset=Get<float>(enemyArt,"ImpactOffsetX")*direction;
+                Assert.That(offset,Is.InRange(0f,previous));previous=offset;
+                Assert.That((Vector2)target.transform.position,Is.EqualTo(enemyRoot));
+                Assert.That(enemyBox.bounds.center,Is.EqualTo(enemyCollider));
                 RenderAt(fps);
             }
             Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
             Assert.That(Mathf.DeltaAngle(baseAngle,drawing.localEulerAngles.z),Is.Zero.Within(.001f));
             Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));Frames(24);AssertClean();
         }
-        [Test] public void EnemyReleaseDrawingFreezesInPauseAndDoesNotReturnAfterZeroShake()
+        [TestCase(false)] [TestCase(true)]
+        public void EnemyReleaseDrawingFreezesInPauseAndDoesNotReturnAfterZeroShake(bool duringSettle)
         {
             var settings=Get<object>(feedback,"Settings");Set(settings,"shake",.5f);
             var target=BeginAuthoredAdaptiveParry(1);
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));Until(()=>!TimeValue<bool>("IsHitStopped"));
+            if(duringSettle)Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));
             var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
             var drawing=Get<SpriteRenderer>(enemyArt,"Artwork").transform;
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(8f/32));
-            Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(-10).Within(.001f));
+            float expectedOffset=duringSettle?16f/32:2f/32,expectedLean=duringSettle?0:-10;
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(expectedOffset));
+            Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(expectedLean).Within(.001f));
             Static("SetPaused",true);Frames(12);
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(8f/32));
-            Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(-10).Within(.001f));
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(expectedOffset));
+            Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(expectedLean).Within(.001f));
             Set(settings,"shake",0f);Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
             Set(settings,"shake",1f);Static("SetPaused",false);Frames(2);
             Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
             Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.Zero.Within(.001f));
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void EnemyRetreatClearsWhenTheCounterStarts(bool queued)
+        {
+            Set(Get<object>(feedback,"Settings"),"shake",1f);
+            var target=BeginAuthoredAdaptiveParry(1);
+            Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
+            var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
+            if(!queued)
+            {
+                Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));
+                Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Not.Zero);
+            }
+            Assert.That((bool)Call(player,"RequestAction",PlayerActionRequest.Attack),Is.True);
+            Until(()=>Get<bool>(counter,"IsActive"));
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
+            Assert.That(Get<int>(counter,"ConsumedCount"),Is.EqualTo(1));
+        }
+        [TestCase("Reset")] [TestCase("Hit")] [TestCase("TargetDisabled")]
+        public void EnemyRetreatSettleCannotReappearAfterInterruption(string operation)
+        {
+            Set(Get<object>(feedback,"Settings"),"shake",1f);
+            var target=BeginAuthoredAdaptiveParry(1);
+            Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));
+            var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Not.Zero);
+            if(operation=="Reset")Call(arena,"ResetActionsOnly");
+            else if(operation=="Hit")Call(player,"ForceHit","EnemyRetreatSettle");
+            else target.gameObject.SetActive(false);
+            Call(presentation,"AdvanceVisuals",0f);
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
+            Frames(5);Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
         }
         [TestCase(0f,1f,1f,false,false,true)] [TestCase(1f,0f,1f,true,false,true)]
         [TestCase(1f,1f,0f,true,true,false)] [TestCase(.5f,.5f,.5f,true,true,true)] [TestCase(0f,0f,0f,false,false,false)]

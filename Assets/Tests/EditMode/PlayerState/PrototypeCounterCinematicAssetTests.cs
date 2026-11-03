@@ -77,13 +77,14 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [TestCase("CounterCinematic.asset")]
         [TestCase("CounterLaunch_ReferenceTrial.asset")]
-        public void BothGameplayProfilesDoubleTheRecoilDistanceWithoutIncreasingTheLean(string filename)
+        public void BothGameplayProfilesUseAFullTileOfFixedPoseRetreat(string filename)
         {
             var profile = AssetDatabase.LoadAssetAtPath<ScriptableObject>(Folder + filename);
             Assert.That(profile, Is.Not.Null);
             Assert.That(Get<bool>(profile,"IsParryTuningValid"),Is.True);
-            Assert.That(Get<float>(profile,"parryEnemyReleasePixels"),Is.EqualTo(16));
+            Assert.That(Get<float>(profile,"parryEnemyReleasePixels"),Is.EqualTo(32));
             Assert.That(Get<float>(profile,"parryEnemyReleaseLeanDegrees"),Is.EqualTo(20));
+            Assert.That(Get<int>(profile,"parryEnemyReleaseSettleFrames"),Is.EqualTo(8));
         }
 
         [Test] public void TransferAndKickClipMatchesClockWithoutChangingLegacyDataOrEvents()

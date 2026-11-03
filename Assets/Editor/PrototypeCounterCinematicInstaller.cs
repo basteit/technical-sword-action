@@ -31,7 +31,8 @@ public static class PrototypeCounterCinematicInstaller
             profile.parryCameraZoomCurve = CounterCinematicProfile.CreateParryZoomCurve();
             profile.parryCameraReturnCurve = CounterCinematicProfile.CreateParryReturnCurve();
             profile.parryReferenceAccent = true; profile.parryReferenceSparkRadius = 3.2f;
-            profile.parryDirectionalSparks = true; profile.parryEnemyReleasePixels = 16; profile.parryEnemyReleaseLeanDegrees = 20;
+            profile.parryDirectionalSparks = true; profile.parryEnemyReleasePixels = 32; profile.parryEnemyReleaseLeanDegrees = 20;
+            profile.parryEnemyReleaseSettleFrames = 8;
             profile.parryFlareLength = 10.5f; profile.parryFlareSeconds = .1f;
             if (!profile.IsValid) throw new InvalidOperationException("Invalid expressive parry trial: " + path);
             EditorUtility.SetDirty(profile); AssetDatabase.SaveAssetIfDirty(profile);

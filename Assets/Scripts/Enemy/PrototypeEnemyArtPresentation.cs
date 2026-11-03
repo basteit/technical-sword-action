@@ -37,7 +37,8 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         impactOffsetOwner = owner; impactOffsetX = worldX; impactLeanDegrees = leanDegrees; Show();
     }
     public void ReleaseImpactOffset(object owner)
-    { if (ReferenceEquals(impactOffsetOwner, owner)) { ResetImpactOffset(); Show(); } }
+    { if (IsImpactOffsetOwnedBy(owner)) { ResetImpactOffset(); Show(); } }
+    public bool IsImpactOffsetOwnedBy(object owner) => owner != null && ReferenceEquals(impactOffsetOwner, owner);
     private void ResetImpactOffset()
     { impactOffsetOwner = null; impactOffsetX = impactLeanDegrees = 0; }
     public bool HasAuthoredParryCue => isActiveAndEnabled && artwork != null && artwork.enabled &&

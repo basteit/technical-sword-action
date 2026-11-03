@@ -71,8 +71,9 @@ MonoBehaviour:
   parrySparkRadius: 1.2
   parryActorJitterPixels: 2
   parryActorJitterStepFrames: 2
-  parryEnemyReleasePixels: 16
+  parryEnemyReleasePixels: 32
   parryEnemyReleaseLeanDegrees: 20
+  parryEnemyReleaseSettleFrames: 8
   parryCameraEnabled: 1
   parryCameraReturnOnHitstopEnd: 1
   parryCounterCameraBridge: 1

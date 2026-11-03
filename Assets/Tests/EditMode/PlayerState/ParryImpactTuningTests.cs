@@ -44,11 +44,18 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("parryFlareLength",0f)] [TestCase("parryFlareSeconds",float.NaN)] [TestCase("parryReferenceSparkRadius",-1f)]
         [TestCase("parryCameraArcHeight",-1f)]
         [TestCase("parryEnemyReleasePixels",-1f)] [TestCase("parryEnemyReleasePixels",float.NaN)]
-        [TestCase("parryEnemyReleasePixels",17f)]
+        [TestCase("parryEnemyReleasePixels",33f)]
         [TestCase("parryEnemyReleaseLeanDegrees",31f)] [TestCase("parryEnemyReleaseLeanDegrees",float.NaN)]
         [TestCase("parryCounterCameraBridgeSeconds",0f)] [TestCase("parryCounterCameraBridgeSeconds",float.NaN)]
         public void InvalidTuningIsRejected(string field,float value)
         {var p=Profile();Set(p,field,value);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);}
+
+        [TestCase(-1)] [TestCase(31)]
+        public void InvalidEnemyRecoilSettleDurationIsRejected(int frames)
+        {
+            var p=Profile();Set(p,"parryEnemyReleaseSettleFrames",frames);
+            Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);
+        }
 
         [Test] public void TunedWaveIsStrongerAndSlowerWithoutChangingTheLegacyDefaults()
         {
