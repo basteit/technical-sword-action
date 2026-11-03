@@ -69,6 +69,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(.01f)] public float parrySparkRadius = 1.2f;
     [Range(0, 4)] public float parryActorJitterPixels = 2;
     [Min(1)] public int parryActorJitterStepFrames = 2;
+    [Range(0, 8)] public float parryEnemyReleasePixels;
     [Header("Parry contact camera (gameplay only)")]
     public bool parryCameraEnabled = true;
     public bool parryCameraReturnOnHitstopEnd = true;
@@ -90,12 +91,13 @@ public sealed class CounterCinematicProfile : ScriptableObject
     public AnimationCurve parryCameraZoomCurve = CreateParryZoomCurve();
     public AnimationCurve parryCameraReturnCurve = CreateParryReturnCurve();
     public bool parryReferenceAccent = true;
+    public bool parryDirectionalSparks;
     [Min(.01f)] public float parryReferenceSparkRadius = 3.2f;
     [Min(.01f)] public float parryFlareLength = 10.5f;
     [Min(.01f)] public float parryFlareSeconds = .1f;
     public static AnimationCurve CreateParryPositionCurve() => AnimationCurve.EaseInOut(0, 0, 1, 1);
     public static AnimationCurve CreateParryZoomCurve() => new AnimationCurve(new Keyframe(0, 0, 0, 0), new Keyframe(1, 1, 2, 2));
-    public static AnimationCurve CreateParryReturnCurve() => new AnimationCurve(new Keyframe(0, 0, 3, 3), new Keyframe(1, 1, 0, 0));
+    public static AnimationCurve CreateParryReturnCurve() => new AnimationCurve(new Keyframe(0, 0, .25f, .25f), new Keyframe(1, 1, 0, 0));
     public Vector3 SampleParryCameraPosition(Vector3 from, Vector3 to, int elapsed, int duration)
     {
         float t = duration <= 0 ? 1 : Mathf.Clamp01(elapsed / (float)Mathf.Max(1, duration - parryCameraPositionLeadFrames));
@@ -137,6 +139,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
         Finite(parrySparkSeconds) && parrySparkSeconds > 0 && Finite(parryGlowSeconds) && parryGlowSeconds > 0 &&
         Finite(parrySparkRadius) && parrySparkRadius > 0 &&
         Finite(parryActorJitterPixels) && parryActorJitterPixels >= 0 && parryActorJitterPixels <= 4 && parryActorJitterStepFrames > 0 &&
+        Finite(parryEnemyReleasePixels) && parryEnemyReleasePixels >= 0 && parryEnemyReleasePixels <= 8 &&
         Finite(parryLightRiseSeconds) && parryLightRiseSeconds > 0 &&
         Finite(parryLightHoldSeconds) && parryLightHoldSeconds >= 0 &&
         Finite(parryLightFadeSeconds) && parryLightFadeSeconds > 0 &&

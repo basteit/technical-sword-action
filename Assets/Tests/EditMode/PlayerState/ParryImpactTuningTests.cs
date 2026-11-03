@@ -43,6 +43,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("parryCameraImpactSize",5f)] [TestCase("parryCameraHoldSeconds",-1f)] [TestCase("parryCameraReturnSeconds",0f)]
         [TestCase("parryFlareLength",0f)] [TestCase("parryFlareSeconds",float.NaN)] [TestCase("parryReferenceSparkRadius",-1f)]
         [TestCase("parryCameraArcHeight",-1f)]
+        [TestCase("parryEnemyReleasePixels",-1f)] [TestCase("parryEnemyReleasePixels",float.NaN)]
         [TestCase("parryCounterCameraBridgeSeconds",0f)] [TestCase("parryCounterCameraBridgeSeconds",float.NaN)]
         public void InvalidTuningIsRejected(string field,float value)
         {var p=Profile();Set(p,field,value);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);}
@@ -115,14 +116,16 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);Set(p,"parrySparkColor",new Color(1,.36f,.035f,1));
             Set(p,"parryActorJitterStepFrames",0);Assert.That(Get<bool>(p,"IsParryTuningValid"),Is.False);
         }
-        [Test] public void AdditionalOrangeGeometryMirrorsWithoutChangingItsWorldContactOrLeakingToAnotherCamera()
+        [TestCase(false)] [TestCase(true)]
+        public void AdditionalOrangeGeometryMirrorsWithoutChangingItsWorldContactOrLeakingToAnotherCamera(bool directional)
         {
             var go=new GameObject("OrangeParryCamera");owned.Add(go);var camera=go.AddComponent<Camera>();camera.enabled=false;
             var other=new GameObject("OtherParryCamera");owned.Add(other);var otherCamera=other.AddComponent<Camera>();otherCamera.enabled=false;
             var material=new Material(Shader.Find("TechnicalSwordAction/VideoPixelGlow"));owned.Add(material);
             var accent=go.AddComponent(T("ParryOrangeImpact"));Call(accent,"Configure",camera,material);
             var p=Profile();var contact=new Vector2(2,3);
-            Call(accent,"Begin",contact,1,p);Call(accent,"Advance",0f,1f,1f);
+            Set(p,"parryDirectionalSparks",directional);
+            Call(accent,"Begin",contact,1,p);Call(accent,"Advance",0f,1f,1f);Call(accent,"Advance",.08f,1f,1f);
             var mesh=Get<Mesh>(accent,"sparkMesh");var right=mesh.vertices;
             Assert.That(Get<int>(accent,"ActiveRendererCount"),Is.EqualTo(3));
             Assert.That(Get<int>(accent,"ParticleCount"),Is.EqualTo(32));
@@ -134,7 +137,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That((Vector2)Get<MeshRenderer>(accent,"sparks").transform.position,Is.EqualTo(contact));
             Call(accent,"AfterCamera",default(UnityEngine.Rendering.ScriptableRenderContext),camera);
             Assert.That(Get<MeshRenderer>(accent,"sparks").enabled,Is.False);
-            Call(accent,"Begin",contact,-1,p);Call(accent,"Advance",0f,1f,1f);var left=mesh.vertices;
+            Call(accent,"Begin",contact,-1,p);Call(accent,"Advance",0f,1f,1f);Call(accent,"Advance",.08f,1f,1f);var left=mesh.vertices;
+            int forward=0;
+            for(int i=0;i<32;i++)
+            {
+                float x=(right[i*12+2].x+right[i*12+3].x)*.5f;
+                float mirrored=(left[i*12+2].x+left[i*12+3].x)*.5f;
+                Assert.That(mirrored,Is.EqualTo(-x).Within(1f/64));
+                if(x>0)forward++;
+            }
+            if(directional)Assert.That(forward,Is.EqualTo(24));
+            else Assert.That(forward,Is.InRange(14,18));
             for(int i=0;i<right.Length;i++)
             {
                 // Mirroring reverses quad winding too, so compare corresponding end-pair bounds.
@@ -158,8 +171,22 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Call(p,"SampleParryCameraPosition",from,to,6,8),Is.EqualTo(to));
             Assert.That((float)Call(p,"SampleParryCameraSize",5.625f,6,8),Is.GreaterThan(4.25f));
             Assert.That(Call(p,"SampleParryCameraSize",5.625f,8,8),Is.EqualTo(4.25f));
-            Assert.That((float)Call(p,"SampleParryCameraReturn",.5f),Is.EqualTo(.875f).Within(.0001f));
+            Assert.That((float)Call(p,"SampleParryCameraReturn",.5f),Is.EqualTo(.53125f).Within(.0001f));
             Assert.That(Call(p,"SampleParryCameraReturn",1f),Is.EqualTo(1f));
+        }
+        [Test] public void ParryCameraReturnMovesImmediatelyButEasesInAndOut()
+        {
+            var p=Profile();
+            Assert.That(Call(p,"SampleParryCameraReturn",0f),Is.EqualTo(0f));
+            float first=(float)Call(p,"SampleParryCameraReturn",.1f);
+            Assert.That(first,Is.InRange(.03f,.06f));
+            float previous=first;
+            for(int i=2;i<=10;i++)
+            {
+                float next=(float)Call(p,"SampleParryCameraReturn",i/10f);
+                Assert.That(next,Is.GreaterThan(previous));previous=next;
+            }
+            Assert.That(previous,Is.EqualTo(1f));
         }
         [TestCase(0)] [TestCase(1)] [TestCase(2)] [TestCase(4)]
         public void ShortOrMissingPreparationStillHasFiniteExactCameraEndpoints(int duration)

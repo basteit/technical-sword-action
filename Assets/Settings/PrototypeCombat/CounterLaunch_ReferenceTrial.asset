@@ -72,6 +72,7 @@ MonoBehaviour:
   parrySparkRadius: 1.2
   parryActorJitterPixels: 2
   parryActorJitterStepFrames: 2
+  parryEnemyReleasePixels: 4
   parryCameraEnabled: 1
   parryCameraReturnOnHitstopEnd: 1
   parryCounterCameraBridge: 1
@@ -141,8 +142,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 3
-      outSlope: 3
+      inSlope: 0.25
+      outSlope: 0.25
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -160,6 +161,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   parryReferenceAccent: 1
+  parryDirectionalSparks: 1
   parryReferenceSparkRadius: 3.2
   parryFlareLength: 10.5
   parryFlareSeconds: 0.1

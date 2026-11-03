@@ -33,6 +33,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     private PrototypeEnemyArtPresentation parryEnemyArt;
     private float parryRealTime, nextParryLightTime;
     private float parryJitterAge = -1;
+    private float parryEnemyReleaseAge = -1;
     private int parryJitterFacing;
     private bool parryJitterFresh;
     private Damageable2D parryJitterTarget;
@@ -67,7 +68,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     public bool IsParryImpactPending => parrySequenceActive && !parryImpactPresented;
     public bool HasQueuedParryCounter => queuedParryCounter;
     public int ParryImpactDelayFrames => parryLeadFrames;
-    public bool IsParryActorJitterActive => parryJitterAge >= 0;
+    public bool IsParryActorJitterActive => parryJitterAge >= 0 && Profile != null && Profile.parryActorJitterPixels > 0;
     public float ParryActorJitterX => playerArt != null ? playerArt.ImpactOffsetX : 0;
     public int OrangeParryEffectCount => orangeImpact != null ? orangeImpact.ActiveRendererCount : 0;
     public bool IsOrangeParryGlowVisible => orangeImpact != null && orangeImpact.IsGlowVisible;
@@ -300,12 +301,32 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     }
     private void AdvanceParryJitter(float seconds)
     {
-        if (parryJitterAge < 0) return;
-        if (!CombatTimeController.IsHitStopped || !parrySequenceActive || ShakeStrength <= 0 || Profile.parryActorJitterPixels <= 0 ||
+        if (parryJitterAge < 0 && parryEnemyReleaseAge < 0) return;
+        if (!parrySequenceActive || ShakeStrength <= 0 ||
             parryJitterTarget == null || !parryJitterTarget.IsAlive || !parryJitterTarget.gameObject.activeInHierarchy ||
             playerArt == null || !playerArt.isActiveAndEnabled ||
             (parryJitterArt != null && !parryJitterArt.isActiveAndEnabled))
         { ClearParryJitter(); return; }
+        if (parryEnemyReleaseAge >= 0 || !CombatTimeController.IsHitStopped)
+        {
+            if (Profile.parryTrialHitstopFrames == 0 || Profile.parryEnemyReleasePixels <= 0 ||
+                parryJitterArt == null || !parryJitterArt.IsParryDeflectionOwnedBy(this))
+            { ClearParryJitter(); return; }
+            if (parryEnemyReleaseAge < 0)
+            {
+                // Change only the enemy's existing drawing offset; leave its root and collider untouched.
+                playerArt.ReleaseImpactOffset(this);
+                parryJitterAge = -1;
+                parryEnemyReleaseAge = 0;
+            }
+            else parryEnemyReleaseAge += seconds;
+            float duration = Profile.parryFollowThroughFrames * CombatTimeController.StepSeconds;
+            if (parryEnemyReleaseAge >= duration) { ClearParryJitter(); return; }
+            float remaining = 1 - Mathf.SmoothStep(0, 1, parryEnemyReleaseAge / duration);
+            float pixels = Mathf.Round(Profile.parryEnemyReleasePixels * ShakeStrength * remaining);
+            parryJitterArt.SetImpactOffset(this, pixels * parryJitterFacing / 32f);
+            return;
+        }
         if (!parryJitterFresh) parryJitterAge += seconds;
         parryJitterFresh = false;
         float offset = Profile.SampleParryJitter(parryJitterAge, ShakeStrength) * parryJitterFacing;
@@ -318,7 +339,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         if (playerArt != null) playerArt.ReleaseImpactOffset(this);
         if (parryJitterArt != null) parryJitterArt.ReleaseImpactOffset(this);
         if (parryJitterCue != null) parryJitterCue.ReleaseImpactOffset(this);
-        parryJitterAge = -1; parryJitterTarget = null; parryJitterArt = null; parryJitterCue = null;
+        parryJitterAge = parryEnemyReleaseAge = -1; parryJitterTarget = null; parryJitterArt = null; parryJitterCue = null;
     }
     private void SampleCounter()
     {

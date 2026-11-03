@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 /// <summary>Additional gameplay sparks/light. Procedural geometry, not recolored or edited received artwork.</summary>
 public sealed class ParryOrangeImpact : MonoBehaviour
 {
-    private const int SparkCount = 32, RingSegments = 24, FlareRayCount = 3;
+    private const int SparkCount = 32, ForwardSparkCount = 24, RingSegments = 24, FlareRayCount = 3;
     private static readonly float[] Angles = { 18, 38, 61, 85, 112, 142, 165, 195, 218, 247, 278, 306, 330, 350 };
     private Camera captureCamera;
     private CounterCinematicProfile profile;
@@ -107,6 +107,7 @@ public sealed class ParryOrangeImpact : MonoBehaviour
     {
         float progress = Mathf.Clamp01(age / profile.parrySparkSeconds), fade = (1 - progress) * (1 - progress);
         float travel = 1 - (1 - progress) * (1 - progress);
+        bool directional = profile.parryReferenceAccent && profile.parryDirectionalSparks;
         for (int i = 0; i < SparkCount; i++)
         {
             if (!profile.parryReferenceAccent && i >= Angles.Length)
@@ -114,13 +115,19 @@ public sealed class ParryOrangeImpact : MonoBehaviour
                 for (int j = 0; j < 12; j++) { sparkVertices[i * 12 + j] = Vector3.zero; sparkColors[i * 12 + j] = Color.clear; }
                 continue;
             }
-            float angle = (profile.parryReferenceAccent ? (i * 137.50776f + 18) % 360 : Angles[i]) * Mathf.Deg2Rad;
+            // Keep a few short return sparks so the contact still reads as metal striking metal.
+            bool returnSpark = directional && i >= ForwardSparkCount;
+            float degrees = directional
+                ? returnSpark ? 117 + (i - ForwardSparkCount) * 17 : -42 + ((i * 17) % ForwardSparkCount) * 4.5f
+                : profile.parryReferenceAccent ? (i * 137.50776f + 18) % 360 : Angles[i];
+            float angle = degrees * Mathf.Deg2Rad;
             Vector2 direction = new Vector2(Mathf.Cos(angle) * facing, Mathf.Sin(angle));
             float radius = profile.parryReferenceAccent ? profile.parryReferenceSparkRadius : profile.parrySparkRadius;
-            float distance = .08f + radius * travel * (.55f + (i % 5) * .11f);
+            float distance = .08f + radius * travel * (.55f + (i % 5) * .11f) * (returnSpark ? .35f : 1);
             Vector2 head = direction * distance + Vector2.down * (.24f * progress * progress);
             float length = profile.parryReferenceAccent ? .12f + .8f * (1 - progress) * (.45f + ((i * 7) % 11) * .075f) :
                 .08f + .18f * (1 - progress) * (.6f + (i % 3) * .2f);
+            if (returnSpark) length *= .45f;
             Vector2 tail = head - direction * length;
             var tint = profile.parrySparkColor; tint.a *= fade * strength;
             SetQuad(i * 12, tail, head, 3f / 32, new Color(.32f, .055f, .008f, tint.a * .85f));
