@@ -38,7 +38,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<float>(profile,"parryLegacyBloomStrength"),Is.Zero);
             Assert.That(Get<bool>(profile,"parryOrangeAccent"),Is.True);
             Assert.That(Get<float>(profile,"parryActorJitterPixels"),Is.EqualTo(2));
-            Assert.That(Get<float>(profile,"parryEnemyReleasePixels"),Is.EqualTo(4));
+            Assert.That(Get<float>(profile,"parryEnemyReleasePixels"),Is.EqualTo(8));
+            Assert.That(Get<float>(profile,"parryEnemyReleaseLeanDegrees"),Is.EqualTo(20));
             Assert.That(Get<bool>(profile,"parryCameraEnabled"),Is.True);
             Assert.That(Get<bool>(profile,"parryCameraReturnOnHitstopEnd"),Is.True);
             Assert.That(Get<bool>(profile,"parryCounterCameraBridge"),Is.True);

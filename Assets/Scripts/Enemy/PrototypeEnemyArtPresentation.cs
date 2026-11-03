@@ -11,6 +11,8 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private Damageable2D health;
     private EnemyCounterLaunch2D launch;
     private Vector3 restPosition;
+    private Quaternion restRotation;
+    private Vector3 recoilFootPivot;
     private int elapsed, attackElapsed, hitRemaining, deathElapsed;
     private bool parried, attackRecoveryVisible, deathFacingLeft;
     private bool counterFacingHeld, counterFacingLeft;
@@ -19,7 +21,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private int capturedAttackFrame, parryDrawingFrame;
     private int parryNaturalLeadFrames, parryDrawingLeadFrames;
     private object impactOffsetOwner;
-    private float impactOffsetX;
+    private float impactOffsetX, impactLeanDegrees;
     public int ParryImpactSourceFrame => library?.Find("Enemy_Attack")?.parryImpactFrame ?? 0;
     public int CombatTickOrder => 320;
     public string MotionName { get; private set; } = "Idle";
@@ -28,13 +30,16 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     public bool UsesDownParryPose => useDownParryPose;
     public bool IsCounterFacingHeld => counterFacingHeld;
     public float ImpactOffsetX => impactOffsetX;
-    public void SetImpactOffset(object owner, float worldX)
+    public void SetImpactOffset(object owner, float worldX, float leanDegrees = 0)
     {
-        if (owner == null || !float.IsFinite(worldX) || impactOffsetOwner != null && !ReferenceEquals(impactOffsetOwner, owner)) return;
-        impactOffsetOwner = owner; impactOffsetX = worldX; Show();
+        if (owner == null || !float.IsFinite(worldX) || !float.IsFinite(leanDegrees) ||
+            impactOffsetOwner != null && !ReferenceEquals(impactOffsetOwner, owner)) return;
+        impactOffsetOwner = owner; impactOffsetX = worldX; impactLeanDegrees = leanDegrees; Show();
     }
     public void ReleaseImpactOffset(object owner)
-    { if (ReferenceEquals(impactOffsetOwner, owner)) { impactOffsetOwner = null; impactOffsetX = 0; Show(); } }
+    { if (ReferenceEquals(impactOffsetOwner, owner)) { ResetImpactOffset(); Show(); } }
+    private void ResetImpactOffset()
+    { impactOffsetOwner = null; impactOffsetX = impactLeanDegrees = 0; }
     public bool HasAuthoredParryCue => isActiveAndEnabled && artwork != null && artwork.enabled &&
         library != null && library.Find("Enemy_Windup") is { HasValidParryCue: true };
     public int WindupSourceFrame { get; private set; } = -1;
@@ -48,7 +53,17 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     {
         ai = GetComponent<EnemyMeleeChaser2D>(); health = GetComponent<Damageable2D>();
         launch = GetComponent<EnemyCounterLaunch2D>();
-        if (artwork != null) restPosition = artwork.transform.localPosition;
+        if (artwork != null)
+        {
+            var drawing = artwork.transform;
+            restPosition = drawing.localPosition; restRotation = drawing.localRotation;
+            if (TryGetComponent<BoxCollider2D>(out var box))
+            {
+                // The installed normal-enemy art lines its feet up with the bottom of this box.
+                Vector3 foot = box.offset - Vector2.up * (box.size.y * .5f);
+                recoilFootPivot = drawing.InverseTransformPoint(transform.TransformPoint(foot));
+            }
+        }
     }
 
     private void OnEnable()
@@ -64,7 +79,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private void OnAttack() { attackElapsed = 0; attackRecoveryVisible = true; Show(); }
     private void OnHit(Damageable2D _, int damage, Vector2 direction)
     {
-        impactOffsetOwner = null; impactOffsetX = 0;
+        ResetImpactOffset();
         parryDrawingOwner = null;
         hitRemaining = library?.Find("Enemy_Hit")?.TotalFrames ?? 6;
         parried = attackRecoveryVisible = false; Show();
@@ -111,7 +126,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     }
     private void OnDied(Damageable2D _, Vector2 direction)
     {
-        impactOffsetOwner = null; impactOffsetX = 0;
+        ResetImpactOffset();
         parryDrawingOwner = null;
         deathElapsed = 0; deathFacingLeft = counterFacingHeld ? counterFacingLeft : ai.Facing.x < 0;
         // Keep only the drawing alive. HP, colliders and combat participation already ended.
@@ -120,7 +135,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     }
     private void OnCounterLaunch(int direction)
     {
-        impactOffsetOwner = null; impactOffsetX = 0;
+        ResetImpactOffset();
         parryDrawingOwner = null;
         // The kick travels away from its attacker. Keep the drawing facing back toward them,
         // without changing the AI direction that determined the rear approach.
@@ -131,7 +146,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private void OnReset(Damageable2D _) => ResetDrawing();
     private void ResetDrawing()
     {
-        impactOffsetOwner = null; impactOffsetX = 0;
+        ResetImpactOffset();
         parryDrawingOwner = null; capturedAttackForParry = false;
         elapsed = attackElapsed = hitRemaining = deathElapsed = 0;
         parried = attackRecoveryVisible = false;
@@ -144,7 +159,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         {
             artwork.color = Color.white;
             artwork.sprite = library?.Find("Enemy_Idle")?.At(0);
-            artwork.transform.localPosition = restPosition;
+            artwork.transform.SetLocalPositionAndRotation(restPosition, restRotation);
             artwork.flipX = ai.Facing.x < 0;
         }
     }
@@ -234,8 +249,18 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         if (sprite != null) artwork.sprite = sprite;
         artwork.flipX = counterFacingHeld ? counterFacingLeft : !health.IsAlive ? deathFacingLeft : ai.Facing.x < 0;
         bool down = MotionName == "Death" || (MotionName == "Parried" && useDownParryPose);
-        artwork.transform.localPosition = restPosition + (down ? Vector3.down * (2f / 32f) : Vector3.zero) +
-            artwork.transform.parent.InverseTransformVector(Vector3.right * impactOffsetX);
+        var drawing = artwork.transform;
+        Vector3 position = restPosition + (down ? Vector3.down * (2f / 32f) : Vector3.zero) +
+            drawing.parent.InverseTransformVector(Vector3.right * impactOffsetX);
+        Quaternion rotation = restRotation;
+        if (impactLeanDegrees != 0)
+        {
+            rotation = restRotation * Quaternion.AngleAxis(-impactLeanDegrees, Vector3.forward);
+            // Apply the lean around the foot anchor, not the center of the sprite.
+            Vector3 pivot = Vector3.Scale(recoilFootPivot, drawing.localScale);
+            position += restRotation * pivot - rotation * pivot;
+        }
+        drawing.SetLocalPositionAndRotation(position, rotation);
     }
 
     /// <summary>Retime only gameplay drawing. Keep the authored large flash readable and the AI contact tick unchanged.</summary>
@@ -260,7 +285,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
 
     private void OnDisable()
     {
-        impactOffsetOwner = null; impactOffsetX = 0;
+        ResetImpactOffset();
         parryDrawingOwner = null;
         counterFacingHeld = false;
         CombatTimeController.Unregister(this);
@@ -272,6 +297,6 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         }
         if (ai != null) ai.AttackStarted -= OnAttack;
         if (launch != null) launch.LaunchStarted -= OnCounterLaunch;
-        if (artwork != null) { artwork.transform.localPosition = restPosition; artwork.color = Color.white; }
+        if (artwork != null) { artwork.transform.SetLocalPositionAndRotation(restPosition, restRotation); artwork.color = Color.white; }
     }
 }

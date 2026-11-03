@@ -804,13 +804,18 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [TestCase(30,1)] [TestCase(60,1)] [TestCase(120,1)]
         [TestCase(30,-1)] [TestCase(60,-1)] [TestCase(120,-1)]
-        public void HitstopJittersBothDrawingsAndReleasePushesOnlyTheEnemyDrawing(int fps,int direction)
+        public void HitstopJittersBothDrawingsAndReleaseLeansOnlyTheEnemyAroundItsFeet(int fps,int direction)
         {
             Set(Get<object>(feedback,"Settings"),"shake",1f);
             var target=BeginAuthoredAdaptiveParry(direction);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
             var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
+            var drawing=Get<SpriteRenderer>(enemyArt,"Artwork").transform;
+            float baseAngle=drawing.localEulerAngles.z;
             Vector2 playerRoot=body.position,enemyRoot=target.transform.position;
-            Vector3 playerCollider=player.GetComponent<Collider2D>().bounds.center,enemyCollider=target.GetComponent<Collider2D>().bounds.center;
+            var enemyBox=target.GetComponent<BoxCollider2D>();
+            Vector3 playerCollider=player.GetComponent<Collider2D>().bounds.center,enemyCollider=enemyBox.bounds.center;
+            Vector3 enemyFoot=target.transform.TransformPoint(enemyBox.offset-Vector2.up*(enemyBox.size.y*.5f));
+            Vector3 footPivot=drawing.InverseTransformPoint(enemyFoot+Vector3.right*Get<float>(enemyArt,"ImpactOffsetX"));
             bool positive=false,negative=false;int samples=0;
             while(TimeValue<bool>("IsHitStopped")&&samples++<fps)
             {
@@ -819,27 +824,33 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 positive|=p>0;negative|=p<0;
                 Assert.That(body.position,Is.EqualTo(playerRoot));Assert.That((Vector2)target.transform.position,Is.EqualTo(enemyRoot));
                 Assert.That(player.GetComponent<Collider2D>().bounds.center,Is.EqualTo(playerCollider));
-                Assert.That(target.GetComponent<Collider2D>().bounds.center,Is.EqualTo(enemyCollider));
+                Assert.That(enemyBox.bounds.center,Is.EqualTo(enemyCollider));
                 Assert.That(Camera.main.orthographicSize,Is.EqualTo(4.25f));
                 Assert.That(Get<SpriteRenderer>(art,"Artwork").transform.position.x-playerRoot.x,Is.EqualTo(p).Within(.00001f));
-                Assert.That(Get<SpriteRenderer>(enemyArt,"Artwork").transform.position.x-enemyRoot.x,Is.EqualTo(e).Within(.00001f));
+                Assert.That(drawing.position.x-enemyRoot.x,Is.EqualTo(e).Within(.00001f));
+                Assert.That(Mathf.DeltaAngle(baseAngle,drawing.localEulerAngles.z),Is.Zero.Within(.001f));
                 RenderAt(fps);
             }
             Assert.That(positive&&negative,Is.True);Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);
             Assert.That(Get<bool>(presentation,"IsParryActorJitterActive"),Is.False);
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(direction*4f/32));
-            float previous=4f/32;
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(direction*8f/32));
+            Assert.That(Mathf.DeltaAngle(baseAngle,drawing.localEulerAngles.z),Is.EqualTo(-direction*20).Within(.001f));
+            float previous=8f/32,previousLean=20;
             for(int i=0;i<=fps/4;i++)
             {
                 float offset=Get<float>(enemyArt,"ImpactOffsetX");
                 Assert.That(offset*direction,Is.InRange(0f,previous));previous=offset*direction;
+                float lean=-direction*Mathf.DeltaAngle(baseAngle,drawing.localEulerAngles.z);
+                Assert.That(lean,Is.InRange(-.001f,previousLean+.001f));previousLean=lean;
                 Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);
                 Assert.That((Vector2)target.transform.position,Is.EqualTo(enemyRoot));
-                Assert.That(target.GetComponent<Collider2D>().bounds.center,Is.EqualTo(enemyCollider));
-                Assert.That(Get<SpriteRenderer>(enemyArt,"Artwork").transform.position.x-enemyRoot.x,Is.EqualTo(offset).Within(.00001f));
+                Assert.That(enemyBox.bounds.center,Is.EqualTo(enemyCollider));
+                if(Get<bool>(presentation,"IsParrySequenceActive"))
+                    Assert.That(Vector3.Distance(drawing.TransformPoint(footPivot),enemyFoot+Vector3.right*offset),Is.LessThan(.0001f));
                 RenderAt(fps);
             }
             Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
+            Assert.That(Mathf.DeltaAngle(baseAngle,drawing.localEulerAngles.z),Is.Zero.Within(.001f));
             Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));Frames(24);AssertClean();
         }
         [Test] public void EnemyReleaseDrawingFreezesInPauseAndDoesNotReturnAfterZeroShake()
@@ -848,13 +859,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var target=BeginAuthoredAdaptiveParry(1);
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));Until(()=>!TimeValue<bool>("IsHitStopped"));
             var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(2f/32));
+            var drawing=Get<SpriteRenderer>(enemyArt,"Artwork").transform;
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(4f/32));
+            Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(-10).Within(.001f));
             Static("SetPaused",true);Frames(12);
-            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(2f/32));
+            Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.EqualTo(4f/32));
+            Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.EqualTo(-10).Within(.001f));
             Set(settings,"shake",0f);Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
             Set(settings,"shake",1f);Static("SetPaused",false);Frames(2);
             Assert.That(Get<float>(enemyArt,"ImpactOffsetX"),Is.Zero);
+            Assert.That(Mathf.DeltaAngle(0,drawing.localEulerAngles.z),Is.Zero.Within(.001f));
         }
         [TestCase(0f,1f,1f,false,false,true)] [TestCase(1f,0f,1f,true,false,true)]
         [TestCase(1f,1f,0f,true,true,false)] [TestCase(.5f,.5f,.5f,true,true,true)] [TestCase(0f,0f,0f,false,false,false)]
@@ -995,6 +1010,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             else ((Behaviour)presentation).enabled=false;
             Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Get<float>(target.GetComponent(T("PrototypeEnemyArtPresentation")),"ImpactOffsetX"),Is.Zero);
+            var drawing=Get<SpriteRenderer>(target.GetComponent(T("PrototypeEnemyArtPresentation")),"Artwork");
+            Assert.That(Mathf.DeltaAngle(0,drawing.transform.localEulerAngles.z),Is.Zero.Within(.001f));
             Assert.That(Camera.main.transform.position,Is.EqualTo(original));Assert.That(Camera.main.orthographicSize,Is.EqualTo(5.625f));
             Assert.That(Get<bool>(presentation,"IsParryCameraActive"),Is.False);Assert.That(Get<bool>(feedback,"HasCameraFocus"),Is.False);
         }

@@ -70,6 +70,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Range(0, 4)] public float parryActorJitterPixels = 2;
     [Min(1)] public int parryActorJitterStepFrames = 2;
     [Range(0, 8)] public float parryEnemyReleasePixels;
+    [Range(0, 30)] public float parryEnemyReleaseLeanDegrees;
     [Header("Parry contact camera (gameplay only)")]
     public bool parryCameraEnabled = true;
     public bool parryCameraReturnOnHitstopEnd = true;
@@ -140,6 +141,7 @@ public sealed class CounterCinematicProfile : ScriptableObject
         Finite(parrySparkRadius) && parrySparkRadius > 0 &&
         Finite(parryActorJitterPixels) && parryActorJitterPixels >= 0 && parryActorJitterPixels <= 4 && parryActorJitterStepFrames > 0 &&
         Finite(parryEnemyReleasePixels) && parryEnemyReleasePixels >= 0 && parryEnemyReleasePixels <= 8 &&
+        Finite(parryEnemyReleaseLeanDegrees) && parryEnemyReleaseLeanDegrees >= 0 && parryEnemyReleaseLeanDegrees <= 30 &&
         Finite(parryLightRiseSeconds) && parryLightRiseSeconds > 0 &&
         Finite(parryLightHoldSeconds) && parryLightHoldSeconds >= 0 &&
         Finite(parryLightFadeSeconds) && parryLightFadeSeconds > 0 &&

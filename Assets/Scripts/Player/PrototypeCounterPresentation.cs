@@ -309,7 +309,8 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
         { ClearParryJitter(); return; }
         if (parryEnemyReleaseAge >= 0 || !CombatTimeController.IsHitStopped)
         {
-            if (Profile.parryTrialHitstopFrames == 0 || Profile.parryEnemyReleasePixels <= 0 ||
+            if (Profile.parryTrialHitstopFrames == 0 ||
+                (Profile.parryEnemyReleasePixels <= 0 && Profile.parryEnemyReleaseLeanDegrees <= 0) ||
                 parryJitterArt == null || !parryJitterArt.IsParryDeflectionOwnedBy(this))
             { ClearParryJitter(); return; }
             if (parryEnemyReleaseAge < 0)
@@ -322,9 +323,10 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
             else parryEnemyReleaseAge += seconds;
             float duration = Profile.parryFollowThroughFrames * CombatTimeController.StepSeconds;
             if (parryEnemyReleaseAge >= duration) { ClearParryJitter(); return; }
-            float remaining = 1 - Mathf.SmoothStep(0, 1, parryEnemyReleaseAge / duration);
-            float pixels = Mathf.Round(Profile.parryEnemyReleasePixels * ShakeStrength * remaining);
-            parryJitterArt.SetImpactOffset(this, pixels * parryJitterFacing / 32f);
+            float strength = (1 - Mathf.SmoothStep(0, 1, parryEnemyReleaseAge / duration)) * ShakeStrength;
+            float pixels = Mathf.Round(Profile.parryEnemyReleasePixels * strength);
+            parryJitterArt.SetImpactOffset(this, pixels * parryJitterFacing / 32f,
+                Profile.parryEnemyReleaseLeanDegrees * strength * parryJitterFacing);
             return;
         }
         if (!parryJitterFresh) parryJitterAge += seconds;
