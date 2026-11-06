@@ -71,11 +71,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(arena, "ResetActionsOnly"); clock.GetType().GetProperty("ManualAdvanceOnly").SetValue(clock, savedManual); yield return null;
         }
 
-        [Test] public void StartsInPreviousFastWithoutEnemiesAndKeepsSnappyAsAnExplicitComparison()
+        [Test] public void StartsInSlowerOriginalWithoutEnemiesAndKeepsFastModesAsExplicitComparisons()
         {
             Assert.That(Get<bool>(trial, "IsConfigured"), Is.True);
-            Assert.That(sceneDefaultTempo, Is.EqualTo("FastTrial"));
-            Assert.That(sceneDefaultHitFrames, Is.EqualTo(new[] { 12, 9, 12, 30 }));
+            Assert.That(sceneDefaultTempo, Is.EqualTo("Original"));
+            Assert.That(sceneDefaultHitFrames, Is.EqualTo(new[] { 15, 12, 15, 38 }));
             Assert.That(sceneDefaultController, Is.SameAs(sceneExpectedController));
             Assert.That(Get<bool>(trial, "StrongAttackHits"), Is.True);
             Assert.That(Call(Feedback, "GetAttackHitstopFrames", 1), Is.EqualTo(8));

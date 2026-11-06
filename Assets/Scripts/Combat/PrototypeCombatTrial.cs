@@ -23,7 +23,7 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
     [Header("Trial defaults; originals remain separate assets")]
     [SerializeField] private bool referenceTiming = true;
     [SerializeField] private bool referenceReaction = true;
-    [SerializeField] private bool fastAttacks = true;
+    [SerializeField] private bool fastAttacks;
     [SerializeField] private bool snappyFirstTwo;
     [SerializeField] private bool strongAttackHits = true;
     private PrototypeCombatArena arena;

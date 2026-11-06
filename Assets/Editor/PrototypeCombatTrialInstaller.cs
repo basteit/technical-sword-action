@@ -19,6 +19,25 @@ public static class PrototypeCombatTrialInstaller
     private const string AttackPath = "Assets/Settings/PrototypeCombat/FourStepAttack.asset";
     private const string OriginalEnemyPath = "Assets/Settings/PrototypeCombat/NormalMelee.asset";
 
+    [MenuItem("Tools/Technical Sword Action/Prototype/Use Slower Normal Attack Default")]
+    public static void UseSlowerNormalAttackDefault()
+    {
+        var scene = SceneManager.GetActiveScene();
+        if (Application.isPlaying || scene.path != PrototypeCombatSceneBuilder.ScenePath || scene.isDirty)
+            throw new InvalidOperationException("Open the saved, clean prototype in EditMode first.");
+        var trial = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<PrototypeCombatTrial>(true)).Single();
+        var data = new SerializedObject(trial);
+        data.FindProperty("fastAttacks").boolValue = false; data.FindProperty("snappyFirstTwo").boolValue = false;
+        var attack = (PlayerAttack2D)data.FindProperty("attack").objectReferenceValue;
+        var definition = data.FindProperty("originalAttack").objectReferenceValue;
+        var controller = (RuntimeAnimatorController)data.FindProperty("originalController").objectReferenceValue;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        var attackData = new SerializedObject(attack); attackData.FindProperty("definition").objectReferenceValue = definition;
+        attackData.ApplyModifiedPropertiesWithoutUndo();
+        attack.GetComponent<Animator>().runtimeAnimatorController = controller;
+        EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene);
+    }
+
     [MenuItem("Tools/Technical Sword Action/Prototype/Install Reference Combat Trial")]
     public static void Install()
     {

@@ -5595,7 +5595,7 @@ MonoBehaviour:
   strongAttackImpact: {fileID: 11400000, guid: f3d05f52a69d31c45852d40621613e34, type: 2}
   referenceTiming: 1
   referenceReaction: 1
-  fastAttacks: 1
+  fastAttacks: 0
   snappyFirstTwo: 0
   strongAttackHits: 1
 --- !u!1 &1048344828
