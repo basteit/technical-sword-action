@@ -23,7 +23,7 @@ public static class PrototypeSfxInstaller
     public static AudioClip Clip(string name)
     {
         var clip = AssetDatabase.LoadAssetAtPath<AudioClip>(AudioFolder + name + ".wav");
-        if (clip == null) throw new InvalidOperationException("Missing CC0 sound: " + name);
+        if (clip == null) throw new InvalidOperationException("Missing licensed prototype sound: " + name);
         return clip;
     }
     public static AudioClip FeedbackClip(CombatFeedbackKind kind) => Clip(kind switch {
@@ -46,14 +46,14 @@ public static class PrototypeSfxInstaller
             profile = ScriptableObject.CreateInstance<PrototypeSfxProfile>();
             profile.entries = new[] {
                 Entry(PrototypeSfxCue.Footstep,"FootstepA",.13f,5),
-                Entry(PrototypeSfxCue.Jump,"Jump",.25f), Entry(PrototypeSfxCue.Land,"Land",.27f,20),
+                Entry(PrototypeSfxCue.Jump,"Jump",.25f), Entry(PrototypeSfxCue.Land,"Land",.22f,20),
                 Entry(PrototypeSfxCue.Dash,"Dash",.34f,45),
-                Entry(PrototypeSfxCue.Swing1,"SwordA",.35f,35), Entry(PrototypeSfxCue.Swing2,"SwordB",.35f,35,1.04f),
-                Entry(PrototypeSfxCue.Swing3,"SwordA",.37f,35,1.1f), Entry(PrototypeSfxCue.Swing4,"SwordIai",.42f,45,.94f),
+                Entry(PrototypeSfxCue.Swing1,"SwordA",.28f,35), Entry(PrototypeSfxCue.Swing2,"SwordB",.30f,35,1.04f),
+                Entry(PrototypeSfxCue.Swing3,"SwordA",.31f,35,1.1f), Entry(PrototypeSfxCue.Swing4,"SwordIai",.34f,45,1),
                 Entry(PrototypeSfxCue.Sheathe,"Sheathe",.14f,8), Entry(PrototypeSfxCue.ParryReady,"ParryReady",.2f,35),
-                Entry(PrototypeSfxCue.Parry,"ParryClang",.65f,90,1,0), Entry(PrototypeSfxCue.JustParry,"ParryClang",.7f,95,1.07f,0),
+                Entry(PrototypeSfxCue.Parry,"ParryClang",.6f,90,1,0), Entry(PrototypeSfxCue.JustParry,"ParryClang",.65f,95,1.07f,0),
                 Entry(PrototypeSfxCue.ParryMiss,"ParryMiss",.12f,5),
-                Entry(PrototypeSfxCue.LightHit,"LightHit",.45f,65), Entry(PrototypeSfxCue.HeavyHit,"HeavyHit",.55f,75,.95f),
+                Entry(PrototypeSfxCue.LightHit,"LightHit",.5f,65), Entry(PrototypeSfxCue.HeavyHit,"HeavyHit",.58f,75,1),
                 Entry(PrototypeSfxCue.CounterTransfer,"CounterTransfer",.4f,50,1,0),
                 Entry(PrototypeSfxCue.CounterCharge,"CounterCharge",.2f,40,1,0),
                 Entry(PrototypeSfxCue.CounterRelease,"Dash",.4f,70,1.1f,0),

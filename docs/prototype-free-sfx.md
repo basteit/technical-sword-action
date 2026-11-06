@@ -1,5 +1,33 @@
 # プロトタイプのフリーSE差し替え（#92）
 
+## 追加調整: 高い金属音と着地音の再選定（2026-11-07）
+
+体験目的: 刀の空振りは鋭い風切り、命中は短い金属の切断音、パリィは澄んだ金属の余韻として聞き分け、着地だけが低く大きく浮かないようにする。
+
+着手時の受入条件:
+
+1. Kenney以外の公式配布サイトから、公開Gitと商用配布に使える素材を選び、作者・作品名・原音・ライセンス・加工と使用先を記録する。クレジット必須素材はビルドにも通知を含める。
+2. 空振りに命中/弾きの金属衝突音を鳴らさず、実命中と同期パリィでだけ接触音を出す。着地を短い靴底の接地音へ替え、好評だったJump.wav・ジャンプ音量/ピッチを変更しない。
+3. 音色とミックスの2軸だけを調整する。通常攻撃ORIGINAL、パリィ/反撃、停止、カメラ、判定を維持し、音源検証と関連EditMode/PlayModeテストを行う。聴感の最終採否は人が確認する。
+
+同じIssue #92 / ブランチ / Draft PR #99の修正として進める。以下の初回Kenneyのみという素材方針とCC0のみという記載は初回の履歴であり、本調整の素材表を現在の採用として優先する。
+
+### 現在の差し替え素材
+
+| 用途 | 採用素材 / 変更 |
+| --- | --- |
+| 空振り1〜4段 | SoundBible「Sword Swing」Mike Koenig + Kenneyの薄い風切り/抜刀。金属の衝突音は入れず、命中より音量を抑える |
+| 通常命中 / 4段命中 | SoundBible「Swords Collide」Sound Explorer / 「Swords Clashing」Mike Koenig。低いパンチ/肉切り成分を外し、短い高音の金属接触へ |
+| パリィ / Just | 同上の剣同士の衝突を別配合。最初の1打だけを抽出し、高い余韻を0.65秒まで残す。火花と停止のインパクト時だけ鳴る |
+| 着地 | BigSoundBank「Footsteps, Shoe on Concrete」#0514、Joseph SARDIN。単独の靴底接触を0.18秒へ加工し、低音を削る。音量0.27→0.22 |
+| ジャンプ | Jump.wavはSHA-256 `9e923b4a2ffe056a4eb271416676f11c95fb141a7e87f74a26822a260f882c7c` のまま。音量0.25・ピッチ1・変化幅0.025も維持 |
+
+SoundBibleの3作品は各作品ページでCC BY 3.0を確認した（[Sword Swing](https://soundbible.com/1176-Sword-Swing.html)、[Swords Collide](https://soundbible.com/1980-Swords-Collide.html)、[Swords Clashing](https://soundbible.com/857-Swords-Clashing.html)）。作者・題名・出典・[ライセンス](https://creativecommons.org/licenses/by/3.0/)・加工表示を保持する。BigSoundBankは[作品ページ](https://bigsoundbank.com/footsteps-shoe-on-concrete-s0514.html)と[利用条件](https://bigsoundbank.com/licenses.html)でCC0と商用/再配布を確認した。OtoLogicは取得制限があり今回採用しなかった。
+
+原音と条件は `ThirdParty/AdditionalAudio`、全24音の現行ハッシュ・加工レシピは `ThirdParty/PrototypeAudio/manifest.json` に統合した。`Tools/Audio/Import-PrototypeSfx.ps1` はGit同梱の選択原音だけで再加工できる（FFmpegは別途必要）。旧Kenney専用manifestは統合先へ移し、古いハッシュを現行と誤認させない。旧パス互換MP3のうち命中/弾き3本も今回の金属音へ更新する。
+
+必須クレジットは `Assets/StreamingAssets/AudioCredits.txt` に置き、Unityの通常ビルドでData/StreamingAssets以下へそのまま同梱する。今回配布ZIPの再作成は行わない。ジャンプ以外の変更は上表7音と音量/一部ピッチだけで、反撃の蹴り・帯電、敵の口攻撃、足音などは保持した。
+
 ## 体験目的
 
 現在の各モーションと、空振り・命中・弾き・反撃・被弾の違いを音でも確認でき、繰り返しても主要な接触音が埋もれない試遊版にする。

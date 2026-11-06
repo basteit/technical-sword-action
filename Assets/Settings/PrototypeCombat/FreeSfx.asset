@@ -31,7 +31,7 @@ MonoBehaviour:
   - cue: 2
     clips:
     - {fileID: 8300000, guid: ae9d092992525834db0897cc5c4d0974, type: 3}
-    volume: 0.27
+    volume: 0.22
     pitch: 1
     pitchVariation: 0.025
     priority: 20
@@ -45,29 +45,29 @@ MonoBehaviour:
   - cue: 4
     clips:
     - {fileID: 8300000, guid: 9865acb5e910fca4ab210b15b8fab8d7, type: 3}
-    volume: 0.35
+    volume: 0.28
     pitch: 1
     pitchVariation: 0.025
     priority: 35
   - cue: 5
     clips:
     - {fileID: 8300000, guid: ee01c846df8809941bdba63f4168585b, type: 3}
-    volume: 0.35
+    volume: 0.3
     pitch: 1.04
     pitchVariation: 0.025
     priority: 35
   - cue: 6
     clips:
     - {fileID: 8300000, guid: 9865acb5e910fca4ab210b15b8fab8d7, type: 3}
-    volume: 0.37
+    volume: 0.31
     pitch: 1.1
     pitchVariation: 0.025
     priority: 35
   - cue: 7
     clips:
     - {fileID: 8300000, guid: d4275ec364d257247b1554d3ab7caad4, type: 3}
-    volume: 0.42
-    pitch: 0.94
+    volume: 0.34
+    pitch: 1
     pitchVariation: 0.025
     priority: 45
   - cue: 8
@@ -87,14 +87,14 @@ MonoBehaviour:
   - cue: 10
     clips:
     - {fileID: 8300000, guid: 499c82ac498b2574ab71dc2813ab9da0, type: 3}
-    volume: 0.65
+    volume: 0.6
     pitch: 1
     pitchVariation: 0
     priority: 90
   - cue: 11
     clips:
     - {fileID: 8300000, guid: 499c82ac498b2574ab71dc2813ab9da0, type: 3}
-    volume: 0.7
+    volume: 0.65
     pitch: 1.07
     pitchVariation: 0
     priority: 95
@@ -108,15 +108,15 @@ MonoBehaviour:
   - cue: 13
     clips:
     - {fileID: 8300000, guid: 403f08e7d72ddbd42a8c9ceb6dda1ead, type: 3}
-    volume: 0.45
+    volume: 0.5
     pitch: 1
     pitchVariation: 0.025
     priority: 65
   - cue: 14
     clips:
     - {fileID: 8300000, guid: 043ce5f6d19efd144ae96b2a9183828a, type: 3}
-    volume: 0.55
-    pitch: 0.95
+    volume: 0.58
+    pitch: 1
     pitchVariation: 0.025
     priority: 75
   - cue: 15

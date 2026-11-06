@@ -9,25 +9,33 @@ try {
     if (-not (Test-Path -LiteralPath $Ffmpeg -PathType Leaf)) { throw 'FFmpeg is required.' }
     $out = 'Assets/Audio/PrototypeFreeSfx'
     $archive = 'ThirdParty/KenneyAudio'
-    New-Item -ItemType Directory -Force -Path $out,$archive | Out-Null
+    $manifestFolder = 'ThirdParty/PrototypeAudio'
+    New-Item -ItemType Directory -Force -Path $out,$archive,$manifestFolder | Out-Null
+    $additional = @{
+        'SoundBible/Sword_Swing' = @{path='ThirdParty/AdditionalAudio/SoundBible/Sword_Swing.wav'; title='Sword Swing'; author='Mike Koenig'; license='CC-BY-3.0'; url='https://soundbible.com/1176-Sword-Swing.html'; download='https://soundbible.com/grab.php?id=1176&type=wav'; sha256='93a2e6e9e17daea9cbebb54317c3669640c7b07c919a71c6856750cff76a7389'}
+        'SoundBible/Swords_Collide' = @{path='ThirdParty/AdditionalAudio/SoundBible/Swords_Collide.wav'; title='Swords Collide'; author='Sound Explorer'; license='CC-BY-3.0'; url='https://soundbible.com/1980-Swords-Collide.html'; download='https://soundbible.com/grab.php?id=1980&type=wav'; sha256='5113abd89a3efabc32c40a1c6868ab1cfb796055a642e5ff3052e0bcf836cd3f'}
+        'SoundBible/Swords_Clashing' = @{path='ThirdParty/AdditionalAudio/SoundBible/Swords_Clashing.wav'; title='Swords Clashing'; author='Mike Koenig'; license='CC-BY-3.0'; url='https://soundbible.com/857-Swords-Clashing.html'; download='https://soundbible.com/grab.php?id=857&type=wav'; sha256='ea20c872a4b7bed3cb0db8f44db9e5d6ed93638709cc816a2318efe64ec74b90'}
+        'BigSoundBank/0514' = @{path='ThirdParty/AdditionalAudio/BigSoundBank/0514.wav'; title='Footsteps, Shoe on Concrete'; author='Joseph SARDIN'; license='CC0-1.0'; url='https://bigsoundbank.com/footsteps-shoe-on-concrete-s0514.html'; download='https://bigsoundbank.com/UPLOAD/bwf-en/0514.wav'; sha256='e424c7d07c7197f0d9aa5e3570de72d2572c1930984a92254013fa5e8fa76397'}
+    }
+    $packUrls = @{'rpg-audio'='https://kenney.nl/assets/rpg-audio'; 'impact-sounds'='https://kenney.nl/assets/impact-sounds'; 'sci-fi-sounds'='https://kenney.nl/assets/sci-fi-sounds'}
     $recipes = @(
         @{name='FootstepA'; seconds=.19; sources=@('impact-sounds/footstep_concrete_000'); filters=@('volume=1')},
         @{name='FootstepB'; seconds=.19; sources=@('impact-sounds/footstep_concrete_002'); filters=@('volume=1')},
         @{name='Jump'; seconds=.25; sources=@('rpg-audio/cloth3'); filters=@('atempo=1.35')},
-        @{name='Land'; seconds=.27; sources=@('impact-sounds/impactSoft_heavy_001'); filters=@('volume=1')},
+        @{name='Land'; seconds=.18; sources=@('BigSoundBank/0514'); filters=@('atrim=start=0.38:end=0.59,asetpts=PTS-STARTPTS,highpass=f=300,lowpass=f=7000,equalizer=f=1500:t=q:w=1:g=2,atempo=1.2')},
         @{name='Dash'; seconds=.27; sources=@('rpg-audio/knifeSlice2','rpg-audio/cloth2'); filters=@('atempo=1.8','atempo=1.5,volume=0.4')},
-        @{name='SwordA'; seconds=.30; sources=@('rpg-audio/knifeSlice'); filters=@('atempo=1.6')},
-        @{name='SwordB'; seconds=.27; sources=@('rpg-audio/knifeSlice2'); filters=@('atempo=1.75')},
-        @{name='SwordIai'; seconds=.38; sources=@('rpg-audio/drawKnife3','rpg-audio/knifeSlice2'); filters=@('atempo=1.5,volume=0.65','atempo=1.4')},
+        @{name='SwordA'; seconds=.22; sources=@('SoundBible/Sword_Swing','rpg-audio/knifeSlice'); filters=@('asetrate=55200,aresample=48000,highpass=f=650,equalizer=f=3000:t=q:w=1.2:g=3','atempo=1.4,highpass=f=900,volume=0.25')},
+        @{name='SwordB'; seconds=.20; sources=@('SoundBible/Sword_Swing','rpg-audio/knifeSlice2'); filters=@('asetrate=62400,aresample=48000,highpass=f=750,equalizer=f=3400:t=q:w=1.2:g=3','atempo=1.55,highpass=f=1000,volume=0.25')},
+        @{name='SwordIai'; seconds=.30; sources=@('SoundBible/Sword_Swing','rpg-audio/drawKnife3'); filters=@('asetrate=52800,aresample=48000,highpass=f=650,equalizer=f=3000:t=q:w=1.2:g=3','atempo=1.5,highpass=f=1800,volume=0.18')},
         @{name='Sheathe'; seconds=.22; sources=@('rpg-audio/metalLatch','rpg-audio/clothBelt2'); filters=@('volume=0.7','atempo=2,volume=0.4')},
         @{name='ParryReady'; seconds=.20; sources=@('rpg-audio/drawKnife1'); filters=@('atempo=1.8')},
-        @{name='ParryClang'; seconds=.65; sources=@('impact-sounds/impactMetal_heavy_001','impact-sounds/impactPlate_medium_000'); filters=@('volume=1','volume=0.32')},
+        @{name='ParryClang'; seconds=.65; sources=@('SoundBible/Swords_Clashing','SoundBible/Swords_Collide'); filters=@('atrim=start=0.135:end=0.98,asetpts=PTS-STARTPTS,asetrate=60000,aresample=48000,highpass=f=1100,lowpass=f=11000,equalizer=f=4000:t=q:w=1.2:g=3','atrim=start=0.019,asetpts=PTS-STARTPTS,highpass=f=1800,lowpass=f=11000,volume=0.35')},
         @{name='ParryMiss'; seconds=.16; sources=@('rpg-audio/cloth1'); filters=@('atempo=2')},
         @{name='CounterTransfer'; seconds=.29; sources=@('sci-fi-sounds/forceField_002'); filters=@('atrim=0:0.6,areverse,atempo=2')},
         @{name='CounterCharge'; seconds=.90; sources=@('sci-fi-sounds/forceField_000'); filters=@('volume=1')},
         @{name='CounterImpact'; seconds=.65; sources=@('impact-sounds/impactPunch_heavy_000','sci-fi-sounds/lowFrequency_explosion_000','sci-fi-sounds/forceField_001'); filters=@('volume=1','atrim=0:0.45,volume=0.3','atrim=0:0.30,volume=0.2')},
-        @{name='LightHit'; seconds=.29; sources=@('rpg-audio/chop','impact-sounds/impactPunch_medium_000'); filters=@('atempo=1.5,volume=0.55','volume=1')},
-        @{name='HeavyHit'; seconds=.42; sources=@('rpg-audio/chop','impact-sounds/impactPunch_heavy_002'); filters=@('volume=0.7','volume=1')},
+        @{name='LightHit'; seconds=.29; sources=@('SoundBible/Swords_Collide'); filters=@('atrim=start=0.019,asetpts=PTS-STARTPTS,asetrate=55680,aresample=48000,highpass=f=1000,lowpass=f=11000,equalizer=f=3200:t=q:w=1:g=3')},
+        @{name='HeavyHit'; seconds=.42; sources=@('SoundBible/Swords_Collide','SoundBible/Swords_Clashing'); filters=@('atrim=start=0.019,asetpts=PTS-STARTPTS,asetrate=52800,aresample=48000,highpass=f=850,lowpass=f=11000,equalizer=f=3000:t=q:w=1:g=3','atrim=start=0.135:end=0.7,asetpts=PTS-STARTPTS,asetrate=57600,aresample=48000,highpass=f=1400,lowpass=f=11000,volume=0.35')},
         @{name='PlayerHit'; seconds=.34; sources=@('impact-sounds/impactPunch_medium_002'); filters=@('volume=1')},
         @{name='Fall'; seconds=.36; sources=@('rpg-audio/dropLeather','impact-sounds/impactSoft_heavy_000'); filters=@('atempo=1.4','volume=0.6')},
         @{name='EnemyWindup'; seconds=.24; sources=@('rpg-audio/cloth2'); filters=@('atempo=1.6')},
@@ -39,22 +47,36 @@ try {
     $packs = @('rpg-audio','impact-sounds','sci-fi-sounds')
     foreach ($pack in $packs) {
         $license = Join-Path $SourceRoot "$pack/License.txt"
+        if (-not (Test-Path -LiteralPath $license)) { $license = "$archive/$pack/License.txt" }
         if (-not (Test-Path -LiteralPath $license)) { throw "Missing original license: $pack" }
         New-Item -ItemType Directory -Force -Path "$archive/$pack" | Out-Null
-        Copy-Item -LiteralPath $license -Destination "$archive/$pack/License.txt"
+        if ([IO.Path]::GetFullPath($license) -ne [IO.Path]::GetFullPath("$archive/$pack/License.txt")) {
+            Copy-Item -LiteralPath $license -Destination "$archive/$pack/License.txt"
+        }
     }
     $records = foreach ($recipe in $recipes) {
         $arguments = @('-hide_banner','-loglevel','error','-y','-filter_complex_threads','1')
         $chains = @(); $sources = @()
         for ($i=0; $i -lt $recipe.sources.Count; $i++) {
             $parts = $recipe.sources[$i].Split('/')
-            $source = Join-Path $SourceRoot "$($parts[0])/Audio/$($parts[1]).ogg"
-            $raw = "$archive/$($parts[0])/$($parts[1]).ogg"
-            if (-not (Test-Path -LiteralPath $source)) { throw "Missing source: $source" }
-            Copy-Item -LiteralPath $source -Destination $raw
+            if ($additional.ContainsKey($recipe.sources[$i])) {
+                $metadata = $additional[$recipe.sources[$i]]
+                $raw = $metadata.path
+                if (-not (Test-Path -LiteralPath $raw) -or (Get-FileHash -LiteralPath $raw -Algorithm SHA256).Hash.ToLowerInvariant() -ne $metadata.sha256) {
+                    throw "Missing or changed licensed original: $raw"
+                }
+            } else {
+                $source = Join-Path $SourceRoot "$($parts[0])/Audio/$($parts[1]).ogg"
+                $raw = "$archive/$($parts[0])/$($parts[1]).ogg"
+                if (-not (Test-Path -LiteralPath $raw)) {
+                    if (-not (Test-Path -LiteralPath $source)) { throw "Missing source: $source" }
+                    Copy-Item -LiteralPath $source -Destination $raw
+                }
+                $metadata = @{title=$parts[1]; author='Kenney'; license='CC0-1.0'; url=$packUrls[$parts[0]]}
+            }
             $arguments += @('-i',$raw)
             $chains += "[$($i):a]aformat=sample_rates=48000:channel_layouts=mono,$($recipe.filters[$i]),apad=whole_dur=2[s$i]"
-            $sources += @{path=$raw; sha256=(Get-FileHash -LiteralPath $raw -Algorithm SHA256).Hash.ToLowerInvariant(); filter=$recipe.filters[$i]}
+            $sources += @{path=$raw; sha256=(Get-FileHash -LiteralPath $raw -Algorithm SHA256).Hash.ToLowerInvariant(); filter=$recipe.filters[$i]; title=$metadata.title; author=$metadata.author; license=$metadata.license; url=$metadata.url; download=$metadata.download}
         }
         $labels = (0..($recipe.sources.Count-1) | ForEach-Object { "[s$_]" }) -join ''
         $seconds = $recipe.seconds.ToString('0.000',[Globalization.CultureInfo]::InvariantCulture)
@@ -73,7 +95,8 @@ try {
         $dest = "$out/$($recipe.name).wav"
         & $Ffmpeg @arguments -filter_complex "$graph;[mix]volume=${gain}dB,alimiter=limit=0.56:level=false[out]" -map '[out]' -ar 48000 -ac 1 -c:a pcm_s16le $dest
         if ($LASTEXITCODE -ne 0) { throw "Encoding failed: $dest" }
-        @{name=$recipe.name; asset=$dest; seconds=$recipe.seconds; peakTargetDb=-6; gainDb=[double]::Parse($gain,[Globalization.CultureInfo]::InvariantCulture); sha256=(Get-FileHash -LiteralPath $dest -Algorithm SHA256).Hash.ToLowerInvariant(); sources=$sources}
+        $license = if ($sources.license -contains 'CC-BY-3.0') { 'CC-BY-3.0' } else { 'CC0-1.0' }
+        @{name=$recipe.name; asset=$dest; license=$license; seconds=$recipe.seconds; peakTargetDb=-6; gainDb=[double]::Parse($gain,[Globalization.CultureInfo]::InvariantCulture); sha256=(Get-FileHash -LiteralPath $dest -Algorithm SHA256).Hash.ToLowerInvariant(); sources=$sources}
     }
     # Keep compatibility GUIDs: the old recordings are replaced, not layered or left referenced.
     $compatibility = @{'HitSound_RayTap'='LightHit';'HitSound_Release'='HeavyHit';'HitSound_RayRelease'='ParryClang';'HitSound_RayStay'='PlayerHit'}
@@ -81,7 +104,9 @@ try {
         & $Ffmpeg -hide_banner -loglevel error -y -i "$out/$($compatibility[$key]).wav" -c:a libmp3lame -q:a 2 "Assets/Audio/$key.mp3"
         if ($LASTEXITCODE -ne 0) { throw "Compatibility replacement failed: $key" }
     }
-    $manifest = @{license='CC0-1.0'; author='Kenney'; acquired='2026-11-07'; sampleRate=48000; channels=1; bits=16; preprocessing='Remove leading silence below -48 dB; per-layer tempo/trim/reverse/gain; mix; high-pass 65 Hz; fade 3/25 ms; peak-normalize -6 dBFS; safety limit 0.56; PCM16 mono48kHz'; packs=@{ 'rpg-audio'='https://kenney.nl/assets/rpg-audio'; 'impact-sounds'='https://kenney.nl/assets/impact-sounds'; 'sci-fi-sounds'='https://kenney.nl/assets/sci-fi-sounds' }; compatibility=$compatibility; clips=@($records)}
-    $manifest | ConvertTo-Json -Depth 9 | Set-Content -LiteralPath "$archive/manifest.json" -Encoding utf8
+    $jump = @($records | Where-Object name -eq 'Jump')[0]
+    if ($jump.sha256 -ne '9e923b4a2ffe056a4eb271416676f11c95fb141a7e87f74a26822a260f882c7c') { throw 'The approved jump sound must remain byte-identical.' }
+    $manifest = @{licenses=@('CC0-1.0','CC-BY-3.0'); authors=@('Kenney','Mike Koenig','Sound Explorer','Joseph SARDIN'); acquired='2026-11-07'; credits='Assets/StreamingAssets/AudioCredits.txt'; sampleRate=48000; channels=1; bits=16; preprocessing='Per-layer trim/tempo/pitch/EQ/reverse/gain as recorded; remove leading silence below -48 dB; mix; high-pass 65 Hz; fade 3/25 ms; peak-normalize -6 dBFS; safety limit 0.56; PCM16 mono48kHz'; packs=$packUrls; compatibility=$compatibility; clips=@($records)}
+    $manifest | ConvertTo-Json -Depth 9 | Set-Content -LiteralPath "$manifestFolder/manifest.json" -Encoding utf8
     Write-Output "Imported $($records.Count) processed clips and replaced four legacy recordings."
 } finally { Pop-Location }

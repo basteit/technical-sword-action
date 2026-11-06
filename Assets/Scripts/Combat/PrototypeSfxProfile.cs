@@ -10,7 +10,7 @@ public enum PrototypeSfxCue
     HealStart, HealApply, SpecialCast, SpecialHit, Interact
 }
 
-/// <summary>Replaceable, presentation-only prototype sound palette. All clips are CC0 derivatives.</summary>
+/// <summary>Replaceable, presentation-only licensed sound palette. See StreamingAssets/AudioCredits.txt.</summary>
 [CreateAssetMenu(menuName = "Technical Sword Action/Prototype SFX Profile")]
 public sealed class PrototypeSfxProfile : ScriptableObject
 {

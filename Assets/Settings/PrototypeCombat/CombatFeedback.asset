@@ -22,7 +22,7 @@ MonoBehaviour:
     flashFrames: 3
     tint: {r: 1, g: 0.9, b: 0.55, a: 1}
     clip: {fileID: 8300000, guid: 403f08e7d72ddbd42a8c9ceb6dda1ead, type: 3}
-    volume: 0.45
+    volume: 0.5
     pitch: 1
   - kind: 1
     hitstopFrames: 5
@@ -33,8 +33,8 @@ MonoBehaviour:
     flashFrames: 3
     tint: {r: 1, g: 0.75, b: 0.3, a: 1}
     clip: {fileID: 8300000, guid: 043ce5f6d19efd144ae96b2a9183828a, type: 3}
-    volume: 0.55
-    pitch: 0.95
+    volume: 0.58
+    pitch: 1
   - kind: 2
     hitstopFrames: 5
     shakePixels: 4
@@ -55,7 +55,7 @@ MonoBehaviour:
     flashFrames: 3
     tint: {r: 1, g: 1, b: 1, a: 1}
     clip: {fileID: 8300000, guid: 499c82ac498b2574ab71dc2813ab9da0, type: 3}
-    volume: 0.65
+    volume: 0.6
     pitch: 1
   - kind: 4
     hitstopFrames: 7
@@ -66,7 +66,7 @@ MonoBehaviour:
     flashFrames: 3
     tint: {r: 0.5, g: 0.8, b: 1, a: 1}
     clip: {fileID: 8300000, guid: 499c82ac498b2574ab71dc2813ab9da0, type: 3}
-    volume: 0.7
+    volume: 0.65
     pitch: 1.07
   - kind: 5
     hitstopFrames: 3

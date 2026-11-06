@@ -11,7 +11,7 @@ These selected original Ogg files are from the official CC0 packs below. They ar
 
 CC0 permits commercial use, adaptation, and redistribution. Attribution is optional; no endorsement is implied. No sounds from OtoLogic or Sound Effect Lab are included.
 
-`manifest.json` records the selected original filenames and SHA-256 values, processed asset hashes, source-layer edits, compatibility replacements, and acquisition date. The original downloaded ZIP SHA-256 values were:
+The current combined manifest at `ThirdParty/PrototypeAudio/manifest.json` records the selected original filenames and SHA-256 values, processed asset hashes, source-layer edits, compatibility replacements, and acquisition date. The metallic refinement also uses SoundBible (CC BY 3.0) and BigSoundBank (CC0); those originals and notices are in `ThirdParty/AdditionalAudio`. The original downloaded Kenney ZIP SHA-256 values were:
 
 | Official pack | SHA-256 |
 | --- | --- |
@@ -25,5 +25,5 @@ Optional distribution credit:
 
 ```text
 Sound effects: Kenney (kenney.nl), CC0 1.0.
-Edited/mixed for this prototype. See ThirdParty/KenneyAudio/manifest.json.
+Edited/mixed for this prototype. See ThirdParty/PrototypeAudio/manifest.json.
 ```

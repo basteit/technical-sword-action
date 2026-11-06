@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -12,7 +14,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private const string ProfilePath = "Assets/Settings/PrototypeCombat/FreeSfx.asset";
         private const BindingFlags Flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         private static object Get(object target, string name) => target.GetType().GetProperty(name, Flags)?.GetValue(target) ?? target.GetType().GetField(name, Flags).GetValue(target);
-        [Test] public void PaletteCoversEveryCueWithValidPublicDomainClips()
+        [Test] public void PaletteCoversEveryCueWithValidLicensedClips()
         {
             var profile = AssetDatabase.LoadAssetAtPath<ScriptableObject>(ProfilePath);
             Assert.That(profile, Is.Not.Null); Assert.That(Get(profile, "IsValid"), Is.True);
@@ -51,6 +53,68 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(paths, Does.Contain(ProfilePath));
             Assert.That(paths.Where(p => p.StartsWith("Assets/Audio/HitSound_")), Is.Empty);
             Assert.That(paths.Count(p => p.StartsWith("Assets/Audio/PrototypeFreeSfx/") && p.EndsWith(".wav")), Is.EqualTo(24));
+        }
+        private static object EntryFor(string cue)
+        {
+            var profile = AssetDatabase.LoadAssetAtPath<ScriptableObject>(ProfilePath);
+            return ((Array)Get(profile, "entries")).Cast<object>().Single(e => Get(e, "cue").ToString() == cue);
+        }
+        private static string Sha256(string path)
+        {
+            using var hash = SHA256.Create();
+            return BitConverter.ToString(hash.ComputeHash(File.ReadAllBytes(path))).Replace("-", "").ToLowerInvariant();
+        }
+        [Test] public void ApprovedJumpBytesAndPlaybackTuningAreUnchanged()
+        {
+            Assert.That(Sha256("Assets/Audio/PrototypeFreeSfx/Jump.wav"), Is.EqualTo("9e923b4a2ffe056a4eb271416676f11c95fb141a7e87f74a26822a260f882c7c"));
+            var entry = EntryFor("Jump");
+            Assert.That(Get(entry, "volume"), Is.EqualTo(.25f));
+            Assert.That(Get(entry, "pitch"), Is.EqualTo(1f));
+            Assert.That(Get(entry, "pitchVariation"), Is.EqualTo(.025f));
+        }
+        [Test] public void WhiffsHitsAndParriesUseDifferentClips()
+        {
+            var contacts = new[] { "LightHit", "HeavyHit", "Parry", "JustParry" }
+                .SelectMany(cue => (AudioClip[])Get(EntryFor(cue), "clips")).ToArray();
+            foreach (var cue in new[] { "Swing1", "Swing2", "Swing3", "Swing4" })
+                foreach (var clip in (AudioClip[])Get(EntryFor(cue), "clips"))
+                    CollectionAssert.DoesNotContain(contacts, clip, cue);
+            Assert.That(Get(EntryFor("Parry"), "clips"), Is.Not.EqualTo(Get(EntryFor("LightHit"), "clips")));
+        }
+        [Test] public void LandingIsShorterAndQuieterThanJump()
+        {
+            var land = EntryFor("Land"); var jump = EntryFor("Jump");
+            Assert.That(((AudioClip[])Get(land, "clips"))[0].length, Is.InRange(.15f, .21f));
+            Assert.That((float)Get(land, "volume"), Is.LessThan((float)Get(jump, "volume")));
+        }
+        [Test] public void RequiredAudioCreditsAreIncludedInStreamingAssets()
+        {
+            string text = File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "AudioCredits.txt"));
+            foreach (var credit in new[] { "Mike Koenig", "Sound Explorer", "Sword Swing", "Swords Collide", "Swords Clashing", "https://creativecommons.org/licenses/by/3.0/", "Modified", "Joseph SARDIN", "Kenney" })
+                Assert.That(text, Does.Contain(credit));
+            // StreamingAssets are copied verbatim; Unity intentionally uses DefaultImporter, not TextAsset.
+            Assert.That(AssetDatabase.AssetPathToGUID("Assets/StreamingAssets/AudioCredits.txt"), Is.Not.Empty);
+        }
+        [Serializable] private sealed class AudioManifest { public ClipRecord[] clips = Array.Empty<ClipRecord>(); }
+        [Serializable] private sealed class ClipRecord { public string asset = ""; public string sha256 = ""; public string license = ""; public SourceRecord[] sources = Array.Empty<SourceRecord>(); }
+        [Serializable] private sealed class SourceRecord { public string path = ""; public string sha256 = ""; public string author = ""; public string title = ""; public string license = ""; public string url = ""; }
+        [Test] public void CombinedManifestMatchesAllOriginalAndProcessedBytes()
+        {
+            var manifest = JsonUtility.FromJson<AudioManifest>(File.ReadAllText("ThirdParty/PrototypeAudio/manifest.json"));
+            Assert.That(manifest.clips.Length, Is.EqualTo(24));
+            foreach (var clip in manifest.clips)
+            {
+                Assert.That(Sha256(clip.asset), Is.EqualTo(clip.sha256), clip.asset);
+                Assert.That(clip.license, Is.EqualTo("CC0-1.0").Or.EqualTo("CC-BY-3.0"));
+                Assert.That(clip.sources, Is.Not.Empty);
+                foreach (var source in clip.sources)
+                {
+                    Assert.That(Sha256(source.path), Is.EqualTo(source.sha256), source.path);
+                    Assert.That(source.author, Is.Not.Empty); Assert.That(source.title, Is.Not.Empty);
+                    Assert.That(source.url, Does.StartWith("https://"));
+                    Assert.That(source.license, Is.EqualTo("CC0-1.0").Or.EqualTo("CC-BY-3.0"));
+                }
+            }
         }
         [TestCase("volume", float.NaN)] [TestCase("volume", 1.1f)] [TestCase("volume", -.01f)]
         [TestCase("pitch", float.PositiveInfinity)] [TestCase("pitch", .4f)]

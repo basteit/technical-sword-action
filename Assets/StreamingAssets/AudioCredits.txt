@@ -1,0 +1,37 @@
+PROTOTYPE SOUND EFFECT CREDITS / プロトタイプ効果音
+
+SoundBible materials — Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+License: https://creativecommons.org/licenses/by/3.0/
+
+"Sword Swing" by Mike Koenig
+Source: https://soundbible.com/1176-Sword-Swing.html
+Used in SwordA, SwordB, SwordIai (normal attack movement/whiff cues).
+
+"Swords Collide" by Sound Explorer
+Source: https://soundbible.com/1980-Swords-Collide.html
+Used in LightHit, HeavyHit, ParryClang (confirmed contact/parry cues).
+
+"Swords Clashing" by Mike Koenig
+Source: https://soundbible.com/857-Swords-Clashing.html
+Used in HeavyHit and ParryClang.
+
+Modified for this prototype: excerpts, mono/resampling, pitch, EQ/high-pass,
+mixing with CC0 layers, fades, peak normalization and format conversion.
+These six derivative files and their compatibility MP3 copies are CC BY 3.0.
+No endorsement by the authors or SoundBible is implied.
+
+"Footsteps, Shoe on Concrete" (#0514) by Joseph SARDIN / BigSoundBank
+Source: https://bigsoundbank.com/footsteps-shoe-on-concrete-s0514.html
+License: CC0 1.0, https://creativecommons.org/publicdomain/zero/1.0/
+Modified: single sneaker contact, trim, EQ, tempo, fades and normalization.
+Used as Land. Credit is voluntary.
+
+Additional sound effects by Kenney (https://kenney.nl/), CC0 1.0.
+RPG Audio: https://kenney.nl/assets/rpg-audio
+Impact Sounds: https://kenney.nl/assets/impact-sounds
+Sci-Fi Sounds: https://kenney.nl/assets/sci-fi-sounds
+Edited/mixed for this prototype. Kenney credit is voluntary.
+
+This notice applies to the named audio, not the game's code or original art.
+Keep this file when distributing the game or these sound derivatives.
+Source and processing records: ThirdParty/PrototypeAudio/manifest.json

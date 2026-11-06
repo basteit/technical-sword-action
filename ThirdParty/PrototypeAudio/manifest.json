@@ -1,0 +1,635 @@
+{
+  "clips": [
+    {
+      "peakTargetDb": -6,
+      "sha256": "f395910efc23f3c10e08acaa4b90366ea98dec964ebffce67776e43480325128",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/impact-sounds/footstep_concrete_000.ogg",
+          "sha256": "d7267e183067757c92c169de2a379abea592cfca6b39bb2e8feea15221ad79fe",
+          "filter": "volume=1",
+          "download": null,
+          "title": "footstep_concrete_000",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/impact-sounds"
+        }
+      ],
+      "seconds": 0.19,
+      "asset": "Assets/Audio/PrototypeFreeSfx/FootstepA.wav",
+      "gainDb": -5.16,
+      "license": "CC0-1.0",
+      "name": "FootstepA"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "54c423dfe677370783a88a1be6071add9748f66dd1705bd937f5d8aacdca2593",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/impact-sounds/footstep_concrete_002.ogg",
+          "sha256": "b21fa546d74941196b25da8a20b7010abd8c05c4fcf93545d1f344e66a664e13",
+          "filter": "volume=1",
+          "download": null,
+          "title": "footstep_concrete_002",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/impact-sounds"
+        }
+      ],
+      "seconds": 0.19,
+      "asset": "Assets/Audio/PrototypeFreeSfx/FootstepB.wav",
+      "gainDb": -5.36,
+      "license": "CC0-1.0",
+      "name": "FootstepB"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "9e923b4a2ffe056a4eb271416676f11c95fb141a7e87f74a26822a260f882c7c",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/cloth3.ogg",
+          "sha256": "a48632d17a4f1416541d261a32a31612e01267144c407fa3ecab3ff410f0085b",
+          "filter": "atempo=1.35",
+          "download": null,
+          "title": "cloth3",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        }
+      ],
+      "seconds": 0.25,
+      "asset": "Assets/Audio/PrototypeFreeSfx/Jump.wav",
+      "gainDb": 4.24,
+      "license": "CC0-1.0",
+      "name": "Jump"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "19cc52d95a407006651edd3d44d48a8e5239c579271bf5f77d6722408dc49f43",
+      "sources": [
+        {
+          "path": "ThirdParty/AdditionalAudio/BigSoundBank/0514.wav",
+          "sha256": "e424c7d07c7197f0d9aa5e3570de72d2572c1930984a92254013fa5e8fa76397",
+          "filter": "atrim=start=0.38:end=0.59,asetpts=PTS-STARTPTS,highpass=f=300,lowpass=f=7000,equalizer=f=1500:t=q:w=1:g=2,atempo=1.2",
+          "download": "https://bigsoundbank.com/UPLOAD/bwf-en/0514.wav",
+          "title": "Footsteps, Shoe on Concrete",
+          "author": "Joseph SARDIN",
+          "license": "CC0-1.0",
+          "url": "https://bigsoundbank.com/footsteps-shoe-on-concrete-s0514.html"
+        }
+      ],
+      "seconds": 0.18,
+      "asset": "Assets/Audio/PrototypeFreeSfx/Land.wav",
+      "gainDb": -5.26,
+      "license": "CC0-1.0",
+      "name": "Land"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "5f7c9d68ee6a5ada8e7a3351eb8c24711d22339f67276edfc7602249d3bf265c",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/knifeSlice2.ogg",
+          "sha256": "6c2064d0ef988d1ec3d56868e823ea8823a5cac00f2742560052633529407def",
+          "filter": "atempo=1.8",
+          "download": null,
+          "title": "knifeSlice2",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        },
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/cloth2.ogg",
+          "sha256": "8a7451193c38bc05483aec25dd193e163a15d44cf7fff04ac7912573231b0201",
+          "filter": "atempo=1.5,volume=0.4",
+          "download": null,
+          "title": "cloth2",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        }
+      ],
+      "seconds": 0.27,
+      "asset": "Assets/Audio/PrototypeFreeSfx/Dash.wav",
+      "gainDb": -7.86,
+      "license": "CC0-1.0",
+      "name": "Dash"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "7aea953a5d6e02f0e706db44ee243dd21f4c54d27cb8c91238bde86f3444623b",
+      "sources": [
+        {
+          "path": "ThirdParty/AdditionalAudio/SoundBible/Sword_Swing.wav",
+          "sha256": "93a2e6e9e17daea9cbebb54317c3669640c7b07c919a71c6856750cff76a7389",
+          "filter": "asetrate=55200,aresample=48000,highpass=f=650,equalizer=f=3000:t=q:w=1.2:g=3",
+          "download": "https://soundbible.com/grab.php?id=1176&type=wav",
+          "title": "Sword Swing",
+          "author": "Mike Koenig",
+          "license": "CC-BY-3.0",
+          "url": "https://soundbible.com/1176-Sword-Swing.html"
+        },
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/knifeSlice.ogg",
+          "sha256": "4cd96dc630bed9840c15f1dd2306da2cc56a4da26a5d3f1a03c5a7265ac5e54f",
+          "filter": "atempo=1.4,highpass=f=900,volume=0.25",
+          "download": null,
+          "title": "knifeSlice",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        }
+      ],
+      "seconds": 0.22,
+      "asset": "Assets/Audio/PrototypeFreeSfx/SwordA.wav",
+      "gainDb": -0.96,
+      "license": "CC-BY-3.0",
+      "name": "SwordA"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "38eeaecb54b5a43669af92c0af31acaefef80fde64243236e9d9076ee0ba1088",
+      "sources": [
+        {
+          "path": "ThirdParty/AdditionalAudio/SoundBible/Sword_Swing.wav",
+          "sha256": "93a2e6e9e17daea9cbebb54317c3669640c7b07c919a71c6856750cff76a7389",
+          "filter": "asetrate=62400,aresample=48000,highpass=f=750,equalizer=f=3400:t=q:w=1.2:g=3",
+          "download": "https://soundbible.com/grab.php?id=1176&type=wav",
+          "title": "Sword Swing",
+          "author": "Mike Koenig",
+          "license": "CC-BY-3.0",
+          "url": "https://soundbible.com/1176-Sword-Swing.html"
+        },
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/knifeSlice2.ogg",
+          "sha256": "6c2064d0ef988d1ec3d56868e823ea8823a5cac00f2742560052633529407def",
+          "filter": "atempo=1.55,highpass=f=1000,volume=0.25",
+          "download": null,
+          "title": "knifeSlice2",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        }
+      ],
+      "seconds": 0.2,
+      "asset": "Assets/Audio/PrototypeFreeSfx/SwordB.wav",
+      "gainDb": -0.86,
+      "license": "CC-BY-3.0",
+      "name": "SwordB"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "590107f74af80149fd8069e97f4709abca6fcc2d3d3764c8db067d62948cf936",
+      "sources": [
+        {
+          "path": "ThirdParty/AdditionalAudio/SoundBible/Sword_Swing.wav",
+          "sha256": "93a2e6e9e17daea9cbebb54317c3669640c7b07c919a71c6856750cff76a7389",
+          "filter": "asetrate=52800,aresample=48000,highpass=f=650,equalizer=f=3000:t=q:w=1.2:g=3",
+          "download": "https://soundbible.com/grab.php?id=1176&type=wav",
+          "title": "Sword Swing",
+          "author": "Mike Koenig",
+          "license": "CC-BY-3.0",
+          "url": "https://soundbible.com/1176-Sword-Swing.html"
+        },
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/drawKnife3.ogg",
+          "sha256": "a11ae62fb1a628425769d11a9de394980ad8909c31f4c9a4316f226963e21caf",
+          "filter": "atempo=1.5,highpass=f=1800,volume=0.18",
+          "download": null,
+          "title": "drawKnife3",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        }
+      ],
+      "seconds": 0.3,
+      "asset": "Assets/Audio/PrototypeFreeSfx/SwordIai.wav",
+      "gainDb": -0.76,
+      "license": "CC-BY-3.0",
+      "name": "SwordIai"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "50f265d7ef057e4c062cf53fbfc336b9bbc8e90b8284cdb2f63c96fc6103278e",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/metalLatch.ogg",
+          "sha256": "ba9ba60b172b3ebc131a940f25793cd2e207aca7af73dc80d637277f060f1708",
+          "filter": "volume=0.7",
+          "download": null,
+          "title": "metalLatch",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        },
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/clothBelt2.ogg",
+          "sha256": "d545b1d9f20e6188140aaf551a96f1e82fe0d15f7ca066fac8b065e1231e0038",
+          "filter": "atempo=2,volume=0.4",
+          "download": null,
+          "title": "clothBelt2",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        }
+      ],
+      "seconds": 0.22,
+      "asset": "Assets/Audio/PrototypeFreeSfx/Sheathe.wav",
+      "gainDb": -6.46,
+      "license": "CC0-1.0",
+      "name": "Sheathe"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "4cb61f6317475f1f5f1e1acbe685b55197c4734f35f8335fe81ddef70dc73240",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/drawKnife1.ogg",
+          "sha256": "276403e72c3b71c47bc24db3083970c23f8e5551ffa78f436f83483c56f3f0bb",
+          "filter": "atempo=1.8",
+          "download": null,
+          "title": "drawKnife1",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        }
+      ],
+      "seconds": 0.2,
+      "asset": "Assets/Audio/PrototypeFreeSfx/ParryReady.wav",
+      "gainDb": 20.94,
+      "license": "CC0-1.0",
+      "name": "ParryReady"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "ff5535dc87648c7e0a5ee36594be7420e624d3583dfc35c679751849769cf5ea",
+      "sources": [
+        {
+          "path": "ThirdParty/AdditionalAudio/SoundBible/Swords_Clashing.wav",
+          "sha256": "ea20c872a4b7bed3cb0db8f44db9e5d6ed93638709cc816a2318efe64ec74b90",
+          "filter": "atrim=start=0.135:end=0.98,asetpts=PTS-STARTPTS,asetrate=60000,aresample=48000,highpass=f=1100,lowpass=f=11000,equalizer=f=4000:t=q:w=1.2:g=3",
+          "download": "https://soundbible.com/grab.php?id=857&type=wav",
+          "title": "Swords Clashing",
+          "author": "Mike Koenig",
+          "license": "CC-BY-3.0",
+          "url": "https://soundbible.com/857-Swords-Clashing.html"
+        },
+        {
+          "path": "ThirdParty/AdditionalAudio/SoundBible/Swords_Collide.wav",
+          "sha256": "5113abd89a3efabc32c40a1c6868ab1cfb796055a642e5ff3052e0bcf836cd3f",
+          "filter": "atrim=start=0.019,asetpts=PTS-STARTPTS,highpass=f=1800,lowpass=f=11000,volume=0.35",
+          "download": "https://soundbible.com/grab.php?id=1980&type=wav",
+          "title": "Swords Collide",
+          "author": "Sound Explorer",
+          "license": "CC-BY-3.0",
+          "url": "https://soundbible.com/1980-Swords-Collide.html"
+        }
+      ],
+      "seconds": 0.65,
+      "asset": "Assets/Audio/PrototypeFreeSfx/ParryClang.wav",
+      "gainDb": -2.86,
+      "license": "CC-BY-3.0",
+      "name": "ParryClang"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "4f58362ab33807dd8dc900b35bf05f52dfc2fc7b890fde06b6002d10f8d6328a",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/cloth1.ogg",
+          "sha256": "ddb93a3671233f95da0e0b10367f082f7eb42fa6caaddcf776410aa8833c747d",
+          "filter": "atempo=2",
+          "download": null,
+          "title": "cloth1",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        }
+      ],
+      "seconds": 0.16,
+      "asset": "Assets/Audio/PrototypeFreeSfx/ParryMiss.wav",
+      "gainDb": 1.34,
+      "license": "CC0-1.0",
+      "name": "ParryMiss"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "04576387122e0cb57cc5a8f8d44e9dc7b06219ed96faacc2f3946a759f4b915c",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/sci-fi-sounds/forceField_002.ogg",
+          "sha256": "051b0eafc479695af4ca3607d41fd4be41bae7c21f4f9508d004722b09f1bd63",
+          "filter": "atrim=0:0.6,areverse,atempo=2",
+          "download": null,
+          "title": "forceField_002",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/sci-fi-sounds"
+        }
+      ],
+      "seconds": 0.29,
+      "asset": "Assets/Audio/PrototypeFreeSfx/CounterTransfer.wav",
+      "gainDb": -6.46,
+      "license": "CC0-1.0",
+      "name": "CounterTransfer"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "42183de99f382de349c9699279f9b7d84d9931c50099fe99a944d79087e6210f",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/sci-fi-sounds/forceField_000.ogg",
+          "sha256": "c2916f2a062c8ddd1aca2826d134fe90847037db31342726ffb0f9097afe339c",
+          "filter": "volume=1",
+          "download": null,
+          "title": "forceField_000",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/sci-fi-sounds"
+        }
+      ],
+      "seconds": 0.9,
+      "asset": "Assets/Audio/PrototypeFreeSfx/CounterCharge.wav",
+      "gainDb": -7.26,
+      "license": "CC0-1.0",
+      "name": "CounterCharge"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "28d1089da68e52f0328bd3cd8cebf2f2e5dc9425c8c8a9e4338664cdd089cc96",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/impact-sounds/impactPunch_heavy_000.ogg",
+          "sha256": "b33a8f14068aec24ec69ba85e5e87fdc41228975f6a1a3e44a6e7d6fc3d9f8d8",
+          "filter": "volume=1",
+          "download": null,
+          "title": "impactPunch_heavy_000",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/impact-sounds"
+        },
+        {
+          "path": "ThirdParty/KenneyAudio/sci-fi-sounds/lowFrequency_explosion_000.ogg",
+          "sha256": "3cb48d86dab63140cfb9aaeea4d4a6846abaca5831d157d8adbec0490da26343",
+          "filter": "atrim=0:0.45,volume=0.3",
+          "download": null,
+          "title": "lowFrequency_explosion_000",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/sci-fi-sounds"
+        },
+        {
+          "path": "ThirdParty/KenneyAudio/sci-fi-sounds/forceField_001.ogg",
+          "sha256": "5574e69dd04e5f59322c5ddffde5978f077b09170ae5e29cec0bd9901828cd90",
+          "filter": "atrim=0:0.30,volume=0.2",
+          "download": null,
+          "title": "forceField_001",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/sci-fi-sounds"
+        }
+      ],
+      "seconds": 0.65,
+      "asset": "Assets/Audio/PrototypeFreeSfx/CounterImpact.wav",
+      "gainDb": -8.56,
+      "license": "CC0-1.0",
+      "name": "CounterImpact"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "f15f82aeb7b1c2182cfc25f6b95e0756e6146c93aa544c65af1adf06ebdfcaf2",
+      "sources": [
+        {
+          "path": "ThirdParty/AdditionalAudio/SoundBible/Swords_Collide.wav",
+          "sha256": "5113abd89a3efabc32c40a1c6868ab1cfb796055a642e5ff3052e0bcf836cd3f",
+          "filter": "atrim=start=0.019,asetpts=PTS-STARTPTS,asetrate=55680,aresample=48000,highpass=f=1000,lowpass=f=11000,equalizer=f=3200:t=q:w=1:g=3",
+          "download": "https://soundbible.com/grab.php?id=1980&type=wav",
+          "title": "Swords Collide",
+          "author": "Sound Explorer",
+          "license": "CC-BY-3.0",
+          "url": "https://soundbible.com/1980-Swords-Collide.html"
+        }
+      ],
+      "seconds": 0.29,
+      "asset": "Assets/Audio/PrototypeFreeSfx/LightHit.wav",
+      "gainDb": -2.36,
+      "license": "CC-BY-3.0",
+      "name": "LightHit"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "f9da996316efacbe45dee622345f74ffbda9200d44770388c39a2ffa08710877",
+      "sources": [
+        {
+          "path": "ThirdParty/AdditionalAudio/SoundBible/Swords_Collide.wav",
+          "sha256": "5113abd89a3efabc32c40a1c6868ab1cfb796055a642e5ff3052e0bcf836cd3f",
+          "filter": "atrim=start=0.019,asetpts=PTS-STARTPTS,asetrate=52800,aresample=48000,highpass=f=850,lowpass=f=11000,equalizer=f=3000:t=q:w=1:g=3",
+          "download": "https://soundbible.com/grab.php?id=1980&type=wav",
+          "title": "Swords Collide",
+          "author": "Sound Explorer",
+          "license": "CC-BY-3.0",
+          "url": "https://soundbible.com/1980-Swords-Collide.html"
+        },
+        {
+          "path": "ThirdParty/AdditionalAudio/SoundBible/Swords_Clashing.wav",
+          "sha256": "ea20c872a4b7bed3cb0db8f44db9e5d6ed93638709cc816a2318efe64ec74b90",
+          "filter": "atrim=start=0.135:end=0.7,asetpts=PTS-STARTPTS,asetrate=57600,aresample=48000,highpass=f=1400,lowpass=f=11000,volume=0.35",
+          "download": "https://soundbible.com/grab.php?id=857&type=wav",
+          "title": "Swords Clashing",
+          "author": "Mike Koenig",
+          "license": "CC-BY-3.0",
+          "url": "https://soundbible.com/857-Swords-Clashing.html"
+        }
+      ],
+      "seconds": 0.42,
+      "asset": "Assets/Audio/PrototypeFreeSfx/HeavyHit.wav",
+      "gainDb": -3.26,
+      "license": "CC-BY-3.0",
+      "name": "HeavyHit"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "2cca0440936277e8c2445d531cbd7ba139695f6d06cb40b5d74684a878672a67",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/impact-sounds/impactPunch_medium_002.ogg",
+          "sha256": "6492f9ccbc8d24dcef607bb1b48790b7870961474561f7fe5601e1c73a3018ef",
+          "filter": "volume=1",
+          "download": null,
+          "title": "impactPunch_medium_002",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/impact-sounds"
+        }
+      ],
+      "seconds": 0.34,
+      "asset": "Assets/Audio/PrototypeFreeSfx/PlayerHit.wav",
+      "gainDb": -7.06,
+      "license": "CC0-1.0",
+      "name": "PlayerHit"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "1594e7c6fb7b5c945b502b2ad33c778f79f49cd368bbfee06932b20d8071262e",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/dropLeather.ogg",
+          "sha256": "097e1d3b74949b0145fda0519d40b7e0773ab82ec4858727f95be830927e1a45",
+          "filter": "atempo=1.4",
+          "download": null,
+          "title": "dropLeather",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        },
+        {
+          "path": "ThirdParty/KenneyAudio/impact-sounds/impactSoft_heavy_000.ogg",
+          "sha256": "49e7ca88743fca974bb8676ea138b751cfd8f9033b5e7af8736c2a215d6edbc1",
+          "filter": "volume=0.6",
+          "download": null,
+          "title": "impactSoft_heavy_000",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/impact-sounds"
+        }
+      ],
+      "seconds": 0.36,
+      "asset": "Assets/Audio/PrototypeFreeSfx/Fall.wav",
+      "gainDb": -2.26,
+      "license": "CC0-1.0",
+      "name": "Fall"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "79edde5a48943afa422063e4b106e08aeb75b7886f8d06c2cceba38aa30761aa",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/cloth2.ogg",
+          "sha256": "8a7451193c38bc05483aec25dd193e163a15d44cf7fff04ac7912573231b0201",
+          "filter": "atempo=1.6",
+          "download": null,
+          "title": "cloth2",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        }
+      ],
+      "seconds": 0.24,
+      "asset": "Assets/Audio/PrototypeFreeSfx/EnemyWindup.wav",
+      "gainDb": 1.24,
+      "license": "CC0-1.0",
+      "name": "EnemyWindup"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "4d4e92d2c1bf01e84b0626b6fb1f95b3c66574aac77ece8cfc60c08b051c7fd5",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/chop.ogg",
+          "sha256": "d00c2b3c9fff07e376145c8c8c45c90e5084ec192f6ce0387db233f7b86f1486",
+          "filter": "atempo=1.5",
+          "download": null,
+          "title": "chop",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        }
+      ],
+      "seconds": 0.29,
+      "asset": "Assets/Audio/PrototypeFreeSfx/EnemyAttack.wav",
+      "gainDb": -7.46,
+      "license": "CC0-1.0",
+      "name": "EnemyAttack"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "a2283d5292a9c43649163c7f63d6fd1ffa0882bc613a7837f2758c2f87049f32",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/sci-fi-sounds/forceField_004.ogg",
+          "sha256": "05609bb296cbc287ae95ac8924c89809d69c89d7bb357cc6a117ec1b1ef65e09",
+          "filter": "atempo=1.5",
+          "download": null,
+          "title": "forceField_004",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/sci-fi-sounds"
+        }
+      ],
+      "seconds": 0.3,
+      "asset": "Assets/Audio/PrototypeFreeSfx/Danger.wav",
+      "gainDb": -6.36,
+      "license": "CC0-1.0",
+      "name": "Danger"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "96a788084b7df25284497b4753f9e91138599310f6ff5710aba613172281da9f",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/sci-fi-sounds/forceField_003.ogg",
+          "sha256": "15e3fe971ffd3415e5ab641d3a4d043fb31f6712b0956315b524ba29c3889cda",
+          "filter": "atempo=1.25",
+          "download": null,
+          "title": "forceField_003",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/sci-fi-sounds"
+        }
+      ],
+      "seconds": 0.42,
+      "asset": "Assets/Audio/PrototypeFreeSfx/Heal.wav",
+      "gainDb": -5.86,
+      "license": "CC0-1.0",
+      "name": "Heal"
+    },
+    {
+      "peakTargetDb": -6,
+      "sha256": "0d1b819d106c493285f0cbcab3d7781edd7078bdb8e3873f93803221a3888e6d",
+      "sources": [
+        {
+          "path": "ThirdParty/KenneyAudio/rpg-audio/metalClick.ogg",
+          "sha256": "9851a69d0c613e13bceef08060ecc4148f098ef487927cbebe270d642398a3b3",
+          "filter": "volume=1",
+          "download": null,
+          "title": "metalClick",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/rpg-audio"
+        }
+      ],
+      "seconds": 0.14,
+      "asset": "Assets/Audio/PrototypeFreeSfx/Interact.wav",
+      "gainDb": -0.96,
+      "license": "CC0-1.0",
+      "name": "Interact"
+    }
+  ],
+  "preprocessing": "Per-layer trim/tempo/pitch/EQ/reverse/gain as recorded; remove leading silence below -48 dB; mix; high-pass 65 Hz; fade 3/25 ms; peak-normalize -6 dBFS; safety limit 0.56; PCM16 mono48kHz",
+  "channels": 1,
+  "licenses": [
+    "CC0-1.0",
+    "CC-BY-3.0"
+  ],
+  "authors": [
+    "Kenney",
+    "Mike Koenig",
+    "Sound Explorer",
+    "Joseph SARDIN"
+  ],
+  "bits": 16,
+  "credits": "Assets/StreamingAssets/AudioCredits.txt",
+  "acquired": "2026-11-07",
+  "packs": {
+    "rpg-audio": "https://kenney.nl/assets/rpg-audio",
+    "impact-sounds": "https://kenney.nl/assets/impact-sounds",
+    "sci-fi-sounds": "https://kenney.nl/assets/sci-fi-sounds"
+  },
+  "sampleRate": 48000,
+  "compatibility": {
+    "HitSound_RayStay": "PlayerHit",
+    "HitSound_RayRelease": "ParryClang",
+    "HitSound_Release": "HeavyHit",
+    "HitSound_RayTap": "LightHit"
+  }
+}
