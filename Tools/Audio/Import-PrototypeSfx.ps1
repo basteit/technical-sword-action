@@ -22,7 +22,7 @@ try {
         'SoundBible/Realistic_Punch' = @{path='ThirdParty/AdditionalAudio/SoundBible/Realistic_Punch.wav'; title='Realistic Punch'; author='Mark DiAngelo'; license='CC-BY-3.0'; url='https://soundbible.com/2069-Realistic-Punch.html'; download='https://soundbible.com/grab.php?id=2069&type=wav'; sha256='c04bdef72208d0aa3e7c74f8225e9f9e00f4eee8d3ed845a897d3454f3932cd2'}
         'BigSoundBank/0514' = @{path='ThirdParty/AdditionalAudio/BigSoundBank/0514.wav'; title='Footsteps, Shoe on Concrete'; author='Joseph SARDIN'; license='CC0-1.0'; url='https://bigsoundbank.com/footsteps-shoe-on-concrete-s0514.html'; download='https://bigsoundbank.com/UPLOAD/bwf-en/0514.wav'; sha256='e424c7d07c7197f0d9aa5e3570de72d2572c1930984a92254013fa5e8fa76397'}
     }
-    $packUrls = @{'rpg-audio'='https://kenney.nl/assets/rpg-audio'; 'impact-sounds'='https://kenney.nl/assets/impact-sounds'; 'sci-fi-sounds'='https://kenney.nl/assets/sci-fi-sounds'}
+    $packUrls = [ordered]@{'rpg-audio'='https://kenney.nl/assets/rpg-audio'; 'impact-sounds'='https://kenney.nl/assets/impact-sounds'; 'sci-fi-sounds'='https://kenney.nl/assets/sci-fi-sounds'}
     $recipes = @(
         @{name='FootstepA'; seconds=.19; sources=@('impact-sounds/footstep_concrete_000'); filters=@('volume=1')},
         @{name='FootstepB'; seconds=.19; sources=@('impact-sounds/footstep_concrete_002'); filters=@('volume=1')},
@@ -81,7 +81,7 @@ try {
             }
             $arguments += @('-i',$raw)
             $chains += "[$($i):a]aformat=sample_rates=48000:channel_layouts=mono,$($recipe.filters[$i]),apad=whole_dur=2[s$i]"
-            $sources += @{path=$raw; sha256=(Get-FileHash -LiteralPath $raw -Algorithm SHA256).Hash.ToLowerInvariant(); filter=$recipe.filters[$i]; title=$metadata.title; author=$metadata.author; license=$metadata.license; url=$metadata.url; download=$metadata.download}
+            $sources += [ordered]@{path=$raw; sha256=(Get-FileHash -LiteralPath $raw -Algorithm SHA256).Hash.ToLowerInvariant(); filter=$recipe.filters[$i]; title=$metadata.title; author=$metadata.author; license=$metadata.license; url=$metadata.url; download=$metadata.download}
         }
         $labels = (0..($recipe.sources.Count-1) | ForEach-Object { "[s$_]" }) -join ''
         $seconds = $recipe.seconds.ToString('0.000',[Globalization.CultureInfo]::InvariantCulture)
@@ -101,17 +101,18 @@ try {
         & $Ffmpeg @arguments -filter_complex "$graph;[mix]volume=${gain}dB,alimiter=limit=0.56:level=false[out]" -map '[out]' -ar 48000 -ac 1 -c:a pcm_s16le $dest
         if ($LASTEXITCODE -ne 0) { throw "Encoding failed: $dest" }
         $license = if ($sources.license -contains 'CC-BY-3.0') { 'CC-BY-3.0' } else { 'CC0-1.0' }
-        @{name=$recipe.name; asset=$dest; license=$license; seconds=$recipe.seconds; peakTargetDb=-6; gainDb=[double]::Parse($gain,[Globalization.CultureInfo]::InvariantCulture); sha256=(Get-FileHash -LiteralPath $dest -Algorithm SHA256).Hash.ToLowerInvariant(); sources=$sources}
+        [ordered]@{name=$recipe.name; asset=$dest; license=$license; seconds=$recipe.seconds; peakTargetDb=-6; gainDb=[double]::Parse($gain,[Globalization.CultureInfo]::InvariantCulture); sha256=(Get-FileHash -LiteralPath $dest -Algorithm SHA256).Hash.ToLowerInvariant(); sources=$sources}
     }
     # Keep compatibility GUIDs: the old recordings are replaced, not layered or left referenced.
-    $compatibility = @{'HitSound_RayTap'='LightHit';'HitSound_Release'='HeavyHit';'HitSound_RayRelease'='ParryClang';'HitSound_RayStay'='PlayerHit'}
+    $compatibility = [ordered]@{'HitSound_RayTap'='LightHit';'HitSound_Release'='HeavyHit';'HitSound_RayRelease'='ParryClang';'HitSound_RayStay'='PlayerHit'}
     foreach ($key in $compatibility.Keys) {
         & $Ffmpeg -hide_banner -loglevel error -y -i "$out/$($compatibility[$key]).wav" -c:a libmp3lame -q:a 2 "Assets/Audio/$key.mp3"
         if ($LASTEXITCODE -ne 0) { throw "Compatibility replacement failed: $key" }
     }
     $jump = @($records | Where-Object name -eq 'Jump')[0]
     if ($jump.sha256 -ne '9e923b4a2ffe056a4eb271416676f11c95fb141a7e87f74a26822a260f882c7c') { throw 'The approved jump sound must remain byte-identical.' }
-    $manifest = @{licenses=@('CC0-1.0','CC-BY-3.0'); authors=@('Kenney','Mike Koenig','Mark DiAngelo','Sound Explorer','Joseph SARDIN'); acquired='2026-11-07'; credits='Assets/StreamingAssets/AudioCredits.txt'; sampleRate=48000; channels=1; bits=16; preprocessing='Per-layer trim/tempo/pitch/EQ/reverse/delay/tremolo/gain as recorded; remove leading silence below -48 dB; mix; high-pass 65 Hz; fade 3/25 ms; peak-normalize -6 dBFS; safety limit 0.56; PCM16 mono48kHz'; packs=$packUrls; compatibility=$compatibility; clips=@($records)}
+    # Stable key order keeps re-imports byte-identical and makes future recipe changes reviewable.
+    $manifest = [ordered]@{licenses=@('CC0-1.0','CC-BY-3.0'); authors=@('Kenney','Mike Koenig','Mark DiAngelo','Sound Explorer','Joseph SARDIN'); acquired='2026-11-07'; credits='Assets/StreamingAssets/AudioCredits.txt'; sampleRate=48000; channels=1; bits=16; preprocessing='Per-layer trim/tempo/pitch/EQ/reverse/delay/tremolo/gain as recorded; remove leading silence below -48 dB; mix; high-pass 65 Hz; fade 3/25 ms; peak-normalize -6 dBFS; safety limit 0.56; PCM16 mono48kHz'; packs=$packUrls; compatibility=$compatibility; clips=@($records)}
     $manifest | ConvertTo-Json -Depth 9 | Set-Content -LiteralPath "$manifestFolder/manifest.json" -Encoding utf8
     Write-Output "Imported $($records.Count) processed clips and replaced four legacy recordings."
 } finally { Pop-Location }
