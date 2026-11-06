@@ -379,10 +379,9 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
                 AttackStarted?.Invoke();
                 return;
             }
-            if (distance <= attackRange * 1.1f)
-            {
-                pendingMeleeHit = true;
-            }
+            // Resolve the attack even on a whiff: the parry-only proximity probe
+            // has its own range, while the ordinary damage shape stays unchanged.
+            pendingMeleeHit = true;
 
             currentState = State.Recovery;
             stateTimer = recoveryDuration;
@@ -414,6 +413,18 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
     private void TryApplyMeleeHit()
     {
         if (combatDefinition == null) AttackStarted?.Invoke();
+        var context = new CombatHitContext2D(damageable, attackSequence,
+            combatDefinition == null || configuredParryable, configuredParryReaction);
+        var player = target != null ? target.GetComponentInParent<PlayerDamageReceiver2D>() : null;
+        if (player != null && (attackTargetLayers.value & (1 << player.gameObject.layer)) != 0 &&
+            !hitReceivers.Contains(player.GetInstanceID()) &&
+            (combatDefinition == null || Physics2D.Linecast(transform.position, player.transform.position,
+                combatDefinition.obstacleLayers).collider == null) &&
+            player.TryParryContextHit(attackDamage, transform.position, context))
+        {
+            hitReceivers.Add(player.GetInstanceID());
+            return; // The actual source was interrupted; do not apply another collider hit.
+        }
         Collider2D[] hits = combatDefinition == null
             ? Physics2D.OverlapCircleAll(transform.position, attackRange)
             : Physics2D.OverlapBoxAll((Vector2)transform.position + new Vector2(facing.x < 0 ? -configuredHitOffset.x : configuredHitOffset.x, configuredHitOffset.y), configuredHitSize, 0, attackTargetLayers);
@@ -433,8 +444,7 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
             }
 
             if (receiver is IContextDamageReceiver2D contextual)
-                contextual.TryReceiveContextHit(attackDamage, transform.position, attackKnockback,
-                    new CombatHitContext2D(damageable, attackSequence, combatDefinition == null || configuredParryable, configuredParryReaction));
+                contextual.TryReceiveContextHit(attackDamage, transform.position, attackKnockback, context);
             else receiver.TryReceiveHit(attackDamage, transform.position, attackKnockback);
         }
     }

@@ -161,6 +161,34 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IContextDamageReceiver2D, I
         return TryReceiveContextHit(damage, sourcePosition, knockbackForce, new CombatHitContext2D(null, 0));
     }
 
+    /// <summary>Parry-only proximity probe from an active attack. A miss never creates damage or consumes its hit ID.</summary>
+    public bool TryParryContextHit(int damage, Vector2 sourcePosition, CombatHitContext2D context)
+    {
+        if (damage <= 0 || !isActiveAndEnabled || currentHp <= 0 ||
+            (stateMachine != null && stateMachine.LifeState == PlayerLifeState.Dead) ||
+            (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick)) return false;
+        if (context.Source != null && (!context.Source.IsAlive ||
+            (lastAttackBySource.TryGetValue(context.Source.GetInstanceID(), out long id) && id == context.AttackId))) return false;
+        if (counter == null) counter = GetComponent<PlayerParryCounter2D>();
+        if (counter != null && counter.IsCounterInvincible) return false;
+        if (!TryBlockWithParry(sourcePosition, context)) return false;
+        if (context.Source != null) lastAttackBySource[context.Source.GetInstanceID()] = context.AttackId;
+        return true;
+    }
+
+    private bool TryBlockWithParry(Vector2 sourcePosition, CombatHitContext2D context)
+    {
+        if (parry == null || !parry.TryResolveContextParry(sourcePosition, context, out ParryResult result)) return false;
+        LastParryResult = result;
+        blockedByParry++;
+        if (parry.LastResolvedAsPrimary)
+        {
+            ApplyParryEffects(result);
+            specialGauge?.AddOnParry(result);
+        }
+        return true;
+    }
+
     public bool TryReceiveContextHit(int damage, Vector2 sourcePosition, float knockbackForce, CombatHitContext2D context)
     {
         LastParryResult = ParryResult.None;
@@ -181,17 +209,8 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IContextDamageReceiver2D, I
         if (counter == null) counter = GetComponent<PlayerParryCounter2D>();
         if (counter != null && counter.IsCounterInvincible) { blockedByInvincible++; return false; }
 
-        if (parry != null && parry.TryResolveContextParry(sourcePosition, context, out ParryResult parryResult))
+        if (TryBlockWithParry(sourcePosition, context))
         {
-            LastParryResult = parryResult;
-            blockedByParry++;
-            if (parry.LastResolvedAsPrimary) ApplyParryEffects(parryResult);
-
-            if (specialGauge != null && parry.LastResolvedAsPrimary)
-            {
-                specialGauge.AddOnParry(parryResult);
-            }
-
             return false;
         }
 
