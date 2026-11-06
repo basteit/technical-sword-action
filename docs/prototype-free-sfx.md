@@ -1,5 +1,33 @@
 # プロトタイプのフリーSE差し替え（#92）
 
+## 最新調整: 斬り込み・きらめき・電撃・重い蹴り（2026-11-07）
+
+体験目的: 空振りの風切りに対して命中は切り裂く手触りを返し、パリィ構えのきらめき、タメの電撃、カウンター命中の重い打撃を別々の音として伝える。
+
+着手時の受入条件:
+
+1. LightHit/HeavyHitは長い金属の響きではなく切り込む音へ、ParryReadyは短いきらめき、CounterChargeはタメ中の電撃、CounterImpactは重い打撃、Dashは独立した風切りへ差し替える。実命中前に切断/重打撃を鳴らさない。
+2. 好評だったパリィ成功、ジャンプ、着地と通常攻撃の空振り音を保持する。発音イベント、攻撃ORIGINAL、判定、停止、敵の予兆、モーション、カメラを変更せず、音色とミックスの2軸だけを調整する。帯電は中断/解除/無音で残さない。
+3. 商用利用・公開Git同梱の条件、作者・題名・原音/出力ハッシュ、加工方法とクレジットを更新し、再加工と関連自動テストを通す。聴感の最終採否と15分確認は人が行う。
+
+同じIssue #92 / Draft PR #99内の追加調整。直前の「斬撃命中も高い金属音」という指定だけを最新依頼で置き換え、パリィ成功の金属音は維持する。成功は切断/打撃、失敗・空振りは動作音だけに分ける。以下の前回・初回の検証記録は、それぞれの時点の履歴として残す。
+
+### 現在の素材と配合
+
+| 用途 | 現在の採用 / 発音位置 |
+| --- | --- |
+| 通常命中 / 4段命中 | SoundBible「Ninja Samurai Sword」Mike Koenigの切り込み部分を短く抽出。通常0.29秒、4段0.42秒（薄いKenney chopを追加）。剣同士の金属衝突層は外し、実命中でだけ発音 |
+| パリィ構え | Kenney Impact Soundsのbell/glassを高音化し、短い時間差で0.28秒のきらめきへ加工。音量0.22。構え開始に1回で、成功音は兼ねない |
+| パリィ成功 / Just | 直前のParryClangをバイト単位で維持。敵ピークへ同期した表示インパクトに鳴る |
+| ダッシュ | SoundBible「Woosh」Mark DiAngelo。刃と衣擦れを外し、単独の風切りを0.27秒へ加工。受理された地上/空中Dash開始に1回 |
+| カウンターのタメ | SoundBible「Electricity」Mike Koenigの抜粋と細かい振幅変化を0.90秒ループへ。音量0.20→0.25、ChargeStarted〜ChargeReleasedだけ。対象消失/中断/Pause/無音の既存管理を維持 |
+| 蹴り出し / 実命中 | 蹴り出しはDashの薄い風切り（音量0.40→0.25）。命中はSoundBible「Kick」Mike Koenig + 「Realistic Punch」Mark DiAngeloの打撃アタックと低い胴鳴り0.65秒、音量0.78→0.85。電撃・爆発層を命中から外す |
+| 維持する音 | Jump、Land、ParryClang、SwordA/B/Iaiなど18音は直前 `7af7949` とバイト同一。攻撃速度・判定・演出時刻も維持 |
+
+新規の5作品はそれぞれの公式ページでCC BY 3.0を確認した（[Ninja Samurai Sword](https://soundbible.com/1526-Ninja-Samurai-Sword.html)、[Electricity](https://soundbible.com/1107-Electricity.html)、[Woosh](https://soundbible.com/2068-Woosh.html)、[Kick](https://soundbible.com/996-Kick.html)、[Realistic Punch](https://soundbible.com/2069-Realistic-Punch.html)）。Ninja Samurai SwordのWAV配布は空応答だったため公式MP3を原音のまま保存した。加工後は48kHz/mono/PCM16へ統一し、出典・加工・CC BY 3.0通知をStreamingAssetsのクレジットへ追加した。現在のCC BY派生WAVは9本、残りはCC0。
+
+変更するWAVはLightHit、HeavyHit、ParryReady、CounterCharge、CounterImpact、Dashの6本。互換MP3のRayTap/Releaseも同じ切断音へ更新する。未受領モーションや音源を完成扱いにせず、配布ZIPは今回更新しない。高音の構えが成功と紛らわしくないか、斬撃の質感と蹴りの重みの最終採否は人による確認を残す。
+
 ## 追加調整: 高い金属音と着地音の再選定（2026-11-07）
 
 体験目的: 刀の空振りは鋭い風切り、命中は短い金属の切断音、パリィは澄んだ金属の余韻として聞き分け、着地だけが低く大きく浮かないようにする。
@@ -12,7 +40,7 @@
 
 同じIssue #92 / ブランチ / Draft PR #99の修正として進める。以下の初回Kenneyのみという素材方針とCC0のみという記載は初回の履歴であり、本調整の素材表を現在の採用として優先する。
 
-### 現在の差し替え素材
+### 前回の差し替え素材
 
 | 用途 | 採用素材 / 変更 |
 | --- | --- |
@@ -106,14 +134,14 @@ SoundBibleの3作品は各作品ページでCC BY 3.0を確認した（[Sword Sw
 | --- | --- | --- |
 | 足音 | FootstepA/B（concrete、交互） | 接地中・通常歩行の実移動1.3unitごと。立ち止まり/空中/攻撃移動では鳴らさない |
 | ジャンプ/着地 | Jump（cloth3、維持）/Land（短い靴底接触） | 受理された踏切/実接地。床抜けはジャンプ音なし |
-| ダッシュ | Dash（knifeSlice2＋cloth2） | 実際の開始に1回。地上/空中共用 |
+| ダッシュ | Dash（Wooshの風切り） | 実際の開始に1回。地上/空中共用 |
 | 攻撃1/2/3/4 | SwordA / SwordB / SwordAの音色差 / SwordIai | 各段のActive開始2F前。空振りでも動作音のみ再生 |
-| 通常命中/4段命中 | LightHit / HeavyHit（高い剣の金属接触） | 同一攻撃の実命中。同tickの多重Collider/複数命中は音を積まない |
+| 通常命中/4段命中 | LightHit / HeavyHit（短い切り込み） | 同一攻撃の実命中。同tickの多重Collider/複数命中は音を積まない |
 | 納刀 | Sheathe（metalLatch＋clothBelt2） | 実際に復帰へ進んだ後半。次段へ接続した場合や中断時は予約しない |
-| パリィ構え/失敗 | ParryReady / ParryMiss | 開始/失敗時。小さな構え・衣擦れで成功の金属音と区別 |
+| パリィ構え/失敗 | ParryReady（きらめき）/ ParryMiss（衣擦れ） | 開始/失敗時。成功の金属衝突音と区別 |
 | パリィ成功/Just | ParryClang（高い剣衝突＋余韻） | 敵の攻撃ピークへ同期した表示インパクト。Justは小さな音色差だけで二重に重ねない |
-| 反撃転移/帯電 | CounterTransfer / CounterCharge（forceField） | BlinkStarted / ChargeStarted。帯電だけループし、解除/中断/対象消失で止める |
-| 蹴り出し/反撃命中 | Dashの短い音色差 / CounterImpact（重打撃＋低音＋薄い電気） | ChargeReleased / 実際のHitConfirmed。転移と命中を混同しない |
+| 反撃転移/帯電 | CounterTransfer（forceField）/ CounterCharge（電撃） | BlinkStarted / ChargeStarted。帯電だけループし、解除/中断/対象消失で止める |
+| 蹴り出し/反撃命中 | Dashの薄い風切り / CounterImpact（重い打撃＋胴鳴り） | ChargeReleased / 実際のHitConfirmed。転移と命中を混同しない |
 | 被弾/死亡 | PlayerHit / Fall | 実ダメージ/死亡状態。死亡音を毎tick再開しない |
 | 敵の予備動作/攻撃/不可予兆 | EnemyWindup / EnemyAttack / Danger | 既存の開始イベント/不可攻撃の合図区間。通常敵へ追加の黄色VFXは付けない |
 | 敵撃破 | Fall（弱音量） | 撃破成立。同tickの斬撃/反撃命中より低優先度 |

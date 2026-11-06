@@ -80,7 +80,7 @@ MonoBehaviour:
   - cue: 9
     clips:
     - {fileID: 8300000, guid: a2973a7b42cd3c04ba432f8896349a43, type: 3}
-    volume: 0.2
+    volume: 0.22
     pitch: 1
     pitchVariation: 0.025
     priority: 35
@@ -129,21 +129,21 @@ MonoBehaviour:
   - cue: 16
     clips:
     - {fileID: 8300000, guid: 46a666cbe21e030488f49c1b82fae316, type: 3}
-    volume: 0.2
+    volume: 0.25
     pitch: 1
     pitchVariation: 0
     priority: 40
   - cue: 17
     clips:
     - {fileID: 8300000, guid: 926c53129dccb7e44a083e1cfa2d0fce, type: 3}
-    volume: 0.4
+    volume: 0.25
     pitch: 1.1
     pitchVariation: 0
     priority: 70
   - cue: 18
     clips:
     - {fileID: 8300000, guid: 6d1b40a6fcd58e24ab1220850737e6c0, type: 3}
-    volume: 0.78
+    volume: 0.85
     pitch: 1
     pitchVariation: 0
     priority: 95

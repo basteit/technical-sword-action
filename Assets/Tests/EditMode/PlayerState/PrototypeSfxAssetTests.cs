@@ -72,6 +72,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get(entry, "pitch"), Is.EqualTo(1f));
             Assert.That(Get(entry, "pitchVariation"), Is.EqualTo(.025f));
         }
+        [TestCase("Land", "19cc52d95a407006651edd3d44d48a8e5239c579271bf5f77d6722408dc49f43")]
+        [TestCase("ParryClang", "ff5535dc87648c7e0a5ee36594be7420e624d3583dfc35c679751849769cf5ea")]
+        [TestCase("SwordA", "7aea953a5d6e02f0e706db44ee243dd21f4c54d27cb8c91238bde86f3444623b")]
+        [TestCase("SwordB", "38eeaecb54b5a43669af92c0af31acaefef80fde64243236e9d9076ee0ba1088")]
+        [TestCase("SwordIai", "590107f74af80149fd8069e97f4709abca6fcc2d3d3764c8db067d62948cf936")]
+        public void ApprovedLandingParryAndWhiffsRemainByteIdentical(string name, string expected)
+        { Assert.That(Sha256("Assets/Audio/PrototypeFreeSfx/" + name + ".wav"), Is.EqualTo(expected)); }
         [Test] public void WhiffsHitsAndParriesUseDifferentClips()
         {
             var contacts = new[] { "LightHit", "HeavyHit", "Parry", "JustParry" }
@@ -90,7 +97,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [Test] public void RequiredAudioCreditsAreIncludedInStreamingAssets()
         {
             string text = File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "AudioCredits.txt"));
-            foreach (var credit in new[] { "Mike Koenig", "Sound Explorer", "Sword Swing", "Swords Collide", "Swords Clashing", "https://creativecommons.org/licenses/by/3.0/", "Modified", "Joseph SARDIN", "Kenney" })
+            foreach (var credit in new[] { "Mike Koenig", "Mark DiAngelo", "Sound Explorer", "Sword Swing", "Swords Collide", "Swords Clashing", "Ninja Samurai Sword", "Electricity", "Woosh", "Kick", "Realistic Punch", "https://creativecommons.org/licenses/by/3.0/", "Modified", "Joseph SARDIN", "Kenney" })
                 Assert.That(text, Does.Contain(credit));
             // StreamingAssets are copied verbatim; Unity intentionally uses DefaultImporter, not TextAsset.
             Assert.That(AssetDatabase.AssetPathToGUID("Assets/StreamingAssets/AudioCredits.txt"), Is.Not.Empty);
@@ -98,6 +105,25 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [Serializable] private sealed class AudioManifest { public ClipRecord[] clips = Array.Empty<ClipRecord>(); }
         [Serializable] private sealed class ClipRecord { public string asset = ""; public string sha256 = ""; public string license = ""; public SourceRecord[] sources = Array.Empty<SourceRecord>(); }
         [Serializable] private sealed class SourceRecord { public string path = ""; public string sha256 = ""; public string author = ""; public string title = ""; public string license = ""; public string url = ""; }
+        [Test] public void SparkleWindElectricityAndContactsHaveSeparateRoles()
+        {
+            var cues = new[] { "ParryReady", "Dash", "CounterCharge", "CounterHit", "LightHit", "Parry" };
+            var clips = cues.Select(cue => ((AudioClip[])Get(EntryFor(cue), "clips"))[0]).ToArray();
+            Assert.That(clips.Distinct().Count(), Is.EqualTo(cues.Length));
+            var manifest = JsonUtility.FromJson<AudioManifest>(File.ReadAllText("ThirdParty/PrototypeAudio/manifest.json"));
+            foreach (var name in new[] { "LightHit", "HeavyHit" })
+            {
+                var sources = manifest.clips.Single(c => c.asset.EndsWith("/" + name + ".wav")).sources;
+                CollectionAssert.Contains(sources.Select(s => s.title).ToArray(), "Ninja Samurai Sword");
+                Assert.That(sources.Any(s => s.title.StartsWith("Swords ")), Is.False, "Clashing belongs to parry, not cutting flesh/material.");
+            }
+            var charge = manifest.clips.Single(c => c.asset.EndsWith("/CounterCharge.wav"));
+            CollectionAssert.Contains(charge.sources.Select(s => s.title).ToArray(), "Electricity");
+            var hit = manifest.clips.Single(c => c.asset.EndsWith("/CounterImpact.wav"));
+            CollectionAssert.AreEquivalent(new[] { "Kick", "Realistic Punch" }, hit.sources.Select(s => s.title).ToArray());
+            var dash = manifest.clips.Single(c => c.asset.EndsWith("/Dash.wav"));
+            CollectionAssert.AreEqual(new[] { "Woosh" }, dash.sources.Select(s => s.title).ToArray());
+        }
         [Test] public void CombinedManifestMatchesAllOriginalAndProcessedBytes()
         {
             var manifest = JsonUtility.FromJson<AudioManifest>(File.ReadAllText("ThirdParty/PrototypeAudio/manifest.json"));

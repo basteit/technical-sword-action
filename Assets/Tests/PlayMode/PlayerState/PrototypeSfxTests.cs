@@ -98,6 +98,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             if(airborne) { Request(PlayerActionRequest.Jump); Frames(4); }
             Request(PlayerActionRequest.Dash); Frames(10); Assert.That(Count("Dash"),Is.EqualTo(1));
+            Assert.That(Sources.Any(a=>a.isPlaying&&a.clip!=null&&a.clip.name=="Dash"&&!a.loop),Is.True);
+            Assert.That(Count("LightHit")+Count("HeavyHit")+Count("CounterHit"),Is.Zero);
             if(airborne) { Request(PlayerActionRequest.Dash); Assert.That(Count("Dash"),Is.EqualTo(1)); }
         }
         [TestCase(false)] [TestCase(true)]
@@ -146,14 +148,24 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Request(PlayerActionRequest.Parry); Frames(50);
             Assert.That(Count("ParryMiss"),Is.EqualTo(1)); Assert.That(Count("Parry"),Is.Zero); Assert.That(Count("JustParry"),Is.Zero);
         }
+        [Test] public void ParryReadySparklesBeforeAnySuccessfulContact()
+        {
+            Request(PlayerActionRequest.Parry);
+            Assert.That(Count("ParryReady"),Is.EqualTo(1));
+            Assert.That(Sources.Any(a=>a.isPlaying&&a.clip!=null&&a.clip.name=="ParryReady"&&!a.loop),Is.True);
+            Assert.That(Count("Parry")+Count("JustParry"),Is.Zero);
+            Frames(50); Assert.That(Count("ParryReady"),Is.EqualTo(1));
+        }
         [Test] public void CounterTransferChargeReleaseAndImpactFollowTheRealPhases()
         {
             BeginCounter(); Until(()=>Get<bool>(sfx,"ChargeLoopActive"));
             Assert.That(Count("CounterTransfer"),Is.EqualTo(1)); Assert.That(Count("CounterCharge"),Is.EqualTo(1));
+            Assert.That(Sources.Any(a=>a.isPlaying&&a.loop&&a.clip!=null&&a.clip.name=="CounterCharge"),Is.True);
             Assert.That(Count("CounterHit"),Is.Zero);
             Until(()=>Get<int>(counter,"HitCount")==1);
             Assert.That(Count("CounterRelease"),Is.EqualTo(1)); Assert.That(Count("CounterHit"),Is.EqualTo(1));
             Assert.That(Get<bool>(sfx,"ChargeLoopActive"),Is.False);
+            Assert.That(Sources.Any(a=>a.isPlaying&&a.clip!=null&&a.clip.name=="CounterImpact"&&!a.loop),Is.True);
             Until(()=>!Get<bool>(counter,"IsActive")); Frames(20); Assert.That(Count("CounterHit"),Is.EqualTo(1));
             Assert.That(Count("Land"),Is.EqualTo(1));
         }
