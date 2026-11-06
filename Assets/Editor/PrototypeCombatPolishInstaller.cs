@@ -24,6 +24,7 @@ public static class PrototypeCombatPolishInstaller
         try
         {
             InstallIntoScene(scene);
+            PrototypeSfxInstaller.InstallIntoScene(scene);
             EditorSceneManager.SaveScene(scene);
         }
         finally
@@ -50,7 +51,7 @@ public static class PrototypeCombatPolishInstaller
             slash.attackId = "heavy-overhead-slash"; slash.windupFrames = 42; slash.activeFrames = 4;
             slash.recoveryFrames = 38; slash.cooldownFrames = 40; slash.damage = 14;
             slash.attackRange = 1.65f; slash.hitOffset = new Vector2(.8f, 0); slash.hitSize = new Vector2(1.65f, 1.3f);
-            slash.windupClip = Audio("HitSound_RayTap");
+            slash.windupClip = PrototypeSfxInstaller.Clip("EnemyWindup");
             Save(slash);
         }
         var sweep = LoadOrCreate<EnemyAttackDefinition>("StrongLowSweep", out bool createSweep);
@@ -61,7 +62,7 @@ public static class PrototypeCombatPolishInstaller
             sweep.parryable = false; sweep.resistHitStunWhileAttacking = true;
             sweep.attackRange = 1.65f; sweep.hitOffset = new Vector2(.9f, -.5f); sweep.hitSize = new Vector2(1.9f, .55f);
             sweep.countermeasure = "Jump over the low sweep, or Dash through it; punish the long recovery.";
-            sweep.windupClip = Audio("HitSound_RayStay"); Save(sweep);
+            sweep.windupClip = PrototypeSfxInstaller.Clip("Danger"); Save(sweep);
         }
         var strong = LoadOrCreate<EnemyCombatDefinition>("StrongMelee", out bool createStrong);
         if (createStrong)
@@ -110,14 +111,14 @@ public static class PrototypeCombatPolishInstaller
         if (createProfile)
         {
             profile.entries = new[] {
-                Entry(CombatFeedbackKind.LightHit, 3, 3, .08f, 8, .18f, new Color(1,.9f,.55f), "HitSound_RayTap", 1.15f),
-                Entry(CombatFeedbackKind.HeavyHit, 5, 4, .12f, 12, .34f, new Color(1,.75f,.3f), "HitSound_Release", .9f),
-                Entry(CombatFeedbackKind.Counter, 5, 4, .12f, 14, .42f, new Color(.5f,1,1), "HitSound_RayRelease", .8f),
-                Entry(CombatFeedbackKind.Parry, 3, 4, .12f, 10, .28f, Color.white, "HitSound_RayTap", 1.3f),
-                Entry(CombatFeedbackKind.JustParry, 7, 6, .16f, 14, .4f, new Color(.5f,.8f,1), "HitSound_RayRelease", 1.3f),
-                Entry(CombatFeedbackKind.PlayerHit, 3, 3, .08f, 12, .3f, new Color(1,.45f,.4f), "HitSound_RayStay", .85f),
-                Entry(CombatFeedbackKind.Defeat, 0, 0, 0, 18, .45f, new Color(.7f,.75f,.8f), "", 1),
-                Entry(CombatFeedbackKind.ParryMiss, 0, 0, 0, 8, .15f, new Color(.5f,.5f,.5f), "HitSound_RayStay", .65f)
+                Entry(CombatFeedbackKind.LightHit, 3, 3, .08f, 8, .18f, new Color(1,.9f,.55f), 1.15f),
+                Entry(CombatFeedbackKind.HeavyHit, 5, 4, .12f, 12, .34f, new Color(1,.75f,.3f), .9f),
+                Entry(CombatFeedbackKind.Counter, 5, 4, .12f, 14, .42f, new Color(.5f,1,1), .8f),
+                Entry(CombatFeedbackKind.Parry, 3, 4, .12f, 10, .28f, Color.white, 1.3f),
+                Entry(CombatFeedbackKind.JustParry, 7, 6, .16f, 14, .4f, new Color(.5f,.8f,1), 1.3f),
+                Entry(CombatFeedbackKind.PlayerHit, 3, 3, .08f, 12, .3f, new Color(1,.45f,.4f), .85f),
+                Entry(CombatFeedbackKind.Defeat, 0, 0, 0, 18, .45f, new Color(.7f,.75f,.8f), 1),
+                Entry(CombatFeedbackKind.ParryMiss, 0, 0, 0, 8, .15f, new Color(.5f,.5f,.5f), .65f)
             }; Save(profile);
         }
         var settings = LoadOrCreate<CombatFeedbackSettings>("FeedbackSettings", out bool createSettings);
@@ -132,11 +133,10 @@ public static class PrototypeCombatPolishInstaller
         Set(arena, "strongEnemy", strongEnemy); Set(arena, "coordinator", coordinator); Set(arena, "feedback", feedback);
     }
     private static CombatFeedbackProfile.Entry Entry(CombatFeedbackKind kind, int stop, float pixels, float seconds,
-        int lifetime, float size, Color tint, string clip, float pitch) => new() {
+        int lifetime, float size, Color tint, float pitch) => new() {
             kind = kind, hitstopFrames = stop, shakePixels = pixels, shakeSeconds = seconds, lifetimeFrames = lifetime,
-            glyphSize = size, tint = tint, clip = Audio(clip), volume = .5f, pitch = pitch, flashFrames = 3
+            glyphSize = size, tint = tint, clip = PrototypeSfxInstaller.FeedbackClip(kind), volume = .5f, pitch = pitch, flashFrames = 3
         };
-    private static AudioClip Audio(string name) => string.IsNullOrEmpty(name) ? null : AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/" + name + ".mp3");
     private static T LoadOrCreate<T>(string name, out bool created) where T : ScriptableObject
     {
         string path = Folder + name + ".asset"; var data = AssetDatabase.LoadAssetAtPath<T>(path);

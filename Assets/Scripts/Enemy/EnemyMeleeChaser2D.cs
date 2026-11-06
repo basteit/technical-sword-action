@@ -169,7 +169,8 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
         attackSequence++;
         hitReceivers.Clear();
         WindupStarted?.Invoke();
-        if (currentAttack != null && currentAttack.windupClip != null && TryGetComponent<AudioSource>(out var audio))
+        if (!PrototypeSfx2D.IsManaging(target != null ? target.gameObject : null) &&
+            currentAttack != null && currentAttack.windupClip != null && TryGetComponent<AudioSource>(out var audio))
             audio.PlayOneShot(currentAttack.windupClip);
         return true;
     }

@@ -173,7 +173,7 @@ public class PlayerSpecialSkill2D : MonoBehaviour, ICombatTickListener, ICombatT
 
     private void PlayClip(AudioClip clip, float volume)
     {
-        if (audioSource == null || clip == null)
+        if (PrototypeSfx2D.IsManaging(gameObject) || audioSource == null || clip == null)
         {
             return;
         }

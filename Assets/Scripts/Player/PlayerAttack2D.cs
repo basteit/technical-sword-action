@@ -664,7 +664,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
     private void PlayClip(AudioClip clip, float volume)
     {
-        if (audioSource == null || clip == null)
+        if (PrototypeSfx2D.IsManaging(gameObject) || audioSource == null || clip == null)
         {
             return;
         }
