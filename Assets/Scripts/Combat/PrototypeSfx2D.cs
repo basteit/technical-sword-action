@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 /// <summary>Opt-in SFX bus: gameplay remains authoritative; no audio event drives combat or animation.</summary>
 [DisallowMultipleComponent, DefaultExecutionOrder(10990)]
-public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
+public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     private sealed class Voice
     {
@@ -35,6 +35,8 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
     private CombatFeedback2D feedback;
     private PrototypeSfxProfile validated;
     private bool valid;
+    private bool chargeAccentPending;
+    private int chargeAccentFrame;
     public int CombatTickOrder => 650;
     public PrototypeSfxProfile Profile => profile;
     public int PlayedCount { get; private set; }
@@ -94,16 +96,21 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
     }
     private void OnStep(int step) { currentStep = step; swingPending = sheathePending = true; }
     private void OnTransfer() => Play(PrototypeSfxCue.CounterTransfer);
-    // ChargeStarted is the authored kick pose reveal (currently 12F), not a looping ambience.
-    private void OnCharge() => Play(PrototypeSfxCue.CounterCharge, false, true);
-    private void OnRelease() { StopCharge(); Play(PrototypeSfxCue.CounterRelease); }
-    private void OnCounterFinished(bool completed) { StopCharge(); if (!completed) StopActions(); swingPending = sheathePending = false; }
+    // The authored effect reaches its largest cel six combat ticks after the pose reveal.
+    private void OnCharge()
+    {
+        chargeAccentPending = IsReady && profile.counterAccentEnabled && counter != null;
+        if (chargeAccentPending) chargeAccentFrame = Mathf.Min(counter.ChargeFrame + profile.counterAccentOffsetFrames,
+            Mathf.Max(counter.ChargeFrame, counter.ChargeReleaseFrame - 1));
+    }
+    private void OnRelease() { chargeAccentPending = false; StopCharge(); Play(PrototypeSfxCue.CounterRelease); }
+    private void OnCounterFinished(bool completed) { chargeAccentPending = false; StopCharge(); if (!completed) StopActions(); swingPending = sheathePending = false; }
     private void OnCounterLanded() { Play(PrototypeSfxCue.Land); suppressCounterLanding = true; }
     private void OnEnemyWindup() => Play(PrototypeSfxCue.EnemyWindup);
     private void OnEnemyAttack() => Play(PrototypeSfxCue.EnemyAttack);
     private void OnDamage(int amount, string source, long sequence)
     {
-        StopCharge(); StopActions(); swingPending = sheathePending = false;
+        chargeAccentPending = false; StopCharge(); StopActions(); swingPending = sheathePending = false;
         // Fatal damage resets the combat session immediately after this callback.
         // Start its fall sound from the resulting Dead state, not before that reset.
     }
@@ -184,6 +191,17 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
         }
     }
 
+    public void CombatTickTimers()
+    {
+        if (!chargeAccentPending || CombatTimeController.IsPaused) return;
+        if (!IsReady || !profile.counterAccentEnabled || counter == null || !counter.IsActive || counter.HasReleasedCharge ||
+            counter.SelectedTarget == null || !counter.SelectedTarget.ParticipatingInCombat)
+        { chargeAccentPending = false; return; }
+        if (counter.ElapsedFrames < chargeAccentFrame) return;
+        // Resolve after counter/presentation timers, on the same tick as the peak cel.
+        chargeAccentPending = false;
+        Play(PrototypeSfxCue.CounterCharge, false, true);
+    }
     private void Play(PrototypeSfxCue cue, bool impact = false, bool chargeAccent = false)
     {
         if (!IsReady || CombatTimeController.IsPaused) return;
@@ -218,6 +236,8 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
         Mathf.Clamp01(feedback.Settings.masterVolume) * Mathf.Clamp01(feedback.Settings.sfxVolume) : 0;
     public void RefreshVolumes()
     {
+        if (profile != null && !profile.counterAccentEnabled)
+        { chargeAccentPending = false; StopCharge(); }
         if (ChargeAccentActive && (counter == null || !counter.IsActive || counter.SelectedTarget == null ||
             !counter.SelectedTarget.ParticipatingInCombat)) StopCharge();
         float sum = 0;
@@ -242,6 +262,8 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
     { for (int i = 0; i < ActionVoices; i++) if (voices[i] != null) { voices[i].source.Stop(); voices[i].paused = false; } }
     private void OnPause(bool paused)
     {
+        if (!paused && profile != null && !profile.counterAccentEnabled)
+        { chargeAccentPending = false; StopCharge(); }
         foreach (var voice in voices)
         {
             if (voice == null) continue;
@@ -253,6 +275,7 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
     {
         foreach (var voice in voices) if (voice != null) { voice.source.Stop(); voice.paused = false; voice.gain = 0; }
         initialized = swingPending = sheathePending = healApplied = deathHandled = suppressCounterLanding = false;
+        chargeAccentPending = false; chargeAccentFrame = 0;
         currentStep = 0; walkDistance = 0; impactTick = decisionTick = -1; impactPriority = -1;
         Array.Fill(lastCueTicks, -1); if (dangerSequences != null) Array.Fill(dangerSequences, -1);
     }

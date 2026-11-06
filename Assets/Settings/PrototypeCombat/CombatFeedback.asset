@@ -22,7 +22,7 @@ MonoBehaviour:
     flashFrames: 3
     tint: {r: 1, g: 0.9, b: 0.55, a: 1}
     clip: {fileID: 8300000, guid: 403f08e7d72ddbd42a8c9ceb6dda1ead, type: 3}
-    volume: 0.5
+    volume: 0.55
     pitch: 1
   - kind: 1
     hitstopFrames: 5
@@ -33,7 +33,7 @@ MonoBehaviour:
     flashFrames: 3
     tint: {r: 1, g: 0.75, b: 0.3, a: 1}
     clip: {fileID: 8300000, guid: 043ce5f6d19efd144ae96b2a9183828a, type: 3}
-    volume: 0.58
+    volume: 0.65
     pitch: 1
   - kind: 2
     hitstopFrames: 5
@@ -44,7 +44,7 @@ MonoBehaviour:
     flashFrames: 3
     tint: {r: 0.5, g: 1, b: 1, a: 1}
     clip: {fileID: 8300000, guid: 6d1b40a6fcd58e24ab1220850737e6c0, type: 3}
-    volume: 0.85
+    volume: 0.9
     pitch: 1
   - kind: 3
     hitstopFrames: 3

@@ -107,6 +107,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [Serializable] private sealed class AudioManifest { public ClipRecord[] clips = Array.Empty<ClipRecord>(); }
         [Serializable] private sealed class ClipRecord { public string asset = ""; public string sha256 = ""; public string license = ""; public SourceRecord[] sources = Array.Empty<SourceRecord>(); }
         [Serializable] private sealed class SourceRecord { public string path = ""; public string sha256 = ""; public string author = ""; public string title = ""; public string license = ""; public string url = ""; }
+        [Test] public void CounterElectricityIsDisabledInTheShippedPalette()
+        {
+            var profile = AssetDatabase.LoadAssetAtPath<ScriptableObject>(ProfilePath);
+            Assert.That(Get(profile,"counterAccentEnabled"),Is.False);
+            Assert.That(((AudioClip[])Get(EntryFor("CounterCharge"),"clips")),Is.Not.Empty,
+                "Keep the optional accent available without enabling it by default.");
+        }
         [Test] public void SparkleWindElectricityAndContactsHaveSeparateRoles()
         {
             var cues = new[] { "ParryReady", "Dash", "CounterCharge", "CounterHit", "LightHit", "Parry" };
@@ -116,22 +123,25 @@ namespace TechnicalSwordAction.PlayerState.Tests
             foreach (var name in new[] { "LightHit", "HeavyHit" })
             {
                 var sources = manifest.clips.Single(c => c.asset.EndsWith("/" + name + ".wav")).sources;
-                CollectionAssert.Contains(sources.Select(s => s.title).ToArray(), "Sword Swing");
-                Assert.That(sources.Any(s => s.title.Contains("Ninja") || s.title == "chop" || s.title.StartsWith("Swords ")), Is.False, "Cutting uses a stylized sweep, not gore or a parry clang.");
+                CollectionAssert.Contains(sources.Select(s => s.title).ToArray(), "Woosh");
+                Assert.That(sources.Any(s => s.title.StartsWith("knifeSlice")),Is.True);
+                Assert.That(sources.Any(s => s.title.Contains("Ninja") || s.title == "chop" || s.title.StartsWith("Swords ") ||
+                    s.title.StartsWith("laser") || s.title.StartsWith("explosion") || s.title.StartsWith("impactMetal")),
+                    Is.False, "Cutting uses air and blade sweeps, not gore, clangs or electronic layers.");
             }
             var charge = manifest.clips.Single(c => c.asset.EndsWith("/CounterCharge.wav"));
             CollectionAssert.Contains(charge.sources.Select(s => s.title).ToArray(), "Electricity");
             var hit = manifest.clips.Single(c => c.asset.EndsWith("/CounterImpact.wav"));
-            CollectionAssert.AreEquivalent(new[] { "explosionCrunch_001", "impactMetal_004" }, hit.sources.Select(s => s.title).ToArray());
+            CollectionAssert.AreEquivalent(new[] { "Realistic Punch", "impactPunch_medium_000", "impactPunch_heavy_004" }, hit.sources.Select(s => s.title).ToArray());
             var dash = manifest.clips.Single(c => c.asset.EndsWith("/Dash.wav"));
             CollectionAssert.AreEqual(new[] { "Woosh" }, dash.sources.Select(s => s.title).ToArray());
         }
         [Test] public void StylizedContactsAndElectricAccentHaveShortEnvelopes()
         {
-            Assert.That(((AudioClip[])Get(EntryFor("CounterCharge"), "clips"))[0].length, Is.InRange(.10f,.16f));
-            Assert.That(((AudioClip[])Get(EntryFor("CounterHit"), "clips"))[0].length, Is.InRange(.20f,.33f));
-            Assert.That(((AudioClip[])Get(EntryFor("LightHit"), "clips"))[0].length, Is.InRange(.10f,.21f));
-            Assert.That(((AudioClip[])Get(EntryFor("HeavyHit"), "clips"))[0].length, Is.InRange(.20f,.28f));
+            Assert.That(((AudioClip[])Get(EntryFor("CounterCharge"), "clips"))[0].length, Is.InRange(.16f,.20f));
+            Assert.That(((AudioClip[])Get(EntryFor("CounterHit"), "clips"))[0].length, Is.InRange(.22f,.26f));
+            Assert.That(((AudioClip[])Get(EntryFor("LightHit"), "clips"))[0].length, Is.InRange(.19f,.23f));
+            Assert.That(((AudioClip[])Get(EntryFor("HeavyHit"), "clips"))[0].length, Is.InRange(.26f,.30f));
         }
         [Test] public void CombinedManifestMatchesAllOriginalAndProcessedBytes()
         {
@@ -150,6 +160,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     Assert.That(source.license, Is.EqualTo("CC0-1.0").Or.EqualTo("CC-BY-3.0"));
                 }
             }
+        }
+        [TestCase(-1)] [TestCase(61)]
+        public void InvalidCounterAccentOffsetIsRejected(int value)
+        {
+            var copy = UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<ScriptableObject>(ProfilePath));
+            try
+            {
+                copy.GetType().GetField("counterAccentOffsetFrames").SetValue(copy,value);
+                Assert.That(Get(copy,"IsValid"),Is.False);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(copy); }
         }
         [TestCase("volume", float.NaN)] [TestCase("volume", 1.1f)] [TestCase("volume", -.01f)]
         [TestCase("pitch", float.PositiveInfinity)] [TestCase("pitch", .4f)]

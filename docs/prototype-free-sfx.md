@@ -1,24 +1,59 @@
 # プロトタイプのフリーSE差し替え（#92）
 
-## 最新調整: ゲーム的な切り抜けと単発電撃・衝撃（2026-11-07）
+## 最新調整: 電撃OFF・清涼な打撃・非電子の斬撃（2026-11-07）
+
+体験目的: 電撃の刺激を一旦なくし、こもらない短い打撃と、電子音や生々しい質感を使わない「ズバッ」とした斬撃で爽快さを作る。
+
+着手時の受入条件:
+
+1. CounterChargeを既定OFFにし、タメ/最大光で電撃を鳴らさない。後から再試用できる設定と素材は保持し、映像の発光や反撃時間は変えない。
+2. CounterImpactから合成爆発・金属レイヤーを外し、低域を整理した短い打撃へ。LightHit/HeavyHitからlaserを完全に外し、実際の風切りと刃の通過音を使う。湿ったNinja素材や高域の強い電子EQへ戻さない。空振り・パリィ・移動音は保持する。
+3. 音色/ミックスと電撃の有効無効だけを調整し、原音・加工・出典・通知を更新する。電撃OFFの既定動作と、任意ON時の同期/中断テストを分ける。自動検証と人による聴感の受入を区別する。
+
+同じIssue #92内の最新依頼。以下の強い電子音・爆発・電撃同期は比較履歴であり、現在はCounterChargeをOFFにする方針を優先する。音の最終採否は人による試聴と操作で確認する。
+
+### 現在の配合
+
+- 電撃: `counterAccentEnabled=false`。素材・音量・18F同期設定は比較用に保持するが、発音を予約せず、実行中にOFFにした場合も音を止める。カウンターの発光は変更しない。
+- LightHit / HeavyHit: Woosh＋Kenney knifeSlice2 / knifeSliceの風切り。laserレイヤーを削除し、極端な高域の強調を避ける。0.21 / 0.28秒、音量0.55 / 0.65。
+- CounterImpact: Realistic Punchの短いアタック＋Kenney impactPunch_medium_000 / impactPunch_heavy_004。爆発と金属レイヤーを削除し、450〜500Hz以下のこもりを整理。0.24秒、音量0.9。命中21Fは変えない。
+- 原音/加工manifestと配布クレジットを更新。全24WAVのうち9本がCC BY 3.0（既定OFFのCounterChargeを含む）、残り15本がCC0。好評だったジャンプ・着地・パリィ成功/構え・Dash・空振りは維持する。
+- 要件定義に最新の採用方針を追記した。以下の電子音・爆発の配合は比較履歴であり、現在の音源ではない。
+
+### 検証状態
+
+2026-11-07 06:30 JST、承認処理が復旧したため、今回版のUnityコンパイル Error 0 / Warning 0、EditMode SE Asset 27/27、PlayMode SE 38/38（計65件）を確認した。電撃OFF・任意ONの18F同期・途中OFF・中断・Pause・既存音の保持を含む。下の319件は過去版の別の範囲であり、今回版の全件再実行とは扱わない。人による聴感・15分操作・Build受入は未実施。
+
+ローカルでは全24WAVの48kHz/monoデコード、ピーク-6.1〜-6.0dBFS、全原音/出力SHA-256と再加工manifestの一致を確認。差分の空白検証も合格。試聴サンプルは `.uloop/outputs/audio-preview/prototype-natural-slash-clear-kick-no-zap-20261107.mp3`（斬撃2種→カウンター命中、電撃なし）。これは音の組立サンプルであり、Unity実機収録や聴感の合格を意味しない。
+
+## 比較履歴: ゲーム的な切り抜けと単発電撃・衝撃（2026-11-07）
 
 体験目的: 生々しい切断や鈍い胴鳴りではなく、短く鋭い切り抜けと、キメの電撃一発から明快な衝撃へつながるゲーム的な爽快感を返す。
 
 着手時の受入条件:
 
 1. LightHit/HeavyHitからNinja Samurai Swordとchopを外し、風切り＋短い電子的アクセントへ置き換える。CounterImpactは実録の重い打撃から短い誇張された衝撃へ。空振りに命中音を付けず、パリィ成功/構え、Dash、Jump、Landは維持する。
-2. CounterChargeをループしない短い電撃一発へ変更する。初期キメ位置は現行のCounterKick姿勢が現れるChargeStarted=12Fとし、タメ中に再発音せず、命中は既存21Fの確定Hitだけにする。Pause・中断・Reset・対象消失・無音でも遅延音や再発音を残さない。
+2. CounterChargeをループしない短い電撃一発へ変更する。最新の追加依頼では光が最大になる素材6枚目（現行18F）へ合わせ、タメ中に再発音せず、命中は既存21Fの確定Hitだけにする。Pause・中断・Reset・対象消失・無音でも遅延音や再発音を残さない。
 3. 音色/音量と発音の包絡・単発化の2軸に限定し、モーション・判定・速度・停止・カメラを変更しない。原音/加工/クレジットを更新し、単発・同期・中断と維持対象の自動テストを行う。聴感と15分操作の最終採否は人が確認する。
 
-同じIssue #92 / Draft PR #99の再調整。前回の肉切り・持続電撃・鈍い重打撃は比較履歴とし、今回の指定を優先する。キメを12Fとした位置と音色の配合は調整可能な初期解釈で、原稿や別の動画用Sceneは変更しない。
+同じIssue #92 / Draft PR #99の再調整。前回の肉切り・持続電撃・鈍い重打撃は比較履歴とし、今回の指定を優先する。最初の単発版では構え始め12Fへ置いたが、最新依頼で素材 `CounterKickEffect_06` の最大光に合わせ18Fへ移した。原稿や別の動画用Sceneは変更しない。
 
-### 現在の配合と接続
+### 当時の配合と接続
 
-- LightHit/HeavyHit: SoundBible「Sword Swing」の鋭い風切りに、Kenney Sci-Fi SoundsのlaserSmall_002 / laserLarge_002を短く加工した電子アクセントを重ねる。0.19 / 0.26秒。Ninja Samurai Sword・chop・実録打撃は使わない。
-- CounterCharge: 「Electricity」の短い抜粋＋Kenney impactMetal_004のアタック、0.14秒・音量0.42。CounterKick姿勢の表示開始であるChargeStarted（現行12F）へ同期して一度だけ発音する。専用声部を維持しつつ全AudioSourceのloopをfalseにし、その後の長いタメは無音。
-- CounterImpact: Kenney explosionCrunch_001＋impactMetal_004、0.30秒。重低音の長い胴鳴りを避け、短い合成衝撃を実命中21Fへ同期する。以前のKick/Realistic Punchは現在のUnity素材から除き、原音は履歴としてのみ保持する。
+- LightHit/HeavyHit: SoundBible「Sword Swing」の鋭い風切りに、Kenney Sci-Fi SoundsのlaserSmall_002 / laserLarge_002を短く加工した電子アクセントを重ねる。さらに短い0.16 / 0.22秒、高域の輪郭と電子層を強め、音量0.58 / 0.68。Ninja Samurai Sword・chop・実録打撃は使わない。
+- CounterCharge: 「Electricity」の短い抜粋＋Kenney impactMetal_004/000の強いアタック、0.18秒・音量0.75。12FのChargeStartedでは予約だけを作り、設定の `counterAccentOffsetFrames=6` 後（18F）のタイマー更新で発音する。素材6枚目の開始はdurations先頭5枚の合計6Fに対応する。専用声部を維持しつつ全AudioSourceのloopをfalseにし、ピーク前のPauseでは予約を進めず、中断/対象消失/Reset/Disableで捨てる。音量0でピークを過ぎた分を後から鳴らさない。
+- CounterImpact: Kenney explosionCrunch_001/003＋impactMetal_004、0.34秒・音量1.0。短い合成衝撃の中域アタックと密度をさらに強め、実命中21Fへ同期する。各Clipは約-6dBFS、同時ゲイン制限は維持する。以前のKick/Realistic Punchは現在のUnity素材から除き、原音は履歴としてのみ保持する。
 - 変更WAVは上記4音。残り20音は直前 `aea58e2` と内容不変。パリィ成功/構え、Dash、Jump、Land、通常攻撃の空振り、全ゲームプレイ時刻を保つ。互換MP3のRayTap/Releaseも新しい命中音へ更新する。
-- 選択したKenney原音4本と既存CC0のLicense、加工式/原音・出力ハッシュを保存する。現在のCC BY派生WAVは8本、CounterImpactを含む残り16本はCC0。旧候補のNinja/Kick/Realistic Punchは使用中と誤認しないよう出典と通知を修正する。
+- 選択したKenney原音6本と既存CC0のLicense、加工式/原音・出力ハッシュを保存する。現在のCC BY派生WAVは8本、CounterImpactを含む残り16本はCC0。旧候補のNinja/Kick/Realistic Punchは使用中と誤認しないよう出典と通知を修正する。
+
+### 検証状態（最大光への追加調整は未検証）
+
+- 12F単発版 `306e2d3` まで: Compile Error 0 / Warning 0。EditMode SE Asset 24、Combat Trial Asset 14、PlayMode SE 31、Combat Trial 65、Counter Cinematic 185、関連319件すべて合格。
+- その直後のConsole取得で、操作承認の自動審査が利用上限エラーとなった。安全性の拒否ではなく審査処理が完了しなかったため、その承認を迂回するUnity操作やGit書込みは行わない。
+- 最新の18Fピーク同期・音量/音色強化はローカルへ反映し、単発待機・ピーク前の中断/Pauseと設定範囲のテストを更新したが、Unityコンパイル/テストは未実行。319件の合格をこの追加版の合格とは扱わない。追加分は未コミット/未プッシュで、PRも追加版へ未更新。
+- ローカルで全24WAVの48kHz/monoデコード、ピーク-6.1〜-6.0dBFS、全原音/加工ハッシュとmanifestの再加工一致を確認した。差分の空白検証も合格。これはUnityでのコンパイル・実行テストの代わりではない。試聴音声は音色・間隔の組立サンプルであり、最新ゲームの録画や動作検証ではない。
+
+承認機構の利用上限解消後にUnity検証、Console確認、今回分のコミット/プッシュとPR更新を再開する。聴感、耳への刺さり、15分操作と配布ZIP更新も未実施。
 
 ## 直前調整: 斬り込み・きらめき・電撃・重い蹴り（2026-11-07）
 

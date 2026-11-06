@@ -108,14 +108,14 @@ MonoBehaviour:
   - cue: 13
     clips:
     - {fileID: 8300000, guid: 403f08e7d72ddbd42a8c9ceb6dda1ead, type: 3}
-    volume: 0.5
+    volume: 0.55
     pitch: 1
     pitchVariation: 0.025
     priority: 65
   - cue: 14
     clips:
     - {fileID: 8300000, guid: 043ce5f6d19efd144ae96b2a9183828a, type: 3}
-    volume: 0.58
+    volume: 0.65
     pitch: 1
     pitchVariation: 0.025
     priority: 75
@@ -129,7 +129,7 @@ MonoBehaviour:
   - cue: 16
     clips:
     - {fileID: 8300000, guid: 46a666cbe21e030488f49c1b82fae316, type: 3}
-    volume: 0.42
+    volume: 0.75
     pitch: 1
     pitchVariation: 0
     priority: 40
@@ -143,7 +143,7 @@ MonoBehaviour:
   - cue: 18
     clips:
     - {fileID: 8300000, guid: 6d1b40a6fcd58e24ab1220850737e6c0, type: 3}
-    volume: 0.85
+    volume: 0.9
     pitch: 1
     pitchVariation: 0
     priority: 95
@@ -227,3 +227,5 @@ MonoBehaviour:
   footstepDistance: 1.3
   swingLeadFrames: 2
   sheatheRecoveryProgress: 0.65
+  counterAccentOffsetFrames: 6
+  counterAccentEnabled: 0

@@ -17,6 +17,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private Component clock, player, motor, attack, counter, presentation, feedback, sfx, arena;
         private Rigidbody2D body;
         private bool savedManual;
+        private ScriptableObject audioProfileOverride;
         private static Type T(string name) => Type.GetType(name + ", Assembly-CSharp", true);
         private static object Call(object obj, string name, params object[] args) => obj.GetType().GetMethod(name, Flags).Invoke(obj, args);
         private static V Get<V>(object obj, string name) => (V)(obj.GetType().GetProperty(name, Flags)?.GetValue(obj) ?? obj.GetType().GetField(name, Flags).GetValue(obj));
@@ -47,13 +48,21 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(go.GetComponent(T("EnemyMeleeChaser2D")), "ResetForCapture", player.transform, true);
             Physics2D.SyncTransforms(); return health;
         }
-        private void BeginCounter()
+        private void BeginCounter(bool enableAccent = true)
         {
+            if (enableAccent)
+            {
+                // Exercise the optional path without changing the shared default-OFF asset.
+                audioProfileOverride = Object.Instantiate((ScriptableObject)Get<object>(sfx,"Profile"));
+                Set(audioProfileOverride,"counterAccentEnabled",true);
+                Set(sfx,"profile",audioProfileOverride);
+            }
             var enemy = Enemy(); Call(counter, "RegisterParriedEnemy", enemy);
             Request(PlayerActionRequest.Attack); Assert.That(Get<bool>(counter,"IsActive"), Is.True);
         }
         [UnitySetUp] public IEnumerator Setup()
         {
+            audioProfileOverride = null;
             clock = (Component)Object.FindFirstObjectByType(T("CombatTimeController"));
             savedManual = Get<bool>(clock,"ManualAdvanceOnly"); clock.GetType().GetProperty("ManualAdvanceOnly").SetValue(clock,true);
             yield return EditorSceneManager.LoadSceneInPlayMode("Assets/Scenes/PrototypeCombatValidation.unity",new LoadSceneParameters(LoadSceneMode.Single));
@@ -74,6 +83,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Static("SetPaused",false);
             if (player != null && !player.gameObject.activeSelf) player.gameObject.SetActive(true);
             if (arena != null) Call(arena,"ResetActionsOnly");
+            if (audioProfileOverride != null) Object.Destroy(audioProfileOverride);
             clock.GetType().GetProperty("ManualAdvanceOnly").SetValue(clock,savedManual); yield return null;
         }
         [Test] public void SpawnAndIdleAreSilent()
@@ -156,12 +166,36 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Count("Parry")+Count("JustParry"),Is.Zero);
             Frames(50); Assert.That(Count("ParryReady"),Is.EqualTo(1));
         }
+        [Test] public void CounterElectricityIsOffByDefaultButTheKickStillHits()
+        {
+            Assert.That(Get<bool>(Get<object>(sfx,"Profile"),"counterAccentEnabled"),Is.False);
+            BeginCounter(false); Until(()=>Get<int>(counter,"HitCount")==1);
+            Assert.That(Count("CounterCharge"),Is.Zero);
+            Assert.That(Get<bool>(sfx,"ChargeAccentActive"),Is.False);
+            Assert.That(Sources.Any(a=>a.isPlaying&&a.clip!=null&&a.clip.name=="CounterCharge"),Is.False);
+            Assert.That(Count("CounterHit"),Is.EqualTo(1));
+            Assert.That(Get<int>(counter,"SelectedDamage"),Is.EqualTo(90));
+        }
+        [TestCase(false)] [TestCase(true)]
+        public void DisablingTheOptionalAccentCancelsPendingOrPlayingAudio(bool afterPeak)
+        {
+            BeginCounter();
+            if(afterPeak) Until(()=>Count("CounterCharge")==1);
+            else Until(()=>Get<int>(counter,"ElapsedFrames")==Get<int>(counter,"ChargeFrame"));
+            int count=Count("CounterCharge");
+            Set(audioProfileOverride,"counterAccentEnabled",false); Call(sfx,"RefreshVolumes");
+            Assert.That(Get<bool>(sfx,"ChargeAccentActive"),Is.False);
+            Until(()=>Get<int>(counter,"HitCount")==1);
+            Assert.That(Count("CounterCharge"),Is.EqualTo(count));
+            Assert.That(Count("CounterHit"),Is.EqualTo(1));
+        }
         [Test] public void CounterTransferChargeReleaseAndImpactFollowTheRealPhases()
         {
             BeginCounter(); Until(()=>Get<bool>(sfx,"ChargeAccentActive"));
             Assert.That(Count("CounterTransfer"),Is.EqualTo(1)); Assert.That(Count("CounterCharge"),Is.EqualTo(1));
             Assert.That(Sources.Any(a=>a.isPlaying&&!a.loop&&a.clip!=null&&a.clip.name=="CounterCharge"),Is.True);
-            Assert.That(Get<int>(counter,"ElapsedFrames"),Is.EqualTo(Get<int>(counter,"ChargeFrame")));
+            Assert.That(Get<int>(counter,"ElapsedFrames"),Is.EqualTo(Get<int>(counter,"ChargeFrame")+
+                Get<int>(Get<object>(sfx,"Profile"),"counterAccentOffsetFrames")));
             Assert.That(Get<bool>(sfx,"ChargeLoopActive"),Is.False);
             Assert.That(Count("CounterHit"),Is.Zero);
             Until(()=>Get<int>(counter,"HitCount")==1);
@@ -173,16 +207,37 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [Test] public void ElectricAccentEndsBeforeTheLongHoldAndNeverRepeats()
         {
-            BeginCounter(); Until(()=>Count("CounterCharge")==1);
-            Frames(20);
+            BeginCounter(); Until(()=>Get<int>(counter,"ElapsedFrames")==Get<int>(counter,"ChargeFrame"));
+            Assert.That(Count("CounterCharge"),Is.Zero);
+            Until(()=>Count("CounterCharge")==1);
+            Call(sfx,"AdvanceAudio",.3f);
             Assert.That(Get<bool>(counter,"IsActive"),Is.True);
+            Assert.That(Get<bool>(counter,"HasReleasedCharge"),Is.False);
             Assert.That(Get<bool>(sfx,"ChargeAccentActive"),Is.False);
             Assert.That(Get<bool>(sfx,"ChargeLoopActive"),Is.False);
             Assert.That(Count("CounterCharge"),Is.EqualTo(1));
             Assert.That(Count("CounterHit"),Is.Zero);
-            Frames(15); Assert.That(Count("CounterCharge"),Is.EqualTo(1));
+            Frames(1); Assert.That(Count("CounterCharge"),Is.EqualTo(1));
             Until(()=>Get<int>(counter,"HitCount")==1);
             Assert.That(Count("CounterCharge"),Is.EqualTo(1));
+        }
+        [TestCase("Reset")] [TestCase("Disable")] [TestCase("TargetLost")]
+        public void CancellingBeforeTheLightPeakDiscardsThePendingElectricAccent(string interruption)
+        {
+            BeginCounter(); Until(()=>Get<int>(counter,"ElapsedFrames")==Get<int>(counter,"ChargeFrame"));
+            Assert.That(Count("CounterCharge"),Is.Zero);
+            if(interruption=="Reset") Call(arena,"ResetActionsOnly");
+            else if(interruption=="Disable") ((Behaviour)sfx).enabled=false;
+            else ((Component)Get<object>(counter,"SelectedTarget")).gameObject.SetActive(false);
+            Frames(120); Assert.That(Count("CounterCharge"),Is.Zero);
+        }
+        [Test] public void PausingBeforeThePeakDoesNotStartOrLoseThePendingAccent()
+        {
+            BeginCounter(); Until(()=>Get<int>(counter,"ElapsedFrames")==Get<int>(counter,"ChargeFrame"));
+            Static("SetPaused",true); Frames(60); Assert.That(Count("CounterCharge"),Is.Zero);
+            Static("SetPaused",false); Until(()=>Count("CounterCharge")==1);
+            Assert.That(Get<int>(counter,"ElapsedFrames"),Is.EqualTo(Get<int>(counter,"ChargeFrame")+
+                Get<int>(Get<object>(sfx,"Profile"),"counterAccentOffsetFrames")));
         }
         [TestCase("Reset")] [TestCase("Disable")] [TestCase("TargetLost")]
         public void CounterChargeCannotLeakAfterInterruption(string interruption)

@@ -29,6 +29,9 @@ public sealed class PrototypeSfxProfile : ScriptableObject
     [Min(.1f)] public float footstepDistance = 1.3f;
     [Range(0, 6)] public int swingLeadFrames = 2;
     [Range(0, 1)] public float sheatheRecoveryProgress = .65f;
+    [Range(0, 60)] public int counterAccentOffsetFrames = 6;
+    [Tooltip("Optional counter electricity sound. Disabled by default; does not affect the visual effect.")]
+    public bool counterAccentEnabled = false;
     public Entry Find(PrototypeSfxCue cue) => Array.Find(entries, e => e != null && e.cue == cue);
     public bool IsValid
     {
@@ -36,7 +39,8 @@ public sealed class PrototypeSfxProfile : ScriptableObject
         {
             if (entries == null || !float.IsFinite(footstepDistance) || footstepDistance < .1f ||
                 swingLeadFrames < 0 || swingLeadFrames > 6 || !float.IsFinite(sheatheRecoveryProgress) ||
-                sheatheRecoveryProgress < 0 || sheatheRecoveryProgress > 1) return false;
+                sheatheRecoveryProgress < 0 || sheatheRecoveryProgress > 1 ||
+                counterAccentOffsetFrames < 0 || counterAccentOffsetFrames > 60) return false;
             foreach (PrototypeSfxCue cue in Enum.GetValues(typeof(PrototypeSfxCue)))
             {
                 int count = 0;
