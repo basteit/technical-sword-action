@@ -75,6 +75,7 @@ public static class PrototypeCombatSceneBuilder
             Set(motor, "groundCheck", feet.transform); Set(motor, "groundLayer", groundMask);
             Set(motor, "dashDuration", 20f / 60f); Set(motor, "dashCooldown", 34f / 60f); Set(motor, "ignoreCollisionLayersWhileDashing", enemyMask);
             Set(motor, "dashMoveFrames", 12); Set(motor, "preserveAirDashVertical", true);
+            Set(motor, "moveSpeed", PlayerMotor2D.PrototypeMoveSpeed); Set(motor, "groundDashRecoveryFrames", 2);
             Set(health, "maxHp", 100); Set(health, "hitStopMoveDuration", .3f); Set(health, "ignoreCollisionLayersWhileInvincible", enemyMask);
             Set(health, "normalParryHitStop", 3f / 60f); Set(health, "justParryHitStop", 5f / 60f);
             Set(heal, "healAmount", 40); Set(heal, "applyFrame", 36); Set(heal, "endFrame", 54);

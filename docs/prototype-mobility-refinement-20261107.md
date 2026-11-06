@@ -25,7 +25,16 @@
 - Compile Error0 / Warning0、全EditMode 343/343、関連PlayMode 113/113（移動24・会話19・SE38・近距離パリィ25・素材統合7）。
 - 頂点5→6の順序と各コマ6F以上の表示、速度比1.20、地上Dash14F/終了時の移動引き継ぎ/残りCD14F、空中Dash20Fと着地途中での長さ維持、Hit/Dead/Reset/Disableでの引き継ぎなし、旧会話テスト位置での共有B→Dashを確認した。
 - 会話テスト用配置は実行時fixtureへ移し、会話の19回帰とInteractのSEテストを維持した。共有Prefab・会話データ・ユーザー素材は変更していない。
-- 全体回帰と実画面は確認中。直前の全PlayModeは928件中915合格・既存13失敗であり、全体合格とは扱わない。既存失敗の内訳と比較証跡は[前回の接続記録](prototype-mobility-and-proximity-parry.md)を参照。
+- 全PlayModeは940件中927合格・13失敗・Skip0。直前の928件中915合格・13失敗に対し、失敗名とAssertion文面は13件すべて一致し、新しい失敗は0。全体合格とは扱わない。動画キックの揺れ2件、停止9F/旧期待8Fの差3件、4段防御キャンセル動画の終了7件、5F接触をJustとする旧期待1件は今回修正しない。既存失敗の切り分けは[前回の接続記録](prototype-mobility-and-proximity-parry.md)を参照。
+- CLIの180秒上限後もUnity側の進捗（653/940、786/940）を確認し、重複実行せず315.750秒での完了を待った。Consoleの保存先にある最終XMLを`.uloop/outputs/TestResults/full-playmode-mobility-refinement-20261107.xml`へ保存した（生成物のためGit対象外）。
+- 実Game View 1920×1080・通常Camera Size5.625で頂点5（ジャンプ17F）→6（23F）を確認し、[2画面](validation/prototype-mobility-refinement-20261107/)を記録した。6F Hitstopを要求して3F進めてもSprite/位置は不変。地上Dash14F終了でNeutral、速度5.28228、無敵false、残りCD14F、距離3.6unitを確認した。
+- 検証後は入力・診断表示・手動時計を戻し、敵なしへリセットしてEditModeへ戻した。最終CompileとConsoleはError0 / Warning0、対象Sceneの未保存変更なし。物理パッド/15分操作とDevelopment Build/配布ZIP更新は未実施。
+
+## 数値の調整・戻し方
+
+- `PrototypePlayerArtSet.asset`: `Apex Cel Frames`=6、`Apex Vertical Speed`=4。旧テンポは3/2だが、がたつきの原因だった5↔6ループは復活させない。
+- PrototypePlayerの`PlayerMotor2D`: `Move Speed`=5.28228（旧4.4019）、`Ground Dash Recovery Frames`=2。後者を-1にすると従来の全体20Fへ戻る。`Dash Duration`20F・`Dash Cooldown`34F・`Dash Move Frames`12は基準値として保持し、地上オーバーライド時だけ全体14F/CD28Fを導出する。
+- 会話テストを明示的に再配置/撤去するメニューは[会話記録](prototype-dialogue.md)を参照する。自動配置は再開しない。
 
 ## 人による確認
 

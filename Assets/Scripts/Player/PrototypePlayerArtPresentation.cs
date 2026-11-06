@@ -80,7 +80,10 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour, ICombatTickL
         else if (jumpStartTick >= 0 && speed >= -artSet.apexVerticalSpeed && !motor.IsDroppingThrough)
         {
             if (apexStartTick < 0) apexStartTick = CombatTimeController.TickCount;
-            index = 4 + (int)((CombatTimeController.TickCount - apexStartTick) / Mathf.Max(1, artSet.apexCelFrames) % 2);
+            // These are a transition from rising to falling, not a two-pose idle loop.
+            // Repeating 5 -> 6 -> 5 makes the body snap backwards around the apex.
+            index = 4 + (int)System.Math.Min(1L,
+                (CombatTimeController.TickCount - apexStartTick) / Mathf.Max(1, artSet.apexCelFrames));
             MobilityPhase = "Apex";
         }
         else { index = 6; MobilityPhase = "Fall"; }

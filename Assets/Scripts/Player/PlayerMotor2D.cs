@@ -6,8 +6,9 @@ using TechnicalSwordAction.PlayerState;
 [RequireComponent(typeof(Collider2D))]
 public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
-    // Approved 1.5x walking take (2026-10-16); about 4.2057 unit/s after floor friction.
+    // Historical filming baseline (2026-10-16); retain it for existing scenes/captures.
     public const float StandardMoveSpeed = 4.4019f;
+    public const float PrototypeMoveSpeed = StandardMoveSpeed * 1.2f;
     [Header("Move")]
     [SerializeField] private float moveSpeed = StandardMoveSpeed;
     [SerializeField] private bool flipSpriteByMoveInput = true;
@@ -38,7 +39,10 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     [SerializeField] private float dashCooldown = 0.8f;
     [SerializeField, Min(0)] private int dashMoveFrames;
     [SerializeField] private bool preserveAirDashVertical;
+    [Tooltip("-1 keeps the legacy total. Otherwise ground starts use dashMoveFrames + this recovery, preserving the existing post-dash cooldown. Air starts are unchanged.")]
+    [SerializeField, Min(-1)] private int groundDashRecoveryFrames = -1;
     private int dashElapsedFrames;
+    private bool usesGroundDashTiming;
     [SerializeField] private LayerMask ignoreCollisionLayersWhileDashing;
 
     [Header("Optional References")]
@@ -325,8 +329,14 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         if (!isGrounded) airDashUsed = true;
         isDashing = true;
         dashElapsedFrames = 0;
-        dashTimer = dashDuration;
-        dashCooldownTimer = dashCooldown;
+        // Choose once at launch; landing during an air dash must not change its duration.
+        usesGroundDashTiming = isGrounded && groundDashRecoveryFrames >= 0 && dashMoveFrames > 0;
+        dashTimer = usesGroundDashTiming
+            ? (dashMoveFrames + groundDashRecoveryFrames) * CombatTimeController.StepSeconds
+            : dashDuration;
+        dashCooldownTimer = usesGroundDashTiming
+            ? dashTimer + Mathf.Max(0f, dashCooldown - dashDuration)
+            : dashCooldown;
 
         rb.gravityScale = preserveAirDashVertical && !isGrounded ? originalGravityScale : 0f;
         rb.linearVelocity = new Vector2(dashDirection.x * dashSpeed, preserveAirDashVertical && !isGrounded ? rb.linearVelocity.y : 0f);
@@ -336,7 +346,9 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
     private void EndDash(bool notifyStateMachine)
     {
+        bool handoffToMovement = notifyStateMachine && usesGroundDashTiming && isGrounded;
         isDashing = false;
+        usesGroundDashTiming = false;
         dashTimer = 0f;
         rb.gravityScale = originalGravityScale;
         rb.linearVelocity = preserveAirDashVertical && !isGrounded ? new Vector2(0, rb.linearVelocity.y) : Vector2.zero;
@@ -345,6 +357,12 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         if (notifyStateMachine)
         {
             stateMachine?.CompleteAction(PlayerActionState.Dash, "DashComplete");
+            // Natural completion alone may resume held movement. Forced Hit/Dead,
+            // Disable, Reset and cancellation must never create this extra velocity.
+            if (handoffToMovement && !DialogueController.GameplayInputBlocked &&
+                (stateMachine == null || stateMachine.LifeState == PlayerLifeState.Alive &&
+                 stateMachine.ActionState == PlayerActionState.Neutral))
+                ApplyCombatVelocity();
         }
     }
 
@@ -358,6 +376,7 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
         if (!isDashing)
         {
+            usesGroundDashTiming = false;
             rb.gravityScale = originalGravityScale;
             RestoreDashIgnoredCollisions();
             return;

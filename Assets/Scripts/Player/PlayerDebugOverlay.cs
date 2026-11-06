@@ -60,6 +60,7 @@ public class PlayerDebugOverlay : MonoBehaviour
             text.AppendLine(interactor != null ? $"Interact candidate: {interactor.CurrentInteractable?.InteractionPrompt ?? "None"}" : "Interact: N/A (PlayerInteractor2D missing)");
             text.AppendLine(motor != null ? $"Velocity: {motor.Velocity} / Owner {motor.VelocityOwner}\nGrounded {motor.IsGrounded} / AirDashUsed {motor.AirDashUsed} / FloorDrop {motor.IsDroppingThrough} / Coyote {motor.CoyoteRemainingFrames}F" : "Motor: N/A (PlayerMotor2D missing)");
             if (artwork != null) text.AppendLine($"Mobility art: {artwork.MobilityPhase} / source cel {artwork.MobilitySourceFrame}");
+            if (motor != null) text.AppendLine($"Move speed {motor.MoveSpeed:0.00} / Dash {motor.DashRemaining * 60:0}F / CD {motor.DashCooldownRemaining * 60:0}F / Dash invincible {motor.IsDashInvincible}");
             text.AppendLine(damageReceiver != null ? $"HP {damageReceiver.CurrentHp}/{damageReceiver.MaxHp} / Invincible {damageReceiver.InvincibleRemaining * 60:0}F" : "HP: N/A (PlayerDamageReceiver2D missing)");
         }
         else if (selectedGroup == 1)

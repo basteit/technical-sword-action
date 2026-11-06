@@ -824,8 +824,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 812cd144d882115499f01c24dd95a889, type: 3}
   - {fileID: 21300000, guid: 262b1888f9c0445448dc8f3282c2b6fd, type: 3}
   takeoffCelFrames: 3
-  apexCelFrames: 3
-  apexVerticalSpeed: 2
+  apexCelFrames: 6
+  apexVerticalSpeed: 4
 --- !u!213 &2679726605003706969
 Sprite:
   m_ObjectHideFlags: 0

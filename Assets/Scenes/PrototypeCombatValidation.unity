@@ -8709,7 +8709,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab1595bc663493d4b993f8398d58e5a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMotor2D
-  moveSpeed: 4.4019
+  moveSpeed: 5.28228
   flipSpriteByMoveInput: 1
   jumpForce: 12
   groundCheck: {fileID: 1056788165}
@@ -8725,6 +8725,7 @@ MonoBehaviour:
   dashCooldown: 0.56666666
   dashMoveFrames: 12
   preserveAirDashVertical: 1
+  groundDashRecoveryFrames: 2
   ignoreCollisionLayersWhileDashing:
     serializedVersion: 2
     m_Bits: 64

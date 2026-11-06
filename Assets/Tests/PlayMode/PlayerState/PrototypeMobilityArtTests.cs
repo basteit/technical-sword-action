@@ -73,6 +73,82 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(ticks,Is.InRange(8,65));Assert.That(peak,Is.LessThan(2.8f));CollectionAssert.Contains(seen,7);
             Assert.That(Get<bool>(motor,"IsGrounded"),Is.True);
         }
+        [Test] public void ApexTransitionsForwardOnceAndHoldsEachPoseInsteadOfJittering()
+        {
+            Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);
+            var apex=new List<int>();int limit=120;
+            do
+            {
+                Frames(1);
+                if(Get<string>(art,"MobilityPhase")=="Apex")apex.Add(Get<int>(art,"MobilitySourceFrame"));
+            }while((!Get<bool>(motor,"IsGrounded")||apex.Count==0)&&--limit>0);
+            Assert.That(limit,Is.GreaterThan(0));Assert.That(apex,Is.Ordered.Ascending);
+            Assert.That(apex.Count(c=>c==5),Is.EqualTo(6));
+            Assert.That(apex.Count(c=>c==6),Is.GreaterThanOrEqualTo(6));
+            Assert.That(apex.Distinct(),Is.EqualTo(new[]{5,6}));
+        }
+        [TestCase(-1)] [TestCase(1)] public void FasterWalkingCoversTwentyPercentMoreDistanceWithoutRetimingTheArt(int direction)
+        {
+            Assert.That(Get<float>(motor,"MoveSpeed"),Is.EqualTo(5.28228f).Within(.00001f));
+            Call(motor,"SetMoveInput",Vector2.right*direction);float start=body.position.x;Frames(30);
+            float tuned=direction*(body.position.x-start);
+            Call(arena,"ResetActionsOnly");body.position=new Vector2(0,.81f);player.transform.position=body.position;
+            motor.GetType().GetField("moveSpeed",Flags).SetValue(motor,4.4019f);
+            Call(motor,"SetMoveInput",Vector2.right*direction);Physics2D.SyncTransforms();Frames(4);
+            start=body.position.x;Frames(30);float baseline=direction*(body.position.x-start);
+            Assert.That(tuned/baseline,Is.EqualTo(1.2f).Within(.015f));
+        }
+        [TestCase(-1)] [TestCase(1)] public void GroundDashEndsAtFourteenTicksAndHandsOffToHeldMovement(int direction)
+        {
+            Call(motor,"SetMoveInput",Vector2.right*direction);Request(PlayerActionRequest.Dash);Frames(12);
+            Assert.That(Get<bool>(motor,"IsDashing"),Is.True);Assert.That(Get<bool>(motor,"IsDashInvincible"),Is.False);
+            Frames(1);Assert.That(Get<bool>(motor,"IsDashing"),Is.True);
+            Assert.That(body.linearVelocity.x,Is.Zero.Within(.001f),"Only the two recovery ticks remain, with no extra dash travel.");
+            Frames(1);Assert.That(Get<bool>(motor,"IsDashing"),Is.False);
+            Assert.That(Get<PlayerActionState>(player,"ActionState"),Is.EqualTo(PlayerActionState.Neutral));
+            Assert.That(body.linearVelocity.x,Is.EqualTo(direction*Get<float>(motor,"MoveSpeed")).Within(.001f));
+            Assert.That(Get<float>(motor,"DashCooldownRemaining")*60,Is.EqualTo(14f).Within(.001f));
+            float end=body.position.x;Frames(1);Assert.That(direction*(body.position.x-end),Is.GreaterThan(.07f));
+        }
+        [Test] public void AirDashStillUsesTwentyTicksAndCannotRestartBeforeLanding()
+        {
+            Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);Frames(5);
+            Request(PlayerActionRequest.Dash);Frames(14);Assert.That(Get<bool>(motor,"IsDashing"),Is.True);
+            Frames(6);Assert.That(Get<bool>(motor,"IsDashing"),Is.False);Assert.That(Get<bool>(motor,"AirDashUsed"),Is.True);
+            Assert.That(Get<float>(motor,"DashCooldownRemaining")*60,Is.EqualTo(14f).Within(.001f));
+            Frames(14);Assert.That(Get<bool>(motor,"CanStartDash"),Is.False);
+        }
+        [Test] public void LandingDuringAirDashDoesNotAdoptTheShorterGroundDuration()
+        {
+            body.position=new Vector2(0,1.6f);player.transform.position=body.position;
+            body.linearVelocity=new Vector2(0,-10);Physics2D.SyncTransforms();Frames(1);
+            Assert.That(Get<bool>(motor,"IsGrounded"),Is.False);
+            Request(PlayerActionRequest.Dash);Frames(14);
+            Assert.That(Get<bool>(motor,"IsGrounded"),Is.True);Assert.That(Get<bool>(motor,"IsDashing"),Is.True);
+            Frames(6);Assert.That(Get<bool>(motor,"IsDashing"),Is.False);
+        }
+        [TestCase("Hit")] [TestCase("Dead")] [TestCase("Reset")] [TestCase("Disable")]
+        public void InterruptedGroundDashNeverAppliesTheNaturalMovementHandoff(string reason)
+        {
+            Call(motor,"SetMoveInput",Vector2.right);Request(PlayerActionRequest.Dash);Frames(13);
+            if(reason=="Hit")Call(player,"ForceHit","MobilityRefinementTest");
+            if(reason=="Dead")Call(player,"SetDead","MobilityRefinementTest");
+            if(reason=="Reset")Call(arena,"ResetActionsOnly");
+            if(reason=="Disable")((Behaviour)motor).enabled=false;
+            Assert.That(Get<bool>(motor,"IsDashing"),Is.False);Assert.That(Get<bool>(motor,"IsDashInvincible"),Is.False);
+            Assert.That(body.linearVelocity.x,Is.Zero.Within(.001f));
+            ((Behaviour)motor).enabled=true;
+        }
+        [Test] public void RemovedDialogueTestLeavesSharedBAsDashAtItsFormerLocation()
+        {
+            Assert.That(Object.FindFirstObjectByType(T("DialogueController")),Is.Null);
+            Assert.That(Object.FindFirstObjectByType(T("DialogueInteractable2D")),Is.Null);
+            body.position=new Vector2(-6,.81f);player.transform.position=body.position;Physics2D.SyncTransforms();Frames(2);
+            Call(player.GetComponent(T("PlayerInteractor2D")),"RefreshAfterTeleport");
+            Assert.That(Call(player,"RequestSharedDashInteract"),Is.True);Frames(1);
+            Assert.That(Get<PlayerActionRequest>(player,"LastSharedInputResolution"),Is.EqualTo(PlayerActionRequest.Dash));
+            Assert.That(Get<bool>(motor,"IsDashing"),Is.True);
+        }
         [TestCase(PlayerActionRequest.Attack)] [TestCase(PlayerActionRequest.Parry)]
         [TestCase(PlayerActionRequest.Special)] [TestCase(PlayerActionRequest.Dash)]
         public void AirActionsOwnTheirArtworkInsteadOfBeingOverwrittenByJump(PlayerActionRequest action)
