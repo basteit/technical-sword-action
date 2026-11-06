@@ -28,6 +28,16 @@
 
 変更するWAVはLightHit、HeavyHit、ParryReady、CounterCharge、CounterImpact、Dashの6本。互換MP3のRayTap/Releaseも同じ切断音へ更新する。未受領モーションや音源を完成扱いにせず、配布ZIPは今回更新しない。高音の構えが成功と紛らわしくないか、斬撃の質感と蹴りの重みの最終採否は人による確認を残す。
 
+### 最新調整後の検証
+
+- Unity 6000.3.9f1 / ULoop 2.1.3: Compile Error 0 / Warning 0、最終Console Error 0 / Warning 0。
+- EditMode: SE Asset 21/21、Combat Trial Asset 14/14。PlayMode: SE 30/30、Combat Trial 65/65、Counter Cinematic 185/185。関連315件合格（全プロジェクト全テストではない）。最終再加工後のSE Asset 21件再実行も合格した。
+- 構え開始のParryReady、地上/空中Dash、実命中時だけの切断/キック音、タメ中だけの電撃ループ、解除/対象消失/中断/Pause/無音と重複抑制を確認した。
+- Git同梱の選択原音だけで全24音を再加工し、原音・出力ハッシュを照合。同一入力の再加工で全WAVとmanifestがバイト一致した。manifestのキー順も固定し、別PowerShell起動で再実行しても差分が出ないことを確認した。直前 `7af7949` と比較して6音だけ変更、18音は不変。
+- `Test-Repository -Staged / -BaseRef 7af7949` 合格。要件定義は最新追記と旧指定の修正だけを選択し、既存の未コミット645追加/171削除や原稿・Scene等は保持した。終了時は保存済みPrototypeCombatValidation、Dirty=false、PlayMode停止、背景再生false。
+
+人に残す確認: 斬撃の切り込み感、構えのきらめきと成功音の識別、タメ電撃→重いキックのつながり、ダッシュの風切り、15分連戦とヘッドホン/スピーカー比較。自動テストは聴感の最終承認ではない。Development Buildと配布ZIPの更新は未実施。
+
 ## 追加調整: 高い金属音と着地音の再選定（2026-11-07）
 
 体験目的: 刀の空振りは鋭い風切り、命中は短い金属の切断音、パリィは澄んだ金属の余韻として聞き分け、着地だけが低く大きく浮かないようにする。
