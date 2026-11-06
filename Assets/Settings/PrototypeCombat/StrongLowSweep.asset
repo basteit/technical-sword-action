@@ -21,9 +21,10 @@ MonoBehaviour:
   damage: 20
   knockback: 4.5
   parryable: 0
+  parryReaction: 0
   resistHitStunWhileAttacking: 1
   attackRange: 1.65
   hitOffset: {x: 0.9, y: -0.5}
   hitSize: {x: 1.9, y: 0.55}
   countermeasure: Jump over the low sweep, or Dash through it; punish the long recovery.
-  windupClip: {fileID: 8300000, guid: 1095409cfd91d8a48b9893b051a1eda1, type: 3}
+  windupClip: {fileID: 8300000, guid: c7c05fe49acdc8c418a2cac4385cd44b, type: 3}

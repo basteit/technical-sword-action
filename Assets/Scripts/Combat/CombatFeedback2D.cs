@@ -121,8 +121,9 @@ public sealed class CombatFeedback2D : MonoBehaviour
     }
     private void RememberAudio(GameObject root)
     {
+        var sfx = GetComponent<PrototypeSfx2D>();
         foreach (var audio in root.GetComponentsInChildren<AudioSource>(true))
-            if (!audioVolumes.ContainsKey(audio)) audioVolumes.Add(audio, audio.volume);
+            if ((sfx == null || !sfx.OwnsAudioSource(audio)) && !audioVolumes.ContainsKey(audio)) audioVolumes.Add(audio, audio.volume);
     }
     private void OnEnable()
     {
@@ -225,7 +226,8 @@ public sealed class CombatFeedback2D : MonoBehaviour
         // At most one voice for a combat tick; upgrade to the stronger cue rather than stacking/clipping.
         int priority = kind == CombatFeedbackKind.JustParry ? 10 : kind == CombatFeedbackKind.Counter ? 9 :
             kind == CombatFeedbackKind.HeavyHit ? 8 : kind == CombatFeedbackKind.PlayerHit ? 7 : 5;
-        if (entry.clip != null && (lastAudioTick != CombatTimeController.TickCount || priority > lastAudioPriority))
+        bool externalAudio = TryGetComponent<PrototypeSfx2D>(out var sfx) && sfx.TryPlayFeedback(kind);
+        if (!externalAudio && entry.clip != null && (lastAudioTick != CombatTimeController.TickCount || priority > lastAudioPriority))
         {
             sound.Stop(); sound.clip = entry.clip; sound.pitch = entry.pitch;
             sound.volume = entry.volume * Mathf.Clamp01(Settings.masterVolume) * Mathf.Clamp01(Settings.sfxVolume);
