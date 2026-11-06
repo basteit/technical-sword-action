@@ -15,7 +15,8 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour, ICombatTickL
     private PlayerStateMachine state;
     private PlayerMotor2D motor;
     private PlayerAttack2D attack;
-    private long jumpStartTick = -1, apexStartTick = -1;
+    private long jumpStartTick = -1;
+    private bool hasEnteredFall;
     public string MobilityPhase { get; private set; } = "None";
     public int MobilitySourceFrame { get; private set; }
     public int CombatTickOrder => 1200;
@@ -55,14 +56,18 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour, ICombatTickL
     {
         if (state != null && motor != null && state.LastDecisionTick == CombatTimeController.TickCount &&
             state.LastAcceptedRequest == TechnicalSwordAction.PlayerState.PlayerActionRequest.Jump && !motor.IsDroppingThrough)
-        { jumpStartTick = CombatTimeController.TickCount; apexStartTick = -1; }
+        { jumpStartTick = CombatTimeController.TickCount; hasEnteredFall = false; }
     }
 
     public void CombatTickTimers()
     {
         MobilityPhase = "None"; MobilitySourceFrame = 0;
         if (source == null || artSet == null || !artSet.HasSubmittedJump || state == null || motor == null) return;
-        if (motor.IsGrounded) { jumpStartTick = apexStartTick = -1; }
+        float speed = motor.Velocity.y;
+        float apexEdge = Mathf.Max(.01f, artSet.apexVerticalSpeed);
+        float apexCenter = Mathf.Clamp(artSet.apexCenterVerticalSpeed, .01f, apexEdge);
+        if (motor.IsGrounded) { jumpStartTick = -1; hasEnteredFall = false; }
+        else if (speed < -apexCenter) hasEnteredFall = true;
         if (state.LifeState != TechnicalSwordAction.PlayerState.PlayerLifeState.Alive) return;
         if (state.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.Dash)
         { MobilityPhase = "Dash"; return; } // Its normal clip owns the submitted three-cel dash.
@@ -70,20 +75,17 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour, ICombatTickL
             attack != null && attack.IsRecovering || motor.IsGrounded || DialogueController.GameplayInputBlocked) return;
 
         int index;
-        float speed = motor.Velocity.y;
         long elapsed = jumpStartTick >= 0 ? CombatTimeController.TickCount - jumpStartTick : long.MaxValue;
         int takeoff = Mathf.Max(1, artSet.takeoffCelFrames);
-        if (elapsed < takeoff * 3 && speed > artSet.apexVerticalSpeed)
+        if (elapsed < takeoff * 3 && speed > apexEdge)
         { index = (int)(elapsed / takeoff); MobilityPhase = "Takeoff"; }
-        else if (speed > artSet.apexVerticalSpeed)
+        else if (speed > apexEdge)
         { index = 3; MobilityPhase = "Rise"; }
-        else if (jumpStartTick >= 0 && speed >= -artSet.apexVerticalSpeed && !motor.IsDroppingThrough)
+        else if (!hasEnteredFall && jumpStartTick >= 0 && speed >= -apexCenter && !motor.IsDroppingThrough)
         {
-            if (apexStartTick < 0) apexStartTick = CombatTimeController.TickCount;
-            // These are a transition from rising to falling, not a two-pose idle loop.
-            // Repeating 5 -> 6 -> 5 makes the body snap backwards around the apex.
-            index = 4 + (int)System.Math.Min(1L,
-                (CombatTimeController.TickCount - apexStartTick) / Mathf.Max(1, artSet.apexCelFrames));
+            // Cel 5 eases out of ascent, cel 6 straddles the actual apex, then cel 7
+            // follows descent. A fixed cel timer drifts when Jump is released early.
+            index = speed > apexCenter ? 4 : 5;
             MobilityPhase = "Apex";
         }
         else { index = 6; MobilityPhase = "Fall"; }
@@ -95,7 +97,7 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour, ICombatTickL
     }
 
     private void ResetMobility()
-    { jumpStartTick = apexStartTick = -1; MobilityPhase = "None"; MobilitySourceFrame = 0; }
+    { jumpStartTick = -1; hasEnteredFall = false; MobilityPhase = "None"; MobilitySourceFrame = 0; }
 
     public void RefreshVisual()
     {

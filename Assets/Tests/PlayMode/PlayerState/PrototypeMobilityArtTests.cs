@@ -73,19 +73,41 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(ticks,Is.InRange(8,65));Assert.That(peak,Is.LessThan(2.8f));CollectionAssert.Contains(seen,7);
             Assert.That(Get<bool>(motor,"IsGrounded"),Is.True);
         }
-        [Test] public void ApexTransitionsForwardOnceAndHoldsEachPoseInsteadOfJittering()
+        [TestCase(30)] [TestCase(60)] [TestCase(120)]
+        public void ApexTransitionsMatchActualUpwardAndDownwardSpeedAtEveryRenderRate(int fps)
         {
             Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);
-            var apex=new List<int>();int limit=120;
+            var apex=new List<int>();int limit=fps*3;bool sawRisingSix=false,sawFallingSix=false,sawFall=false;
             do
             {
-                Frames(1);
-                if(Get<string>(art,"MobilityPhase")=="Apex")apex.Add(Get<int>(art,"MobilitySourceFrame"));
+                Frames(1,fps);int cel=Get<int>(art,"MobilitySourceFrame");float speed=body.linearVelocity.y;
+                if(Get<string>(art,"MobilityPhase")=="Rise")Assert.That(speed,Is.GreaterThan(4f));
+                if(Get<string>(art,"MobilityPhase")=="Apex")
+                {
+                    apex.Add(cel);
+                    if(cel==5)Assert.That(speed,Is.InRange(1.25f,4f));
+                    if(cel==6)
+                    {
+                        Assert.That(speed,Is.InRange(-1.25f,1.25f));
+                        sawRisingSix|=speed>0;sawFallingSix|=speed<0;
+                    }
+                }
+                if(sawFall)Assert.That(cel,Is.EqualTo(7).Or.EqualTo(0),"Landing collision sets vy to zero before the next ground check; do not flash apex cel 6 again.");
+                if(cel==7&&!sawFall){Assert.That(speed,Is.LessThan(-1.25f));sawFall=true;}
             }while((!Get<bool>(motor,"IsGrounded")||apex.Count==0)&&--limit>0);
             Assert.That(limit,Is.GreaterThan(0));Assert.That(apex,Is.Ordered.Ascending);
-            Assert.That(apex.Count(c=>c==5),Is.EqualTo(6));
-            Assert.That(apex.Count(c=>c==6),Is.GreaterThanOrEqualTo(6));
             Assert.That(apex.Distinct(),Is.EqualTo(new[]{5,6}));
+            Assert.That(sawRisingSix&&sawFallingSix,Is.True,"Cel 6 must straddle the real apex, not precede or lag behind it.");
+        }
+        [TestCase(5f,4)] [TestCase(2.5f,5)] [TestCase(.6f,6)] [TestCase(-.6f,6)] [TestCase(-2.5f,7)]
+        public void TheSameVerticalSpeedKeepsItsPoseWithoutTheOldSixTickCelTimer(float speed,int cel)
+        {
+            Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);Frames(12);
+            body.gravityScale=0;body.linearDamping=0;body.linearVelocity=new Vector2(0,speed);
+            for(int i=0;i<12;i++)
+            {
+                Frames(1);Assert.That(Get<int>(art,"MobilitySourceFrame"),Is.EqualTo(cel));
+            }
         }
         [TestCase(-1)] [TestCase(1)] public void FasterWalkingCoversTwentyPercentMoreDistanceWithoutRetimingTheArt(int direction)
         {

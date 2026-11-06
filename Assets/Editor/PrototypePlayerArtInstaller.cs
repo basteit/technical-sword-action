@@ -67,7 +67,8 @@ public static class PrototypePlayerArtInstaller
         set.jumpFrames = jump;
         // Display tuning only; the native 100/300ms source and movement physics are preserved.
         set.takeoffCelFrames = Mathf.Max(1,set.takeoffCelFrames);
-        set.apexCelFrames = Mathf.Max(1,set.apexCelFrames);
+        set.apexVerticalSpeed = Mathf.Max(.01f,set.apexVerticalSpeed);
+        set.apexCenterVerticalSpeed = Mathf.Clamp(set.apexCenterVerticalSpeed,.01f,set.apexVerticalSpeed);
         foreach (string action in new[] { "Jump", "Fall", "DropThrough", "Dash" })
         {
             var entry = set.Find(action);

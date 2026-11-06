@@ -37,10 +37,10 @@ public sealed class PrototypePlayerArtSet : ScriptableObject
     [Header("Submitted jump (1-3 takeoff, 4 rise, 5-6 apex, 7 fall)")]
     public Sprite[] jumpFrames = Array.Empty<Sprite>();
     [Min(1)] public int takeoffCelFrames = 3;
-    [Tooltip("Hold cel 5 for this many combat ticks, then hold cel 6 until falling; never loop backwards.")]
-    [Min(1)] public int apexCelFrames = 6;
-    [Tooltip("Visual apex band only. Does not change gravity, jump height or vertical velocity.")]
+    [Tooltip("Upward speed below which cel 4 transitions to cel 5 near the apex. Visual only.")]
     [Min(.01f)] public float apexVerticalSpeed = 4f;
+    [Tooltip("Cel 6 spans this positive/negative speed around the apex; faster descent uses cel 7. Visual only.")]
+    [Min(.01f)] public float apexCenterVerticalSpeed = 1.25f;
     public bool HasSubmittedJump => jumpFrames != null && jumpFrames.Length == 7 &&
         Array.TrueForAll(jumpFrames, sprite => sprite != null);
 
