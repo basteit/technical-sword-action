@@ -16,6 +16,7 @@ using Object = UnityEngine.Object;
 
 namespace TechnicalSwordAction.PlayerState.Tests
 {
+    [Category("OptionalDialogue")]
     public sealed class PrototypeDialogueTests
     {
         private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;

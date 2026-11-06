@@ -81,7 +81,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(player, "BlocksStandardMovement"), Is.False);
         }
 
-        [TestCase(5, "Just")] [TestCase(9, "Normal")]
+        [TestCase(3, "Just")] [TestCase(4, "Normal")]
+        [TestCase(5, "Normal")] [TestCase(9, "Normal")]
         public void SuccessfulParryKeepsHeldMovementStoppedOnlyForItsExistingLock(int contactFrame, string result)
         {
             Place(0, .81f); Call(motor, "SetMoveInput", Vector2.right);

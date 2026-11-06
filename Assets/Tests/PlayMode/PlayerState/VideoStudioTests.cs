@@ -11,6 +11,7 @@ using Object=UnityEngine.Object;
 
 namespace TechnicalSwordAction.PlayerState.Tests
 {
+    [Category("VideoTooling")]
     public sealed class VideoStudioTests
     {
         private const BindingFlags Flags=BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic;

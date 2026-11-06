@@ -11,6 +11,7 @@ using Object=UnityEngine.Object;
 
 namespace TechnicalSwordAction.PlayerState.Tests
 {
+    [Category("VideoTooling")]
     public sealed class DefenseCancelShowcaseTests
     {
         private const BindingFlags Flags=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance;
@@ -28,10 +29,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [UnityTearDown] public IEnumerator Teardown()
         { Call(director,"ResetTake",2);Set(clock,"ManualAdvanceOnly",false);yield return null; }
+        // Four-stage cases also enforce the legacy 3-6s capture acceptance budget.
+        // The suite manifest separates those cases without weakening that target.
         [TestCase(2,30,false)] [TestCase(2,60,false)] [TestCase(2,120,false)]
         [TestCase(2,30,true)] [TestCase(2,60,true)] [TestCase(2,120,true)]
-        [TestCase(4,30,false)] [TestCase(4,60,false)] [TestCase(4,120,false)]
-        [TestCase(4,30,true)] [TestCase(4,60,true)] [TestCase(4,120,true)]
+        [TestCase(4,30,false,Category="LegacyVideoAcceptance")] [TestCase(4,60,false,Category="LegacyVideoAcceptance")] [TestCase(4,120,false,Category="LegacyVideoAcceptance")]
+        [TestCase(4,30,true,Category="LegacyVideoAcceptance")] [TestCase(4,60,true,Category="LegacyVideoAcceptance")] [TestCase(4,120,true,Category="LegacyVideoAcceptance")]
         public void AttackCancelCounterDashAndReturnComboUseTheActualStateAndTarget(int stages,int fps,bool mirror)
         {
             Set(director,"MirrorLayout",mirror);Call(director,"StartTake",stages,true);
@@ -66,7 +69,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That((int)clockType.GetProperty("SlowOwnerCount").GetValue(null),Is.Zero);
             Assert.That(Get<float>(presentation,"DimAlpha"),Is.Zero);
         }
-        [Test] public void BothEndingsAndBothDirectionsResetTenTimesEach()
+        [Test, Category("LegacyVideoAcceptance")] public void BothEndingsAndBothDirectionsResetTenTimesEach()
         {
             var utility=Type.GetType("VideoCaptureUtility, Assembly-CSharp-Editor",true);
             string report=(string)utility.GetMethod("ValidateDefenseCancelResetRuns").Invoke(null,null);

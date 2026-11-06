@@ -11,6 +11,7 @@ using Object=UnityEngine.Object;
 
 namespace TechnicalSwordAction.PlayerState.Tests
 {
+    [Category("VideoTooling")]
     public sealed class CombatVideoIntegrationTests
     {
         private Component director,clock,state,counter,health,presentation;
@@ -1121,7 +1122,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
             object Mark(string name)=>marks.Single(m=>(string)m.GetType().GetField("kind").GetValue(m)==name);
             long Tick(string name)=>(long)Mark(name).GetType().GetField("tick").GetValue(Mark(name));
             double Real(string name)=>(double)Mark(name).GetType().GetField("realSeconds").GetValue(Mark(name));
-            Assert.That(Tick("ChargeRelease")-Tick("ChargeStart"),Is.EqualTo(8));
+            Assert.That(Tick("ChargeRelease")-Tick("ChargeStart"),
+                Is.EqualTo(Get<int>(counter,"ChargeReleaseFrame")-Get<int>(counter,"ChargeFrame")),
+                "Charge events must match the current authored timing, not the superseded eight-tick take.");
             Assert.That(Tick("Kick")-Tick("ChargeRelease"),Is.EqualTo(1));
             Assert.That(Tick("Landing")-Tick("Kick"),Is.EqualTo(24));
             // At 30fps both 60Hz events can fall in the same sampled render frame.
@@ -1327,7 +1330,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<bool>(driver,"IsLaunched"),Is.True);
             Assert.That(Get<int>(enemy,"DeathCount"),Is.EqualTo(1));
             Vector3 origin=enemy.transform.position;
-            for(int i=0;i<16;i++) Step();
+            // Hitstop is now 16F. Count launch motion only after it releases, rather
+            // than sampling an unmoved target after sixteen paused render frames.
+            for(int wait=0;wait<120&&(bool)clockType.GetProperty("IsHitStopped").GetValue(null);wait++)Step();
+            Assert.That((bool)clockType.GetProperty("IsHitStopped").GetValue(null),Is.False,"Hitstop did not release.");
+            for(int i=0;i<9;i++) Step();
             Vector3 airborne=enemy.transform.position;var visual=enemy.GetComponentInChildren<SpriteRenderer>();Quaternion rotation=visual.transform.localRotation;
             double real=Get<double>(director,"RealElapsed");
             Assert.That(airborne.y-origin.y,Is.InRange(.21f,.27f));Assert.That(Mathf.Abs(airborne.x-origin.x),Is.GreaterThan(.4f));
