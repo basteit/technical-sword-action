@@ -77,6 +77,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("SwordA", "7aea953a5d6e02f0e706db44ee243dd21f4c54d27cb8c91238bde86f3444623b")]
         [TestCase("SwordB", "38eeaecb54b5a43669af92c0af31acaefef80fde64243236e9d9076ee0ba1088")]
         [TestCase("SwordIai", "590107f74af80149fd8069e97f4709abca6fcc2d3d3764c8db067d62948cf936")]
+        [TestCase("ParryReady", "aae2b7bb4c9014b1cd84d7cd0814a5a66368b133c3eb1ab34736150318c2e073")]
+        [TestCase("Dash", "a2e34e96e9703534012aeeb50766db1a26134c3524f9da431ebf29a45a621209")]
         public void ApprovedLandingParryAndWhiffsRemainByteIdentical(string name, string expected)
         { Assert.That(Sha256("Assets/Audio/PrototypeFreeSfx/" + name + ".wav"), Is.EqualTo(expected)); }
         [Test] public void WhiffsHitsAndParriesUseDifferentClips()
@@ -114,15 +116,22 @@ namespace TechnicalSwordAction.PlayerState.Tests
             foreach (var name in new[] { "LightHit", "HeavyHit" })
             {
                 var sources = manifest.clips.Single(c => c.asset.EndsWith("/" + name + ".wav")).sources;
-                CollectionAssert.Contains(sources.Select(s => s.title).ToArray(), "Ninja Samurai Sword");
-                Assert.That(sources.Any(s => s.title.StartsWith("Swords ")), Is.False, "Clashing belongs to parry, not cutting flesh/material.");
+                CollectionAssert.Contains(sources.Select(s => s.title).ToArray(), "Sword Swing");
+                Assert.That(sources.Any(s => s.title.Contains("Ninja") || s.title == "chop" || s.title.StartsWith("Swords ")), Is.False, "Cutting uses a stylized sweep, not gore or a parry clang.");
             }
             var charge = manifest.clips.Single(c => c.asset.EndsWith("/CounterCharge.wav"));
             CollectionAssert.Contains(charge.sources.Select(s => s.title).ToArray(), "Electricity");
             var hit = manifest.clips.Single(c => c.asset.EndsWith("/CounterImpact.wav"));
-            CollectionAssert.AreEquivalent(new[] { "Kick", "Realistic Punch" }, hit.sources.Select(s => s.title).ToArray());
+            CollectionAssert.AreEquivalent(new[] { "explosionCrunch_001", "impactMetal_004" }, hit.sources.Select(s => s.title).ToArray());
             var dash = manifest.clips.Single(c => c.asset.EndsWith("/Dash.wav"));
             CollectionAssert.AreEqual(new[] { "Woosh" }, dash.sources.Select(s => s.title).ToArray());
+        }
+        [Test] public void StylizedContactsAndElectricAccentHaveShortEnvelopes()
+        {
+            Assert.That(((AudioClip[])Get(EntryFor("CounterCharge"), "clips"))[0].length, Is.InRange(.10f,.16f));
+            Assert.That(((AudioClip[])Get(EntryFor("CounterHit"), "clips"))[0].length, Is.InRange(.20f,.33f));
+            Assert.That(((AudioClip[])Get(EntryFor("LightHit"), "clips"))[0].length, Is.InRange(.10f,.21f));
+            Assert.That(((AudioClip[])Get(EntryFor("HeavyHit"), "clips"))[0].length, Is.InRange(.20f,.28f));
         }
         [Test] public void CombinedManifestMatchesAllOriginalAndProcessedBytes()
         {

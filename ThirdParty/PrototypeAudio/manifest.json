@@ -365,51 +365,61 @@
       "name": "CounterCharge",
       "asset": "Assets/Audio/PrototypeFreeSfx/CounterCharge.wav",
       "license": "CC-BY-3.0",
-      "seconds": 0.9,
+      "seconds": 0.14,
       "peakTargetDb": -6,
-      "gainDb": 2.44,
-      "sha256": "35e22a3f43bf4bbbc4b91dc4bff371957b6d1d41d24856026fa60f307b697a98",
+      "gainDb": 11.24,
+      "sha256": "31462d394fd793a441fd9aef7101c651a476fa435663aacf3fc76640756f2805",
       "sources": [
         {
           "path": "ThirdParty/AdditionalAudio/SoundBible/Electricity.wav",
           "sha256": "275893afa155c64dfd5bafd06e7fd4eec6b341a256fb7550fb5c862a75980a90",
-          "filter": "atrim=start=0.35:end=1.35,asetpts=PTS-STARTPTS,highpass=f=350,lowpass=f=7500,tremolo=f=18:d=0.35,atempo=1.111111",
+          "filter": "atrim=start=0.55:end=0.72,asetpts=PTS-STARTPTS,asetrate=72000,aresample=48000,highpass=f=700,lowpass=f=9500,afade=t=out:st=0.035:d=0.07",
           "title": "Electricity",
           "author": "Mike Koenig",
           "license": "CC-BY-3.0",
           "url": "https://soundbible.com/1107-Electricity.html",
           "download": "https://soundbible.com/grab.php?id=1107&type=wav"
+        },
+        {
+          "path": "ThirdParty/KenneyAudio/sci-fi-sounds/impactMetal_004.ogg",
+          "sha256": "0032710d1fc88c217946cd54492f275eb4363bb8025a4bc1b7ce08df7b3c60de",
+          "filter": "atempo=3,highpass=f=1600,lowpass=f=10000,volume=0.45",
+          "title": "impactMetal_004",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/sci-fi-sounds",
+          "download": null
         }
       ]
     },
     {
       "name": "CounterImpact",
       "asset": "Assets/Audio/PrototypeFreeSfx/CounterImpact.wav",
-      "license": "CC-BY-3.0",
-      "seconds": 0.65,
+      "license": "CC0-1.0",
+      "seconds": 0.3,
       "peakTargetDb": -6,
-      "gainDb": -7.26,
-      "sha256": "3eb5d82e31eb414568c241f032529dfa351c8a02b2b33c9f48dbb49f5a147ab3",
+      "gainDb": -7.56,
+      "sha256": "a379f09c2f6aeade62e07e8f4df8b3de23afe1edf89e7eaef7c69417d073ea20",
       "sources": [
         {
-          "path": "ThirdParty/AdditionalAudio/SoundBible/Realistic_Punch.wav",
-          "sha256": "c04bdef72208d0aa3e7c74f8225e9f9e00f4eee8d3ed845a897d3454f3932cd2",
-          "filter": "atrim=start=0.08:end=0.30,asetpts=PTS-STARTPTS,asetrate=43200,aresample=48000,highpass=f=70,lowpass=f=6500",
-          "title": "Realistic Punch",
-          "author": "Mark DiAngelo",
-          "license": "CC-BY-3.0",
-          "url": "https://soundbible.com/2069-Realistic-Punch.html",
-          "download": "https://soundbible.com/grab.php?id=2069&type=wav"
+          "path": "ThirdParty/KenneyAudio/sci-fi-sounds/explosionCrunch_001.ogg",
+          "sha256": "fdd04d6f0032d4d57c134ad37f3587d2d00e58c9572715275bd8cf4f43593576",
+          "filter": "atrim=0:0.22,asetrate=55200,aresample=48000,highpass=f=180,lowpass=f=9500,equalizer=f=2200:t=q:w=1:g=3,atempo=1.4",
+          "title": "explosionCrunch_001",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/sci-fi-sounds",
+          "download": null
         },
         {
-          "path": "ThirdParty/AdditionalAudio/SoundBible/Kick.wav",
-          "sha256": "da8a074296b72bc208e64279ce102c40f138e63b6d4bd7d82a1e127e9a970ab1",
-          "filter": "atrim=start=0.015:end=0.50,asetpts=PTS-STARTPTS,asetrate=40320,aresample=48000,highpass=f=65,lowpass=f=4000,equalizer=f=130:t=q:w=0.8:g=3,volume=0.65",
-          "title": "Kick",
-          "author": "Mike Koenig",
-          "license": "CC-BY-3.0",
-          "url": "https://soundbible.com/996-Kick.html",
-          "download": "https://soundbible.com/grab.php?id=996&type=wav"
+          "path": "ThirdParty/KenneyAudio/sci-fi-sounds/impactMetal_004.ogg",
+          "sha256": "0032710d1fc88c217946cd54492f275eb4363bb8025a4bc1b7ce08df7b3c60de",
+          "filter": "atempo=2,highpass=f=700,lowpass=f=10000,volume=0.6",
+          "title": "impactMetal_004",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/sci-fi-sounds",
+          "download": null
         }
       ]
     },
@@ -417,20 +427,30 @@
       "name": "LightHit",
       "asset": "Assets/Audio/PrototypeFreeSfx/LightHit.wav",
       "license": "CC-BY-3.0",
-      "seconds": 0.29,
+      "seconds": 0.19,
       "peakTargetDb": -6,
-      "gainDb": -5.46,
-      "sha256": "1d0c81bab33baca9794bfd1109ff27e33e7f3bcbbf22371f2ff24e241e45074e",
+      "gainDb": 0.04,
+      "sha256": "c538e9f2d2ea11aecefa523bbea8e1ab2e56592d113b8cd20849003d466b6a7d",
       "sources": [
         {
-          "path": "ThirdParty/AdditionalAudio/SoundBible/Ninja_Samurai_Sword.mp3",
-          "sha256": "4d13cfb15f59aa60fdb3233499da8a8c11d11e9a3009ab7540932082c8590822",
-          "filter": "atrim=start=0.24:end=0.72,asetpts=PTS-STARTPTS,atempo=1.75,highpass=f=180,lowpass=f=9000,equalizer=f=2000:t=q:w=0.9:g=2",
-          "title": "Ninja Samurai Sword",
+          "path": "ThirdParty/AdditionalAudio/SoundBible/Sword_Swing.wav",
+          "sha256": "93a2e6e9e17daea9cbebb54317c3669640c7b07c919a71c6856750cff76a7389",
+          "filter": "asetrate=60000,aresample=48000,highpass=f=900,lowpass=f=9500,equalizer=f=3000:t=q:w=1:g=3",
+          "title": "Sword Swing",
           "author": "Mike Koenig",
           "license": "CC-BY-3.0",
-          "url": "https://soundbible.com/1526-Ninja-Samurai-Sword.html",
-          "download": "https://soundbible.com/grab.php?id=1526&type=mp3"
+          "url": "https://soundbible.com/1176-Sword-Swing.html",
+          "download": "https://soundbible.com/grab.php?id=1176&type=wav"
+        },
+        {
+          "path": "ThirdParty/KenneyAudio/sci-fi-sounds/laserSmall_002.ogg",
+          "sha256": "e70139466c3e801358c9041ee17db7ff82c0e9a9cdf44647ad0ea6b9f8458f63",
+          "filter": "atrim=0:0.28,asetrate=62400,aresample=48000,atempo=2,highpass=f=1600,lowpass=f=10000,volume=0.5",
+          "title": "laserSmall_002",
+          "author": "Kenney",
+          "license": "CC0-1.0",
+          "url": "https://kenney.nl/assets/sci-fi-sounds",
+          "download": null
         }
       ]
     },
@@ -438,29 +458,29 @@
       "name": "HeavyHit",
       "asset": "Assets/Audio/PrototypeFreeSfx/HeavyHit.wav",
       "license": "CC-BY-3.0",
-      "seconds": 0.42,
+      "seconds": 0.26,
       "peakTargetDb": -6,
-      "gainDb": -5.06,
-      "sha256": "39408dad3ecafe319b2c4f518e37a2d26410386230b929af4354130209311428",
+      "gainDb": -0.26,
+      "sha256": "f05db15c1eb717c154ca3b6a57d487c0ad76d6ecab33eeeaf035f10871baa3cb",
       "sources": [
         {
-          "path": "ThirdParty/AdditionalAudio/SoundBible/Ninja_Samurai_Sword.mp3",
-          "sha256": "4d13cfb15f59aa60fdb3233499da8a8c11d11e9a3009ab7540932082c8590822",
-          "filter": "atrim=start=0.24:end=0.84,asetpts=PTS-STARTPTS,asetrate=45600,aresample=48000,atempo=1.5,highpass=f=150,lowpass=f=9000,equalizer=f=1800:t=q:w=0.9:g=2",
-          "title": "Ninja Samurai Sword",
+          "path": "ThirdParty/AdditionalAudio/SoundBible/Sword_Swing.wav",
+          "sha256": "93a2e6e9e17daea9cbebb54317c3669640c7b07c919a71c6856750cff76a7389",
+          "filter": "asetrate=55200,aresample=48000,highpass=f=750,lowpass=f=9500,equalizer=f=2800:t=q:w=1:g=3",
+          "title": "Sword Swing",
           "author": "Mike Koenig",
           "license": "CC-BY-3.0",
-          "url": "https://soundbible.com/1526-Ninja-Samurai-Sword.html",
-          "download": "https://soundbible.com/grab.php?id=1526&type=mp3"
+          "url": "https://soundbible.com/1176-Sword-Swing.html",
+          "download": "https://soundbible.com/grab.php?id=1176&type=wav"
         },
         {
-          "path": "ThirdParty/KenneyAudio/rpg-audio/chop.ogg",
-          "sha256": "d00c2b3c9fff07e376145c8c8c45c90e5084ec192f6ce0387db233f7b86f1486",
-          "filter": "atempo=1.2,highpass=f=180,volume=0.2",
-          "title": "chop",
+          "path": "ThirdParty/KenneyAudio/sci-fi-sounds/laserLarge_002.ogg",
+          "sha256": "e5e0b6ccc4d5720c8174a3e5b7cc6f9be3057352a89cbb2e99a00efc6fe5cc11",
+          "filter": "atrim=0:0.34,asetrate=57600,aresample=48000,atempo=2.5,highpass=f=1300,lowpass=f=10000,volume=0.4",
+          "title": "laserLarge_002",
           "author": "Kenney",
           "license": "CC0-1.0",
-          "url": "https://kenney.nl/assets/rpg-audio",
+          "url": "https://kenney.nl/assets/sci-fi-sounds",
           "download": null
         }
       ]

@@ -55,7 +55,7 @@ public static class PrototypeSfxInstaller
                 Entry(PrototypeSfxCue.ParryMiss,"ParryMiss",.12f,5),
                 Entry(PrototypeSfxCue.LightHit,"LightHit",.5f,65), Entry(PrototypeSfxCue.HeavyHit,"HeavyHit",.58f,75,1),
                 Entry(PrototypeSfxCue.CounterTransfer,"CounterTransfer",.4f,50,1,0),
-                Entry(PrototypeSfxCue.CounterCharge,"CounterCharge",.25f,40,1,0),
+                Entry(PrototypeSfxCue.CounterCharge,"CounterCharge",.42f,40,1,0),
                 Entry(PrototypeSfxCue.CounterRelease,"Dash",.25f,70,1.1f,0),
                 Entry(PrototypeSfxCue.CounterHit,"CounterImpact",.85f,95,1,0),
                 Entry(PrototypeSfxCue.PlayerHit,"PlayerHit",.55f,80), Entry(PrototypeSfxCue.PlayerDeath,"Fall",.26f,90,.9f,0),

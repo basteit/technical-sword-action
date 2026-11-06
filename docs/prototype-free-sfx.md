@@ -1,6 +1,26 @@
 # プロトタイプのフリーSE差し替え（#92）
 
-## 最新調整: 斬り込み・きらめき・電撃・重い蹴り（2026-11-07）
+## 最新調整: ゲーム的な切り抜けと単発電撃・衝撃（2026-11-07）
+
+体験目的: 生々しい切断や鈍い胴鳴りではなく、短く鋭い切り抜けと、キメの電撃一発から明快な衝撃へつながるゲーム的な爽快感を返す。
+
+着手時の受入条件:
+
+1. LightHit/HeavyHitからNinja Samurai Swordとchopを外し、風切り＋短い電子的アクセントへ置き換える。CounterImpactは実録の重い打撃から短い誇張された衝撃へ。空振りに命中音を付けず、パリィ成功/構え、Dash、Jump、Landは維持する。
+2. CounterChargeをループしない短い電撃一発へ変更する。初期キメ位置は現行のCounterKick姿勢が現れるChargeStarted=12Fとし、タメ中に再発音せず、命中は既存21Fの確定Hitだけにする。Pause・中断・Reset・対象消失・無音でも遅延音や再発音を残さない。
+3. 音色/音量と発音の包絡・単発化の2軸に限定し、モーション・判定・速度・停止・カメラを変更しない。原音/加工/クレジットを更新し、単発・同期・中断と維持対象の自動テストを行う。聴感と15分操作の最終採否は人が確認する。
+
+同じIssue #92 / Draft PR #99の再調整。前回の肉切り・持続電撃・鈍い重打撃は比較履歴とし、今回の指定を優先する。キメを12Fとした位置と音色の配合は調整可能な初期解釈で、原稿や別の動画用Sceneは変更しない。
+
+### 現在の配合と接続
+
+- LightHit/HeavyHit: SoundBible「Sword Swing」の鋭い風切りに、Kenney Sci-Fi SoundsのlaserSmall_002 / laserLarge_002を短く加工した電子アクセントを重ねる。0.19 / 0.26秒。Ninja Samurai Sword・chop・実録打撃は使わない。
+- CounterCharge: 「Electricity」の短い抜粋＋Kenney impactMetal_004のアタック、0.14秒・音量0.42。CounterKick姿勢の表示開始であるChargeStarted（現行12F）へ同期して一度だけ発音する。専用声部を維持しつつ全AudioSourceのloopをfalseにし、その後の長いタメは無音。
+- CounterImpact: Kenney explosionCrunch_001＋impactMetal_004、0.30秒。重低音の長い胴鳴りを避け、短い合成衝撃を実命中21Fへ同期する。以前のKick/Realistic Punchは現在のUnity素材から除き、原音は履歴としてのみ保持する。
+- 変更WAVは上記4音。残り20音は直前 `aea58e2` と内容不変。パリィ成功/構え、Dash、Jump、Land、通常攻撃の空振り、全ゲームプレイ時刻を保つ。互換MP3のRayTap/Releaseも新しい命中音へ更新する。
+- 選択したKenney原音4本と既存CC0のLicense、加工式/原音・出力ハッシュを保存する。現在のCC BY派生WAVは8本、CounterImpactを含む残り16本はCC0。旧候補のNinja/Kick/Realistic Punchは使用中と誤認しないよう出典と通知を修正する。
+
+## 直前調整: 斬り込み・きらめき・電撃・重い蹴り（2026-11-07）
 
 体験目的: 空振りの風切りに対して命中は切り裂く手触りを返し、パリィ構えのきらめき、タメの電撃、カウンター命中の重い打撃を別々の音として伝える。
 
@@ -12,7 +32,7 @@
 
 同じIssue #92 / Draft PR #99内の追加調整。直前の「斬撃命中も高い金属音」という指定だけを最新依頼で置き換え、パリィ成功の金属音は維持する。成功は切断/打撃、失敗・空振りは動作音だけに分ける。以下の前回・初回の検証記録は、それぞれの時点の履歴として残す。
 
-### 現在の素材と配合
+### 直前時点の素材と配合
 
 | 用途 | 現在の採用 / 発音位置 |
 | --- | --- |
@@ -28,7 +48,7 @@
 
 変更するWAVはLightHit、HeavyHit、ParryReady、CounterCharge、CounterImpact、Dashの6本。互換MP3のRayTap/Releaseも同じ切断音へ更新する。未受領モーションや音源を完成扱いにせず、配布ZIPは今回更新しない。高音の構えが成功と紛らわしくないか、斬撃の質感と蹴りの重みの最終採否は人による確認を残す。
 
-### 最新調整後の検証
+### 直前調整後の検証
 
 - Unity 6000.3.9f1 / ULoop 2.1.3: Compile Error 0 / Warning 0、最終Console Error 0 / Warning 0。
 - EditMode: SE Asset 21/21、Combat Trial Asset 14/14。PlayMode: SE 30/30、Combat Trial 65/65、Counter Cinematic 185/185。関連315件合格（全プロジェクト全テストではない）。最終再加工後のSE Asset 21件再実行も合格した。
@@ -146,12 +166,12 @@ SoundBibleの3作品は各作品ページでCC BY 3.0を確認した（[Sword Sw
 | ジャンプ/着地 | Jump（cloth3、維持）/Land（短い靴底接触） | 受理された踏切/実接地。床抜けはジャンプ音なし |
 | ダッシュ | Dash（Wooshの風切り） | 実際の開始に1回。地上/空中共用 |
 | 攻撃1/2/3/4 | SwordA / SwordB / SwordAの音色差 / SwordIai | 各段のActive開始2F前。空振りでも動作音のみ再生 |
-| 通常命中/4段命中 | LightHit / HeavyHit（短い切り込み） | 同一攻撃の実命中。同tickの多重Collider/複数命中は音を積まない |
+| 通常命中/4段命中 | LightHit / HeavyHit（ゲーム的な切り抜け） | 同一攻撃の実命中。同tickの多重Collider/複数命中は音を積まない |
 | 納刀 | Sheathe（metalLatch＋clothBelt2） | 実際に復帰へ進んだ後半。次段へ接続した場合や中断時は予約しない |
 | パリィ構え/失敗 | ParryReady（きらめき）/ ParryMiss（衣擦れ） | 開始/失敗時。成功の金属衝突音と区別 |
 | パリィ成功/Just | ParryClang（高い剣衝突＋余韻） | 敵の攻撃ピークへ同期した表示インパクト。Justは小さな音色差だけで二重に重ねない |
-| 反撃転移/帯電 | CounterTransfer（forceField）/ CounterCharge（電撃） | BlinkStarted / ChargeStarted。帯電だけループし、解除/中断/対象消失で止める |
-| 蹴り出し/反撃命中 | Dashの薄い風切り / CounterImpact（重い打撃＋胴鳴り） | ChargeReleased / 実際のHitConfirmed。転移と命中を混同しない |
+| 反撃転移/キメ | CounterTransfer（forceField）/ CounterCharge（短い電撃） | BlinkStarted / ChargeStartedに各1回。電撃をループせず、解除/中断/対象消失でも止める |
+| 蹴り出し/反撃命中 | Dashの薄い風切り / CounterImpact（明快な合成衝撃） | ChargeReleased / 実際のHitConfirmed。転移と命中を混同しない |
 | 被弾/死亡 | PlayerHit / Fall | 実ダメージ/死亡状態。死亡音を毎tick再開しない |
 | 敵の予備動作/攻撃/不可予兆 | EnemyWindup / EnemyAttack / Danger | 既存の開始イベント/不可攻撃の合図区間。通常敵へ追加の黄色VFXは付けない |
 | 敵撃破 | Fall（弱音量） | 撃破成立。同tickの斬撃/反撃命中より低優先度 |
@@ -161,6 +181,6 @@ SoundBibleの3作品は各作品ページでCC BY 3.0を確認した（[Sword Sw
 
 待機、上昇、頂点、下降、後ずさり、フェード、F1/F2リセットには独立した音を付けず、モーションの切替ごとに音が連打されることを避ける。重パリィ専用の追加音は未制作とし、既存成功音へフォールバックする。
 
-`CombatFeedback2D` の視覚・停止・カメラはそのまま、発音だけを新しいバスへ委譲する。旧Attack/Special/敵予兆の直接再生は、このバスが有効なときだけ抑制する。バスは動作4声＋接触1声＋帯電1声で上限6声とし、個別Clipを約-6dBFSへ正規化、同時ゲインの合計を1.6以下へ抑える。パリィや反撃の音は同tickの弱い音より優先し、スローで音のピッチを変更しない。
+`CombatFeedback2D` の視覚・停止・カメラはそのまま、発音だけを新しいバスへ委譲する。旧Attack/Special/敵予兆の直接再生は、このバスが有効なときだけ抑制する。バスは動作4声＋接触1声＋キメ電撃1声で上限6声とし、すべて単発再生する。個別Clipを約-6dBFSへ正規化、同時ゲインの合計を1.6以下へ抑える。パリィや反撃の音は同tickの弱い音より優先し、スローで音のピッチを変更しない。
 
 Pauseでは自分が再生中だった音だけを一時停止/再開し、被弾・死亡・中断では帯電と動作予約を止める。SessionReset、Disable、Scene変更では全専用音源を停止する。再開/復活時の初回接地を着地として誤発音しない。

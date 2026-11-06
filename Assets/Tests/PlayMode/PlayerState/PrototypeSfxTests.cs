@@ -158,39 +158,57 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [Test] public void CounterTransferChargeReleaseAndImpactFollowTheRealPhases()
         {
-            BeginCounter(); Until(()=>Get<bool>(sfx,"ChargeLoopActive"));
+            BeginCounter(); Until(()=>Get<bool>(sfx,"ChargeAccentActive"));
             Assert.That(Count("CounterTransfer"),Is.EqualTo(1)); Assert.That(Count("CounterCharge"),Is.EqualTo(1));
-            Assert.That(Sources.Any(a=>a.isPlaying&&a.loop&&a.clip!=null&&a.clip.name=="CounterCharge"),Is.True);
+            Assert.That(Sources.Any(a=>a.isPlaying&&!a.loop&&a.clip!=null&&a.clip.name=="CounterCharge"),Is.True);
+            Assert.That(Get<int>(counter,"ElapsedFrames"),Is.EqualTo(Get<int>(counter,"ChargeFrame")));
+            Assert.That(Get<bool>(sfx,"ChargeLoopActive"),Is.False);
             Assert.That(Count("CounterHit"),Is.Zero);
             Until(()=>Get<int>(counter,"HitCount")==1);
             Assert.That(Count("CounterRelease"),Is.EqualTo(1)); Assert.That(Count("CounterHit"),Is.EqualTo(1));
-            Assert.That(Get<bool>(sfx,"ChargeLoopActive"),Is.False);
+            Assert.That(Get<bool>(sfx,"ChargeAccentActive"),Is.False);
             Assert.That(Sources.Any(a=>a.isPlaying&&a.clip!=null&&a.clip.name=="CounterImpact"&&!a.loop),Is.True);
             Until(()=>!Get<bool>(counter,"IsActive")); Frames(20); Assert.That(Count("CounterHit"),Is.EqualTo(1));
             Assert.That(Count("Land"),Is.EqualTo(1));
         }
+        [Test] public void ElectricAccentEndsBeforeTheLongHoldAndNeverRepeats()
+        {
+            BeginCounter(); Until(()=>Count("CounterCharge")==1);
+            Frames(20);
+            Assert.That(Get<bool>(counter,"IsActive"),Is.True);
+            Assert.That(Get<bool>(sfx,"ChargeAccentActive"),Is.False);
+            Assert.That(Get<bool>(sfx,"ChargeLoopActive"),Is.False);
+            Assert.That(Count("CounterCharge"),Is.EqualTo(1));
+            Assert.That(Count("CounterHit"),Is.Zero);
+            Frames(15); Assert.That(Count("CounterCharge"),Is.EqualTo(1));
+            Until(()=>Get<int>(counter,"HitCount")==1);
+            Assert.That(Count("CounterCharge"),Is.EqualTo(1));
+        }
         [TestCase("Reset")] [TestCase("Disable")] [TestCase("TargetLost")]
         public void CounterChargeCannotLeakAfterInterruption(string interruption)
         {
-            BeginCounter(); Until(()=>Get<bool>(sfx,"ChargeLoopActive"));
+            BeginCounter(); Until(()=>Get<bool>(sfx,"ChargeAccentActive"));
             if(interruption=="Reset") Call(arena,"ResetActionsOnly");
             else if(interruption=="Disable") ((Behaviour)sfx).enabled=false;
             else { ((Component)Get<object>(counter,"SelectedTarget")).gameObject.SetActive(false); Frames(2); }
-            Assert.That(Get<bool>(sfx,"ChargeLoopActive"),Is.False);
+            Assert.That(Get<bool>(sfx,"ChargeAccentActive"),Is.False);
             if(interruption!="TargetLost") Assert.That(Get<int>(sfx,"ActiveVoiceCount"),Is.Zero);
             Frames(20); Assert.That(Count("CounterHit"),Is.Zero);
         }
         [UnityTest] public IEnumerator PauseSuspendsAndResumesTheChargeWithoutRetriggeringIt()
         {
-            BeginCounter(); Until(()=>Get<bool>(sfx,"ChargeLoopActive")); Static("SetPaused",true);
+            BeginCounter(); Until(()=>Get<bool>(sfx,"ChargeAccentActive")); Static("SetPaused",true);
             Assert.That(Sources.All(a=>!a.isPlaying),Is.True); Frames(60); yield return null;
             Assert.That(Count("CounterCharge"),Is.EqualTo(1)); Static("SetPaused",false); yield return null;
-            Assert.That(Get<bool>(sfx,"ChargeLoopActive"),Is.True); Assert.That(Count("CounterCharge"),Is.EqualTo(1));
+            Assert.That(Get<bool>(sfx,"ChargeAccentActive"),Is.True); Assert.That(Count("CounterCharge"),Is.EqualTo(1));
+            Call(sfx,"AdvanceAudio",.3f); Assert.That(Get<bool>(sfx,"ChargeAccentActive"),Is.False);
+            Static("SetPaused",true); Static("SetPaused",false);
+            Assert.That(Get<bool>(sfx,"ChargeAccentActive"),Is.False); Assert.That(Count("CounterCharge"),Is.EqualTo(1));
         }
         [TestCase("masterVolume")] [TestCase("sfxVolume")]
         public void MuteUpdatesAllVoicesAndNeverChangesCounterGameplay(string setting)
         {
-            BeginCounter(); Until(()=>Get<bool>(sfx,"ChargeLoopActive")); Set(Get<object>(feedback,"Settings"),setting,0f); Call(sfx,"RefreshVolumes");
+            BeginCounter(); Until(()=>Get<bool>(sfx,"ChargeAccentActive")); Set(Get<object>(feedback,"Settings"),setting,0f); Call(sfx,"RefreshVolumes");
             Assert.That(Sources.All(a=>a.volume==0),Is.True);
             Until(()=>Get<int>(counter,"HitCount")==1); Assert.That(Count("CounterHit"),Is.Zero);
             Assert.That(Get<int>(counter,"SelectedDamage"),Is.EqualTo(90)); Assert.That(Sources.All(a=>a.volume==0),Is.True);

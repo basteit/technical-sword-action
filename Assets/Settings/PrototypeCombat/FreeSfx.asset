@@ -129,7 +129,7 @@ MonoBehaviour:
   - cue: 16
     clips:
     - {fileID: 8300000, guid: 46a666cbe21e030488f49c1b82fae316, type: 3}
-    volume: 0.25
+    volume: 0.42
     pitch: 1
     pitchVariation: 0
     priority: 40

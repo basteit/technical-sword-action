@@ -44,8 +44,9 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
     {
         get { int n = 0; foreach (var v in voices) if (v != null && (v.source.isPlaying || v.paused)) n++; return n; }
     }
-    public bool ChargeLoopActive => voices[ChargeVoice] != null &&
+    public bool ChargeAccentActive => voices[ChargeVoice] != null &&
         (voices[ChargeVoice].source.isPlaying || voices[ChargeVoice].paused);
+    public bool ChargeLoopActive => ChargeAccentActive && voices[ChargeVoice].source.loop;
     public bool IsReady
     {
         get
@@ -93,6 +94,7 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
     }
     private void OnStep(int step) { currentStep = step; swingPending = sheathePending = true; }
     private void OnTransfer() => Play(PrototypeSfxCue.CounterTransfer);
+    // ChargeStarted is the authored kick pose reveal (currently 12F), not a looping ambience.
     private void OnCharge() => Play(PrototypeSfxCue.CounterCharge, false, true);
     private void OnRelease() { StopCharge(); Play(PrototypeSfxCue.CounterRelease); }
     private void OnCounterFinished(bool completed) { StopCharge(); if (!completed) StopActions(); swingPending = sheathePending = false; }
@@ -182,12 +184,12 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
         }
     }
 
-    private void Play(PrototypeSfxCue cue, bool impact = false, bool loop = false)
+    private void Play(PrototypeSfxCue cue, bool impact = false, bool chargeAccent = false)
     {
         if (!IsReady || CombatTimeController.IsPaused) return;
         var entry = profile.Find(cue);
         if (entry == null || lastCueTicks[(int)cue] == CombatTimeController.TickCount || MasterGain <= 0) return;
-        int slot = loop ? ChargeVoice : impact ? ImpactVoice : -1;
+        int slot = chargeAccent ? ChargeVoice : impact ? ImpactVoice : -1;
         if (impact && impactTick == CombatTimeController.TickCount && entry.priority <= impactPriority) return;
         if (slot < 0)
         {
@@ -201,7 +203,7 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
         }
         var voice = voices[slot]; voice.source.Stop(); voice.paused = false;
         int index = cueCounts[(int)cue];
-        voice.source.clip = entry.clips[index % entry.clips.Length]; voice.source.loop = loop;
+        voice.source.clip = entry.clips[index % entry.clips.Length]; voice.source.loop = false;
         voice.source.pitch = entry.pitch + ((index % 3) - 1) * entry.pitchVariation;
         voice.source.priority = 256 - Mathf.Clamp(entry.priority * 2, 0, 256);
         voice.gain = entry.volume; voice.priority = entry.priority;
@@ -216,7 +218,7 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener
         Mathf.Clamp01(feedback.Settings.masterVolume) * Mathf.Clamp01(feedback.Settings.sfxVolume) : 0;
     public void RefreshVolumes()
     {
-        if (ChargeLoopActive && (counter == null || !counter.IsActive || counter.SelectedTarget == null ||
+        if (ChargeAccentActive && (counter == null || !counter.IsActive || counter.SelectedTarget == null ||
             !counter.SelectedTarget.ParticipatingInCombat)) StopCharge();
         float sum = 0;
         foreach (var voice in voices) if (voice != null && (voice.source.isPlaying || voice.paused)) sum += voice.gain;
