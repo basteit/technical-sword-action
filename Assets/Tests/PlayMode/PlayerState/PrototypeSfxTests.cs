@@ -312,6 +312,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [Test] public void InteractHasOneCueAndDoesNotCreateDashAudio()
         {
+            PrototypeDialogueFixture.Create(player);
             var target=Object.FindFirstObjectByType(T("DialogueInteractable2D")) as Component;
             body.position=new Vector2(target.transform.position.x,.81f); player.transform.position=body.position;
             Physics2D.SyncTransforms(); Call(player.GetComponent(T("PlayerInteractor2D")),"RefreshAfterTeleport"); Frames(2);

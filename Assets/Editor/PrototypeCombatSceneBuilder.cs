@@ -126,10 +126,6 @@ public static class PrototypeCombatSceneBuilder
                 var cue = enemy.AddComponent<EnemyCombatCue2D>(); Set(cue, "silhouette", silhouette.transform); Set(cue, "weapon", weapon.transform); Set(cue, "cue", cueObject.GetComponent<SpriteRenderer>());
                 enemy.SetActive(false);
             }
-            var interact = Box("InteractCounter", new Vector3(-6, .5f), new Vector2(.6f, 1), Color.cyan);
-            var trigger = interact.AddComponent<BoxCollider2D>(); trigger.size = new Vector2(2, 2); trigger.isTrigger = true;
-            interact.AddComponent<PrototypeInteractable2D>();
-            BasicActionValidationSceneBuilder.EnsureInteractValidation(player);
             var arena = new GameObject("PrototypeArena").AddComponent<PrototypeCombatArena>();
             Set(arena, "player", state);
             var arenaData = new SerializedObject(arena); var list = arenaData.FindProperty("enemies"); list.arraySize = 2;
@@ -137,7 +133,6 @@ public static class PrototypeCombatSceneBuilder
             arenaData.ApplyModifiedPropertiesWithoutUndo();
             player.SetActive(true);
             PrototypeActionStageInstaller.InstallIntoScene(scene);
-            PrototypeDialogueInstaller.InstallIntoScene(scene);
             AssetDatabase.SaveAssets();
             EditorSceneManager.SaveScene(scene, ScenePath);
         }

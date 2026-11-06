@@ -1,5 +1,7 @@
 # プロトタイプ会話（#51）
 
+2026-11-07更新: ユーザー指示により、普段遊ぶ`PrototypeCombatValidation`から会話テストの箱・専用Canvas・案内UIを撤去した。会話システム、Prefab、設定とサンプル台詞は保持し、自動テスト時だけ実行中のfixtureを作る。以下の初期導入・検証記録は履歴であり、現在のステージへ配置済みという意味ではない。詳細は[移動感調整記録](prototype-mobility-refinement-20261107.md)。
+
 ## 体験目的
 
 既存の調べる場所から、立ち絵と会話ボックスが自然に現れる短い会話を試し、後から受領する素材をコード変更なしで適用できるようにする。
@@ -43,9 +45,11 @@
 - 終了時は会話・表示・ロックをリセットし、Player入力と通常の時計を戻してEditModeへ復帰。対象Sceneの未保存変更なし、会話Validator問題0、Console Error0 / Warning0。
 - [検証要約](validation/prototype-dialogue-2026-10-25.json)。全体の13件を修正したり、変更前の完全な作業ツリーで全体テストをやり直したわけではない。
 
-## プロトタイプで試す
+## 会話だけ再確認する場合（明示的な再配置）
 
-1. `Assets/Scenes/PrototypeCombatValidation.unity` を開いてPlayする。古い配布ZIPは今回更新していない。
+普段のプロトタイプには含めない。自動テストは保存Sceneを編集せず、会話専用fixtureで実行する。人が再確認する必要があるときだけ、未保存変更を整理した`PrototypeCombatValidation`で`Tools/Technical Sword Action/Prototype/Install Dialogue Test`を明示的に実行してから以下を試す。確認後はEditModeで`Remove Dialogue Test From Stage`を実行して撤去できる。ステージ再生成での自動再配置は行わない。
+
+1. `Assets/Scenes/PrototypeCombatValidation.unity`を開き、上記の明示的な再配置後にPlayする。配布ZIPは今回更新していない。
 2. 初期位置から左へ移動し、既存の水色の調べる対象（world x=-6）へ近づく。
 3. `E / B 会話テスト` が出たらE、またはゲームパッドBで開く。最初は左キャラと `Test` が現れる。
 4. 一度キーを離してからE、Enter、Space、左クリック、ゲームパッドA/Bで次へ。2行目で右、3行目で左が話す。左は登場を繰り返さない。

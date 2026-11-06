@@ -64,7 +64,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [Test]
-        public void PrototypeSceneReplacesOnlyCounterAndWiresUnifiedStateGate()
+        public void PrototypeSceneOmitsDialogueTestsWithoutDeletingTheReusableSystem()
         {
             const string path = "Assets/Scenes/PrototypeCombatValidation.unity";
             Scene scene = SceneManager.GetSceneByPath(path);
@@ -72,20 +72,15 @@ namespace TechnicalSwordAction.PlayerState.Tests
             if (opened) scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
             try
             {
-                var target = scene.GetRootGameObjects().Single(r => r.name == "InteractCounter");
-                Assert.That(target.GetComponent(T("PrototypeInteractable2D")), Is.Null);
-                var dialogue = target.GetComponent(T("DialogueInteractable2D")); Assert.That(dialogue, Is.Not.Null);
-                Assert.That(target.GetComponent<Collider2D>().isTrigger, Is.True);
-                Assert.That(target.transform.position.x, Is.EqualTo(-6));
-                var data = new SerializedObject(dialogue);
-                Assert.That(data.FindProperty("sequence").objectReferenceValue, Is.SameAs(Asset("Dialogue_PrototypeTest")));
-                var controller = data.FindProperty("controller").objectReferenceValue as Component;
-                Assert.That(controller, Is.Not.Null);
-                var lockData = new SerializedObject(controller);
-                var player = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren(T("PlayerStateMachine"), true)).Single();
-                Assert.That(lockData.FindProperty("playerStateMachine").objectReferenceValue, Is.SameAs(player));
-                Assert.That(lockData.FindProperty("playerBody").objectReferenceValue, Is.SameAs(player.GetComponent<Rigidbody2D>()));
-                Assert.That(lockData.FindProperty("gameplayBehavioursToDisable").arraySize, Is.Zero, "Keep combat participants registered.");
+                var roots = scene.GetRootGameObjects();
+                Assert.That(roots.Select(r => r.name), Has.None.EqualTo("InteractCounter"));
+                Assert.That(roots.Select(r => r.name), Has.None.EqualTo("BasicActionPromptCanvas"));
+                Assert.That(roots.SelectMany(r => r.GetComponentsInChildren(T("DialogueController"), true)), Is.Empty);
+                Assert.That(roots.SelectMany(r => r.GetComponentsInChildren(T("DialogueInteractable2D"), true)), Is.Empty);
+                var player = roots.SelectMany(r => r.GetComponentsInChildren(T("PlayerStateMachine"), true)).Single();
+                Assert.That(player.GetComponent(T("PlayerInteractor2D")), Is.Not.Null, "Shared-B and future interactions remain supported.");
+                Assert.That(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/PrototypeDialogueSystem.prefab"), Is.Not.Null);
+                Assert.That(Asset("Dialogue_PrototypeTest"), Is.Not.Null);
             }
             finally { if (opened) EditorSceneManager.CloseScene(scene, true); }
         }
