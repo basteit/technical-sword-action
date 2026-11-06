@@ -28,6 +28,15 @@ SoundBibleの3作品は各作品ページでCC BY 3.0を確認した（[Sword Sw
 
 必須クレジットは `Assets/StreamingAssets/AudioCredits.txt` に置き、Unityの通常ビルドでData/StreamingAssets以下へそのまま同梱する。今回配布ZIPの再作成は行わない。ジャンプ以外の変更は上表7音と音量/一部ピッチだけで、反撃の蹴り・帯電、敵の口攻撃、足音などは保持した。
 
+### 再選定後の検証
+
+- Unity 6000.3.9f1 / ULoop 2.1.3: Compile Error 0 / Warning 0、最終Console Error 0 / Warning 0。
+- EditMode: `PrototypeSfxAssetTests` 15/15、`PrototypeCombatTrialAssetTests` 14/14。PlayMode: `PrototypeSfxTests` 29/29、`PrototypeCombatTrialTests` 65/65、`PrototypeCounterCinematicTests` 185/185。関連308件合格（全プロジェクト全テストではない）。
+- 全24音の現行ハッシュ・PCM/音量上限と原音ハッシュを検証。直前コミットとのバイト比較で変更7音/不変17音を確認。Git同梱原音だけの再加工も確認し、JumpのSHAと再生設定は固定した。StreamingAssetsの通知はTextAssetではなく素のファイルとして同梱されることに合わせて検証した。
+- `Test-Repository -Staged / -BaseRef 7781adf` と差分監査に合格。今回の要件追記6行だけを選択し、既存未コミットの原稿・Scene・README等は保持した。テスト後は保存済みPrototypeCombatValidation、未保存変更なし、PlayMode停止、背景再生falseへ復帰した。
+
+未実施: 人による15分の聴感/操作感、ヘッドホンとスピーカーでの高域の刺さり方、BGM併用、Development Build、配布ZIP更新。特に「空振り→命中→パリィ」の区別と、ジャンプ後の着地が浮かないかを確認する。自動テストは音源の好みの承認ではない。
+
 ## 体験目的
 
 現在の各モーションと、空振り・命中・弾き・反撃・被弾の違いを音でも確認でき、繰り返しても主要な接触音が埋もれない試遊版にする。
@@ -73,7 +82,7 @@ SoundBibleの3作品は各作品ページでCC BY 3.0を確認した（[Sword Sw
 - 各パックは公式ページと同梱License.txtでCC0を確認した。商用利用・加工・再配布可、クレジット任意。[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)
 - 取得日: 2026-11-07（日本時間）。原音・同梱ライセンスは `ThirdParty/KenneyAudio`、使用音は `Assets/Audio/PrototypeFreeSfx`、再加工手順は `Tools/Audio/Import-PrototypeSfx.ps1` に分離する。
 
-## 検証記録
+## 初回差し替え時の検証記録
 
 2026-11-07（日本時間）、Unity 6000.3.9f1 / ULoop 2.1.3、同じ作業フォルダで確認した。
 
@@ -96,13 +105,13 @@ SoundBibleの3作品は各作品ページでCC BY 3.0を確認した（[Sword Sw
 | 用途 | 使用音 | 発音位置 |
 | --- | --- | --- |
 | 足音 | FootstepA/B（concrete、交互） | 接地中・通常歩行の実移動1.3unitごと。立ち止まり/空中/攻撃移動では鳴らさない |
-| ジャンプ/着地 | Jump（cloth3）/Land（soft impact） | 受理された踏切/実接地。床抜けはジャンプ音なし |
+| ジャンプ/着地 | Jump（cloth3、維持）/Land（短い靴底接触） | 受理された踏切/実接地。床抜けはジャンプ音なし |
 | ダッシュ | Dash（knifeSlice2＋cloth2） | 実際の開始に1回。地上/空中共用 |
 | 攻撃1/2/3/4 | SwordA / SwordB / SwordAの音色差 / SwordIai | 各段のActive開始2F前。空振りでも動作音のみ再生 |
-| 通常命中/4段命中 | LightHit / HeavyHit（chop＋打撃） | 同一攻撃の実命中。同tickの多重Collider/複数命中は音を積まない |
+| 通常命中/4段命中 | LightHit / HeavyHit（高い剣の金属接触） | 同一攻撃の実命中。同tickの多重Collider/複数命中は音を積まない |
 | 納刀 | Sheathe（metalLatch＋clothBelt2） | 実際に復帰へ進んだ後半。次段へ接続した場合や中断時は予約しない |
 | パリィ構え/失敗 | ParryReady / ParryMiss | 開始/失敗時。小さな構え・衣擦れで成功の金属音と区別 |
-| パリィ成功/Just | ParryClang（金属＋plate） | 敵の攻撃ピークへ同期した表示インパクト。Justは小さな音色差だけで二重に重ねない |
+| パリィ成功/Just | ParryClang（高い剣衝突＋余韻） | 敵の攻撃ピークへ同期した表示インパクト。Justは小さな音色差だけで二重に重ねない |
 | 反撃転移/帯電 | CounterTransfer / CounterCharge（forceField） | BlinkStarted / ChargeStarted。帯電だけループし、解除/中断/対象消失で止める |
 | 蹴り出し/反撃命中 | Dashの短い音色差 / CounterImpact（重打撃＋低音＋薄い電気） | ChargeReleased / 実際のHitConfirmed。転移と命中を混同しない |
 | 被弾/死亡 | PlayerHit / Fall | 実ダメージ/死亡状態。死亡音を毎tick再開しない |
