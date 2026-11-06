@@ -23,8 +23,33 @@
 - 滞空はジャンプ頂点付近の**表示**であり、重力停止や新しい浮遊行動を追加しない。短いジャンプ/床抜け/足場離脱は実際の鉛直速度へ追従する。
 - 着地専用の原稿は今回届いていないため、既存の待機/歩行への復帰を維持し、#84全量完了とはしない。
 
+## Unityへの接続
+
+- 原稿のガイド専用 `Layer 1` が透明/黒線だけであることを確認し、出力用メモリ上だけ非表示にした。その他の表示/不透明度と画素は保持。原本を保存し直していない。
+- `Tools/Art/export-player-mobility.lua` がPNG10枚と原稿フレーム/時間のmanifestを出力する。Unityは32PPU・Point・非圧縮・MipMapなし・Pivot(32,38)・FullRect。旧48pxサンプルは削除せず、未作画AirRecoveryの代用と過去の証跡として保持する。
+- `Refresh Submitted Mobility Art` は既存Jump/Fall/DropThrough/Dashの4Clipと専用ArtSetだけを更新し、Scene/Controller/行動定義/動画Libraryを再生成しない。全素材のInstallからも受領移動を復元するため、再インストールで旧素材へ戻らない。
+- `[仮置き]` 表示の踏切は3コマ×各3F（9F）、上昇は4コマ目を保持。鉛直速度±2unit/sの頂点付近は5/6コマを3Fずつ交互にし、その後7を保持する。早離しは実速度に従い、短い軌道へ無理に全区間を押し込まない。原稿の100/300msと、ゲーム表示への配分を区別する。
+- 表示処理はAnimator評価後の戦闘tick末尾にSpriteだけを選ぶ。Attack/Parry/Special/Hit/Death等の行動中は選択を止める。空中Dashは通常Clipが担当し、着地/床抜け/Resetで踏切や頂点を持ち越さない。Pause/Hitstop中は戦闘tickを進めないため姿勢も進めない。診断StateグループでMobility phase/原稿コマ番号を確認できる。
+- ダッシュ3コマは既存Clipの長さへ100:100:300の比率で収める。速度・距離・無敵・空中回数・SE・カメラは変更しない。登録版のPNG/Clip/参照を確認してから使用版をrecord-useで記録する。
+
 ## 検証
 
 - パリィ実装: Compile Error 0 / Warning 0、ProximityParry 25/25、既存PrototypeCombatContract 97/97。全16方向/地空の組合せ、距離/高さ/不可/壁/受付外、通常被弾、同tick複数個体、legacy攻撃を確認。初回の同時攻撃テストはSceneの攻撃役上限で準備に失敗したため、テスト内だけ独立攻撃役にして再実行した。
 - 続くCombatPolishの起動でTest Runnerの一時Scene復元が失敗し中断。テストCLIを終了し、当該テストが作った一時Sceneだけを保存せず閉じ、保存済みPrototypeCombatValidation（dirty=false）へ復旧した。ユーザーの未保存Sceneは操作していない。この範囲は合格とせず、後で再実行する。
-- 原稿ライブラリvalidateと管理ツール20テストが合格。素材登録とUnityへの接続/使用版の検証は別に記録する。移動素材のUnity接続はまだ未実施。
+- 原稿ライブラリvalidateと管理ツール20テストが合格。添付=Current=HistoryのSHA-256一致を両原稿で確認した。
+- 移動接続後のCompile Error 0 / Warning 0、全EditMode 343/343、専用Mobility PlayMode 12/12。30/60/120fpsの全7コマ、左右、早離し、地上/空中Dash、Attack/Parry/Specialの中断、床抜け、Pause/Resetを確認した。
+- 素材更新メニューの再実行で4Clip/ArtSet、Prototype Scene、攻撃/パリィ定義、Motor、動画Libraryの10ハッシュが不変。
+- 全PlayModeは928件中915合格・13失敗・Skip0。CLIの180秒上限後もUnity側が継続していたため、917/928の進捗を読み取り、完了後にConsoleが示したTestResults.xmlを取得した（265.485秒）。タイムアウトを合格ともテスト停止とも扱っていない。
+- 13失敗は動画キックの揺れ2件、停止時間9Fと旧期待8Fの差3件、防御キャンセル動画4段版の完了条件7件、旧移動テストの5F接触をJustとする期待1件。新しい近距離probeを一時OFF・legacy距離ゲートを戻した比較24件でも同じ13件が失敗し、失敗名/Assertion文面が全件一致した。これらは今回の近距離判定とは切り離して未修正とし、動画や過去の期待値を無断変更しない。
+- 比較後は近距離probeをONへ戻し、コンパイル0/0と新規ProximityParry25+Mobility12=37/37を再確認。仮のOFFコードは残していない。全PlayModeを合格とは記載しない。
+- 実画面1920×1080・通常Camera Size5.625で、踏切2/頂点6/落下7/左Dash3を目視した。頂点6で6Fの停止を要求し、3F進めても位置/Spriteが同一であることを確認。4画面は[検証画像フォルダ](validation/prototype-mobility-20261107/)へ保存した。
+- 入力/診断表示/手動時計を戻し、敵なしへリセットしてPlayModeを終了。最終Console Error0 / Warning0。物理ゲームパッド、15分操作、Development Build/配布ZIP更新、ジャンプの髪、着地専用作画は未実施。#84/#34/#50はクローズしない。
+
+## 人による確認
+
+- [ ] 押し続け/早離しの踏切・頂点の見え方、足場着地、床抜けのつながり。
+- [ ] 左右の地上/空中Dash、終端の姿勢、髪と描かれたエフェクト。
+- [ ] 敵の背後へ回った場合と敵が外側へ攻撃した場合の近距離パリィ、範囲外/不可攻撃での失敗の納得感。
+- [ ] 物理パッド/キーボード各15分、操作感と耳/画面の疲労感、Development Build。
+
+既存13失敗は上記のまま別途整理する。新規37件の合格や素材使用版の記録を、これらや全24モーションの完了へ読み替えない。

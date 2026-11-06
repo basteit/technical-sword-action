@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>Moves/resizes the drawing, never the body or its collision/hit origins.</summary>
 [ExecuteAlways, DisallowMultipleComponent, DefaultExecutionOrder(12000)]
-public sealed class PrototypePlayerArtPresentation : MonoBehaviour
+public sealed class PrototypePlayerArtPresentation : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     [SerializeField] private SpriteRenderer source;
     [SerializeField] private SpriteRenderer artwork;
@@ -12,6 +12,13 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour
     private bool ownsVisibility;
     private object impactOffsetOwner;
     private float impactOffsetX;
+    private PlayerStateMachine state;
+    private PlayerMotor2D motor;
+    private PlayerAttack2D attack;
+    private long jumpStartTick = -1, apexStartTick = -1;
+    public string MobilityPhase { get; private set; } = "None";
+    public int MobilitySourceFrame { get; private set; }
+    public int CombatTickOrder => 1200;
 
     public SpriteRenderer Artwork => artwork;
     public PrototypePlayerArtSet ArtSet => artSet;
@@ -31,8 +38,61 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour
         RefreshVisual();
     }
 
-    private void OnEnable() => RefreshVisual();
+    private void OnEnable()
+    {
+        state = GetComponent<PlayerStateMachine>(); motor = GetComponent<PlayerMotor2D>(); attack = GetComponent<PlayerAttack2D>();
+        ResetMobility();
+        if (Application.isPlaying)
+        {
+            CombatTimeController.Register(this);
+            CombatTimeController.SessionReset += ResetMobility;
+        }
+        RefreshVisual();
+    }
     private void LateUpdate() => RefreshVisual();
+
+    public void CombatTick()
+    {
+        if (state != null && motor != null && state.LastDecisionTick == CombatTimeController.TickCount &&
+            state.LastAcceptedRequest == TechnicalSwordAction.PlayerState.PlayerActionRequest.Jump && !motor.IsDroppingThrough)
+        { jumpStartTick = CombatTimeController.TickCount; apexStartTick = -1; }
+    }
+
+    public void CombatTickTimers()
+    {
+        MobilityPhase = "None"; MobilitySourceFrame = 0;
+        if (source == null || artSet == null || !artSet.HasSubmittedJump || state == null || motor == null) return;
+        if (motor.IsGrounded) { jumpStartTick = apexStartTick = -1; }
+        if (state.LifeState != TechnicalSwordAction.PlayerState.PlayerLifeState.Alive) return;
+        if (state.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.Dash)
+        { MobilityPhase = "Dash"; return; } // Its normal clip owns the submitted three-cel dash.
+        if (state.ActionState != TechnicalSwordAction.PlayerState.PlayerActionState.Neutral ||
+            attack != null && attack.IsRecovering || motor.IsGrounded || DialogueController.GameplayInputBlocked) return;
+
+        int index;
+        float speed = motor.Velocity.y;
+        long elapsed = jumpStartTick >= 0 ? CombatTimeController.TickCount - jumpStartTick : long.MaxValue;
+        int takeoff = Mathf.Max(1, artSet.takeoffCelFrames);
+        if (elapsed < takeoff * 3 && speed > artSet.apexVerticalSpeed)
+        { index = (int)(elapsed / takeoff); MobilityPhase = "Takeoff"; }
+        else if (speed > artSet.apexVerticalSpeed)
+        { index = 3; MobilityPhase = "Rise"; }
+        else if (jumpStartTick >= 0 && speed >= -artSet.apexVerticalSpeed && !motor.IsDroppingThrough)
+        {
+            if (apexStartTick < 0) apexStartTick = CombatTimeController.TickCount;
+            index = 4 + (int)((CombatTimeController.TickCount - apexStartTick) / Mathf.Max(1, artSet.apexCelFrames) % 2);
+            MobilityPhase = "Apex";
+        }
+        else { index = 6; MobilityPhase = "Fall"; }
+        MobilitySourceFrame = index + 1;
+        // Animator evaluation has already finished for this tick. Override only its sprite,
+        // never the action, gravity, body, timing, facing or input ownership.
+        source.sprite = artSet.jumpFrames[index];
+        RefreshVisual();
+    }
+
+    private void ResetMobility()
+    { jumpStartTick = apexStartTick = -1; MobilityPhase = "None"; MobilitySourceFrame = 0; }
 
     public void RefreshVisual()
     {
@@ -64,6 +124,9 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour
 
     private void OnDisable()
     {
+        CombatTimeController.Unregister(this);
+        CombatTimeController.SessionReset -= ResetMobility;
+        ResetMobility();
         impactOffsetOwner = null; impactOffsetX = 0;
         RefreshVisual();
         ReleaseVisibility();

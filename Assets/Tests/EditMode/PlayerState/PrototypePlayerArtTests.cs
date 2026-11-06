@@ -97,11 +97,28 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var feet = (Sprite[])Field(Set, "feetPivotSprites");
             Assert.That(feet.Length, Is.EqualTo(6));
             Assert.That(feet.All(sprite => Mathf.Approximately(sprite.pixelsPerUnit, 100)), Is.True);
-            Assert.That(Keys("Jump").Select(key => key.value).Distinct().Count(), Is.EqualTo(6));
-            foreach (string action in new[] { "Heal", "Death", "Hit", "Rest", "Respawn", "Special", "Fall" })
+            Assert.That(Keys("Jump").Select(key => key.value).Distinct().Count(), Is.EqualTo(4));
+            foreach (string action in new[] { "Heal", "Death", "Hit", "Rest", "Respawn", "Special" })
                 Assert.That(Field(Entry(action), "status").ToString(), Is.EqualTo("Substitute"), action);
+            Assert.That(Field(Entry("Fall"),"status").ToString(),Is.EqualTo("SubmittedProvisional"),"The new jump still has unfinished hair.");
             Assert.That(Field(Entry("ParryCounter"), "source"), Is.EqualTo("CounterTransfer + CounterKick"));
             Assert.That(Field(Entry("ParryCounter"), "status").ToString(), Is.EqualTo("SubmittedProvisional"), "The received kick includes a provisional transfer; do not label the whole motion finished.");
+        }
+
+        [Test] public void SubmittedMobilityHasSevenMappedJumpCelsAndThreeDashCels()
+        {
+            var jump=(Sprite[])Field(Set,"jumpFrames");Assert.That(jump.Length,Is.EqualTo(7));
+            Assert.That(jump.All(s=>s!=null&&s.rect.size==new Vector2(64,64)&&s.pivot==new Vector2(32,38)&&s.pixelsPerUnit==32),Is.True);
+            Assert.That(Keys("Jump").Take(4).Select(k=>k.value),Is.EqualTo(jump.Take(4)));
+            foreach(string action in new[]{"Fall","DropThrough"}) Assert.That(Keys(action).All(k=>k.value==jump[6]),Is.True);
+            Assert.That(Keys("Dash").Select(k=>k.value).Distinct().Count(),Is.EqualTo(3));
+            Assert.That(Field(Entry("Dash"),"status").ToString(),Is.EqualTo("Received"));
+            foreach(var sprite in jump.Concat(Keys("Dash").Select(k=>(Sprite)k.value)).Distinct())
+            {
+                var importer=(TextureImporter)AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(sprite));
+                Assert.That(importer.filterMode,Is.EqualTo(FilterMode.Point));Assert.That(importer.mipmapEnabled,Is.False);
+                Assert.That(importer.textureCompression,Is.EqualTo(TextureImporterCompression.Uncompressed));
+            }
         }
     }
 }

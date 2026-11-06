@@ -17,7 +17,81 @@ public static class PrototypePlayerArtInstaller
     public const string PresentationControllerPath = Folder + "/PlayerSubmittedBase.controller";
     public const string SetPath = "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset";
     public const string BaseControllerPath = "Assets/Animations/Player/Prototype/PlayerPrototypeAnimator.controller";
+    public const string MobilityFolder = "Assets/Art/Player/MobilitySubmitted";
     private static readonly EditorCurveBinding SpriteBinding = EditorCurveBinding.PPtrCurve("", typeof(SpriteRenderer), "m_Sprite");
+
+    [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Submitted Mobility Art")]
+    public static void RefreshSubmittedMobilityArt()
+    {
+        if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode before updating artwork.");
+        var set = AssetDatabase.LoadAssetAtPath<PrototypePlayerArtSet>(SetPath);
+        if (set == null) throw new InvalidOperationException("Install the prototype artwork first.");
+        RefreshMobilityAssets(set);
+        EditorUtility.SetDirty(set); AssetDatabase.SaveAssetIfDirty(set);
+        ValidateOrThrow();
+    }
+
+    private static void RefreshMobilityAssets(PrototypePlayerArtSet set)
+    {
+        Sprite[] Load(string prefix, int count)
+        {
+            var frames = new Sprite[count];
+            for (int i = 0; i < count; i++)
+            {
+                string path = $"{MobilityFolder}/{prefix}_{i + 1:00}.png";
+                var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (importer == null) throw new InvalidOperationException("Missing received mobility export: " + path);
+                var settings = new TextureImporterSettings(); importer.ReadTextureSettings(settings);
+                bool changed = importer.textureType != TextureImporterType.Sprite || importer.spriteImportMode != SpriteImportMode.Single ||
+                    importer.spritePixelsPerUnit != 32 || importer.filterMode != FilterMode.Point || importer.mipmapEnabled ||
+                    importer.textureCompression != TextureImporterCompression.Uncompressed ||
+                    settings.spriteAlignment != (int)SpriteAlignment.Custom || settings.spritePivot != new Vector2(.5f,38f/64) ||
+                    settings.spriteMeshType != SpriteMeshType.FullRect;
+                if (changed)
+                {
+                    importer.textureType = TextureImporterType.Sprite; importer.spriteImportMode = SpriteImportMode.Single;
+                    importer.spritePixelsPerUnit = 32; importer.filterMode = FilterMode.Point; importer.mipmapEnabled = false;
+                    importer.textureCompression = TextureImporterCompression.Uncompressed;
+                    settings.textureType = TextureImporterType.Sprite; settings.spriteMode = (int)SpriteImportMode.Single;
+                    settings.spritePixelsPerUnit = 32; settings.filterMode = FilterMode.Point; settings.mipmapEnabled = false;
+                    settings.spriteAlignment = (int)SpriteAlignment.Custom; settings.spritePivot = new Vector2(.5f,38f/64);
+                    settings.spriteMeshType = SpriteMeshType.FullRect; importer.SetTextureSettings(settings);
+                    importer.SaveAndReimport();
+                }
+                frames[i] = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                if (frames[i] == null) throw new InvalidOperationException("Missing mobility sprite: " + path);
+            }
+            return frames;
+        }
+        var jump = Load("Jump",7); var dash = Load("Dash",3);
+        set.jumpFrames = jump;
+        // Display tuning only; the native 100/300ms source and movement physics are preserved.
+        set.takeoffCelFrames = Mathf.Max(1,set.takeoffCelFrames);
+        set.apexCelFrames = Mathf.Max(1,set.apexCelFrames);
+        foreach (string action in new[] { "Jump", "Fall", "DropThrough", "Dash" })
+        {
+            var entry = set.Find(action);
+            if (entry == null || entry.clip == null) throw new InvalidOperationException("Missing prototype action: " + action);
+            var clip = entry.clip; var settings = AnimationUtility.GetAnimationClipSettings(clip);
+            float end = settings.stopTime, last = Mathf.Max(0,end-1f/clip.frameRate);
+            var keys = new List<ObjectReferenceKeyframe>();
+            void Key(float time,Sprite sprite) => keys.Add(new ObjectReferenceKeyframe { time=time, value=sprite });
+            if (action == "Jump")
+            {
+                for (int i=0;i<3;i++) Key(i*set.takeoffCelFrames/60f,jump[i]);
+                Key(3*set.takeoffCelFrames/60f,jump[3]); Key(last,jump[3]);
+            }
+            else if (action == "Dash")
+            { Key(0,dash[0]);Key(end*.2f,dash[1]);Key(end*.4f,dash[2]);Key(last,dash[2]); }
+            else { Key(0,jump[6]);Key(last,jump[6]); }
+            AnimationUtility.SetObjectReferenceCurve(clip,SpriteBinding,keys.Where(k=>k.time<=last)
+                .GroupBy(k=>k.time).Select(g=>g.Last()).OrderBy(k=>k.time).ToArray());
+            AnimationUtility.SetAnimationClipSettings(clip,settings);
+            entry.source = action == "Dash" ? "Player_dash (3 received cels)" : "Player_jamp (1-3 takeoff / 4 rise / 5-6 apex / 7 fall)";
+            entry.status = action == "Dash" ? Status.Received : Status.SubmittedProvisional;
+            EditorUtility.SetDirty(clip); AssetDatabase.SaveAssetIfDirty(clip);
+        }
+    }
 
     [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Walking Display Crops")]
     public static void RefreshWalkingDisplayCrops()
@@ -288,6 +362,8 @@ public static class PrototypePlayerArtInstaller
         set.controller = controller; set.entries = entries.ToArray();
         var cinematic = player.GetComponent<PlayerParryCounter2D>().CinematicProfile;
         if (cinematic != null) PrototypeCounterCinematicInstaller.ApplyCounterArtwork(set, cinematic);
+        // A full reinstall must not restore the old 48px jump or rough dash after this opt-in submission.
+        if (AssetDatabase.IsValidFolder(MobilityFolder)) RefreshMobilityAssets(set);
         EditorUtility.SetDirty(controller); AssetDatabase.SaveAssetIfDirty(controller);
         EditorUtility.SetDirty(set); AssetDatabase.SaveAssetIfDirty(set);
         return set;

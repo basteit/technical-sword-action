@@ -2031,7 +2031,7 @@
     "jump_start": {
       "name": "ジャンプ開始サンプル",
       "status": "sample",
-      "notes": "既存の48pxサンプル。サイズや接地位置をこの整理で描き直さない。",
+      "notes": "既存48pxサンプルを原本のまま保持。2026-11-07以降のJumpはjump原稿へ差し替え済みで、この使用記録は初回接続の履歴。",
       "current": "Current/Player_jamp_start_sample.aseprite",
       "current_sha256": "6cda4621e97cd420d8999513bd3cbdf384dbdfb57e0e3779b74173196aaa33c0",
       "revisions": [
@@ -2089,7 +2089,7 @@
       ],
       "uses": [
         {
-          "consumer": "prototype",
+          "consumer": "prototype-legacy-20261018",
           "motion": "Jump",
           "source_sha256": "6cda4621e97cd420d8999513bd3cbdf384dbdfb57e0e3779b74173196aaa33c0",
           "references": [
@@ -2103,7 +2103,7 @@
     "jump_up": {
       "name": "ジャンプ上昇サンプル",
       "status": "sample",
-      "notes": "既存の48px・1コマ。落下専用の完成原画とは区別。",
+      "notes": "既存48px・1コマを保持。現在は未作画AirRecoveryだけの仮代用。Jump/Fall/DropThroughはjump原稿の受領版へ差し替え済み。",
       "current": "Current/Player_jamp_up_sample.aseprite",
       "current_sha256": "c88edc2b0c0b9cd52195efd8edfd09f959856059f11213e572c3e28b1d94f063",
       "revisions": [
@@ -2146,13 +2146,13 @@
       "uses": [
         {
           "consumer": "prototype",
-          "motion": "Jump/Fall/DropThrough/AirRecovery",
+          "motion": "AirRecovery (legacy sample substitute only)",
           "source_sha256": "c88edc2b0c0b9cd52195efd8edfd09f959856059f11213e572c3e28b1d94f063",
           "references": [
             "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
-            "Assets/Scenes/PrototypeCombatValidation.unity"
+            "Assets/Animations/Player/Submitted/PlayerPrototype_AirRecovery.anim"
           ],
-          "evidence": "docs/validation/prototype-player-art-2026-10-18.json"
+          "evidence": "docs/prototype-mobility-and-proximity-parry.md"
         }
       ]
     },
@@ -2469,6 +2469,198 @@
             "docs/video/final/technical-sword-action-final-20261025.mp4"
           ],
           "evidence": "docs/video/final/README.md"
+        }
+      ]
+    },
+    "jump": {
+      "name": "ジャンプ（踏切・上昇・滞空・落下）",
+      "status": "provisional",
+      "notes": "2026-11-07受領。髪は未完成。1〜3踏切、4上昇、5〜6滞空、7落下として分割使用。登録とUnity反映・検証は別に記録する。",
+      "current": "Current/Player_jamp.aseprite",
+      "current_sha256": "a7710882bd03ee8d7e5cab73bc698afc00929d78cc6fa459216208e66b3c9f6d",
+      "revisions": [
+        {
+          "sha256": "a7710882bd03ee8d7e5cab73bc698afc00929d78cc6fa459216208e66b3c9f6d",
+          "file": "History/jump/a7710882bd03ee8d7e5cab73bc698afc00929d78cc6fa459216208e66b3c9f6d.aseprite",
+          "original_name": "Player_jamp.aseprite",
+          "registered_at": "2026-11-06T21:32:14+00:00",
+          "received_on": "2026-11-07",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 300,
+                "frame": 7
+              }
+            ],
+            "height": 64,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 102,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 64
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "prototype",
+          "motion": "Jump/Takeoff/Rise/Apex/Fall/DropThrough",
+          "source_sha256": "a7710882bd03ee8d7e5cab73bc698afc00929d78cc6fa459216208e66b3c9f6d",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Animations/Player/Submitted/PlayerPrototype_Jump.anim",
+            "Assets/Animations/Player/Submitted/PlayerPrototype_Fall.anim",
+            "Assets/Animations/Player/Submitted/PlayerPrototype_DropThrough.anim"
+          ],
+          "evidence": "docs/prototype-mobility-and-proximity-parry.md"
+        }
+      ]
+    },
+    "dash": {
+      "name": "ダッシュ",
+      "status": "received",
+      "notes": "2026-11-07受領。地上・空中Dashの共通表示へ接続し、専用PlayModeで確認済み。移動性能と無敵時間を保持し、人による最終受入とは区別する。",
+      "current": "Current/Player_dash.aseprite",
+      "current_sha256": "1b9ea26adb22f9c7a61260715a8d1d08ed13a4bc1c8f64ed2144868589d13250",
+      "revisions": [
+        {
+          "sha256": "1b9ea26adb22f9c7a61260715a8d1d08ed13a4bc1c8f64ed2144868589d13250",
+          "file": "History/dash/1b9ea26adb22f9c7a61260715a8d1d08ed13a4bc1c8f64ed2144868589d13250.aseprite",
+          "original_name": "Player_dash.aseprite",
+          "registered_at": "2026-11-06T21:32:15+00:00",
+          "received_on": "2026-11-07",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 300,
+                "frame": 3
+              }
+            ],
+            "height": 64,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
+                "opacity": 128,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 0,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 64
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "prototype",
+          "motion": "Dash",
+          "source_sha256": "1b9ea26adb22f9c7a61260715a8d1d08ed13a4bc1c8f64ed2144868589d13250",
+          "references": [
+            "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+            "Assets/Animations/Player/Submitted/PlayerPrototype_Dash.anim"
+          ],
+          "evidence": "docs/prototype-mobility-and-proximity-parry.md"
         }
       ]
     }
