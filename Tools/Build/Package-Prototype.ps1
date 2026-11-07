@@ -34,8 +34,19 @@ foreach ($item in $required) { if (-not (Test-Path -LiteralPath (Join-Path $pack
 $files = @(Get-ChildItem -LiteralPath $package -Recurse -File -Force)
 $unexpected = @($files | Where-Object { $_.Name -match '(^UnityEditor.*\.dll$|^Assembly-CSharp-Editor\.dll$|\.(cs|aseprite|psd|pdb)$)' })
 if ($unexpected.Count) { throw ('Editor/source/debug files in package: ' + ($unexpected.Name -join ', ')) }
-Compress-Archive -LiteralPath $package -DestinationPath $zip -CompressionLevel Optimal
+Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+# Write ZIP-standard relative paths even under Windows PowerShell, where
+# Compress-Archive can store backslashes and fail cross-tool extraction.
+$writer = [IO.Compression.ZipFile]::Open($zip, [IO.Compression.ZipArchiveMode]::Create)
+try {
+    foreach ($file in $files) {
+        $relative = $file.FullName.Substring($package.Length + 1).Replace('\', '/')
+        [IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+            $writer, $file.FullName, ('TechnicalSwordAction-Prototype/' + $relative),
+            [IO.Compression.CompressionLevel]::Optimal) | Out-Null
+    }
+} finally { $writer.Dispose() }
 $archive = [IO.Compression.ZipFile]::OpenRead($zip)
 try {
     $entries = @($archive.Entries | Where-Object { -not $_.FullName.EndsWith('/') })
