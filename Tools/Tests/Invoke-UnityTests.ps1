@@ -1,7 +1,7 @@
 param(
-    [ValidateSet('daily', 'movement', 'input', 'combat', 'presentation', 'audio', 'dialogue', 'video', 'video-acceptance', 'all')]
+    [ValidateSet('daily', 'movement', 'input', 'combat', 'presentation', 'audio', 'dialogue', 'all')]
     [string]$Suite = 'daily',
-    [ValidateSet('daily', 'movement', 'input', 'combat', 'presentation', 'audio', 'dialogue', 'video', 'video-acceptance', 'all')]
+    [ValidateSet('daily', 'movement', 'input', 'combat', 'presentation', 'audio', 'dialogue', 'all')]
     [string[]]$AdditionalSuite = @(),
     [string]$ULoop = 'C:\Users\hirot\AppData\Roaming\npm\uloop.cmd',
     [switch]$PlanOnly

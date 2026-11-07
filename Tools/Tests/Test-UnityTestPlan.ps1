@@ -47,25 +47,14 @@ try {
     foreach ($critical in @('CombatTimeIntegrationTests','PlayerInputRouterTests','PlayerStateContractTests','PlayerBasicActionsTests','PlayerAttackMotionTests','PrototypeCombatContractTests','ProximityParryTests','PrototypeMobilityArtTests','PrototypeActionStageTests','PrototypePlayerMovementFixTests')) {
         Assert-Plan ($plans['daily'].fixtures -contains $critical) ('Daily omits critical fixture: ' + $critical)
     }
-    foreach ($optional in @('CombatVideoIntegrationTests','DefenseCancelShowcaseTests','VideoStudioTests','PrototypeDialogueTests')) {
+    foreach ($optional in @('PrototypeCounterCinematicTests','PrototypeSfxTests','PrototypeDialogueTests')) {
         Assert-Plan ($plans['daily'].fixtures -notcontains $optional) ('Daily unexpectedly includes optional fixture: ' + $optional)
     }
-    $four = 'TechnicalSwordAction.PlayerState.Tests.DefenseCancelShowcaseTests.AttackCancelCounterDashAndReturnComboUseTheActualStateAndTarget(4,60,False)'
-    $two = $four.Replace('(4,60,False)', '(2,60,False)')
-    $resets = 'TechnicalSwordAction.PlayerState.Tests.DefenseCancelShowcaseTests.BothEndingsAndBothDirectionsResetTenTimesEach'
-    foreach ($legacy in @($four, $resets)) {
-        Assert-Plan ($legacy -notmatch $plans['video'].filterValue) 'Video includes legacy time acceptance.'
-        Assert-Plan ($legacy -match $plans['video-acceptance'].filterValue) 'Legacy acceptance suite misses its case.'
-        Assert-Plan ($legacy -match $plans['all'].filterValue) 'All hides legacy acceptance.'
-    }
-    Assert-Plan ($two -match $plans['video'].filterValue) 'Video accidentally excludes the normal two-stage case.'
-    Assert-Plan ($two -notmatch $plans['video-acceptance'].filterValue) 'Legacy acceptance includes the normal two-stage case.'
-    $parameterizedParent = $four.Substring(0, $four.IndexOf('('))
-    Assert-Plan ($parameterizedParent -notmatch $plans['video'].filterValue) 'Video selects a parent suite that pulls legacy cases back in.'
-    Assert-Plan ($parameterizedParent -notmatch $plans['video-acceptance'].filterValue) 'Acceptance selects a parent suite that pulls two-stage cases in.'
-    $combined = & (Join-Path $PSScriptRoot 'Get-UnityTestPlan.ps1') -Suite daily -AdditionalSuite @('movement','video')
-    Assert-Plan ($four -notmatch $combined.filterValue) 'Combined selection unexpectedly includes legacy acceptance.'
-    Assert-Plan ($two -match $combined.filterValue) 'Combined selection loses video regression.'
+    $combined = & (Join-Path $PSScriptRoot 'Get-UnityTestPlan.ps1') -Suite daily -AdditionalSuite @('movement','audio')
+    $audio = 'TechnicalSwordAction.PlayerState.Tests.PrototypeSfxTests.Example(60,True)'
+    $dialogue = 'TechnicalSwordAction.PlayerState.Tests.PrototypeDialogueTests.Example(60,True)'
+    Assert-Plan ($audio -match $combined.filterValue) 'Combined selection loses audio.'
+    Assert-Plan ($dialogue -notmatch $combined.filterValue) 'Combined selection unexpectedly includes dialogue.'
     $movement = 'TechnicalSwordAction.PlayerState.Tests.PrototypeMobilityArtTests.Example(60,True)'
     Assert-Plan ($movement -match $combined.filterValue) 'Combined selection loses movement.'
     $counts = @()

@@ -34,4 +34,6 @@
 
 旧3〜6秒の受入7件は`video-acceptance`へ分離し、`video`の通常回帰からは除外した。`all`では引き続き実行し、未達を隠さない。標準daily287/287と、補正後のvideo267/267が合格。最終`all`は949件中942合格・7失敗・Skip0で、残った失敗はこの旧動画受入7件だけ。新しい失敗はない。分類と実行条件は[テスト実行方針](../test-policy.md)を参照する。
 
-参照コード: [動画テスト](../../Assets/Tests/PlayMode/PlayerState/CombatVideoIntegrationTests.cs)、[防御キャンセル動画テスト](../../Assets/Tests/PlayMode/PlayerState/DefenseCancelShowcaseTests.cs)、[動画Director](../../Assets/Scripts/Video/CombatVideoDirector.cs)、[動画演出](../../Assets/Scripts/Video/VideoCombatPresentation.cs)、[敵の吹っ飛び](../../Assets/Scripts/Video/VideoEnemyAnimationDriver.cs)、[旧パリィ期待値テスト](../../Assets/Tests/PlayMode/PlayerState/PrototypePlayerMovementFixTests.cs)。
+その後、動画制作の完了に伴い、旧3〜6秒受入を含む撮影専用テストを廃止した。上記の件数・実行手順は廃止前の記録であり、ゲーム設定を変えて旧受入を満たしたことを意味しない。
+
+参照コード: 廃止前の `CombatVideoIntegrationTests` と `DefenseCancelShowcaseTests` はコミット `824f2f6`。現行の[動画Director](../../Assets/Scripts/Video/CombatVideoDirector.cs)、[動画演出](../../Assets/Scripts/Video/VideoCombatPresentation.cs)、[敵の吹っ飛び](../../Assets/Scripts/Video/VideoEnemyAnimationDriver.cs)、[パリィ境界テスト](../../Assets/Tests/PlayMode/PlayerState/PrototypePlayerMovementFixTests.cs)は保持。

@@ -8,9 +8,7 @@
     "presentation": "Counter/parry cinematics, camera, VFX, enemy and player artwork.",
     "audio": "Motion/result SFX, silence, cancellation and audio ownership.",
     "dialogue": "Optional dialogue runtime fixtures; not installed in the playable prototype.",
-    "video": "Capture tooling regression, excluding the old six-second acceptance gate.",
-    "video-acceptance": "Legacy capture acceptance: the old 3-6 second budget, currently not met by the four-stage take.",
-    "all": "All PlayMode tests, including the still-failing legacy video acceptance gate."
+    "all": "All maintained PlayMode tests."
   },
   "fixtures": [
     { "name": "CombatTimeIntegrationTests", "suites": ["daily", "movement", "combat", "presentation"] },
@@ -31,16 +29,6 @@
     { "name": "PrototypeCounterCinematicTests", "suites": ["combat", "presentation"] },
     { "name": "PrototypeCombatTrialTests", "suites": ["combat"] },
     { "name": "PrototypeSfxTests", "suites": ["audio"] },
-    { "name": "PrototypeDialogueTests", "suites": ["dialogue"] },
-    { "name": "CombatVideoIntegrationTests", "suites": ["video"] },
-    { "name": "DefenseCancelShowcaseTests", "suites": ["video"] },
-    { "name": "VideoStudioTests", "suites": ["video"] }
-  ],
-  "videoAcceptancePatterns": [
-    "DefenseCancelShowcaseTests\\.AttackCancelCounterDashAndReturnComboUseTheActualStateAndTarget\\(4,",
-    "DefenseCancelShowcaseTests\\.BothEndingsAndBothDirectionsResetTenTimesEach"
-  ],
-  "videoExcludedParentPatterns": [
-    "DefenseCancelShowcaseTests\\.AttackCancelCounterDashAndReturnComboUseTheActualStateAndTarget$"
+    { "name": "PrototypeDialogueTests", "suites": ["dialogue"] }
   ]
 }
