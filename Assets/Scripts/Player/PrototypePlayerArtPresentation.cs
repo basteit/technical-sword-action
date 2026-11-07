@@ -118,21 +118,26 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour, ICombatTickL
         }
         source.forceRenderingOff = true;
         artwork.enabled = source.enabled;
-        artwork.sprite = artSet.DisplaySpriteFor(source.sprite);
+        // The hit can be resolved after the Animator's state was chosen for this tick.
+        // Draw the temporary standing contact pose even if that tick begins hitstop.
+        Sprite pose = Application.isPlaying && state != null &&
+            state.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.Hit
+            ? artSet.Find("Hit")?.contactSprite ?? source.sprite : source.sprite;
+        artwork.sprite = artSet.DisplaySpriteFor(pose);
         artwork.color = source.color;
         artwork.flipX = source.flipX; artwork.flipY = source.flipY;
         artwork.sortingLayerID = source.sortingLayerID;
         artwork.sortingOrder = Mathf.Max(source.sortingOrder, artSet.foregroundSortingOrder);
         artwork.sharedMaterial = source.sharedMaterial;
-        if (source.sprite == null) return;
+        if (pose == null) return;
 
         // Some unmodified Aseprite samples are 100 PPU with a bottom pivot.
         // Normalize their displayed pixels without reimporting or editing the artist's files.
-        float scale = source.sprite.pixelsPerUnit / Mathf.Max(1f, artSet.pixelsPerUnit);
+        float scale = pose.pixelsPerUnit / Mathf.Max(1f, artSet.pixelsPerUnit);
         artwork.transform.localScale = new Vector3(scale, scale, 1f);
         float feetY = body.offset.y - body.size.y * .5f;
         artwork.transform.localPosition = new Vector3(0,
-            feetY + (artSet.IsFeetPivot(source.sprite) ? 0 : artSet.commonFeetBelowPivot), 0) +
+            feetY + (artSet.IsFeetPivot(pose) ? 0 : artSet.commonFeetBelowPivot), 0) +
             artwork.transform.parent.InverseTransformVector(Vector3.right * impactOffsetX);
     }
 

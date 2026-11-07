@@ -155,6 +155,37 @@ namespace TechnicalSwordAction.PlayerState.Tests
             finally { Object.DestroyImmediate(target); }
         }
 
+        [TestCase(false,-1)] [TestCase(true,1)]
+        public void NonlethalHitUsesStandingPoseImmediatelyAndStillKnocksBack(bool airborne,int direction)
+        {
+            var motor = player.GetComponent(T("PlayerMotor2D"));
+            if (airborne) Call(motor, "SetJumpHeld", true);
+            Assert.That(Call(player, "RequestAction", airborne ? PlayerActionRequest.Jump : PlayerActionRequest.Attack), Is.True);
+            Frames(airborne ? 13 : 3); Refresh();
+            var idle = AssetDatabase.LoadAssetAtPath<AnimationClip>("Assets/Animations/Player/Submitted/PlayerPrototype_Idle.anim");
+            var binding = EditorCurveBinding.PPtrCurve("", typeof(SpriteRenderer), "m_Sprite");
+            var standing = (Sprite)AnimationUtility.GetObjectReferenceCurve(idle, binding)[0].value;
+            Assert.That(artwork.sprite, Is.Not.SameAs(standing));
+
+            var health = player.GetComponent(T("PlayerDamageReceiver2D"));
+            var body = player.GetComponent<Rigidbody2D>();
+            Vector2 before = body.position;
+            Assert.That(Call(health, "TryReceiveHit", 10, before - Vector2.right * direction, 6f), Is.True);
+            Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(Get<int>(health, "MaxHp") - 10));
+            Assert.That(Get<bool>(health, "IsInvincible"), Is.True);
+            Assert.That(Get<PlayerActionState>(player, "ActionState"), Is.EqualTo(PlayerActionState.Hit));
+            Refresh();
+            Assert.That(artwork.sprite, Is.SameAs(standing), "Do not wait for the Animator to enter the hit clip.");
+            int limit = 30;
+            while (Get<bool>(health, "IsHitLocked") && --limit > 0)
+            {
+                Frames(1); Refresh();
+                if (Get<bool>(health, "IsHitLocked")) Assert.That(artwork.sprite, Is.SameAs(standing));
+            }
+            Assert.That(limit, Is.GreaterThan(0));
+            Assert.That((body.position.x - before.x) * direction, Is.GreaterThan(.02f));
+        }
+
         [Test] public void CinematicCounterShowsContactWithoutVideoDirectorOrChangingDamage()
         {
             var target = new GameObject("ArtworkCounterTarget"); target.SetActive(false);

@@ -122,5 +122,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(importer.textureCompression,Is.EqualTo(TextureImporterCompression.Uncompressed));
             }
         }
+
+        [Test] public void HitClipAndImmediatePoseUseTheFirstStandingCel()
+        {
+            var standing = Keys("Idle")[0].value;
+            Assert.That(Field(Entry("Hit"), "contactSprite"), Is.SameAs(standing));
+            Assert.That(Keys("Hit").Select(key => key.value).Distinct().Single(), Is.SameAs(standing));
+            Assert.That(Field(Entry("Hit"), "status").ToString(), Is.EqualTo("Substitute"));
+        }
     }
 }

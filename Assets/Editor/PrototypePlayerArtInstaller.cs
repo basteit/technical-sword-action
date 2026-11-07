@@ -103,6 +103,31 @@ public static class PrototypePlayerArtInstaller
         }
     }
 
+    [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Standing Hit Pose")]
+    public static void RefreshStandingHitPose()
+    {
+        if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode before updating artwork.");
+        var set = AssetDatabase.LoadAssetAtPath<PrototypePlayerArtSet>(SetPath);
+        var idle = set?.Find("Idle");
+        var hit = set?.Find("Hit");
+        var standing = idle?.clip != null ? AnimationUtility.GetObjectReferenceCurve(idle.clip, SpriteBinding)?.FirstOrDefault().value as Sprite : null;
+        if (hit?.clip == null || standing == null)
+            throw new InvalidOperationException("The prototype idle and hit artwork are required.");
+        var clip = hit.clip;
+        var settings = AnimationUtility.GetAnimationClipSettings(clip);
+        float last = Mathf.Max(0, settings.stopTime - 1f / clip.frameRate);
+        var firstKey = new ObjectReferenceKeyframe { time = 0, value = standing };
+        AnimationUtility.SetObjectReferenceCurve(clip, SpriteBinding, last > 0
+            ? new[] { firstKey, new ObjectReferenceKeyframe { time = last, value = standing } }
+            : new[] { firstKey });
+        AnimationUtility.SetAnimationClipSettings(clip, settings);
+        hit.source = idle.source;
+        hit.contactSprite = standing;
+        EditorUtility.SetDirty(clip); AssetDatabase.SaveAssetIfDirty(clip);
+        EditorUtility.SetDirty(set); AssetDatabase.SaveAssetIfDirty(set);
+        ValidateOrThrow();
+    }
+
     [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Walking Display Crops")]
     public static void RefreshWalkingDisplayCrops()
     {
@@ -352,7 +377,8 @@ public static class PrototypePlayerArtInstaller
                     Uniform(Motion("HorizontalSlash"), end); break;
                 case "Hit":
                 {
-                    var motion = Motion("ParryDeflect"); Key(0, motion.frames[2]); Key(end, motion.frames[2]); break;
+                    entry.contactSprite = Motion("IdleReference").frames[0];
+                    Key(0, entry.contactSprite); Key(end, entry.contactSprite); break;
                 }
                 case "Death": case "LandingShock":
                 {
