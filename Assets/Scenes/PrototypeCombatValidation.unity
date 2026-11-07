@@ -8848,6 +8848,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack2D
   definition: {fileID: 11400000, guid: 5f9d8a2e628c5cf449a3eec5ba56e7dd, type: 2}
+  maxComboStep: 2
   inputBufferDuration: 0.1
   fallbackGraceDuration: 0.12
   animator: {fileID: 1882940591}

@@ -115,6 +115,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(false)] [TestCase(true)]
         public void FourStepWhiffsHaveOneTimedSwingPerStepAndOnlyOneFinalSheathe(bool airborne)
         {
+            Set(attack, "maxComboStep", 4);
             if(airborne) { Request(PlayerActionRequest.Jump); Call(motor,"SetJumpHeld",true); Frames(5); }
             Request(PlayerActionRequest.Attack);
             for(int step=1;step<=4;step++)

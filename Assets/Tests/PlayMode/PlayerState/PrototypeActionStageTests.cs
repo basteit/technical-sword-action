@@ -166,6 +166,39 @@ namespace TechnicalSwordAction.PlayerState.Tests
             finally { body.gravityScale = gravity; }
         }
 
+        [TestCase(false)] [TestCase(true)]
+        public void PrototypeComboStopsAtTwoAndCanRestart(bool airborne)
+        {
+            Place(0, airborne ? 4f : 0f);
+            var attack = player.GetComponent(T("PlayerAttack2D"));
+            Assert.That(Get<bool>(motor, "IsGrounded"), Is.EqualTo(!airborne));
+            Assert.That(Get<int>(attack, "MaxComboStep"), Is.EqualTo(2));
+            for (int step = 1; step <= 2; step++)
+            {
+                Assert.That(Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+                Frames(1);
+                Assert.That(Get<int>(attack, "ComboStep"), Is.EqualTo(step));
+                int limit = 120;
+                while (Get<object>(attack, "Phase").ToString() != "Cancel" && --limit > 0) Frames(1);
+                Assert.That(limit, Is.GreaterThan(0));
+            }
+
+            Assert.That(Get<bool>(attack, "IsComboWindowOpen"), Is.False);
+            Assert.That(Get<object>(attack, "OpenCancelWindows").ToString(), Is.EqualTo("Common"));
+            int remaining = Get<int>(attack, "CancelEndFrame") - Get<int>(attack, "ElapsedFrames") + 1;
+            for (int i = 0; i < remaining; i++)
+            {
+                Call(player, "RequestAction", PlayerActionRequest.Attack);
+                Frames(1);
+                Assert.That(Get<int>(attack, "ComboStep"), Is.LessThanOrEqualTo(2));
+            }
+            Assert.That(Get<bool>(attack, "IsRecovering"), Is.True);
+            Assert.That(Get<int>(attack, "FullComboCount"), Is.EqualTo(1));
+            Assert.That(Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Frames(1);
+            Assert.That(Get<int>(attack, "ComboStep"), Is.EqualTo(1));
+        }
+
         [TestCase(false, false)] [TestCase(false, true)]
         [TestCase(true, false)] [TestCase(true, true)]
         public void RealAnimatorFourStepAttackHasNoEventErrorsAndCountsEachHitOnce(bool airborne, bool withTarget)
@@ -199,6 +232,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     Call(damageable, "ResetForCapture", player.transform.position + Vector3.right, 1000);
                 }
                 var attack = player.GetComponent(T("PlayerAttack2D"));
+                Set(attack, "maxComboStep", 4); // Cover the retained 3/4 animations outside the two-step preview.
                 var telemetry = player.GetComponent(T("PlayerCombatTelemetry"));
                 Call(telemetry, "ResetMeasurements");
                 var settings = Get<object>(player.GetComponent(T("CombatFeedback2D")), "Settings");

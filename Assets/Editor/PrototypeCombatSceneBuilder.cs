@@ -84,7 +84,7 @@ public static class PrototypeCombatSceneBuilder
             Set(special, "requiredGauge", 50f); Set(special, "skillDamage", 60); Set(special, "startupLock", 15f / 60f); Set(special, "recoveryLock", 34f / 60f);
             Set(special, "skillPoint", hit.transform); Set(special, "targetLayers", enemyMask);
             Set(attack, "hitPoint", hit.transform); Set(attack, "targetLayers", enemyMask);
-            Set(attack, "animator", animator); Set(attack, "lightHitstopFrames", 3);
+            Set(attack, "animator", animator); Set(attack, "lightHitstopFrames", 3); Set(attack, "maxComboStep", 2);
 
             var timing = LoadOrCreate<ParryTimingDefinition>("ParryTiming"); Set(parry, "timing", timing);
             var counterData = LoadOrCreate<ParryCounterDefinition>("ParryCounter"); counterData.obstacleLayers = groundMask;

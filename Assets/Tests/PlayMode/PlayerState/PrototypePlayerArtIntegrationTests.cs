@@ -125,6 +125,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             hp.GetType().GetField("blockContactPushFromPlayer", Flags).SetValue(hp, false);
             target.SetActive(true); Call(hp, "ResetForCapture", player.transform.position + Vector3.right, 1000);
             var attack = player.GetComponent(T("PlayerAttack2D"));
+            attack.GetType().GetField("maxComboStep", Flags).SetValue(attack, 4);
             var set = Get<object>(presentation, "ArtSet");
             try
             {

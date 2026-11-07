@@ -35,6 +35,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private static void Pause(bool paused) => T("CombatTimeController").GetMethod("SetPaused").Invoke(null, new object[] { paused });
         private object[] Steps => Get<Array>(Get<object>(attack, "Definition"), "steps").Cast<object>().ToArray();
         private SpriteRenderer Drawing => Get<SpriteRenderer>(art, "Artwork");
+        private void EnableFullCombo() => attack.GetType().GetField("maxComboStep", Flags).SetValue(attack, 4);
         private Component Feedback => player.GetComponent(T("CombatFeedback2D"));
         private static int StopRemaining => (int)T("CombatTimeController").GetProperty("HitstopRemainingTicks").GetValue(null);
         private Sprite First(string name) => Get<Sprite[]>(Call(Get<object>(art, "Library"), "Find", "Enemy_" + name), "frames")[0];
@@ -92,6 +93,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(30, 1)] [TestCase(30, -1)] [TestCase(60, 1)] [TestCase(60, -1)] [TestCase(120, 1)] [TestCase(120, -1)]
         public void StrongImpactStopsOnlyFirstTwoStepsAndFreezesTheirContactPoses(int fps, int direction)
         {
+            EnableFullCombo();
             Place(direction); Call(health, "AcquireMotionControl", this);
             var presentation = player.GetComponent(T("PrototypePlayerArtPresentation"));
             var set = Get<object>(presentation, "ArtSet"); var drawing = Get<SpriteRenderer>(presentation, "Artwork");
@@ -124,6 +126,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [TestCase(30)] [TestCase(60)] [TestCase(120)] public void StrongImpactNeverStopsWhiffsAndItsSwitchKeepsOtherModes(int fps)
         {
+            EnableFullCombo();
             Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
             Until(() => Get<int>(attack, "ComboStep") == 1, fps);
             for (int step = 1; step <= 4; step++)
@@ -314,6 +317,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(30)] [TestCase(60)] [TestCase(120)]
         public void SnappyFourStepComboStillHitsEachTargetOnlyOnceAndKeepsDamage(int fps)
         {
+            EnableFullCombo();
             Place(); Call(health, "AcquireMotionControl", this);
             Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
             Until(() => Get<int>(attack, "ComboStep") == 1, fps); // 120fps render frames can contain zero combat ticks
@@ -387,6 +391,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [UnityTest] public IEnumerator EverySnappyStepCanCancelAtItsBoundaryToAllDefenseActions()
         {
+            EnableFullCombo();
             foreach (var request in new[] { PlayerActionRequest.Dash, PlayerActionRequest.Parry, PlayerActionRequest.Special })
                 for (int desired = 1; desired <= 4; desired++)
                 {
@@ -541,6 +546,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [UnityTest] public IEnumerator BothPreviousAttackBaselinesStillShowAllContactPosesAndDealSixtyDamage()
         {
+            EnableFullCombo();
             foreach (var mode in new[] { "FastTrial", "Original" })
             {
                 Call(trial, "SetAttackTempo", Enum.Parse(T("PrototypeAttackTempo"), mode)); yield return null;
