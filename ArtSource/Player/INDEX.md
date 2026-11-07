@@ -18,7 +18,7 @@
 | ジャンプ上昇サンプル (`jump_up`) | [Player_jamp_up_sample.aseprite](Current/Player_jamp_up_sample.aseprite) | 既存サンプル | 48×48 / 1コマ / 100ms | prototype：登録版一致 | [1版](History/jump_up/) |
 | 旧待機サンプル（参考） (`idle_legacy_48`) | [Player_idle_sample.aseprite](Current/Player_idle_sample.aseprite) | 参考 | 48×48 / 4コマ / 800ms | 使用記録なし | [1版](History/idle_legacy_48/) |
 | 反撃キック・独立エフェクト (`counter_kick_effect`) | [Player_counter_kick_effect.aseprite](Current/Player_counter_kick_effect.aseprite) | 受領済み | 256×256 / 15コマ / 1500ms | prototype：登録版一致, video：登録版一致 | [2版](History/counter_kick_effect/) |
-| ジャンプ（踏切・上昇・滞空・落下） (`jump`) | [Player_jamp.aseprite](Current/Player_jamp.aseprite) | 受領済み | 64×64 / 9コマ / 900ms | prototype：更新待ち | [2版](History/jump/) |
+| ジャンプ（踏切・上昇・滞空・落下） (`jump`) | [Player_jamp.aseprite](Current/Player_jamp.aseprite) | 受領済み | 64×64 / 9コマ / 900ms | prototype：登録版一致 | [2版](History/jump/) |
 | ダッシュ (`dash`) | [Player_dash.aseprite](Current/Player_dash.aseprite) | 受領済み | 64×64 / 3コマ / 500ms | prototype：登録版一致 | [1版](History/dash/) |
 
 ## 素材ごとの注意

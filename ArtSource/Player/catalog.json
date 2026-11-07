@@ -2643,15 +2643,16 @@
       "uses": [
         {
           "consumer": "prototype",
-          "motion": "Jump/Takeoff/Rise/Apex/Fall/DropThrough",
-          "source_sha256": "a7710882bd03ee8d7e5cab73bc698afc00929d78cc6fa459216208e66b3c9f6d",
+          "motion": "Jump/Takeoff/Rise(4-5)/Apex(6-7)/Fall(8-9)/DropThrough",
+          "source_sha256": "fd363e709bd8d72d17e328e858716214d0307d4cfea73570f77bb3aba6232ca8",
           "references": [
+            "Assets/Art/Player/MobilitySubmitted/export-manifest.json",
             "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
             "Assets/Animations/Player/Submitted/PlayerPrototype_Jump.anim",
             "Assets/Animations/Player/Submitted/PlayerPrototype_Fall.anim",
             "Assets/Animations/Player/Submitted/PlayerPrototype_DropThrough.anim"
           ],
-          "evidence": "docs/prototype-mobility-and-proximity-parry.md"
+          "evidence": "docs/prototype-jump-hair-and-hit-pose-20261107.md"
         }
       ]
     },
