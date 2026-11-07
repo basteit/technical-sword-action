@@ -254,6 +254,63 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(health, "DeathPresentationOwnerCount"), Is.Zero);
         }
 
+        [TestCase(30, 1)] [TestCase(60, -1)] [TestCase(120, 1)]
+        public void SurvivingCounterTargetKeepsItsDiagonalPoseAndSlidesWithoutHopping(int fps, int direction)
+        {
+            Place(direction, 120);
+            var counter = player.GetComponent(T("PlayerParryCounter2D"));
+            Call(counter, "RegisterParriedEnemy", health);
+            Assert.That(Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Until(() => Get<int>(counter, "HitCount") == 1, fps);
+            Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(30));
+            Assert.That(Get<bool>(launch, "IsSurvivorRetreat"), Is.True);
+            Vector3 contact = ai.transform.position;
+            float previousDistance = 0f;
+            int limit = fps * 2;
+            while (Get<bool>(launch, "IsActive") && limit-- > 0)
+            {
+                Assert.That(Get<string>(art, "MotionName"), Is.EqualTo("CounterRetreat"));
+                Assert.That(Drawing.sprite, Is.SameAs(First("Parried")));
+                Assert.That(Drawing.flipX, Is.EqualTo(direction < 0));
+                Assert.That(Drawing.color.a, Is.EqualTo(1f));
+                Assert.That(Drawing.transform.parent.localRotation, Is.EqualTo(Quaternion.identity));
+                Assert.That(ai.transform.position.y, Is.EqualTo(contact.y).Within(.02f));
+                float distance = (contact.x - ai.transform.position.x) * direction;
+                Assert.That(distance, Is.GreaterThanOrEqualTo(previousDistance - .001f));
+                previousDistance = distance;
+                Frames(1, fps);
+            }
+            Assert.That(limit, Is.GreaterThan(0));
+            Assert.That((contact.x - ai.transform.position.x) * direction, Is.EqualTo(1.6f).Within(.02f));
+            Assert.That(Get<int>(health, "DeathCount"), Is.Zero);
+            Assert.That(Get<int>(health, "MotionOwnerCount"), Is.Zero);
+            Assert.That(Get<string>(art, "MotionName"), Is.Not.EqualTo("CounterRetreat"));
+            var final = ai.transform.position;
+            Frames(fps / 2, fps);
+            Assert.That(ai.transform.position, Is.EqualTo(final), "Finishing the reaction must not snap the target back.");
+        }
+
+        [Test]
+        public void SurvivorStartsFallingAsItSlidesOffAPlatformAndSettlesOnTheFloor()
+        {
+            Place();
+            wall = new GameObject("CounterRetreatTestLedge"); wall.layer = LayerMask.NameToLayer("Ground");
+            wall.transform.position = new Vector3(1.2f, 3);
+            wall.AddComponent<BoxCollider2D>().size = new Vector2(.65f, .2f);
+            Call(health, "ResetForCapture", new Vector3(1.2f, 3.905f), 120);
+            Call(ai, "ResetForCapture", player.transform, true);
+            Physics2D.SyncTransforms();
+            var profile = Get<object>(player.GetComponent(T("PlayerParryCounter2D")), "CinematicProfile");
+            Call(launch, "BeginLaunch", profile, 1);
+            Frames(12);
+            Assert.That(ai.transform.position.y, Is.LessThan(3.8f));
+            Assert.That(Get<string>(art, "MotionName"), Is.EqualTo("CounterRetreat"));
+            Until(() => !Get<bool>(launch, "IsActive"));
+            Assert.That(ai.transform.position.x, Is.EqualTo(2.8f).Within(.02f));
+            Assert.That(ai.transform.position.y, Is.EqualTo(.8f).Within(.02f));
+            Assert.That(Get<int>(health, "MotionOwnerCount"), Is.Zero);
+        }
+
         [TestCase(30)] [TestCase(60)] [TestCase(120)]
         public void SnappyFourStepComboStillHitsEachTargetOnlyOnceAndKeepsDamage(int fps)
         {
@@ -514,8 +571,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(launch, "BeginLaunch", profile, direction); Frames(3);
             Vector3 position = ai.transform.position;
             Pause(true); Frames(120); Assert.That(ai.transform.position, Is.EqualTo(position)); Pause(false);
+            Assert.That(Drawing.sprite, Is.SameAs(First("Parried")));
             T("CombatTimeController").GetMethod("RequestHitstop").Invoke(null, new object[] { this, .1f });
             Frames(5); Assert.That(ai.transform.position, Is.EqualTo(position));
+            Assert.That(Drawing.sprite, Is.SameAs(First("Parried")));
             T("CombatTimeController").GetMethod("ReleaseOwner").Invoke(null, new object[] { this });
             Until(() => !Get<bool>(launch, "IsActive"));
             Assert.That(Mathf.Abs(ai.transform.position.x), Is.LessThanOrEqualTo(1.86f));

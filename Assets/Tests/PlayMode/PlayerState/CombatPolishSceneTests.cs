@@ -148,6 +148,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<int>(target, "CurrentHp"), Is.EqualTo(hp));
                 Assert.That(Get<int>(target, "DeathCount"), Is.Zero);
                 Assert.That(Get<bool>(launch, "IsActive"), Is.True);
+                Assert.That(Get<bool>(launch, "IsSurvivorRetreat"), Is.True);
+                Assert.That(Get<string>(dummy.GetComponent(T("PrototypeEnemyArtPresentation")), "MotionName"), Is.EqualTo("CounterRetreat"));
                 Assert.That(Get<object>(feedback, "LastKind").ToString(), Is.EqualTo("Counter"));
                 Until(() => !Get<bool>(counter, "IsActive") && !Get<bool>(launch, "IsActive") && !Get<bool>(target, "IsStunned"));
             }

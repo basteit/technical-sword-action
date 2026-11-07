@@ -140,6 +140,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     {
         ResetImpactOffset();
         parryDrawingOwner = null;
+        if (launch.IsSurvivorRetreat) hitRemaining = 0;
         // The kick travels away from its attacker. Keep the drawing facing back toward them,
         // without changing the AI direction that determined the rear approach.
         counterFacingHeld = true; counterFacingLeft = direction > 0;
@@ -206,6 +207,11 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
             Color color = artwork.color;
             color.a = 1f - Mathf.Clamp01((deathElapsed / total - .6f) / .4f);
             artwork.color = color;
+        }
+        else if (launch != null && launch.IsSurvivorRetreat)
+        {
+            MotionName = "CounterRetreat";
+            sprite = library.Find("Enemy_Parried")?.At(0); // The authored diagonal chance pose, held for the slide.
         }
         else if (hitRemaining > 0 && !ai.ResistsHitStun) { MotionName = "Hit"; sprite = library.Find("Enemy_Hit")?.At(0); }
         else if (parryDrawingOwner != null && health.IsParryStaggered)

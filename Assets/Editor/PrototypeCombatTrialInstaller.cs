@@ -87,7 +87,7 @@ public static class PrototypeCombatTrialInstaller
             if (newLaunch)
             {
                 launch.launchDistance = 1.6f; launch.launchHeight = .27f; launch.launchFrames = 18;
-                launch.launchRotationDegrees = 0; Save(launch);
+                launch.launchRotationDegrees = 0; launch.groundedRetreatOnSurvival = true; Save(launch);
             }
             if (!fast.IsValid || !snappy.IsValid || !reference.IsValid || !launch.IsValid) throw new InvalidOperationException("Invalid comparison data.");
             var originalController = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(PrototypePlayerArtInstaller.ControllerPath);

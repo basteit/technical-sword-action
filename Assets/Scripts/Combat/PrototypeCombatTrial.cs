@@ -120,7 +120,7 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
             SetStrongAttackHits(!strongAttackHits);
         if (GUILayout.Button("F11 Enemy: " + (referenceTiming ? "VIDEO 96/24F" : "ORIGINAL 30/30F")))
             SetEnemyTiming(!referenceTiming);
-        if (GUILayout.Button("F12 Reaction: " + (referenceReaction ? "DOWN / LOW HOP" : "CHANCE / ROTATING")))
+        if (GUILayout.Button("F12: " + (referenceReaction ? "DOWN / DEFEAT HOP" : "CHANCE / DEFEAT SPIN")))
             SetEnemyReaction(!referenceReaction);
         if (GUILayout.Button("Restore ALL original settings")) RestoreOriginals();
         GUILayout.Label("No parry / counter / special changes");

@@ -114,7 +114,7 @@ public class PlayerDebugOverlay : MonoBehaviour
                 text.AppendLine(enemyArt != null && enemyArt.HasAuthoredParryCue
                     ? $"  Authored flash {enemyArt.IsAuthoredParryCueVisible} / source {enemyArt.WindupSourceFrame}F / lead {enemy.ParryCueLeadFrames}F (no extra marker)"
                     : $"  Placeholder parry cue {enemy.IsParryCueActive} / last {enemy.ParryCueLeadFrames}F of windup");
-                if (launch != null) text.AppendLine($"  Launch {launch.IsActive} {launch.ElapsedFrames}F / {launch.TravelDistance:0.00}u / {launch.LastEndReason} / Motion owners {health.MotionOwnerCount}");
+                if (launch != null) text.AppendLine($"  {(launch.IsSurvivorRetreat ? "Counter retreat" : "Launch")} {launch.IsActive} {launch.ElapsedFrames}F / {launch.TravelDistance:0.00}u / {launch.LastEndReason} / Motion owners {health.MotionOwnerCount}");
             }
             var feedback = GetComponent<CombatFeedback2D>();
             if (feedback != null) text.AppendLine($"Feedback {feedback.LastKind} @{feedback.LastEmissionTick} / emissions {feedback.EmissionCount} / active {feedback.ActiveEffectCount} / flash {feedback.ActiveFlashCount}");

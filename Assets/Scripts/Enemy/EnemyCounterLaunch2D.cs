@@ -13,10 +13,11 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
     private Quaternion restRotation;
     private Vector2 origin;
     private int direction, elapsed;
-    private bool active, settling;
+    private bool active, settling, survivorRetreat;
     private float fallSpeed;
     private readonly RaycastHit2D[] hits = new RaycastHit2D[16];
     public bool IsActive => active;
+    public bool IsSurvivorRetreat => active && survivorRetreat;
     public int ElapsedFrames => elapsed;
     public float TravelDistance => Mathf.Abs(transform.position.x - origin.x);
     public string LastEndReason { get; private set; } = "NotStarted";
@@ -53,6 +54,8 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
         if (!isActiveAndEnabled || settings == null || !settings.IsValid) return;
         Stop(false, "Restarted"); profile = settings; direction = sign < 0 ? -1 : 1;
         origin = transform.position; elapsed = 0; active = true; settling = false; fallSpeed = 0;
+        // Read HP after impact, and keep this trajectory even if another hit later kills the target.
+        survivorRetreat = profile.groundedRetreatOnSurvival && health.IsAlive;
         health.AcquireMotionControl(this); health.AcquireStun(this, (profile.launchFrames + 4) / 60f);
         health.HoldDeathPresentation(this, 3f / 60f); LastEndReason = "Launching";
         LaunchStarted?.Invoke(direction);
@@ -65,17 +68,26 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
         elapsed++;
         if (settling)
         {
-            fallSpeed = Mathf.Min(18, fallSpeed + 30f / 60f);
-            float distance = fallSpeed / 60f;
-            bool blocked = MoveAxis(Vector2.down * distance);
+            bool blocked = StepFall();
             if (blocked || elapsed >= profile.launchFrames + 180) Stop(false, blocked ? "Grounded" : "FallTimeout");
             return;
         }
         float t = Mathf.Clamp01(elapsed / (float)profile.launchFrames);
-        Vector2 desired = origin + Vector2.right * direction * profile.launchDistance * (1 - Mathf.Pow(1 - t, 3)) +
-            Vector2.up * profile.launchHeight * Mathf.Sin(t * Mathf.PI);
-        MoveAxis(Vector2.right * (desired.x - transform.position.x));
-        MoveAxis(Vector2.up * (desired.y - transform.position.y));
+        float x = origin.x + direction * profile.launchDistance * (1 - Mathf.Pow(1 - t, 3));
+        MoveAxis(Vector2.right * (x - transform.position.x));
+        if (survivorRetreat)
+        {
+            // Stay on the floor, but start falling immediately if the slide leaves a ledge.
+            bool grounded = StepFall();
+            if (t >= 1)
+            {
+                if (grounded) Stop(false, "Complete");
+                else settling = true;
+            }
+            return;
+        }
+        float y = origin.y + profile.launchHeight * Mathf.Sin(t * Mathf.PI);
+        MoveAxis(Vector2.up * (y - transform.position.y));
         if (visualRoot != null) visualRoot.localRotation = restRotation * Quaternion.Euler(0, 0, -direction * profile.launchRotationDegrees * Mathf.Sin(t * Mathf.PI * .8f));
         if (t >= 1)
         {
@@ -83,6 +95,13 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
             settling = true; fallSpeed = 0;
             if (MoveAxis(Vector2.down * .02f)) Stop(false, "Complete");
         }
+    }
+    private bool StepFall()
+    {
+        fallSpeed = Mathf.Min(18f, fallSpeed + 30f * CombatTimeController.StepSeconds);
+        if (!MoveAxis(Vector2.down * (fallSpeed * CombatTimeController.StepSeconds))) return false;
+        fallSpeed = 0f;
+        return true;
     }
     private bool MoveAxis(Vector2 delta)
     {
@@ -112,7 +131,7 @@ public sealed class EnemyCounterLaunch2D : MonoBehaviour, ICombatTickListener
     private void Stop(bool ground, string reason)
     {
         if (active && ground) MoveAxis(Vector2.down * 30);
-        active = settling = false; fallSpeed = 0;
+        active = settling = survivorRetreat = false; fallSpeed = 0;
         if (visualRoot != null) visualRoot.localRotation = restRotation;
         if (health != null)
         {

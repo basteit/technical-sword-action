@@ -153,6 +153,7 @@ public static class PrototypeCounterCinematicInstaller
         if (profile == null)
         {
             profile = ScriptableObject.CreateInstance<CounterCinematicProfile>();
+            profile.groundedRetreatOnSurvival = true;
             var collider = player.GetComponent<BoxCollider2D>();
             float visualOffset = collider.offset.y - collider.size.y * .5f + drawing.ArtSet.commonFeetBelowPivot;
             profile.contactOffset = source.Find("CounterKick").counterContactOffset + Vector2.up * visualOffset;
