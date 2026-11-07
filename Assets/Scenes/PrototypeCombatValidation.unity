@@ -3220,6 +3220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PrototypeEnemyArtPresentation
   library: {fileID: 11400000, guid: b636926366890e34389f9088e988a155, type: 2}
   artwork: {fileID: 1131051244}
+  foregroundCueMaterial: {fileID: 2100000, guid: 87e22aa6247f43f8884741354cac64ca, type: 2}
   useDownParryPose: 0
 --- !u!1 &709915719
 GameObject:
@@ -4360,6 +4361,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PrototypeEnemyArtPresentation
   library: {fileID: 11400000, guid: b636926366890e34389f9088e988a155, type: 2}
   artwork: {fileID: 655731127}
+  foregroundCueMaterial: {fileID: 2100000, guid: 87e22aa6247f43f8884741354cac64ca, type: 2}
   useDownParryPose: 0
 --- !u!1 &915269280
 GameObject:
@@ -9714,6 +9716,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PrototypeEnemyArtPresentation
   library: {fileID: 11400000, guid: b636926366890e34389f9088e988a155, type: 2}
   artwork: {fileID: 1702093717}
+  foregroundCueMaterial: {fileID: 2100000, guid: 87e22aa6247f43f8884741354cac64ca, type: 2}
   useDownParryPose: 0
 --- !u!114 &1983144917
 MonoBehaviour:

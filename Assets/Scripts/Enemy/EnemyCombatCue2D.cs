@@ -4,6 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(EnemyMeleeChaser2D))]
 public sealed class EnemyCombatCue2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
+    internal const int ForegroundSortingOrder = short.MaxValue;
     [SerializeField] private Transform silhouette;
     [SerializeField] private Transform weapon;
     [SerializeField] private SpriteRenderer cue;
@@ -29,6 +30,7 @@ public sealed class EnemyCombatCue2D : MonoBehaviour, ICombatTickListener, IComb
     {
         enemy = GetComponent<EnemyMeleeChaser2D>(); health = GetComponent<Damageable2D>();
         artwork = GetComponent<PrototypeEnemyArtPresentation>();
+        if (cue != null) cue.sortingOrder = ForegroundSortingOrder;
         if (silhouette != null) { silhouetteScale = silhouette.localScale; silhouetteRotation = silhouette.localRotation; silhouettePosition = silhouette.localPosition; }
         if (weapon != null) { weaponPosition = weapon.localPosition; weaponRotation = weapon.localRotation; }
     }

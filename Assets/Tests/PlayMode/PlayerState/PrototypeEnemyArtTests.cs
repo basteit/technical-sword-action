@@ -103,6 +103,60 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [Test]
+        public void AuthoredForecastLightDrawsOverPlayerWithoutBringingEnemyBodyForward()
+        {
+            Place();
+            var heroArt = Get<SpriteRenderer>(player.GetComponent(T("PrototypePlayerArtPresentation")), "Artwork");
+            Assert.That((bool)Call(ai, "BeginCaptureAttack"), Is.True);
+            Until(() => Get<bool>(art, "IsAuthoredParryCueVisible"));
+            var cue = drawing.transform.Find("ForegroundParryCue").GetComponent<SpriteRenderer>();
+            Assert.That(cue.sprite, Is.SameAs(drawing.sprite));
+            Assert.That(cue.flipX, Is.EqualTo(drawing.flipX));
+            Assert.That(drawing.sortingOrder, Is.LessThan(heroArt.sortingOrder));
+            Assert.That(cue.sortingOrder, Is.GreaterThan(heroArt.sortingOrder));
+
+            // An opaque stand-in at the player's order covers the entire enemy to expose any body pixels leaking through.
+            var cover = new GameObject("PlayerSortOccluder").AddComponent<SpriteRenderer>();
+            var white = Texture2D.whiteTexture;
+            cover.sprite = Sprite.Create(white, new Rect(0, 0, white.width, white.height), Vector2.one * .5f, white.width);
+            cover.color = Color.magenta;
+            cover.sharedMaterial = drawing.sharedMaterial;
+            cover.sortingLayerID = heroArt.sortingLayerID;
+            cover.sortingOrder = heroArt.sortingOrder + 1;
+            cover.transform.position = drawing.bounds.center;
+            cover.transform.localScale = Vector3.one * 8;
+            var camera = Camera.main;
+            var position = camera.transform.position; float size = camera.orthographicSize;
+            var previousTarget = camera.targetTexture; var previousActive = RenderTexture.active;
+            const int resolution = 128;
+            var target = RenderTexture.GetTemporary(resolution, resolution, 24);
+            var pixels = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            try
+            {
+                camera.transform.position = drawing.bounds.center + Vector3.back * 10;
+                camera.orthographicSize = 2; camera.targetTexture = target; camera.Render();
+                RenderTexture.active = target;
+                pixels.ReadPixels(new Rect(0, 0, resolution, resolution), 0, 0);
+                var colors = pixels.GetPixels32();
+                Assert.That(colors.Any(IsYellow), Is.True, "The existing yellow cue must render in front of the cover.");
+                Assert.That(colors.All(p => IsYellow(p) || (p.r > 230 && p.g < 30 && p.b > 230)), Is.True,
+                    "No blue/grey body pixels may render in front of the cover.");
+            }
+            finally
+            {
+                camera.transform.position = position; camera.orthographicSize = size;
+                camera.targetTexture = previousTarget; RenderTexture.active = previousActive;
+                RenderTexture.ReleaseTemporary(target); Object.DestroyImmediate(pixels);
+                Object.DestroyImmediate(cover.sprite); Object.DestroyImmediate(cover.gameObject);
+            }
+
+            Call(health, "ResetForCapture", ai.transform.position, 120);
+            Assert.That(cue.enabled, Is.False, "Reset removes the telegraph immediately.");
+        }
+
+        private static bool IsYellow(Color32 pixel) => pixel.r > 230 && pixel.g > 220 && pixel.b < 175;
+
+        [Test]
         public void LivingHitOutsideAnAttackUsesChance()
         {
             Place();
