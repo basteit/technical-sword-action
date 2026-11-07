@@ -105,18 +105,19 @@ public sealed class PrototypeCombatArena : MonoBehaviour
         GUILayout.Label("Prototype action / combat acceptance");
         if (GUILayout.Button("F1: Parry practice (one normal)")) ResetArena(false);
         if (GUILayout.Button("F2: Reset actions only (no enemies)")) ResetActionsOnly();
-        if (GUILayout.Button("F3: Two normal enemies")) ResetArena(true);
-        if (GUILayout.Button("F4: Training dummy (infinite HP)")) ResetTrainingEncounter(false);
-        if (GUILayout.Button("F5: Normal + training dummy")) ResetTrainingEncounter(true);
+        using (new GUILayout.HorizontalScope())
+        {
+            if (GUILayout.Button("F3: Two normals")) ResetArena(true);
+            if (GUILayout.Button("F4: Infinite HP dummy")) ResetTrainingEncounter(false);
+        }
+        if (GUILayout.Button("F5: Normal + infinite HP dummy")) ResetTrainingEncounter(true);
         GUILayout.Label("K / RMB: Parry - J / LMB: Counter");
         if (coordinator != null) GUILayout.Label($"Attack roles: {coordinator.ActiveAttackers}/{coordinator.MaximumAttackers}");
         if (feedback != null && feedback.Settings != null)
         {
             var s = feedback.Settings;
-            GUILayout.Label($"F6 Camera (shake / zoom) {s.shake:P0}");
-            GUILayout.Label($"F7 Flash {s.flash:P0}");
+            GUILayout.Label($"F6 Camera {s.shake:P0} / F7 Flash {s.flash:P0}");
             GUILayout.Label($"F8 VFX {s.vfx:P0} / F9 Sound {s.masterVolume:P0}");
-            GUILayout.Label("0% keeps essential hit/telegraph shapes");
             GUILayout.Label($"Feedback: {feedback.LastKind} @{feedback.LastEmissionTick}");
         }
         GUILayout.Label("B: Interact in range / Dash otherwise");
