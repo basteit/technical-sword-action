@@ -61,6 +61,12 @@ ULoopは`uloop.ps1`ではなく導入済み`uloop.cmd`を使う。`-ULoop`で別
 
 廃止したFixtureは `CombatVideoIntegrationTests`、`DefenseCancelShowcaseTests`、`VideoStudioTests`、`VideoStudioAssetTests`。尺の未達を修正したわけではない。[旧13件の診断](validation/known-playmode-failures-20261107.md)を参照。
 
+## 廃止後の検証（2026-11-07）
+
+- ダッシュ・練習ダミー変更を含む維持対象: EditMode 337/337、PlayMode 683/683、Skip0。Compile・Combat Assets Validatorも合格。
+- CLIの180秒上限後にUnityで完了した最終XMLを取得し、再実行せず結果を確認した。XMLは `.uloop/outputs/TestResults/full-playmode-dash-and-training-20261107.xml`（非追跡）。
+- 全19 Fixture、Suite選択、祖先選択、和集合を静的検証136項目で確認。XML上の件数はdaily295、movement103、input23、combat535、presentation296、audio38、dialogue19、all683。
+
 ## 廃止前の検証履歴（2026-11-07）
 
 - 分類とフィルタの静的検証で、全22 Fixtureの登録/用途分類/クラス名、daily必須群、重複しない和集合、video/受入/allの包含と除外、親群からの除外漏れを確認。
