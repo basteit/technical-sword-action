@@ -15,8 +15,7 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour, ICombatTickL
     private PlayerStateMachine state;
     private PlayerMotor2D motor;
     private PlayerAttack2D attack;
-    private long jumpStartTick = -1;
-    private bool hasEnteredFall;
+    private long jumpStartTick = -1, riseStartTick = -1, fallStartTick = -1;
     public string MobilityPhase { get; private set; } = "None";
     public int MobilitySourceFrame { get; private set; }
     public int CombatTickOrder => 1200;
@@ -56,18 +55,22 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour, ICombatTickL
     {
         if (state != null && motor != null && state.LastDecisionTick == CombatTimeController.TickCount &&
             state.LastAcceptedRequest == TechnicalSwordAction.PlayerState.PlayerActionRequest.Jump && !motor.IsDroppingThrough)
-        { jumpStartTick = CombatTimeController.TickCount; hasEnteredFall = false; }
+        {
+            ResetJumpTiming();
+            jumpStartTick = CombatTimeController.TickCount;
+        }
     }
 
     public void CombatTickTimers()
     {
         MobilityPhase = "None"; MobilitySourceFrame = 0;
         if (source == null || artSet == null || !artSet.HasSubmittedJump || state == null || motor == null) return;
+        long tick = CombatTimeController.TickCount;
         float speed = motor.Velocity.y;
         float apexEdge = Mathf.Max(.01f, artSet.apexVerticalSpeed);
         float apexCenter = Mathf.Clamp(artSet.apexCenterVerticalSpeed, .01f, apexEdge);
-        if (motor.IsGrounded) { jumpStartTick = -1; hasEnteredFall = false; }
-        else if (speed < -apexCenter) hasEnteredFall = true;
+        if (motor.IsGrounded) ResetJumpTiming();
+        else if (speed < -apexCenter && fallStartTick < 0) fallStartTick = tick;
         if (state.LifeState != TechnicalSwordAction.PlayerState.PlayerLifeState.Alive) return;
         if (state.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.Dash)
         { MobilityPhase = "Dash"; return; } // Its normal clip owns the submitted three-cel dash.
@@ -75,20 +78,19 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour, ICombatTickL
             attack != null && attack.IsRecovering || motor.IsGrounded || DialogueController.GameplayInputBlocked) return;
 
         int index;
-        long elapsed = jumpStartTick >= 0 ? CombatTimeController.TickCount - jumpStartTick : long.MaxValue;
+        long elapsed = jumpStartTick >= 0 ? tick - jumpStartTick : long.MaxValue;
         int takeoff = Mathf.Max(1, artSet.takeoffCelFrames);
         if (elapsed < takeoff * 3 && speed > apexEdge)
         { index = (int)(elapsed / takeoff); MobilityPhase = "Takeoff"; }
         else if (speed > apexEdge)
-        { index = 3; MobilityPhase = "Rise"; }
-        else if (!hasEnteredFall && jumpStartTick >= 0 && speed >= -apexCenter && !motor.IsDroppingThrough)
+        { index = LoopIndex(ref riseStartTick, tick, artSet.riseCelFrames, 3); MobilityPhase = "Rise"; }
+        else if (fallStartTick < 0 && jumpStartTick >= 0 && speed >= -apexCenter && !motor.IsDroppingThrough)
         {
-            // Cel 5 eases out of ascent, cel 6 straddles the actual apex, then cel 7
-            // follows descent. A fixed cel timer drifts when Jump is released early.
-            index = speed > apexCenter ? 4 : 5;
+            // Cel 6 eases out of ascent; cel 7 straddles the actual apex.
+            index = speed > apexCenter ? 5 : 6;
             MobilityPhase = "Apex";
         }
-        else { index = 6; MobilityPhase = "Fall"; }
+        else { index = LoopIndex(ref fallStartTick, tick, artSet.fallCelFrames, 7); MobilityPhase = "Fall"; }
         MobilitySourceFrame = index + 1;
         // Animator evaluation has already finished for this tick. Override only its sprite,
         // never the action, gravity, body, timing, facing or input ownership.
@@ -96,8 +98,15 @@ public sealed class PrototypePlayerArtPresentation : MonoBehaviour, ICombatTickL
         RefreshVisual();
     }
 
+    private static int LoopIndex(ref long phaseStart, long tick, int celFrames, int firstIndex)
+    {
+        if (phaseStart < 0) phaseStart = tick;
+        return firstIndex + (int)((tick - phaseStart) / Mathf.Max(1, celFrames) % 2);
+    }
+
+    private void ResetJumpTiming() => jumpStartTick = riseStartTick = fallStartTick = -1;
     private void ResetMobility()
-    { jumpStartTick = -1; hasEnteredFall = false; MobilityPhase = "None"; MobilitySourceFrame = 0; }
+    { ResetJumpTiming(); MobilityPhase = "None"; MobilitySourceFrame = 0; }
 
     public void RefreshVisual()
     {

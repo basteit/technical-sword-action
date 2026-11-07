@@ -3,7 +3,7 @@ local root=assert(app.params['root'])
 local out=assert(app.params['out'])
 local review=app.params['review'] or out
 local records={}
-for _,motion in ipairs{{id='jump',file='Player_jamp',count=7},{id='dash',file='Player_dash',count=3}} do
+for _,motion in ipairs{{id='jump',file='Player_jamp',count=9},{id='dash',file='Player_dash',count=3}} do
   local s=assert(app.open(root..'/ArtSource/Player/Current/'..motion.file..'.aseprite'))
   assert(s.width==64 and s.height==64 and #s.frames==motion.count,'Unexpected mobility revision')
   local guide=nil

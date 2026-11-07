@@ -63,10 +63,12 @@ public static class PrototypePlayerArtInstaller
             }
             return frames;
         }
-        var jump = Load("Jump",7); var dash = Load("Dash",3);
+        var jump = Load("Jump", PrototypePlayerArtSet.SubmittedJumpCelCount); var dash = Load("Dash",3);
         set.jumpFrames = jump;
         // Display tuning only; the native 100/300ms source and movement physics are preserved.
         set.takeoffCelFrames = Mathf.Max(1,set.takeoffCelFrames);
+        set.riseCelFrames = Mathf.Max(1, set.riseCelFrames);
+        set.fallCelFrames = Mathf.Max(1, set.fallCelFrames);
         set.apexVerticalSpeed = Mathf.Max(.01f,set.apexVerticalSpeed);
         set.apexCenterVerticalSpeed = Mathf.Clamp(set.apexCenterVerticalSpeed,.01f,set.apexVerticalSpeed);
         foreach (string action in new[] { "Jump", "Fall", "DropThrough", "Dash" })
@@ -77,19 +79,26 @@ public static class PrototypePlayerArtInstaller
             float end = settings.stopTime, last = Mathf.Max(0,end-1f/clip.frameRate);
             var keys = new List<ObjectReferenceKeyframe>();
             void Key(float time,Sprite sprite) => keys.Add(new ObjectReferenceKeyframe { time=time, value=sprite });
+            void JumpLoop(int startFrame, int celFrames, int firstIndex)
+            {
+                int finalFrame = Mathf.FloorToInt(last * 60f + .0001f);
+                for (int f = startFrame; f <= finalFrame; f += celFrames)
+                    Key(f / 60f, jump[firstIndex + (f - startFrame) / celFrames % 2]);
+                Key(last, (Sprite)keys[^1].value);
+            }
             if (action == "Jump")
             {
                 for (int i=0;i<3;i++) Key(i*set.takeoffCelFrames/60f,jump[i]);
-                Key(3*set.takeoffCelFrames/60f,jump[3]); Key(last,jump[3]);
+                JumpLoop(3 * set.takeoffCelFrames, set.riseCelFrames, 3);
             }
             else if (action == "Dash")
             { Key(0,dash[0]);Key(end*.2f,dash[1]);Key(end*.4f,dash[2]);Key(last,dash[2]); }
-            else { Key(0,jump[6]);Key(last,jump[6]); }
+            else JumpLoop(0, set.fallCelFrames, 7);
             AnimationUtility.SetObjectReferenceCurve(clip,SpriteBinding,keys.Where(k=>k.time<=last)
                 .GroupBy(k=>k.time).Select(g=>g.Last()).OrderBy(k=>k.time).ToArray());
             AnimationUtility.SetAnimationClipSettings(clip,settings);
-            entry.source = action == "Dash" ? "Player_dash (3 received cels)" : "Player_jamp (1-3 takeoff / 4 rise / 5-6 apex / 7 fall)";
-            entry.status = action == "Dash" ? Status.Received : Status.SubmittedProvisional;
+            entry.source = action == "Dash" ? "Player_dash (3 received cels)" : "Player_jamp (1-3 takeoff / 4-5 rise / 6-7 apex / 8-9 fall)";
+            entry.status = Status.Received;
             EditorUtility.SetDirty(clip); AssetDatabase.SaveAssetIfDirty(clip);
         }
     }

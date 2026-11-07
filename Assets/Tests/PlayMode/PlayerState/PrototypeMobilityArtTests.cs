@@ -47,7 +47,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {Pause(false);Call(arena,"ResetActionsOnly");clock.GetType().GetProperty("ManualAdvanceOnly").SetValue(clock,manual);yield return null;}
 
         [TestCase(30,-1)] [TestCase(60,1)] [TestCase(120,-1)]
-        public void HeldJumpShowsAllSevenAuthoredCelsInTheCorrectPhases(int fps,int direction)
+        public void HeldJumpShowsAllNineAuthoredCelsInTheCorrectPhases(int fps,int direction)
         {
             Call(motor,"SetFacing",direction);Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);
             var seen=new HashSet<int>();var phases=new HashSet<string>();int limit=fps*3;
@@ -60,10 +60,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     Assert.That(AssetDatabase.GetAssetPath(source.sprite),Does.Contain($"Jump_{cel:00}.png"));
                     var drawing=Get<SpriteRenderer>(art,"Artwork");
                     Assert.That(Mathf.Sign(drawing.transform.lossyScale.x)*(drawing.flipX?-1:1),Is.EqualTo(direction));
-                    Assert.That(cel,phase=="Takeoff"?Is.InRange(1,3):phase=="Rise"?Is.EqualTo(4):phase=="Apex"?Is.InRange(5,6):Is.EqualTo(7));
+                    Assert.That(cel,phase=="Takeoff"?Is.InRange(1,3):phase=="Rise"?Is.InRange(4,5):phase=="Apex"?Is.InRange(6,7):Is.InRange(8,9));
                 }
             }while((!Get<bool>(motor,"IsGrounded")||seen.Count==0)&&--limit>0);
-            Assert.That(limit,Is.GreaterThan(0));CollectionAssert.AreEquivalent(Enumerable.Range(1,7),seen);
+            Assert.That(limit,Is.GreaterThan(0));CollectionAssert.AreEquivalent(Enumerable.Range(1,9),seen);
             CollectionAssert.AreEquivalent(new[]{"Takeoff","Rise","Apex","Fall"},phases);
             Frames(2);Assert.That(Get<string>(art,"MobilityPhase"),Is.EqualTo("None"));
             Assert.That(AssetDatabase.GetAssetPath(source.sprite),Does.Contain("IdleReference"));
@@ -74,14 +74,14 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var seen=new HashSet<int>();float peak=body.position.y;int ticks=0;
             while(!Get<bool>(motor,"IsGrounded")&&ticks++<120)
             {Frames(1);peak=Mathf.Max(peak,body.position.y);seen.Add(Get<int>(art,"MobilitySourceFrame"));}
-            Assert.That(ticks,Is.InRange(8,65));Assert.That(peak,Is.LessThan(2.8f));CollectionAssert.Contains(seen,7);
+            Assert.That(ticks,Is.InRange(8,65));Assert.That(peak,Is.LessThan(2.8f));CollectionAssert.Contains(seen,8);
             Assert.That(Get<bool>(motor,"IsGrounded"),Is.True);
         }
         [TestCase(30)] [TestCase(60)] [TestCase(120)]
         public void ApexTransitionsMatchActualUpwardAndDownwardSpeedAtEveryRenderRate(int fps)
         {
             Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);
-            var apex=new List<int>();int limit=fps*3;bool sawRisingSix=false,sawFallingSix=false,sawFall=false;
+            var apex=new List<int>();int limit=fps*3;bool sawRisingSeven=false,sawFallingSeven=false,sawFall=false;
             do
             {
                 Frames(1,fps);int cel=Get<int>(art,"MobilitySourceFrame");float speed=body.linearVelocity.y;
@@ -89,22 +89,22 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 if(Get<string>(art,"MobilityPhase")=="Apex")
                 {
                     apex.Add(cel);
-                    if(cel==5)Assert.That(speed,Is.InRange(1.25f,4f));
-                    if(cel==6)
+                    if(cel==6)Assert.That(speed,Is.InRange(1.25f,4f));
+                    if(cel==7)
                     {
                         Assert.That(speed,Is.InRange(-1.25f,1.25f));
-                        sawRisingSix|=speed>0;sawFallingSix|=speed<0;
+                        sawRisingSeven|=speed>0;sawFallingSeven|=speed<0;
                     }
                 }
-                if(sawFall)Assert.That(cel,Is.EqualTo(7).Or.EqualTo(0),"Landing collision sets vy to zero before the next ground check; do not flash apex cel 6 again.");
-                if(cel==7&&!sawFall){Assert.That(speed,Is.LessThan(-1.25f));sawFall=true;}
+                if(sawFall)Assert.That(cel,Is.InRange(8,9).Or.EqualTo(0),"Do not flash an apex pose when landing collision zeroes velocity.");
+                if(cel>=8&&!sawFall){Assert.That(speed,Is.LessThan(-1.25f));sawFall=true;}
             }while((!Get<bool>(motor,"IsGrounded")||apex.Count==0)&&--limit>0);
             Assert.That(limit,Is.GreaterThan(0));Assert.That(apex,Is.Ordered.Ascending);
-            Assert.That(apex.Distinct(),Is.EqualTo(new[]{5,6}));
-            Assert.That(sawRisingSix&&sawFallingSix,Is.True,"Cel 6 must straddle the real apex, not precede or lag behind it.");
+            Assert.That(apex.Distinct(),Is.EqualTo(new[]{6,7}));
+            Assert.That(sawRisingSeven&&sawFallingSeven,Is.True,"Cel 7 must straddle the real apex, not precede or lag behind it.");
         }
-        [TestCase(5f,4)] [TestCase(2.5f,5)] [TestCase(.6f,6)] [TestCase(-.6f,6)] [TestCase(-2.5f,7)]
-        public void TheSameVerticalSpeedKeepsItsPoseWithoutTheOldSixTickCelTimer(float speed,int cel)
+        [TestCase(2.5f,6)] [TestCase(.6f,7)] [TestCase(-.6f,7)]
+        public void ApexKeepsItsPoseAtConstantSpeed(float speed,int cel)
         {
             Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);Frames(12);
             body.gravityScale=0;body.linearDamping=0;body.linearVelocity=new Vector2(0,speed);
@@ -112,6 +112,22 @@ namespace TechnicalSwordAction.PlayerState.Tests
             {
                 Frames(1);Assert.That(Get<int>(art,"MobilitySourceFrame"),Is.EqualTo(cel));
             }
+        }
+        [TestCase(5f,4,5,"riseCelFrames")] [TestCase(-2.5f,8,9,"fallCelFrames")]
+        public void SustainedAscentAndDescentRepeatTheirOwnTwoCels(float speed,int first,int second,string interval)
+        {
+            Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);Frames(12);
+            body.gravityScale=0;body.linearDamping=0;body.linearVelocity=new Vector2(0,speed);
+            int celFrames=Get<int>(Get<object>(art,"ArtSet"),interval);
+            var cels=new List<int>();
+            for(int i=0;i<=4*celFrames;i++)
+            {
+                Frames(1);cels.Add(Get<int>(art,"MobilitySourceFrame"));
+            }
+            var changes=cels.Where((cel,i)=>i==0||cel!=cels[i-1]);
+            Assert.That(changes,Is.EqualTo(new[]{first,second,first,second,first})
+                .Or.EqualTo(new[]{second,first,second,first,second}));
+            for(int i=0;i+2*celFrames<cels.Count;i++) Assert.That(cels[i+2*celFrames],Is.EqualTo(cels[i]));
         }
         [TestCase(-1)] [TestCase(1)] public void FasterWalkingCoversTwentyPercentMoreDistanceWithoutRetimingTheArt(int direction)
         {
@@ -268,8 +284,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [Test] public void PauseFreezesTheMobilityCelAndResetClearsItsPhase()
         {
-            Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);Frames(5);
+            Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);Frames(13);
             var sprite=source.sprite;var position=body.position;string phase=Get<string>(art,"MobilityPhase");
+            Assert.That(phase,Is.EqualTo("Rise"));
             Pause(true);Frames(60);Assert.That(source.sprite,Is.SameAs(sprite));Assert.That(body.position,Is.EqualTo(position));
             Assert.That(Get<string>(art,"MobilityPhase"),Is.EqualTo(phase));Pause(false);
             Call(arena,"ResetActionsOnly");Frames(2);Assert.That(Get<int>(art,"MobilitySourceFrame"),Is.Zero);
@@ -282,7 +299,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Physics2D.SyncTransforms();Frames(4);Assert.That(Get<bool>(motor,"IsGrounded"),Is.True);
             Call(motor,"SetJumpDownInput",true);Request(PlayerActionRequest.Jump);Frames(1);
             Assert.That(Get<bool>(motor,"IsDroppingThrough"),Is.True);Assert.That(Get<string>(art,"MobilityPhase"),Is.EqualTo("Fall"));
-            Assert.That(Get<int>(art,"MobilitySourceFrame"),Is.EqualTo(7));
+            Assert.That(Get<int>(art,"MobilitySourceFrame"),Is.EqualTo(8));
         }
     }
 }
