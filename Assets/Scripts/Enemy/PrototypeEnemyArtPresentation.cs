@@ -80,6 +80,8 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private void OnAttack() { attackElapsed = 0; attackRecoveryVisible = true; Show(); }
     private void OnHit(Damageable2D _, int damage, Vector2 direction)
     {
+        // Keep the authored telegraph/contact pose on a non-lethal armored hit.
+        if (health.IsAlive && ai.ResistsHitStun) return;
         ResetImpactOffset();
         parryDrawingOwner = null;
         hitRemaining = library?.Find("Enemy_Hit")?.TotalFrames ?? 6;
@@ -205,7 +207,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
             color.a = 1f - Mathf.Clamp01((deathElapsed / total - .6f) / .4f);
             artwork.color = color;
         }
-        else if (hitRemaining > 0) { MotionName = "Hit"; sprite = library.Find("Enemy_Hit")?.At(0); }
+        else if (hitRemaining > 0 && !ai.ResistsHitStun) { MotionName = "Hit"; sprite = library.Find("Enemy_Hit")?.At(0); }
         else if (parryDrawingOwner != null && health.IsParryStaggered)
         {
             var attack = library.Find("Enemy_Attack");

@@ -322,6 +322,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         LastDamageTaken = infiniteHealth ? 0 : Mathf.Min(currentHp, damage);
         currentHp -= LastDamageTaken;
         HitCount++;
+        bool armored = currentHp > 0 && TryGetComponent<EnemyMeleeChaser2D>(out var melee) && melee.ResistsHitStun;
         if (combatDefinition == null)
         {
             AddBreak(damage * hitBreakMultiplier);
@@ -329,7 +330,6 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         }
         else
         {
-            bool armored = TryGetComponent<EnemyMeleeChaser2D>(out var melee) && melee.ResistsHitStun;
             int frames = strength == EnemyHitStrength.Strong ? combatDefinition.strongHitStunFrames : combatDefinition.lightHitStunFrames;
             bool resistsLight = strength == EnemyHitStrength.Light && lightResistanceTimer > 0;
             if (!armored && !resistsLight && frames > 0)
@@ -342,7 +342,8 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         }
 
         Vector2 dir = direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.right;
-        knockbackVelocity = dir * (combatDefinition != null ? combatDefinition.hitKnockback : knockbackPower);
+        // A committed swing keeps its reach as well as its timer. Damage and contact feedback still resolve.
+        knockbackVelocity = armored ? Vector2.zero : dir * (combatDefinition != null ? combatDefinition.hitKnockback : knockbackPower);
 
         if (!HasExternalFeedback && audioSource != null && hitClip != null)
         {

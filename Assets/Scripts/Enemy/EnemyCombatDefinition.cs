@@ -32,6 +32,8 @@ public sealed class EnemyCombatDefinition : ScriptableObject
     [Min(1)] public int damage = 10;
     [Min(0)] public float knockback = 4.5f;
     public bool parryable = true;
+    [Tooltip("For the single attack below: ordinary hits cannot interrupt windup or active frames. Damage and parry still apply.")]
+    public bool resistHitStunWhileAttacking;
     [Tooltip("Fallback reaction for the single attack below. Per-attack definitions override this value.")]
     public ParryReactionWeight parryReaction = ParryReactionWeight.Light;
     public Vector2 hitOffset = new Vector2(.7f, 0);

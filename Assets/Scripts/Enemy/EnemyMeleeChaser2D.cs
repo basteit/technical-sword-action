@@ -63,8 +63,9 @@ public class EnemyMeleeChaser2D : MonoBehaviour, ICombatTickListener, ICombatHit
         (player.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.ParrySuccess ||
          player.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.ParryCounter ||
          player.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.OpportunityStrike);
-    public bool ResistsHitStun => currentAttack != null && currentAttack.resistHitStunWhileAttacking &&
-        (currentState == State.AttackWindup || currentState == State.Active);
+    public bool ResistsHitStun => (currentState == State.AttackWindup || currentState == State.Active) &&
+        (currentAttack != null ? currentAttack.resistHitStunWhileAttacking :
+            combatDefinition != null && combatDefinition.resistHitStunWhileAttacking);
     public string AttackRoleReason { get; private set; } = "None";
     public EnemyCombatDefinition Definition => combatDefinition;
     public string AttackKind => combatDefinition == null || configuredParryable ? "Parryable" : "Unparryable";

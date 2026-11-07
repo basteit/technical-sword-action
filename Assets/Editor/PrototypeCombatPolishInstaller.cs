@@ -53,6 +53,7 @@ public static class PrototypeCombatPolishInstaller
             slash.attackId = "heavy-overhead-slash"; slash.windupFrames = 42; slash.activeFrames = 4;
             slash.recoveryFrames = 38; slash.cooldownFrames = 40; slash.damage = 14;
             slash.attackRange = 1.65f; slash.hitOffset = new Vector2(.8f, 0); slash.hitSize = new Vector2(1.65f, 1.3f);
+            slash.resistHitStunWhileAttacking = true;
             slash.windupClip = PrototypeSfxInstaller.Clip("EnemyWindup");
             Save(slash);
         }
