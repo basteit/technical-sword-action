@@ -151,12 +151,14 @@ namespace TechnicalSwordAction.PlayerState.Tests
         public void AttackSequenceAlternatesParryableAndLowUnparryableWithoutDuplicateActiveDamage()
         {
             var data = Data(120);
+            Set(data, "resistHitStunWhileAttacking", true);
             var slash = Own(ScriptableObject.CreateInstance(T("EnemyAttackDefinition")));
             var sweep = Own(ScriptableObject.CreateInstance(T("EnemyAttackDefinition")));
             Set(sweep, "parryable", false); Set(sweep, "resistHitStunWhileAttacking", true);
             var array = Array.CreateInstance(T("EnemyAttackDefinition"), 2); array.SetValue(slash, 0); array.SetValue(sweep, 1); Set(data, "attacks", array);
             var melee = Melee(data, null);
             Call(melee, "BeginCaptureAttack"); Assert.That(Get<string>(melee, "AttackKind"), Is.EqualTo("Parryable"));
+            Assert.That(Get<bool>(melee, "ResistsHitStun"), Is.False, "The explicit per-attack setting overrides the single-attack fallback.");
             for (int i = 0; i < 40; i++) { Call(melee, "CombatTick"); Call(melee, "CombatTickTimers"); }
             Call(melee, "BeginCaptureAttack"); Assert.That(Get<string>(melee, "AttackKind"), Is.EqualTo("Unparryable"));
             Assert.That(Get<bool>(melee, "ResistsHitStun"), Is.True);

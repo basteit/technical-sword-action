@@ -34,6 +34,8 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(0)] public float launchHeight = .65f;
     [Min(1)] public int launchFrames = 22;
     [Range(0, 180)] public float launchRotationDegrees = 95;
+    [Tooltip("Keep the horizontal launch distance and timing on survival, but slide without an upward impulse or spin.")]
+    public bool groundedRetreatOnSurvival;
     [Header("Shared impact lighting (opt-in gameplay presentation)")]
     public bool enhancedPresentation;
     public Material parryBacklightMaterial;

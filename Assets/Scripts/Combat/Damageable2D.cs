@@ -13,6 +13,8 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     }
 
     [SerializeField] private int maxHp = 5;
+    [SerializeField, Tooltip("Practice target only: accept hits and reactions without reducing HP or dying.")]
+    private bool infiniteHealth;
     [SerializeField] private string individualId;
     [SerializeField] private EnemyCombatRank combatRank;
     [SerializeField] private EnemyCombatDefinition combatDefinition;
@@ -171,6 +173,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     public float BreakThreshold => breakThreshold;
     public int CurrentHp => currentHp;
     public int MaxHp => maxHp;
+    public bool HasInfiniteHealth => infiniteHealth;
     public float HpNormalized => maxHp > 0 ? (float)currentHp / maxHp : 0f;
     public int CombatTickOrder => 190;
 
@@ -314,9 +317,12 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
             return false;
         }
 
-        LastDamageTaken = Mathf.Min(currentHp, damage);
-        currentHp = Mathf.Max(0, currentHp - damage);
+        // A confirmed hit, not invulnerability: feedback, stun and knockback
+        // still resolve, but the practice target does not lose HP or die.
+        LastDamageTaken = infiniteHealth ? 0 : Mathf.Min(currentHp, damage);
+        currentHp -= LastDamageTaken;
         HitCount++;
+        bool armored = currentHp > 0 && TryGetComponent<EnemyMeleeChaser2D>(out var melee) && melee.ResistsHitStun;
         if (combatDefinition == null)
         {
             AddBreak(damage * hitBreakMultiplier);
@@ -324,7 +330,6 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         }
         else
         {
-            bool armored = TryGetComponent<EnemyMeleeChaser2D>(out var melee) && melee.ResistsHitStun;
             int frames = strength == EnemyHitStrength.Strong ? combatDefinition.strongHitStunFrames : combatDefinition.lightHitStunFrames;
             bool resistsLight = strength == EnemyHitStrength.Light && lightResistanceTimer > 0;
             if (!armored && !resistsLight && frames > 0)
@@ -337,7 +342,8 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         }
 
         Vector2 dir = direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.right;
-        knockbackVelocity = dir * (combatDefinition != null ? combatDefinition.hitKnockback : knockbackPower);
+        // A committed swing keeps its reach as well as its timer. Damage and contact feedback still resolve.
+        knockbackVelocity = armored ? Vector2.zero : dir * (combatDefinition != null ? combatDefinition.hitKnockback : knockbackPower);
 
         if (!HasExternalFeedback && audioSource != null && hitClip != null)
         {

@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public static class PrototypeEnemyArtInstaller
 {
     public const string ArtPath = "Assets/Settings/PrototypeCombat/NormalMeleeArt.asset";
+    private const string ForegroundCuePath = "Assets/Settings/PrototypeCombat/EnemyForecastLight.mat";
     private static readonly string[] Motions = { "Enemy_Idle", "Enemy_Move", "Enemy_Windup", "Enemy_Attack", "Enemy_Hit", "Enemy_Parried", "Enemy_Death" };
 
     [MenuItem("Tools/Technical Sword Action/Prototype/Apply Common Enemy Artwork")]
@@ -26,6 +27,9 @@ public static class PrototypeEnemyArtInstaller
         var source = AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(CombatVideoArtBuilder.LibraryPath);
         if (source == null || Motions.Any(name => source.Find(name) == null))
             throw new InvalidOperationException("Submitted common enemy motions are missing.");
+        var foregroundCue = AssetDatabase.LoadAssetAtPath<Material>(ForegroundCuePath);
+        if (foregroundCue == null)
+            throw new InvalidOperationException("The foreground enemy cue material is missing.");
         var library = AssetDatabase.LoadAssetAtPath<VideoArtLibrary>(ArtPath);
         if (library == null)
         {
@@ -44,7 +48,8 @@ public static class PrototypeEnemyArtInstaller
         }
         var normals = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<EnemyMeleeChaser2D>(true))
             .Where(e => e.Definition != null && e.Definition.name == "NormalMelee").ToArray();
-        if (normals.Length != 2) throw new InvalidOperationException("Expected the two normal-enemy preset instances.");
+        if (normals.Count(enemy => !enemy.GetComponent<Damageable2D>().HasInfiniteHealth) != 2)
+            throw new InvalidOperationException("Expected the two finite normal-enemy preset instances.");
         foreach (var enemy in normals)
         {
             var launch = enemy.GetComponent<EnemyCounterLaunch2D>();
@@ -75,6 +80,7 @@ public static class PrototypeEnemyArtInstaller
             var body = enemy.GetComponent<BoxCollider2D>();
             drawing.transform.localPosition = new Vector3(0, body.offset.y - body.size.y * .5f + 1f, 0);
             Set(art, "library", library); Set(art, "artwork", drawing);
+            Set(art, "foregroundCueMaterial", foregroundCue);
             Set(enemy.GetComponent<Damageable2D>(), "spriteRenderer", drawing);
         }
         EditorSceneManager.MarkSceneDirty(scene);

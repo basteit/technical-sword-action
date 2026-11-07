@@ -35,6 +35,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private static void Pause(bool paused) => T("CombatTimeController").GetMethod("SetPaused").Invoke(null, new object[] { paused });
         private object[] Steps => Get<Array>(Get<object>(attack, "Definition"), "steps").Cast<object>().ToArray();
         private SpriteRenderer Drawing => Get<SpriteRenderer>(art, "Artwork");
+        private void EnableFullCombo() => attack.GetType().GetField("maxComboStep", Flags).SetValue(attack, 4);
         private Component Feedback => player.GetComponent(T("CombatFeedback2D"));
         private static int StopRemaining => (int)T("CombatTimeController").GetProperty("HitstopRemainingTicks").GetValue(null);
         private Sprite First(string name) => Get<Sprite[]>(Call(Get<object>(art, "Library"), "Find", "Enemy_" + name), "frames")[0];
@@ -92,6 +93,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(30, 1)] [TestCase(30, -1)] [TestCase(60, 1)] [TestCase(60, -1)] [TestCase(120, 1)] [TestCase(120, -1)]
         public void StrongImpactStopsOnlyFirstTwoStepsAndFreezesTheirContactPoses(int fps, int direction)
         {
+            EnableFullCombo();
             Place(direction); Call(health, "AcquireMotionControl", this);
             var presentation = player.GetComponent(T("PrototypePlayerArtPresentation"));
             var set = Get<object>(presentation, "ArtSet"); var drawing = Get<SpriteRenderer>(presentation, "Artwork");
@@ -124,6 +126,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [TestCase(30)] [TestCase(60)] [TestCase(120)] public void StrongImpactNeverStopsWhiffsAndItsSwitchKeepsOtherModes(int fps)
         {
+            EnableFullCombo();
             Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
             Until(() => Get<int>(attack, "ComboStep") == 1, fps);
             for (int step = 1; step <= 4; step++)
@@ -254,9 +257,67 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(health, "DeathPresentationOwnerCount"), Is.Zero);
         }
 
+        [TestCase(30, 1)] [TestCase(60, -1)] [TestCase(120, 1)]
+        public void SurvivingCounterTargetKeepsItsDiagonalPoseAndSlidesWithoutHopping(int fps, int direction)
+        {
+            Place(direction, 120);
+            var counter = player.GetComponent(T("PlayerParryCounter2D"));
+            Call(counter, "RegisterParriedEnemy", health);
+            Assert.That(Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Until(() => Get<int>(counter, "HitCount") == 1, fps);
+            Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(30));
+            Assert.That(Get<bool>(launch, "IsSurvivorRetreat"), Is.True);
+            Vector3 contact = ai.transform.position;
+            float previousDistance = 0f;
+            int limit = fps * 2;
+            while (Get<bool>(launch, "IsActive") && limit-- > 0)
+            {
+                Assert.That(Get<string>(art, "MotionName"), Is.EqualTo("CounterRetreat"));
+                Assert.That(Drawing.sprite, Is.SameAs(First("Parried")));
+                Assert.That(Drawing.flipX, Is.EqualTo(direction < 0));
+                Assert.That(Drawing.color.a, Is.EqualTo(1f));
+                Assert.That(Drawing.transform.parent.localRotation, Is.EqualTo(Quaternion.identity));
+                Assert.That(ai.transform.position.y, Is.EqualTo(contact.y).Within(.02f));
+                float distance = (contact.x - ai.transform.position.x) * direction;
+                Assert.That(distance, Is.GreaterThanOrEqualTo(previousDistance - .001f));
+                previousDistance = distance;
+                Frames(1, fps);
+            }
+            Assert.That(limit, Is.GreaterThan(0));
+            Assert.That((contact.x - ai.transform.position.x) * direction, Is.EqualTo(1.6f).Within(.02f));
+            Assert.That(Get<int>(health, "DeathCount"), Is.Zero);
+            Assert.That(Get<int>(health, "MotionOwnerCount"), Is.Zero);
+            Assert.That(Get<string>(art, "MotionName"), Is.Not.EqualTo("CounterRetreat"));
+            var final = ai.transform.position;
+            Frames(fps / 2, fps);
+            Assert.That(ai.transform.position, Is.EqualTo(final), "Finishing the reaction must not snap the target back.");
+        }
+
+        [Test]
+        public void SurvivorStartsFallingAsItSlidesOffAPlatformAndSettlesOnTheFloor()
+        {
+            Place();
+            wall = new GameObject("CounterRetreatTestLedge"); wall.layer = LayerMask.NameToLayer("Ground");
+            wall.transform.position = new Vector3(1.2f, 3);
+            wall.AddComponent<BoxCollider2D>().size = new Vector2(.65f, .2f);
+            Call(health, "ResetForCapture", new Vector3(1.2f, 3.905f), 120);
+            Call(ai, "ResetForCapture", player.transform, true);
+            Physics2D.SyncTransforms();
+            var profile = Get<object>(player.GetComponent(T("PlayerParryCounter2D")), "CinematicProfile");
+            Call(launch, "BeginLaunch", profile, 1);
+            Frames(12);
+            Assert.That(ai.transform.position.y, Is.LessThan(3.8f));
+            Assert.That(Get<string>(art, "MotionName"), Is.EqualTo("CounterRetreat"));
+            Until(() => !Get<bool>(launch, "IsActive"));
+            Assert.That(ai.transform.position.x, Is.EqualTo(2.8f).Within(.02f));
+            Assert.That(ai.transform.position.y, Is.EqualTo(.8f).Within(.02f));
+            Assert.That(Get<int>(health, "MotionOwnerCount"), Is.Zero);
+        }
+
         [TestCase(30)] [TestCase(60)] [TestCase(120)]
         public void SnappyFourStepComboStillHitsEachTargetOnlyOnceAndKeepsDamage(int fps)
         {
+            EnableFullCombo();
             Place(); Call(health, "AcquireMotionControl", this);
             Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
             Until(() => Get<int>(attack, "ComboStep") == 1, fps); // 120fps render frames can contain zero combat ticks
@@ -330,6 +391,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [UnityTest] public IEnumerator EverySnappyStepCanCancelAtItsBoundaryToAllDefenseActions()
         {
+            EnableFullCombo();
             foreach (var request in new[] { PlayerActionRequest.Dash, PlayerActionRequest.Parry, PlayerActionRequest.Special })
                 for (int desired = 1; desired <= 4; desired++)
                 {
@@ -356,7 +418,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [UnityTest] public IEnumerator AttackTempoCyclesBackToPreviousFastInOneActionAndKeepsEnemyAxesIndependent()
         {
-            Call(arena, "ResetStrongEncounter", true); yield return null;
+            Call(arena, "ResetTrainingEncounter", true); yield return null;
             var counterProfile = Get<object>(player.GetComponent(T("PlayerParryCounter2D")), "CinematicProfile");
             for (int repeat = 0; repeat < 3; repeat++)
                 foreach (var expected in new[] { "FastTrial", "Original", "SnappyFirstTwo" })
@@ -484,6 +546,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [UnityTest] public IEnumerator BothPreviousAttackBaselinesStillShowAllContactPosesAndDealSixtyDamage()
         {
+            EnableFullCombo();
             foreach (var mode in new[] { "FastTrial", "Original" })
             {
                 Call(trial, "SetAttackTempo", Enum.Parse(T("PrototypeAttackTempo"), mode)); yield return null;
@@ -514,8 +577,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(launch, "BeginLaunch", profile, direction); Frames(3);
             Vector3 position = ai.transform.position;
             Pause(true); Frames(120); Assert.That(ai.transform.position, Is.EqualTo(position)); Pause(false);
+            Assert.That(Drawing.sprite, Is.SameAs(First("Parried")));
             T("CombatTimeController").GetMethod("RequestHitstop").Invoke(null, new object[] { this, .1f });
             Frames(5); Assert.That(ai.transform.position, Is.EqualTo(position));
+            Assert.That(Drawing.sprite, Is.SameAs(First("Parried")));
             T("CombatTimeController").GetMethod("ReleaseOwner").Invoke(null, new object[] { this });
             Until(() => !Get<bool>(launch, "IsActive"));
             Assert.That(Mathf.Abs(ai.transform.position.x), Is.LessThanOrEqualTo(1.86f));
@@ -541,7 +606,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [TestCase(false)] [TestCase(true)] public void SwitchPreservesSelectedEncounterAndAxesStayIndependent(bool mixed)
         {
-            if (mixed) Call(arena, "ResetStrongEncounter", true); else Call(arena, "ResetArena", false);
+            if (mixed) Call(arena, "ResetTrainingEncounter", true); else Call(arena, "ResetArena", false);
             for (int i = 0; i < 10; i++)
             {
                 Call(trial, "SetModes", false, true, false);
@@ -554,7 +619,15 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<int>(health, "MotionOwnerCount"), Is.Zero); Assert.That(Get<int>(health, "DeathPresentationOwnerCount"), Is.Zero);
             }
             var strong = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "StrongMelee");
-            Assert.That(strong.activeSelf, Is.EqualTo(mixed));
+            var dummy = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "TrainingDummy");
+            Assert.That(strong.activeSelf, Is.False);
+            Assert.That(dummy.activeSelf, Is.EqualTo(mixed));
+            if (mixed)
+            {
+                Assert.That(Get<bool>(dummy.GetComponent(T("Damageable2D")), "HasInfiniteHealth"), Is.True);
+                Assert.That(Get<object>(dummy.GetComponent(T("EnemyMeleeChaser2D")), "Definition"), Is.SameAs(Get<object>(ai, "Definition")));
+                Assert.That(Get<bool>(dummy.GetComponent(T("PrototypeEnemyArtPresentation")), "UsesDownParryPose"), Is.False);
+            }
         }
     }
 }

@@ -44,7 +44,7 @@ MonoBehaviour:
     flashFrames: 3
     tint: {r: 0.5, g: 1, b: 1, a: 1}
     clip: {fileID: 8300000, guid: 6d1b40a6fcd58e24ab1220850737e6c0, type: 3}
-    volume: 0.9
+    volume: 1
     pitch: 1
   - kind: 3
     hitstopFrames: 3

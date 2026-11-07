@@ -6,7 +6,9 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
 {
     [SerializeField] private VideoArtLibrary library;
     [SerializeField] private SpriteRenderer artwork;
+    [SerializeField] private Material foregroundCueMaterial;
     [SerializeField] private bool useDownParryPose;
+    private SpriteRenderer foregroundCue;
     private EnemyMeleeChaser2D ai;
     private Damageable2D health;
     private EnemyCounterLaunch2D launch;
@@ -80,6 +82,8 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private void OnAttack() { attackElapsed = 0; attackRecoveryVisible = true; Show(); }
     private void OnHit(Damageable2D _, int damage, Vector2 direction)
     {
+        // Keep the authored telegraph/contact pose on a non-lethal armored hit.
+        if (health.IsAlive && ai.ResistsHitStun) return;
         ResetImpactOffset();
         parryDrawingOwner = null;
         hitRemaining = library?.Find("Enemy_Hit")?.TotalFrames ?? 6;
@@ -138,6 +142,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     {
         ResetImpactOffset();
         parryDrawingOwner = null;
+        if (launch.IsSurvivorRetreat) hitRemaining = 0;
         // The kick travels away from its attacker. Keep the drawing facing back toward them,
         // without changing the AI direction that determined the rear approach.
         counterFacingHeld = true; counterFacingLeft = direction > 0;
@@ -156,6 +161,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
         // Arena reset notifies health before resetting AI. Do not resample its old windup here.
         MotionName = "Idle";
         WindupSourceFrame = -1;
+        UpdateForegroundCue(false);
         if (artwork != null)
         {
             artwork.color = Color.white;
@@ -205,7 +211,12 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
             color.a = 1f - Mathf.Clamp01((deathElapsed / total - .6f) / .4f);
             artwork.color = color;
         }
-        else if (hitRemaining > 0) { MotionName = "Hit"; sprite = library.Find("Enemy_Hit")?.At(0); }
+        else if (launch != null && launch.IsSurvivorRetreat)
+        {
+            MotionName = "CounterRetreat";
+            sprite = library.Find("Enemy_Parried")?.At(0); // The authored diagonal chance pose, held for the slide.
+        }
+        else if (hitRemaining > 0 && !ai.ResistsHitStun) { MotionName = "Hit"; sprite = library.Find("Enemy_Hit")?.At(0); }
         else if (parryDrawingOwner != null && health.IsParryStaggered)
         {
             var attack = library.Find("Enemy_Attack");
@@ -262,6 +273,32 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
             position += restRotation * pivot - rotation * pivot;
         }
         drawing.SetLocalPositionAndRotation(position, rotation);
+        UpdateForegroundCue(MotionName == "Windup" && sprite != null && HasAuthoredParryCue && !health.IsStunned);
+    }
+
+    private void UpdateForegroundCue(bool visible)
+    {
+        if (!visible || foregroundCueMaterial == null)
+        {
+            if (foregroundCue != null) foregroundCue.enabled = false;
+            return;
+        }
+
+        // Redraw only the baked yellow pixels; the enemy body keeps its original sorting order.
+        if (foregroundCue == null)
+        {
+            var go = new GameObject("ForegroundParryCue") { layer = artwork.gameObject.layer };
+            go.transform.SetParent(artwork.transform, false);
+            foregroundCue = go.AddComponent<SpriteRenderer>();
+            foregroundCue.sharedMaterial = foregroundCueMaterial;
+            foregroundCue.sortingOrder = EnemyCombatCue2D.ForegroundSortingOrder;
+        }
+        foregroundCue.sortingLayerID = artwork.sortingLayerID;
+        foregroundCue.sprite = artwork.sprite;
+        foregroundCue.color = artwork.color;
+        foregroundCue.flipX = artwork.flipX;
+        foregroundCue.flipY = artwork.flipY;
+        foregroundCue.enabled = true;
     }
 
     /// <summary>Retime only gameplay drawing. Keep the authored large flash readable and the AI contact tick unchanged.</summary>
@@ -286,6 +323,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
 
     private void OnDisable()
     {
+        UpdateForegroundCue(false);
         ResetImpactOffset();
         parryDrawingOwner = null;
         counterFacingHeld = false;

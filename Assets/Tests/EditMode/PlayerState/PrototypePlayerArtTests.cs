@@ -97,11 +97,38 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var feet = (Sprite[])Field(Set, "feetPivotSprites");
             Assert.That(feet.Length, Is.EqualTo(6));
             Assert.That(feet.All(sprite => Mathf.Approximately(sprite.pixelsPerUnit, 100)), Is.True);
-            Assert.That(Keys("Jump").Select(key => key.value).Distinct().Count(), Is.EqualTo(6));
-            foreach (string action in new[] { "Heal", "Death", "Hit", "Rest", "Respawn", "Special", "Fall" })
+            Assert.That(Keys("Jump").Select(key => key.value).Distinct().Count(), Is.EqualTo(5));
+            foreach (string action in new[] { "Heal", "Death", "Hit", "Rest", "Respawn", "Special" })
                 Assert.That(Field(Entry(action), "status").ToString(), Is.EqualTo("Substitute"), action);
+            Assert.That(Field(Entry("Fall"),"status").ToString(),Is.EqualTo("Received"),"Use the received revision with hair.");
             Assert.That(Field(Entry("ParryCounter"), "source"), Is.EqualTo("CounterTransfer + CounterKick"));
             Assert.That(Field(Entry("ParryCounter"), "status").ToString(), Is.EqualTo("SubmittedProvisional"), "The received kick includes a provisional transfer; do not label the whole motion finished.");
+        }
+
+        [Test] public void SubmittedMobilityHasNineMappedJumpCelsAndThreeDashCels()
+        {
+            var jump=(Sprite[])Field(Set,"jumpFrames");Assert.That(jump.Length,Is.EqualTo(9));
+            Assert.That(jump.All(s=>s!=null&&s.rect.size==new Vector2(64,64)&&s.pivot==new Vector2(32,38)&&s.pixelsPerUnit==32),Is.True);
+            Assert.That(jump.Select(s=>s.name),Is.EqualTo(Enumerable.Range(1,9).Select(i=>$"Jump_{i:00}")));
+            Assert.That(Keys("Jump").Take(7).Select(k=>k.value),Is.EqualTo(jump.Take(5).Concat(jump.Skip(3).Take(2))));
+            foreach(string action in new[]{"Fall","DropThrough"})
+                Assert.That(Keys(action).Take(3).Select(k=>k.value),Is.EqualTo(new[]{jump[7],jump[8],jump[7]}));
+            Assert.That(Keys("Dash").Select(k=>k.value).Distinct().Count(),Is.EqualTo(3));
+            Assert.That(Field(Entry("Dash"),"status").ToString(),Is.EqualTo("Received"));
+            foreach(var sprite in jump.Concat(Keys("Dash").Select(k=>(Sprite)k.value)).Distinct())
+            {
+                var importer=(TextureImporter)AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(sprite));
+                Assert.That(importer.filterMode,Is.EqualTo(FilterMode.Point));Assert.That(importer.mipmapEnabled,Is.False);
+                Assert.That(importer.textureCompression,Is.EqualTo(TextureImporterCompression.Uncompressed));
+            }
+        }
+
+        [Test] public void HitClipAndImmediatePoseUseTheFirstStandingCel()
+        {
+            var standing = Keys("Idle")[0].value;
+            Assert.That(Field(Entry("Hit"), "contactSprite"), Is.SameAs(standing));
+            Assert.That(Keys("Hit").Select(key => key.value).Distinct().Single(), Is.SameAs(standing));
+            Assert.That(Field(Entry("Hit"), "status").ToString(), Is.EqualTo("Substitute"));
         }
     }
 }

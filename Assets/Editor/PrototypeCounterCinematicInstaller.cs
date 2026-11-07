@@ -153,6 +153,7 @@ public static class PrototypeCounterCinematicInstaller
         if (profile == null)
         {
             profile = ScriptableObject.CreateInstance<CounterCinematicProfile>();
+            profile.groundedRetreatOnSurvival = true;
             var collider = player.GetComponent<BoxCollider2D>();
             float visualOffset = collider.offset.y - collider.size.y * .5f + drawing.ArtSet.commonFeetBelowPivot;
             profile.contactOffset = source.Find("CounterKick").counterContactOffset + Vector2.up * visualOffset;
@@ -209,7 +210,7 @@ public static class PrototypeCounterCinematicInstaller
             if (player.GetComponent<PlayerParryCounter2D>().CinematicProfile != profile || player.GetComponent<PrototypeCounterPresentation>() == null || player.GetComponent<VideoVfxRenderer>() == null)
                 errors.Add("Prototype cinematic action, display and VFX are not connected.");
             var enemies = scene.GetRootGameObjects().SelectMany(root => root.GetComponentsInChildren<EnemyMeleeChaser2D>(true)).ToArray();
-            if (enemies.Length != 3 || enemies.Any(enemy => enemy.GetComponent<EnemyCounterLaunch2D>() == null || enemy.transform.Find("CounterLaunchVisual") == null))
+            if (enemies.Length != 4 || enemies.Any(enemy => enemy.GetComponent<EnemyCounterLaunch2D>() == null || enemy.transform.Find("CounterLaunchVisual") == null))
                 errors.Add("Keep the three optional enemy presets and connect each launch visual owner.");
             if (player.GetComponent<VideoCombatPresentation>() != null || player.GetComponent<VideoPlayerAnimationDriver>() != null || player.GetComponent<CombatVideoDirector>() != null)
                 errors.Add("Filming camera/director/animation drivers must not own gameplay.");

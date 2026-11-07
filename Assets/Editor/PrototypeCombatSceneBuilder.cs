@@ -8,6 +8,7 @@ using Object = UnityEngine.Object;
 public static class PrototypeCombatSceneBuilder
 {
     public const string ScenePath = "Assets/Scenes/PrototypeCombatValidation.unity";
+    public const float DashSpeed = 22.5f;
     private const string SettingsPath = "Assets/Settings/PrototypeCombat";
 
     [MenuItem("Tools/Technical Sword Action/Prototype/Build Combat Validation Scene")]
@@ -74,7 +75,8 @@ public static class PrototypeCombatSceneBuilder
             var hit = new GameObject("HitPoint"); hit.transform.SetParent(player.transform, false); hit.transform.localPosition = Vector3.right * .9f;
             Set(motor, "groundCheck", feet.transform); Set(motor, "groundLayer", groundMask);
             Set(motor, "dashDuration", 20f / 60f); Set(motor, "dashCooldown", 34f / 60f); Set(motor, "ignoreCollisionLayersWhileDashing", enemyMask);
-            Set(motor, "dashMoveFrames", 12); Set(motor, "preserveAirDashVertical", true);
+            Set(motor, "dashSpeed", DashSpeed); Set(motor, "dashMoveFrames", 12); Set(motor, "preserveAirDashVertical", true);
+            Set(motor, "moveSpeed", PlayerMotor2D.PrototypeMoveSpeed); Set(motor, "groundDashRecoveryFrames", 2);
             Set(health, "maxHp", 100); Set(health, "hitStopMoveDuration", .3f); Set(health, "ignoreCollisionLayersWhileInvincible", enemyMask);
             Set(health, "normalParryHitStop", 3f / 60f); Set(health, "justParryHitStop", 5f / 60f);
             Set(heal, "healAmount", 40); Set(heal, "applyFrame", 36); Set(heal, "endFrame", 54);
@@ -82,7 +84,7 @@ public static class PrototypeCombatSceneBuilder
             Set(special, "requiredGauge", 50f); Set(special, "skillDamage", 60); Set(special, "startupLock", 15f / 60f); Set(special, "recoveryLock", 34f / 60f);
             Set(special, "skillPoint", hit.transform); Set(special, "targetLayers", enemyMask);
             Set(attack, "hitPoint", hit.transform); Set(attack, "targetLayers", enemyMask);
-            Set(attack, "animator", animator); Set(attack, "lightHitstopFrames", 3);
+            Set(attack, "animator", animator); Set(attack, "lightHitstopFrames", 3); Set(attack, "maxComboStep", 2);
 
             var timing = LoadOrCreate<ParryTimingDefinition>("ParryTiming"); Set(parry, "timing", timing);
             var counterData = LoadOrCreate<ParryCounterDefinition>("ParryCounter"); counterData.obstacleLayers = groundMask;
@@ -126,10 +128,6 @@ public static class PrototypeCombatSceneBuilder
                 var cue = enemy.AddComponent<EnemyCombatCue2D>(); Set(cue, "silhouette", silhouette.transform); Set(cue, "weapon", weapon.transform); Set(cue, "cue", cueObject.GetComponent<SpriteRenderer>());
                 enemy.SetActive(false);
             }
-            var interact = Box("InteractCounter", new Vector3(-6, .5f), new Vector2(.6f, 1), Color.cyan);
-            var trigger = interact.AddComponent<BoxCollider2D>(); trigger.size = new Vector2(2, 2); trigger.isTrigger = true;
-            interact.AddComponent<PrototypeInteractable2D>();
-            BasicActionValidationSceneBuilder.EnsureInteractValidation(player);
             var arena = new GameObject("PrototypeArena").AddComponent<PrototypeCombatArena>();
             Set(arena, "player", state);
             var arenaData = new SerializedObject(arena); var list = arenaData.FindProperty("enemies"); list.arraySize = 2;
@@ -137,7 +135,6 @@ public static class PrototypeCombatSceneBuilder
             arenaData.ApplyModifiedPropertiesWithoutUndo();
             player.SetActive(true);
             PrototypeActionStageInstaller.InstallIntoScene(scene);
-            PrototypeDialogueInstaller.InstallIntoScene(scene);
             AssetDatabase.SaveAssets();
             EditorSceneManager.SaveScene(scene, ScenePath);
         }

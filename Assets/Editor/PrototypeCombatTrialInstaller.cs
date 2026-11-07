@@ -87,7 +87,7 @@ public static class PrototypeCombatTrialInstaller
             if (newLaunch)
             {
                 launch.launchDistance = 1.6f; launch.launchHeight = .27f; launch.launchFrames = 18;
-                launch.launchRotationDegrees = 0; Save(launch);
+                launch.launchRotationDegrees = 0; launch.groundedRetreatOnSurvival = true; Save(launch);
             }
             if (!fast.IsValid || !snappy.IsValid || !reference.IsValid || !launch.IsValid) throw new InvalidOperationException("Invalid comparison data.");
             var originalController = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(PrototypePlayerArtInstaller.ControllerPath);
@@ -98,7 +98,8 @@ public static class PrototypeCombatTrialInstaller
             var player = roots.SelectMany(root => root.GetComponentsInChildren<PlayerAttack2D>(true)).Single();
             var normals = roots.SelectMany(root => root.GetComponentsInChildren<EnemyMeleeChaser2D>(true))
                 .Where(value => value.Definition == enemy).OrderBy(value => value.name).ToArray();
-            if (normals.Length != 2) throw new InvalidOperationException("Expected exactly two original normal enemies.");
+            if (normals.Count(value => !value.GetComponent<Damageable2D>().HasInfiniteHealth) != 2)
+                throw new InvalidOperationException("Expected exactly two finite original normal enemies.");
             var trial = arena.GetComponent<PrototypeCombatTrial>();
             if (trial == null) trial = arena.gameObject.AddComponent<PrototypeCombatTrial>();
             var so = new SerializedObject(trial);

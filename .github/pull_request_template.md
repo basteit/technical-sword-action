@@ -35,7 +35,8 @@
 ## Test Plan
 - [ ] Compile: Error 0 / Warning 0
 - [ ] Relevant EditMode tests
-- [ ] PlayMode smoke / regression tests
+- [ ] PlayMode daily regression + changed-area suite(s) (`docs/test-policy.md`)
+- Suite(s) / counts / still-pending acceptance:
 - [ ] Run in Unity Play Mode
 - [ ] No Console Error
 - [ ] Basic combat loop works (attack/hit/parry if affected)

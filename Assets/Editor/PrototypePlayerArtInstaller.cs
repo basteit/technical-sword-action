@@ -17,7 +17,116 @@ public static class PrototypePlayerArtInstaller
     public const string PresentationControllerPath = Folder + "/PlayerSubmittedBase.controller";
     public const string SetPath = "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset";
     public const string BaseControllerPath = "Assets/Animations/Player/Prototype/PlayerPrototypeAnimator.controller";
+    public const string MobilityFolder = "Assets/Art/Player/MobilitySubmitted";
     private static readonly EditorCurveBinding SpriteBinding = EditorCurveBinding.PPtrCurve("", typeof(SpriteRenderer), "m_Sprite");
+
+    [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Submitted Mobility Art")]
+    public static void RefreshSubmittedMobilityArt()
+    {
+        if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode before updating artwork.");
+        var set = AssetDatabase.LoadAssetAtPath<PrototypePlayerArtSet>(SetPath);
+        if (set == null) throw new InvalidOperationException("Install the prototype artwork first.");
+        RefreshMobilityAssets(set);
+        EditorUtility.SetDirty(set); AssetDatabase.SaveAssetIfDirty(set);
+        ValidateOrThrow();
+    }
+
+    private static void RefreshMobilityAssets(PrototypePlayerArtSet set)
+    {
+        Sprite[] Load(string prefix, int count)
+        {
+            var frames = new Sprite[count];
+            for (int i = 0; i < count; i++)
+            {
+                string path = $"{MobilityFolder}/{prefix}_{i + 1:00}.png";
+                var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (importer == null) throw new InvalidOperationException("Missing received mobility export: " + path);
+                var settings = new TextureImporterSettings(); importer.ReadTextureSettings(settings);
+                bool changed = importer.textureType != TextureImporterType.Sprite || importer.spriteImportMode != SpriteImportMode.Single ||
+                    importer.spritePixelsPerUnit != 32 || importer.filterMode != FilterMode.Point || importer.mipmapEnabled ||
+                    importer.textureCompression != TextureImporterCompression.Uncompressed ||
+                    settings.spriteAlignment != (int)SpriteAlignment.Custom || settings.spritePivot != new Vector2(.5f,38f/64) ||
+                    settings.spriteMeshType != SpriteMeshType.FullRect;
+                if (changed)
+                {
+                    importer.textureType = TextureImporterType.Sprite; importer.spriteImportMode = SpriteImportMode.Single;
+                    importer.spritePixelsPerUnit = 32; importer.filterMode = FilterMode.Point; importer.mipmapEnabled = false;
+                    importer.textureCompression = TextureImporterCompression.Uncompressed;
+                    settings.textureType = TextureImporterType.Sprite; settings.spriteMode = (int)SpriteImportMode.Single;
+                    settings.spritePixelsPerUnit = 32; settings.filterMode = FilterMode.Point; settings.mipmapEnabled = false;
+                    settings.spriteAlignment = (int)SpriteAlignment.Custom; settings.spritePivot = new Vector2(.5f,38f/64);
+                    settings.spriteMeshType = SpriteMeshType.FullRect; importer.SetTextureSettings(settings);
+                    importer.SaveAndReimport();
+                }
+                frames[i] = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                if (frames[i] == null) throw new InvalidOperationException("Missing mobility sprite: " + path);
+            }
+            return frames;
+        }
+        var jump = Load("Jump", PrototypePlayerArtSet.SubmittedJumpCelCount); var dash = Load("Dash",3);
+        set.jumpFrames = jump;
+        // Display tuning only; the native 100/300ms source and movement physics are preserved.
+        set.takeoffCelFrames = Mathf.Max(1,set.takeoffCelFrames);
+        set.riseCelFrames = Mathf.Max(1, set.riseCelFrames);
+        set.fallCelFrames = Mathf.Max(1, set.fallCelFrames);
+        set.apexVerticalSpeed = Mathf.Max(.01f,set.apexVerticalSpeed);
+        set.apexCenterVerticalSpeed = Mathf.Clamp(set.apexCenterVerticalSpeed,.01f,set.apexVerticalSpeed);
+        foreach (string action in new[] { "Jump", "Fall", "DropThrough", "Dash" })
+        {
+            var entry = set.Find(action);
+            if (entry == null || entry.clip == null) throw new InvalidOperationException("Missing prototype action: " + action);
+            var clip = entry.clip; var settings = AnimationUtility.GetAnimationClipSettings(clip);
+            float end = settings.stopTime, last = Mathf.Max(0,end-1f/clip.frameRate);
+            var keys = new List<ObjectReferenceKeyframe>();
+            void Key(float time,Sprite sprite) => keys.Add(new ObjectReferenceKeyframe { time=time, value=sprite });
+            void JumpLoop(int startFrame, int celFrames, int firstIndex)
+            {
+                int finalFrame = Mathf.FloorToInt(last * 60f + .0001f);
+                for (int f = startFrame; f <= finalFrame; f += celFrames)
+                    Key(f / 60f, jump[firstIndex + (f - startFrame) / celFrames % 2]);
+                Key(last, (Sprite)keys[^1].value);
+            }
+            if (action == "Jump")
+            {
+                for (int i=0;i<3;i++) Key(i*set.takeoffCelFrames/60f,jump[i]);
+                JumpLoop(3 * set.takeoffCelFrames, set.riseCelFrames, 3);
+            }
+            else if (action == "Dash")
+            { Key(0,dash[0]);Key(end*.2f,dash[1]);Key(end*.4f,dash[2]);Key(last,dash[2]); }
+            else JumpLoop(0, set.fallCelFrames, 7);
+            AnimationUtility.SetObjectReferenceCurve(clip,SpriteBinding,keys.Where(k=>k.time<=last)
+                .GroupBy(k=>k.time).Select(g=>g.Last()).OrderBy(k=>k.time).ToArray());
+            AnimationUtility.SetAnimationClipSettings(clip,settings);
+            entry.source = action == "Dash" ? "Player_dash (3 received cels)" : "Player_jamp (1-3 takeoff / 4-5 rise / 6-7 apex / 8-9 fall)";
+            entry.status = Status.Received;
+            EditorUtility.SetDirty(clip); AssetDatabase.SaveAssetIfDirty(clip);
+        }
+    }
+
+    [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Standing Hit Pose")]
+    public static void RefreshStandingHitPose()
+    {
+        if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode before updating artwork.");
+        var set = AssetDatabase.LoadAssetAtPath<PrototypePlayerArtSet>(SetPath);
+        var idle = set?.Find("Idle");
+        var hit = set?.Find("Hit");
+        var standing = idle?.clip != null ? AnimationUtility.GetObjectReferenceCurve(idle.clip, SpriteBinding)?.FirstOrDefault().value as Sprite : null;
+        if (hit?.clip == null || standing == null)
+            throw new InvalidOperationException("The prototype idle and hit artwork are required.");
+        var clip = hit.clip;
+        var settings = AnimationUtility.GetAnimationClipSettings(clip);
+        float last = Mathf.Max(0, settings.stopTime - 1f / clip.frameRate);
+        var firstKey = new ObjectReferenceKeyframe { time = 0, value = standing };
+        AnimationUtility.SetObjectReferenceCurve(clip, SpriteBinding, last > 0
+            ? new[] { firstKey, new ObjectReferenceKeyframe { time = last, value = standing } }
+            : new[] { firstKey });
+        AnimationUtility.SetAnimationClipSettings(clip, settings);
+        hit.source = idle.source;
+        hit.contactSprite = standing;
+        EditorUtility.SetDirty(clip); AssetDatabase.SaveAssetIfDirty(clip);
+        EditorUtility.SetDirty(set); AssetDatabase.SaveAssetIfDirty(set);
+        ValidateOrThrow();
+    }
 
     [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Walking Display Crops")]
     public static void RefreshWalkingDisplayCrops()
@@ -84,6 +193,15 @@ public static class PrototypePlayerArtInstaller
             if (presentation == null) presentation = player.gameObject.AddComponent<PrototypePlayerArtPresentation>();
             presentation.Configure(source, visual, player.GetComponent<BoxCollider2D>(), set);
             if (presentation.Artwork == null) throw new InvalidOperationException("Artwork renderer was not connected.");
+            var feedback = scene.GetRootGameObjects().Select(root => root.GetComponentInChildren<CombatFeedback2D>(true)).SingleOrDefault(f => f != null);
+            if (feedback != null)
+            {
+                var trail = player.GetComponent<PrototypeDashTrail>();
+                if (trail == null) trail = player.gameObject.AddComponent<PrototypeDashTrail>();
+                var serializedTrail = new SerializedObject(trail);
+                serializedTrail.FindProperty("feedback").objectReferenceValue = feedback;
+                serializedTrail.ApplyModifiedPropertiesWithoutUndo();
+            }
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             ValidateOrThrow();
@@ -259,7 +377,8 @@ public static class PrototypePlayerArtInstaller
                     Uniform(Motion("HorizontalSlash"), end); break;
                 case "Hit":
                 {
-                    var motion = Motion("ParryDeflect"); Key(0, motion.frames[2]); Key(end, motion.frames[2]); break;
+                    entry.contactSprite = Motion("IdleReference").frames[0];
+                    Key(0, entry.contactSprite); Key(end, entry.contactSprite); break;
                 }
                 case "Death": case "LandingShock":
                 {
@@ -288,6 +407,8 @@ public static class PrototypePlayerArtInstaller
         set.controller = controller; set.entries = entries.ToArray();
         var cinematic = player.GetComponent<PlayerParryCounter2D>().CinematicProfile;
         if (cinematic != null) PrototypeCounterCinematicInstaller.ApplyCounterArtwork(set, cinematic);
+        // A full reinstall must not restore the old 48px jump or rough dash after this opt-in submission.
+        if (AssetDatabase.IsValidFolder(MobilityFolder)) RefreshMobilityAssets(set);
         EditorUtility.SetDirty(controller); AssetDatabase.SaveAssetIfDirty(controller);
         EditorUtility.SetDirty(set); AssetDatabase.SaveAssetIfDirty(set);
         return set;

@@ -15,6 +15,53 @@ public static class PrototypeDialogueInstaller
     public const string SequencePath = Folder + "/Dialogue_PrototypeTest.asset";
     public const string ProfilePath = Folder + "/Presentation.asset";
 
+    [MenuItem("Tools/Technical Sword Action/Prototype/Remove Dialogue Test From Stage")]
+    public static void Remove()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode first.");
+        if (scene.path != PrototypeCombatSceneBuilder.ScenePath)
+            throw new InvalidOperationException("Open PrototypeCombatValidation first.");
+        if (scene.isDirty) throw new InvalidOperationException("Save or review existing scene changes first.");
+        RemoveFromScene(scene);
+        EditorSceneManager.SaveScene(scene);
+    }
+
+    /// <summary>Remove only the known prototype test placement; keep shared dialogue assets and authoring scenes.</summary>
+    public static int RemoveFromScene(Scene scene)
+    {
+        if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode first.");
+        if (scene.path != PrototypeCombatSceneBuilder.ScenePath)
+            throw new InvalidOperationException("Only the prototype stage owns this test placement.");
+        int removed = 0;
+        foreach (GameObject root in scene.GetRootGameObjects())
+        {
+            bool target = root.name == "InteractCounter" &&
+                (root.GetComponent<DialogueInteractable2D>() != null || root.GetComponent<PrototypeInteractable2D>() != null);
+            bool dialogue = root.name == "PrototypeDialogueSystem" && root.GetComponent<DialogueController>() != null;
+            bool prompt = root.name == "BasicActionPromptCanvas" && root.GetComponentInChildren<InteractionPromptView>(true) != null;
+            if (!target && !dialogue && !prompt) continue;
+            if (prompt)
+            {
+                foreach (var playerRoot in scene.GetRootGameObjects())
+                foreach (var interactor in playerRoot.GetComponentsInChildren<PlayerInteractor2D>(true))
+                {
+                    var data = new SerializedObject(interactor);
+                    var reference = data.FindProperty("promptView");
+                    if (reference.objectReferenceValue is Component component && component.transform.IsChildOf(root.transform))
+                    {
+                        reference.objectReferenceValue = null;
+                        data.ApplyModifiedProperties();
+                    }
+                }
+            }
+            Undo.DestroyObjectImmediate(root);
+            removed++;
+        }
+        if (removed > 0) EditorSceneManager.MarkSceneDirty(scene);
+        return removed;
+    }
+
     [MenuItem("Tools/Technical Sword Action/Prototype/Install Dialogue Test")]
     public static void Install()
     {
@@ -31,7 +78,20 @@ public static class PrototypeDialogueInstaller
     {
         if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode first.");
         var player = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<PlayerStateMachine>(true)).Single();
-        GameObject target = scene.GetRootGameObjects().Single(r => r.name == "InteractCounter");
+        // Explicit reinstall remains available, but the combat stage builder no longer invokes it.
+        GameObject target = scene.GetRootGameObjects().SingleOrDefault(r => r.name == "InteractCounter");
+        if (target == null)
+        {
+            target = new GameObject("InteractCounter");
+            SceneManager.MoveGameObjectToScene(target, scene);
+            Undo.RegisterCreatedObjectUndo(target, "Install dialogue test");
+            target.transform.position = new Vector3(-6, .5f);
+            var trigger = target.AddComponent<BoxCollider2D>(); trigger.size = new Vector2(2, 2); trigger.isTrigger = true;
+            var drawing = target.AddComponent<SpriteRenderer>();
+            drawing.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+            drawing.drawMode = SpriteDrawMode.Sliced; drawing.size = new Vector2(.6f, 1); drawing.color = Color.cyan;
+        }
+        BasicActionValidationSceneBuilder.EnsureInteractValidation(player.gameObject);
         EnsureFolder();
         var profile = LoadOrCreate<DialoguePresentationProfile>(ProfilePath);
         var left = LoadOrCreate<DialogueSpeakerDefinition>(Folder + "/Speaker_PrototypeLeft.asset");

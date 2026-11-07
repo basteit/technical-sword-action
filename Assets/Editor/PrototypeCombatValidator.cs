@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -59,7 +60,7 @@ public static class PrototypeCombatValidator
         try
         {
             int players = 0;
-            int feedbackOwners = 0, coordinators = 0, strongEnemies = 0;
+            int feedbackOwners = 0, coordinators = 0, strongEnemies = 0, unlimitedEnemies = 0;
             Transform actionPlatforms = null, videoGrid = null;
             foreach (var root in scene.GetRootGameObjects())
                 foreach (var transform in root.GetComponentsInChildren<Transform>(true))
@@ -78,6 +79,16 @@ public static class PrototypeCombatValidator
                     }
                     if (transform.TryGetComponent<PrototypeCombatTrial>(out var comparison) && !comparison.IsConfigured)
                         errors.Add("Prototype comparison is missing original/trial references.");
+                    if (transform.TryGetComponent<PrototypeCombatArena>(out var arena))
+                    {
+                        var data = new SerializedObject(arena);
+                        var dummy = data.FindProperty("trainingDummy").objectReferenceValue as EnemyMeleeChaser2D;
+                        var normalPresets = data.FindProperty("enemies");
+                        if (dummy == null || !dummy.GetComponent<Damageable2D>().HasInfiniteHealth ||
+                            dummy.GetComponent<PrototypeEnemyArtPresentation>() == null ||
+                            Enumerable.Range(0, normalPresets.arraySize).Any(i => normalPresets.GetArrayElementAtIndex(i).objectReferenceValue == dummy))
+                            errors.Add("Training preset needs one separate unlimited-HP common enemy, not an override of a normal preset.");
+                    }
                     if (transform.name == "ActionPlatforms") actionPlatforms = transform;
                     if (transform.name == "VideoWhiteGrid") videoGrid = transform;
                     if (!Application.isPlaying && transform.TryGetComponent<EnemyMeleeChaser2D>(out _) && transform.gameObject.activeInHierarchy)
@@ -85,6 +96,7 @@ public static class PrototypeCombatValidator
                     if (transform.GetComponent<CombatFeedback2D>() != null) feedbackOwners++;
                     if (transform.GetComponent<EnemyAttackCoordinator2D>() != null) coordinators++;
                     if (transform.GetComponent<EnemyMeleeChaser2D>() is { Definition: var definition } && definition == strong) strongEnemies++;
+                    if (transform.TryGetComponent<Damageable2D>(out var health) && health.HasInfiniteHealth) unlimitedEnemies++;
                     foreach (var component in transform.GetComponents<Component>())
                     {
                         if (component == null) continue;
@@ -97,8 +109,8 @@ public static class PrototypeCombatValidator
                     }
                 }
             if (players != 1) errors.Add("Validation scene must contain exactly one player.");
-            if (feedbackOwners != 1 || coordinators != 1 || strongEnemies != 1)
-                errors.Add("Validation scene needs one feedback owner, one attack coordinator and one strong enemy.");
+            if (feedbackOwners != 1 || coordinators != 1 || strongEnemies != 1 || unlimitedEnemies != 1)
+                errors.Add("Validation scene needs one feedback owner, one coordinator, one training dummy and one reserved strong fixture.");
             if (videoGrid == null || videoGrid.GetComponentsInChildren<SpriteRenderer>().Length == 0)
                 errors.Add("Validation scene must reuse the existing video white grid.");
             if (actionPlatforms == null || actionPlatforms.GetComponentsInChildren<BoxCollider2D>().Length != 3 ||

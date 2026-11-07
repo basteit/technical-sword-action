@@ -103,13 +103,131 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         [Test]
-        public void LivingHitUsesChanceThenReturnsWithoutResumingAnInterruptedAttack()
+        public void AuthoredForecastLightDrawsOverPlayerWithoutBringingEnemyBodyForward()
         {
-            Place(); Call(ai, "BeginCaptureAttack"); Frames(5);
+            Place();
+            var heroArt = Get<SpriteRenderer>(player.GetComponent(T("PrototypePlayerArtPresentation")), "Artwork");
+            Assert.That((bool)Call(ai, "BeginCaptureAttack"), Is.True);
+            Until(() => Get<bool>(art, "IsAuthoredParryCueVisible"));
+            var cue = drawing.transform.Find("ForegroundParryCue").GetComponent<SpriteRenderer>();
+            Assert.That(cue.sprite, Is.SameAs(drawing.sprite));
+            Assert.That(cue.flipX, Is.EqualTo(drawing.flipX));
+            Assert.That(drawing.sortingOrder, Is.LessThan(heroArt.sortingOrder));
+            Assert.That(cue.sortingOrder, Is.GreaterThan(heroArt.sortingOrder));
+
+            // An opaque stand-in at the player's order covers the entire enemy to expose any body pixels leaking through.
+            var cover = new GameObject("PlayerSortOccluder").AddComponent<SpriteRenderer>();
+            var white = Texture2D.whiteTexture;
+            cover.sprite = Sprite.Create(white, new Rect(0, 0, white.width, white.height), Vector2.one * .5f, white.width);
+            cover.color = Color.magenta;
+            cover.sharedMaterial = drawing.sharedMaterial;
+            cover.sortingLayerID = heroArt.sortingLayerID;
+            cover.sortingOrder = heroArt.sortingOrder + 1;
+            cover.transform.position = drawing.bounds.center;
+            cover.transform.localScale = Vector3.one * 8;
+            var camera = Camera.main;
+            var position = camera.transform.position; float size = camera.orthographicSize;
+            var previousTarget = camera.targetTexture; var previousActive = RenderTexture.active;
+            const int resolution = 128;
+            var target = RenderTexture.GetTemporary(resolution, resolution, 24);
+            var pixels = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+            try
+            {
+                camera.transform.position = drawing.bounds.center + Vector3.back * 10;
+                camera.orthographicSize = 2; camera.targetTexture = target; camera.Render();
+                RenderTexture.active = target;
+                pixels.ReadPixels(new Rect(0, 0, resolution, resolution), 0, 0);
+                var colors = pixels.GetPixels32();
+                Assert.That(colors.Any(IsYellow), Is.True, "The existing yellow cue must render in front of the cover.");
+                Assert.That(colors.All(p => IsYellow(p) || (p.r > 230 && p.g < 30 && p.b > 230)), Is.True,
+                    "No blue/grey body pixels may render in front of the cover.");
+            }
+            finally
+            {
+                camera.transform.position = position; camera.orthographicSize = size;
+                camera.targetTexture = previousTarget; RenderTexture.active = previousActive;
+                RenderTexture.ReleaseTemporary(target); Object.DestroyImmediate(pixels);
+                Object.DestroyImmediate(cover.sprite); Object.DestroyImmediate(cover.gameObject);
+            }
+
+            Call(health, "ResetForCapture", ai.transform.position, 120);
+            Assert.That(cue.enabled, Is.False, "Reset removes the telegraph immediately.");
+        }
+
+        private static bool IsYellow(Color32 pixel) => pixel.r > 230 && pixel.g > 220 && pixel.b < 175;
+
+        [Test]
+        public void LivingHitOutsideAnAttackUsesChance()
+        {
+            Place();
             Assert.That((bool)Call(health, "TryTakeHit", 5, Vector2.right), Is.True);
             Assert.That(drawing.sprite, Is.SameAs(First("Hit")));
             Assert.That(Get<string>(art, "MotionName"), Is.EqualTo("Hit"));
-            Frames(40); Assert.That(Get<string>(art, "MotionName"), Is.Not.EqualTo("Windup"));
+            Frames(40); Assert.That(Get<string>(art, "MotionName"), Is.EqualTo("Idle"));
+        }
+
+        [TestCase("Light")] [TestCase("Strong")]
+        public void NonlethalHitsKeepTheWindupAndActiveAttackButCanPunishRecovery(string strength)
+        {
+            Place(); Assert.That(Call(ai, "BeginCaptureAttack"), Is.True);
+            Frames(5);
+            var hitStrength = Enum.Parse(T("EnemyHitStrength"), strength);
+            Vector3 start = ai.transform.position;
+            Vector2 facing = Get<Vector2>(ai, "Facing");
+            long sequence = Get<long>(ai, "AttackSequence");
+            var coordinator = Object.FindFirstObjectByType(T("EnemyAttackCoordinator2D"));
+            void HitWithoutInterrupting(string motion)
+            {
+                Sprite pose = drawing.sprite;
+                int windup = Get<int>(ai, "WindupRemainingFrames"), active = Get<int>(ai, "ActiveRemainingFrames");
+                Assert.That(Get<bool>(ai, "ResistsHitStun"), Is.True);
+                Assert.That(Call(health, "TryTakeCombatHit", 5, Vector2.right, hitStrength), Is.True);
+                Assert.That(Get<string>(health, "LastHitReaction"), Is.EqualTo("AttackArmor"));
+                Assert.That(Get<bool>(health, "IsStunned"), Is.False);
+                Assert.That(Get<int>(ai, "WindupRemainingFrames"), Is.EqualTo(windup));
+                Assert.That(Get<int>(ai, "ActiveRemainingFrames"), Is.EqualTo(active));
+                Assert.That(Get<string>(art, "MotionName"), Is.EqualTo(motion));
+                Assert.That(drawing.sprite, Is.SameAs(pose));
+                Assert.That(Get<Vector2>(ai, "Facing"), Is.EqualTo(facing));
+                Assert.That(Get<long>(ai, "AttackSequence"), Is.EqualTo(sequence));
+                Assert.That(Get<int>(coordinator, "ActiveAttackers"), Is.EqualTo(1));
+            }
+            HitWithoutInterrupting("Windup");
+            Until(() => Get<int>(ai, "ActiveRemainingFrames") > 0);
+            Assert.That(ai.transform.position, Is.EqualTo(start));
+            var playerHealth = player.GetComponent(T("PlayerDamageReceiver2D"));
+            Assert.That(Get<int>(playerHealth, "CurrentHp"), Is.EqualTo(90));
+            // Contact stops both actors. Wait out the stop without advancing the remaining active frames.
+            Until(() => !(bool)T("CombatTimeController").GetProperty("IsHitStopped").GetValue(null));
+            HitWithoutInterrupting("Attack");
+            Until(() => Get<string>(ai, "CurrentStateName") == "Recovery");
+            Assert.That(ai.transform.position, Is.EqualTo(start));
+            Assert.That(Get<int>(playerHealth, "CurrentHp"), Is.EqualTo(90));
+            Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(110));
+            Assert.That(Get<bool>(ai, "ResistsHitStun"), Is.False);
+            Assert.That(Call(health, "TryTakeCombatHit", 5, Vector2.right, hitStrength), Is.True);
+            Assert.That(Get<bool>(health, "IsStunned"), Is.True);
+            Assert.That(drawing.sprite, Is.SameAs(First("Hit")));
+        }
+
+        [UnityTest]
+        public IEnumerator ActualSlashDoesNotStopTheReferenceWindupButParryDoes()
+        {
+            Call(arena.GetComponent(T("PrototypeCombatTrial")), "SetEnemyTiming", true);
+            yield return null;
+            Place(); Assert.That(Call(ai, "BeginCaptureAttack"), Is.True);
+            Assert.That(Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Until(() => Get<int>(health, "HitCount") == 1);
+            Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(110));
+            Assert.That(Get<string>(health, "LastHitReaction"), Is.EqualTo("AttackArmor"));
+            Assert.That(Get<string>(art, "MotionName"), Is.EqualTo("Windup"));
+            Until(() => Get<bool>(ai, "IsParryCueActive"));
+            Assert.That(Call(player, "RequestAction", PlayerActionRequest.Parry), Is.True);
+            Until(() => Get<bool>(health, "IsParryStaggered"));
+            Assert.That(Get<int>(player.GetComponent(T("PlayerDamageReceiver2D")), "CurrentHp"), Is.EqualTo(100));
+            Assert.That(Get<bool>(ai, "ResistsHitStun"), Is.False);
+            Assert.That(Get<int>(ai, "ActiveRemainingFrames"), Is.Zero);
+            Assert.That(Get<int>(player.GetComponent(T("PlayerParryCounter2D")), "StockCount"), Is.EqualTo(1));
         }
 
         [TestCase(30)] [TestCase(60)] [TestCase(120)]
@@ -137,6 +255,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Frames(5); Assert.That(drawing.sprite, Is.SameAs(pose));
             T("CombatTimeController").GetMethod("ReleaseOwner").Invoke(null, new object[] { this });
             Call(health, "TryTakeHit", 1000, Vector2.right); Frames(32);
+            Assert.That(Get<int>(player.GetComponent(T("PlayerDamageReceiver2D")), "CurrentHp"), Is.EqualTo(100),
+                "A lethal hit must still cancel the committed windup before contact.");
             float alpha = drawing.color.a; Assert.That(alpha, Is.InRange(.001f, .999f));
             Pause(true); Frames(120); Assert.That(drawing.color.a, Is.EqualTo(alpha));
         }

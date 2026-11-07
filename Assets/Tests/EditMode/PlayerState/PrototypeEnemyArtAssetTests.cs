@@ -87,8 +87,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             try
             {
                 var enemies = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren(T("EnemyMeleeChaser2D"), true)).ToArray();
-                Assert.That(enemies.Length, Is.EqualTo(3));
-                foreach (var enemy in enemies.Where(e => e.name.StartsWith("Melee_")))
+                Assert.That(enemies.Length, Is.EqualTo(4));
+                foreach (var enemy in enemies.Where(e => e.name.StartsWith("Melee_") || e.name == "TrainingDummy"))
                 {
                     var art = enemy.GetComponent(T("PrototypeEnemyArtPresentation")); Assert.That(art, Is.Not.Null);
                     var drawing = Get<SpriteRenderer>(art, "Artwork");
@@ -98,6 +98,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     var shape = enemy.GetComponent<BoxCollider2D>(); Assert.That(shape.size, Is.EqualTo(new Vector2(.7f, 1.6f)));
                     var health = new SerializedObject(enemy.GetComponent(T("Damageable2D")));
                     Assert.That(health.FindProperty("spriteRenderer").objectReferenceValue, Is.SameAs(drawing));
+                    Assert.That(health.FindProperty("infiniteHealth").boolValue, Is.EqualTo(enemy.name == "TrainingDummy"));
                     Assert.That(enemy.GetComponent(T("VideoEnemyAnimationDriver")), Is.Null);
                     Assert.That(enemy.gameObject.activeSelf, Is.False);
                     var cue = new SerializedObject(enemy.GetComponent(T("EnemyCombatCue2D")));

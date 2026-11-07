@@ -43,7 +43,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [Test] public void StartsWithoutEnemiesAndDoesNotSpawnThemWhilePracticing()
         {
-            Assert.That(Enemies(true).Length, Is.EqualTo(3), "Keep existing combat targets for explicit QA presets.");
+            Assert.That(Enemies(true).Length, Is.EqualTo(4), "Keep two normals, the training dummy and the inactive strong fixture.");
             Frames(180);
             Assert.That(Enemies(false), Is.Empty);
         }
@@ -52,7 +52,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             for (int i = 0; i < 3; i++)
             {
-                Call(arena, "ResetStrongEncounter", true);
+                Call(arena, "ResetTrainingEncounter", true);
                 Assert.That(Enemies(false).Length, Is.EqualTo(2));
                 Call(arena, "ResetActionsOnly");
                 Frames(1);
@@ -62,6 +62,18 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             Call(arena, "ResetArena", false);
             Assert.That(Enemies(false).Length, Is.EqualTo(1), "Retain the single-normal combat preset API.");
+        }
+
+        [Test] public void PlayablePresetsNeverActivateTheReservedStrongEnemy()
+        {
+            void Active(params string[] expected) => CollectionAssert.AreEquivalent(expected, Enemies(false).Select(e => e.name));
+            Call(arena, "ResetArena", false); Active("Melee_1");
+            Call(arena, "ResetArena", true); Active("Melee_1", "Melee_2");
+            Call(arena, "ResetTrainingEncounter", false); Active("TrainingDummy");
+            Call(arena, "ResetCurrentEncounter"); Active("TrainingDummy");
+            Call(arena, "ResetTrainingEncounter", true); Active("Melee_1", "TrainingDummy");
+            Call(arena, "ResetCurrentEncounter"); Active("Melee_1", "TrainingDummy");
+            Call(arena, "ResetActionsOnly"); Active();
         }
 
         [Test] public void UsesExistingVideoGridAndThreeGroundLayerPlatforms()
@@ -154,6 +166,39 @@ namespace TechnicalSwordAction.PlayerState.Tests
             finally { body.gravityScale = gravity; }
         }
 
+        [TestCase(false)] [TestCase(true)]
+        public void PrototypeComboStopsAtTwoAndCanRestart(bool airborne)
+        {
+            Place(0, airborne ? 4f : 0f);
+            var attack = player.GetComponent(T("PlayerAttack2D"));
+            Assert.That(Get<bool>(motor, "IsGrounded"), Is.EqualTo(!airborne));
+            Assert.That(Get<int>(attack, "MaxComboStep"), Is.EqualTo(2));
+            for (int step = 1; step <= 2; step++)
+            {
+                Assert.That(Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+                Frames(1);
+                Assert.That(Get<int>(attack, "ComboStep"), Is.EqualTo(step));
+                int limit = 120;
+                while (Get<object>(attack, "Phase").ToString() != "Cancel" && --limit > 0) Frames(1);
+                Assert.That(limit, Is.GreaterThan(0));
+            }
+
+            Assert.That(Get<bool>(attack, "IsComboWindowOpen"), Is.False);
+            Assert.That(Get<object>(attack, "OpenCancelWindows").ToString(), Is.EqualTo("Common"));
+            int remaining = Get<int>(attack, "CancelEndFrame") - Get<int>(attack, "ElapsedFrames") + 1;
+            for (int i = 0; i < remaining; i++)
+            {
+                Call(player, "RequestAction", PlayerActionRequest.Attack);
+                Frames(1);
+                Assert.That(Get<int>(attack, "ComboStep"), Is.LessThanOrEqualTo(2));
+            }
+            Assert.That(Get<bool>(attack, "IsRecovering"), Is.True);
+            Assert.That(Get<int>(attack, "FullComboCount"), Is.EqualTo(1));
+            Assert.That(Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Frames(1);
+            Assert.That(Get<int>(attack, "ComboStep"), Is.EqualTo(1));
+        }
+
         [TestCase(false, false)] [TestCase(false, true)]
         [TestCase(true, false)] [TestCase(true, true)]
         public void RealAnimatorFourStepAttackHasNoEventErrorsAndCountsEachHitOnce(bool airborne, bool withTarget)
@@ -187,6 +232,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     Call(damageable, "ResetForCapture", player.transform.position + Vector3.right, 1000);
                 }
                 var attack = player.GetComponent(T("PlayerAttack2D"));
+                Set(attack, "maxComboStep", 4); // Cover the retained 3/4 animations outside the two-step preview.
                 var telemetry = player.GetComponent(T("PlayerCombatTelemetry"));
                 Call(telemetry, "ResetMeasurements");
                 var settings = Get<object>(player.GetComponent(T("CombatFeedback2D")), "Settings");

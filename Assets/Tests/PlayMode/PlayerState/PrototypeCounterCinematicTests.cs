@@ -139,6 +139,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<float>(gauge, "CurrentGauge"), Is.EqualTo(3));
             Assert.That(player.GetComponent<SpriteRenderer>().sprite, Is.SameAs(Get<Sprite>(profile, "ContactSprite")));
             Assert.That(Get<bool>(launch, "IsActive"), Is.True);
+            Assert.That(Get<bool>(launch, "IsSurvivorRetreat"), Is.True);
             long tick = TimeValue<long>("TickCount"); Frames(1); Assert.That(TimeValue<long>("TickCount"), Is.EqualTo(tick), "The contact stop must freeze motion and the impact cel.");
             Until(() => !Get<bool>(counter, "IsActive")); Until(() => !Get<bool>(launch, "IsActive")); Frames(6);
             Assert.That(Get<float>(launch, "TravelDistance"), Is.EqualTo(3.2f).Within(.02f));
@@ -296,8 +297,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var target = Begin(direction, false, 30); ToFrame(21);
             Assert.That(Get<bool>(target, "IsAlive"), Is.False); Assert.That(target.gameObject.activeSelf, Is.True);
             Assert.That(Get<int>(target, "DeathPresentationOwnerCount"), Is.GreaterThan(0));
-            var launch = target.GetComponent(T("EnemyCounterLaunch2D")); Until(() => !TimeValue<bool>("IsHitStopped")); Frames(12);
+            var launch = target.GetComponent(T("EnemyCounterLaunch2D"));
+            Assert.That(Get<bool>(launch, "IsSurvivorRetreat"), Is.False);
+            float contactY = target.transform.position.y;
+            Until(() => !TimeValue<bool>("IsHitStopped")); Frames(12);
             Assert.That(Get<float>(launch, "TravelDistance"), Is.GreaterThan(.5f));
+            Assert.That(target.transform.position.y, Is.GreaterThan(contactY + .45f));
             Until(() => !target.gameObject.activeSelf); Until(() => !Get<bool>(counter, "IsActive")); Frames(6);
             Assert.That(Get<int>(target, "DeathCount"), Is.EqualTo(1)); Assert.That(Get<int>(target, "MotionOwnerCount"), Is.Zero); AssertClean();
         }

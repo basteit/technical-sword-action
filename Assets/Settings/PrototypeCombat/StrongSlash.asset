@@ -22,7 +22,7 @@ MonoBehaviour:
   knockback: 4.5
   parryable: 1
   parryReaction: 0
-  resistHitStunWhileAttacking: 0
+  resistHitStunWhileAttacking: 1
   attackRange: 1.65
   hitOffset: {x: 0.8, y: 0}
   hitSize: {x: 1.65, y: 1.3}

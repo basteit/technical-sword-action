@@ -32,10 +32,13 @@ powershell -ExecutionPolicy Bypass -File .\Tools\Repository\Test-Repository.ps1 
 powershell -ExecutionPolicy Bypass -File .\Tools\Repository\Test-Repository.ps1 -BaseRef 10ec28e
 
 # Unityはcompile → 設定参照 → EditMode → PlayMode → Consoleを逐次確認
+# 既定は本編daily。変更領域とBuild前allの選び方は docs/test-policy.md。
 powershell -ExecutionPolicy Bypass -File .\Tools\Prototype\Validate-Combat.ps1
 ```
 
 基点監査は選んだ範囲だけの検証であり、PR全体に未統合依存がある場合はそれもレビューする。単純なファイル存在監査は実際のScene参照検証の代わりにならない。
+
+Unityの自動確認は[テスト実行方針](test-policy.md)の`daily`と変更領域のSuiteを使い、動画/会話など未変更の全量を毎回走らせない。Build前は旧動画受入も含む`all`の結果を記録する。長いテストがCLIでタイムアウトしてもUnityが継続している場合は再実行せず、終了と最終XMLを確認する。
 
 ## GitHub設定
 

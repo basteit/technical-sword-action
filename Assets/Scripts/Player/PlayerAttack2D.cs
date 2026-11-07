@@ -51,6 +51,8 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     }
 
     [Header("Combo")]
+    [SerializeField, Range(1, ComboStepCount), Tooltip("Playable combo length. Does not remove the remaining attack definitions.")]
+    private int maxComboStep = ComboStepCount;
     [SerializeField, Min(0f)] private float inputBufferDuration = SixFramesAtSixtyFps;
     [SerializeField, Min(0f)] private float fallbackGraceDuration = 0.12f;
 
@@ -118,8 +120,9 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
     public bool IsAttacking => isAttacking;
     public int ComboStep => comboStep;
-    public int MaxComboStep => ComboStepCount;
-    public bool IsComboWindowOpen => definition != null ? Phase == AttackPhase.Cancel && comboStep < 4 : comboWindowOpen;
+    public int MaxComboStep => Mathf.Clamp(maxComboStep, 1, ComboStepCount);
+    public bool IsComboWindowOpen => comboStep < MaxComboStep &&
+        (definition != null ? Phase == AttackPhase.Cancel : comboWindowOpen);
     public bool HasQueuedAttack => queuedNextAttack;
     public bool HitAppliedForCurrentStep => hitAppliedForCurrentStep;
     public float InputBufferRemaining => Mathf.Max(0f, bufferedAttackRemaining);
@@ -159,7 +162,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     public PlayerAttackCancelWindow OpenCancelWindows => definition != null ?
         Phase == AttackPhase.Cancel ? PlayerAttackCancelWindow.Common : PlayerAttackCancelWindow.None : openCancelWindows;
     public bool CanStartAttackFromStateMachine => isActiveAndEnabled && (definition == null || definition.IsValid) &&
-        (!isAttacking || (definition != null && Phase == AttackPhase.Cancel && comboStep < 4));
+        (!isAttacking || (definition != null && IsComboWindowOpen));
     public int ComboAttemptCount { get; private set; }
     public int FullComboCount { get; private set; }
     public float FullComboRate => ComboAttemptCount <= 0 ? 0f : FullComboCount / (float)ComboAttemptCount;
@@ -218,7 +221,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
             groundMotionElapsed += CombatTimeController.StepSeconds;
             if (isAttacking && elapsedFrames >= CurrentDefinition.recoveryStart)
             {
-                if (comboStep == 4) FullComboCount++;
+                if (comboStep == MaxComboStep) FullComboCount++;
                 recoveryStep = comboStep;
                 comboStep = 0; isAttacking = false; recovering = true;
                 LastEndReason = "ConfiguredRecovery";
@@ -267,7 +270,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
             return stateMachine != null && stateMachine.RequestAction(PlayerActionRequest.Attack);
         }
 
-        if (comboStep >= ComboStepCount)
+        if (comboStep >= MaxComboStep)
         {
             return false;
         }
@@ -278,7 +281,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
     public bool TryAdvanceConfiguredCombo()
     {
-        if (definition == null || !isAttacking || Phase != AttackPhase.Cancel || comboStep >= 4) return false;
+        if (definition == null || !isAttacking || !IsComboWindowOpen) return false;
         StartAttackStep(comboStep + 1);
         return true;
     }
@@ -315,7 +318,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     {
         recovering = false; elapsedFrames = 0;
         configuredGaugeAwarded = 0;
-        comboStep = Mathf.Clamp(step, 1, ComboStepCount);
+        comboStep = Mathf.Clamp(step, 1, MaxComboStep);
         if (comboStep == 1)
         {
             ComboAttemptCount++;
@@ -445,7 +448,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     public void OnComboWindowOpen(int step)
     {
         if (definition != null) return;
-        if (!CanProcessAnimationEvent(step) || comboStep >= ComboStepCount)
+        if (!CanProcessAnimationEvent(step) || comboStep >= MaxComboStep)
         {
             return;
         }
@@ -513,14 +516,14 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
         comboWindowOpen = false;
 
-        if (queuedNextAttack && comboStep < ComboStepCount)
+        if (queuedNextAttack && comboStep < MaxComboStep)
         {
             LastEndReason = $"{reason}->Next";
             StartAttackStep(comboStep + 1);
             return;
         }
 
-        if (comboStep == ComboStepCount)
+        if (comboStep == MaxComboStep)
         {
             FullComboCount++;
         }
@@ -542,7 +545,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
     private void TryConsumeBufferedInput()
     {
-        if (!isAttacking || !comboWindowOpen || comboStep >= ComboStepCount || bufferedAttackRemaining <= 0f)
+        if (!isAttacking || !IsComboWindowOpen || bufferedAttackRemaining <= 0f)
         {
             return;
         }

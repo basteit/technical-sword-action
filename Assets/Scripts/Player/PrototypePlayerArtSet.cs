@@ -34,6 +34,18 @@ public sealed class PrototypePlayerArtSet : ScriptableObject
     public float pixelsPerUnit = 32f;
     [Tooltip("Keep the player body/hair ahead of enemy artwork; impact VFX may still overlay both.")]
     public int foregroundSortingOrder = 20;
+    public const int SubmittedJumpCelCount = 9;
+    [Header("Submitted jump (1-3 takeoff, 4-5 rise, 6-7 apex, 8-9 fall)")]
+    public Sprite[] jumpFrames = Array.Empty<Sprite>();
+    [Min(1)] public int takeoffCelFrames = 3;
+    [Min(1)] public int riseCelFrames = 3;
+    [Min(1)] public int fallCelFrames = 6;
+    [Tooltip("Upward speed below which the rise loop gives way to apex cel 6. Visual only.")]
+    [Min(.01f)] public float apexVerticalSpeed = 4f;
+    [Tooltip("Cel 7 spans this speed around the apex; faster descent uses the fall loop. Visual only.")]
+    [Min(.01f)] public float apexCenterVerticalSpeed = 1.25f;
+    public bool HasSubmittedJump => jumpFrames != null && jumpFrames.Length == SubmittedJumpCelCount &&
+        Array.TrueForAll(jumpFrames, sprite => sprite != null);
 
     public Entry Find(string action) => Array.Find(entries, entry => entry.action == action);
     public bool IsFeetPivot(Sprite sprite) => Array.IndexOf(feetPivotSprites, sprite) >= 0;

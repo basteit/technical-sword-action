@@ -110,8 +110,10 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
     {
         GUILayout.BeginArea(new Rect(Screen.width - 310, 302, 298, 240), GUI.skin.box);
         GUILayout.Label("#34 Combat trial (switch = safe reset)");
-        string tempo = AttackTempo == PrototypeAttackTempo.SnappyFirstTwo ? "SNAPPY 9/7/12/30F" :
-            AttackTempo == PrototypeAttackTempo.FastTrial ? "FAST 12/9/12/30F" : "ORIGINAL 15/12/15/38F";
+        string tempo = AttackTempo == PrototypeAttackTempo.SnappyFirstTwo ? "SNAPPY" :
+            AttackTempo == PrototypeAttackTempo.FastTrial ? "FAST" : "ORIGINAL";
+        if (attack != null && attack.Definition != null)
+            tempo += " " + string.Join("/", attack.Definition.steps.Take(attack.MaxComboStep).Select(step => step.activeStart)) + "F";
         if (GUILayout.Button("F10 Attack: " + tempo)) CycleAttackTempo();
         GUILayout.Label("Cycle: SNAPPY -> previous FAST -> ORIGINAL");
         var feedback = attack != null ? attack.GetComponent<CombatFeedback2D>() : null;
@@ -120,7 +122,7 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
             SetStrongAttackHits(!strongAttackHits);
         if (GUILayout.Button("F11 Enemy: " + (referenceTiming ? "VIDEO 96/24F" : "ORIGINAL 30/30F")))
             SetEnemyTiming(!referenceTiming);
-        if (GUILayout.Button("F12 Reaction: " + (referenceReaction ? "DOWN / LOW HOP" : "CHANCE / ROTATING")))
+        if (GUILayout.Button("F12: " + (referenceReaction ? "DOWN / DEFEAT HOP" : "CHANCE / DEFEAT SPIN")))
             SetEnemyReaction(!referenceReaction);
         if (GUILayout.Button("Restore ALL original settings")) RestoreOriginals();
         GUILayout.Label("No parry / counter / special changes");

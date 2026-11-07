@@ -23,7 +23,7 @@ See `CONTRIBUTING.md` for full workflow.
 
 UnityYAMLMergeの端末設定、Assetと.metaの監査、main保護とSquash mergeの規則は[リポジトリ運用](docs/repository-workflow.md)を参照してください。Issueごとにチャット／タスクを分け、一括実装は明示的に依頼された場合だけ例外として記録します。
 
-戦闘プロトタイプの確認は[人間向け統合チェックリスト](docs/prototype-human-acceptance.md)を参照してください。
+戦闘プロトタイプの確認は[人間向け統合チェックリスト](docs/prototype-human-acceptance.md)を参照してください。ダッシュの調整値と無限HPダミーの出し方は[プロトタイプ調整記録](docs/prototype-dash-and-training-20261107.md)にあります。
 
 ## Art Workflow
 

@@ -115,6 +115,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(false)] [TestCase(true)]
         public void FourStepWhiffsHaveOneTimedSwingPerStepAndOnlyOneFinalSheathe(bool airborne)
         {
+            Set(attack, "maxComboStep", 4);
             if(airborne) { Request(PlayerActionRequest.Jump); Call(motor,"SetJumpHeld",true); Frames(5); }
             Request(PlayerActionRequest.Attack);
             for(int step=1;step<=4;step++)
@@ -312,6 +313,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [Test] public void InteractHasOneCueAndDoesNotCreateDashAudio()
         {
+            PrototypeDialogueFixture.Create(player);
             var target=Object.FindFirstObjectByType(T("DialogueInteractable2D")) as Component;
             body.position=new Vector2(target.transform.position.x,.81f); player.transform.position=body.position;
             Physics2D.SyncTransforms(); Call(player.GetComponent(T("PlayerInteractor2D")),"RefreshAfterTeleport"); Frames(2);

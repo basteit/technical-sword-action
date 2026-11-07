@@ -25,7 +25,7 @@ Retained in CounterCharge (optional short accent, currently disabled by default)
 
 "Woosh" by Mark DiAngelo
 Source: https://soundbible.com/2068-Woosh.html
-Used in Dash, the quieter counter kick release movement, and LightHit/HeavyHit.
+Used in Dash, the quieter counter kick release movement, LightHit/HeavyHit, and the CounterImpact air tail.
 
 "Kick" by Mike Koenig
 Source: https://soundbible.com/996-Kick.html
@@ -33,7 +33,7 @@ Retained as source history only; not used by current gameplay.
 
 "Realistic Punch" by Mark DiAngelo
 Source: https://soundbible.com/2069-Realistic-Punch.html
-Used in CounterImpact (short excerpt with low rumble removed and Kenney punch layers).
+Used in CounterImpact (short compressed punch with low rumble removed, layered with Kenney impacts).
 
 Modified for this prototype: excerpts, mono/resampling, pitch/tempo, EQ/filters,
 amplitude modulation, mixing with CC0 layers, fades, normalization and conversion.
@@ -53,7 +53,7 @@ RPG Audio: https://kenney.nl/assets/rpg-audio
 Impact Sounds: https://kenney.nl/assets/impact-sounds
 Sci-Fi Sounds: https://kenney.nl/assets/sci-fi-sounds
 Edited/mixed for this prototype. Kenney credit is voluntary.
-CounterImpact uses short punch layers, without synthetic explosions or metal.
+CounterImpact layers a short punch, a bright plate crack and an air tail, without synthetic explosions.
 The cutting contact cues use air and knife sweeps, without laser or flesh-cutting samples.
 
 This notice applies to the named audio, not the game's code or original art.

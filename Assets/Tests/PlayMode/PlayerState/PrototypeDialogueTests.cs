@@ -16,6 +16,7 @@ using Object = UnityEngine.Object;
 
 namespace TechnicalSwordAction.PlayerState.Tests
 {
+    [Category("OptionalDialogue")]
     public sealed class PrototypeDialogueTests
     {
         private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
@@ -59,7 +60,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             router = player.GetComponent(T("PlayerInputRouter"));
             interactor = player.GetComponent(T("PlayerInteractor2D"));
             arena = (Component)Object.FindFirstObjectByType(T("PrototypeCombatArena"));
-            controller = (Component)Object.FindFirstObjectByType(T("DialogueController"));
+            controller = PrototypeDialogueFixture.Create(player);
             view = Get<Component>(controller, "view");
             ((Behaviour)view).enabled = false; // deterministic visual time, controller input still runs
             left = Get<Component>(view, "leftPortrait"); right = Get<Component>(view, "rightPortrait");
@@ -285,9 +286,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Begin(); Call(controller, "Advance"); Visuals(1);
             yield return EditorSceneManager.LoadSceneInPlayMode("Assets/Scenes/PrototypeCombatValidation.unity", new LoadSceneParameters(LoadSceneMode.Single));
             yield return null;
-            controller = (Component)Object.FindFirstObjectByType(T("DialogueController"));
             player = (Component)Object.FindFirstObjectByType(T("PlayerStateMachine"));
             arena = (Component)Object.FindFirstObjectByType(T("PrototypeCombatArena"));
+            Assert.That(Object.FindFirstObjectByType(T("DialogueController")), Is.Null, "The normal stage no longer contains dialogue tests.");
+            controller = PrototypeDialogueFixture.Create(player);
             Assert.That(Open, Is.False); Assert.That(Locked, Is.False);
             Assert.That((bool)T("DialogueController").GetProperty("GameplayInputBlocked").GetValue(null), Is.False);
         }
