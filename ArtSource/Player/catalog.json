@@ -2474,10 +2474,10 @@
     },
     "jump": {
       "name": "ジャンプ（踏切・上昇・滞空・落下）",
-      "status": "provisional",
-      "notes": "2026-11-07受領。髪は未完成。1〜3踏切、4上昇、5〜6滞空、7落下として分割使用。登録とUnity反映・検証は別に記録する。",
+      "status": "received",
+      "notes": "2026-11-07受領。髪を追加した64px・全9コマ。原稿登録とUnityの使用版は別に記録する。",
       "current": "Current/Player_jamp.aseprite",
-      "current_sha256": "a7710882bd03ee8d7e5cab73bc698afc00929d78cc6fa459216208e66b3c9f6d",
+      "current_sha256": "fd363e709bd8d72d17e328e858716214d0307d4cfea73570f77bb3aba6232ca8",
       "revisions": [
         {
           "sha256": "a7710882bd03ee8d7e5cab73bc698afc00929d78cc6fa459216208e66b3c9f6d",
@@ -2537,6 +2537,90 @@
                 "name": "Hair",
                 "opacity": 255,
                 "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 102,
+                "visible": false
+              }
+            ],
+            "tags": [],
+            "width": 64
+          }
+        },
+        {
+          "sha256": "fd363e709bd8d72d17e328e858716214d0307d4cfea73570f77bb3aba6232ca8",
+          "file": "History/jump/fd363e709bd8d72d17e328e858716214d0307d4cfea73570f77bb3aba6232ca8.aseprite",
+          "original_name": "Player_jamp.aseprite",
+          "registered_at": "2026-11-07T12:37:45+00:00",
+          "received_on": "2026-11-07",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 100,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 100,
+                "frame": 3
+              },
+              {
+                "duration_ms": 100,
+                "frame": 4
+              },
+              {
+                "duration_ms": 100,
+                "frame": 5
+              },
+              {
+                "duration_ms": 100,
+                "frame": 6
+              },
+              {
+                "duration_ms": 100,
+                "frame": 7
+              },
+              {
+                "duration_ms": 100,
+                "frame": 8
+              },
+              {
+                "duration_ms": 100,
+                "frame": 9
+              }
+            ],
+            "height": 64,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": true
               },
               {
                 "is_group": false,
