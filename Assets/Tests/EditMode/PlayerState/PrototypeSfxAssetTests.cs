@@ -132,14 +132,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var charge = manifest.clips.Single(c => c.asset.EndsWith("/CounterCharge.wav"));
             CollectionAssert.Contains(charge.sources.Select(s => s.title).ToArray(), "Electricity");
             var hit = manifest.clips.Single(c => c.asset.EndsWith("/CounterImpact.wav"));
-            CollectionAssert.AreEquivalent(new[] { "Realistic Punch", "impactPunch_medium_000", "impactPunch_heavy_004" }, hit.sources.Select(s => s.title).ToArray());
+            CollectionAssert.AreEquivalent(new[] { "Realistic Punch", "impactPunch_heavy_004", "impactPlate_medium_000", "Woosh" },
+                hit.sources.Select(s => s.title).ToArray());
             var dash = manifest.clips.Single(c => c.asset.EndsWith("/Dash.wav"));
             CollectionAssert.AreEqual(new[] { "Woosh" }, dash.sources.Select(s => s.title).ToArray());
         }
         [Test] public void StylizedContactsAndElectricAccentHaveShortEnvelopes()
         {
             Assert.That(((AudioClip[])Get(EntryFor("CounterCharge"), "clips"))[0].length, Is.InRange(.16f,.20f));
-            Assert.That(((AudioClip[])Get(EntryFor("CounterHit"), "clips"))[0].length, Is.InRange(.22f,.26f));
+            var kick = EntryFor("CounterHit");
+            Assert.That(((AudioClip[])Get(kick, "clips"))[0].length, Is.InRange(.32f,.36f));
+            Assert.That((float)Get(kick, "volume"), Is.EqualTo(1f));
             Assert.That(((AudioClip[])Get(EntryFor("LightHit"), "clips"))[0].length, Is.InRange(.19f,.23f));
             Assert.That(((AudioClip[])Get(EntryFor("HeavyHit"), "clips"))[0].length, Is.InRange(.26f,.30f));
         }

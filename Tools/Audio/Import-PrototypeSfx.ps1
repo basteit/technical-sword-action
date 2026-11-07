@@ -38,7 +38,13 @@ try {
         @{name='ParryMiss'; seconds=.16; sources=@('rpg-audio/cloth1'); filters=@('atempo=2')},
         @{name='CounterTransfer'; seconds=.29; sources=@('sci-fi-sounds/forceField_002'); filters=@('atrim=0:0.6,areverse,atempo=2')},
         @{name='CounterCharge'; seconds=.18; sources=@('SoundBible/Electricity','sci-fi-sounds/impactMetal_004','sci-fi-sounds/impactMetal_000'); filters=@('atrim=start=0.55:end=0.77,asetpts=PTS-STARTPTS,asetrate=72000,aresample=48000,highpass=f=900,lowpass=f=11000,equalizer=f=5000:t=q:w=1:g=5,afade=t=out:st=0.05:d=0.08','atempo=3,highpass=f=1600,lowpass=f=11000,volume=0.65','atrim=0:0.12,atempo=2,highpass=f=2200,equalizer=f=6500:t=q:w=1:g=5,volume=0.6')},
-        @{name='CounterImpact'; seconds=.24; sources=@('SoundBible/Realistic_Punch','impact-sounds/impactPunch_medium_000','impact-sounds/impactPunch_heavy_004'); filters=@('atrim=start=0.08:end=0.25,asetpts=PTS-STARTPTS,asetrate=57600,aresample=48000,highpass=f=500,lowpass=f=7500,equalizer=f=2000:t=q:w=0.8:g=2','atrim=0:0.09,atempo=1.4,highpass=f=1200,lowpass=f=8000,volume=0.5','atrim=0:0.20,asetrate=55200,aresample=48000,highpass=f=450,lowpass=f=7000,volume=0.45')},
+        # Counter contact only: a close punch, a short low body, a bright crack and a delayed air tail.
+        @{name='CounterImpact'; seconds=.34; sources=@('SoundBible/Realistic_Punch','impact-sounds/impactPunch_heavy_004','impact-sounds/impactPlate_medium_000','SoundBible/Woosh'); filters=@(
+            'atrim=start=0.08:end=0.27,asetpts=PTS-STARTPTS,asetrate=55200,aresample=48000,highpass=f=190,lowpass=f=9400,equalizer=f=2200:t=q:w=1:g=3,acompressor=threshold=0.13:ratio=2.6:attack=1.5:release=40:makeup=1.5',
+            'atrim=0:0.17,highpass=f=150,lowpass=f=1500,equalizer=f=400:t=q:w=1.1:g=-4,volume=0.85',
+            'atrim=0:0.16,asetrate=57600,aresample=48000,highpass=f=1600,lowpass=f=9500,adelay=8:all=1,volume=0.52',
+            'atrim=start=0.065:end=0.255,asetpts=PTS-STARTPTS,atempo=0.72,highpass=f=700,lowpass=f=8000,afade=t=in:d=0.012,afade=t=out:st=0.16:d=0.09,adelay=25:all=1,volume=0.55'
+        )},
         @{name='LightHit'; seconds=.21; sources=@('SoundBible/Woosh','rpg-audio/knifeSlice2'); filters=@('atrim=start=0.04:end=0.18,asetpts=PTS-STARTPTS,highpass=f=500,lowpass=f=7500,equalizer=f=2200:t=q:w=1:g=2','atempo=1.55,highpass=f=650,lowpass=f=8000,volume=0.65')},
         @{name='HeavyHit'; seconds=.28; sources=@('SoundBible/Woosh','rpg-audio/knifeSlice'); filters=@('atrim=start=0.04:end=0.20,asetpts=PTS-STARTPTS,atempo=0.75,highpass=f=450,lowpass=f=7500,equalizer=f=2000:t=q:w=1:g=2','atempo=1.15,highpass=f=550,lowpass=f=8000,volume=0.75')},
         @{name='PlayerHit'; seconds=.34; sources=@('impact-sounds/impactPunch_medium_002'); filters=@('volume=1')},
@@ -112,7 +118,7 @@ try {
     $jump = @($records | Where-Object name -eq 'Jump')[0]
     if ($jump.sha256 -ne '9e923b4a2ffe056a4eb271416676f11c95fb141a7e87f74a26822a260f882c7c') { throw 'The approved jump sound must remain byte-identical.' }
     # Stable key order keeps re-imports byte-identical and makes future recipe changes reviewable.
-    $manifest = [ordered]@{licenses=@('CC0-1.0','CC-BY-3.0'); authors=@('Kenney','Mike Koenig','Mark DiAngelo','Sound Explorer','Joseph SARDIN'); acquired='2026-11-07'; credits='Assets/StreamingAssets/AudioCredits.txt'; sampleRate=48000; channels=1; bits=16; preprocessing='Per-layer trim/tempo/pitch/EQ/reverse/delay/tremolo/gain as recorded; remove leading silence below -48 dB; mix; high-pass 65 Hz; fade 3/25 ms; peak-normalize -6 dBFS; safety limit 0.56; PCM16 mono48kHz'; packs=$packUrls; compatibility=$compatibility; clips=@($records)}
+    $manifest = [ordered]@{licenses=@('CC0-1.0','CC-BY-3.0'); authors=@('Kenney','Mike Koenig','Mark DiAngelo','Sound Explorer','Joseph SARDIN'); acquired='2026-11-07'; credits='Assets/StreamingAssets/AudioCredits.txt'; sampleRate=48000; channels=1; bits=16; preprocessing='Per-layer trim/tempo/pitch/EQ/reverse/delay/compression/gain as recorded; remove leading silence below -48 dB; mix; high-pass 65 Hz; fade 3/25 ms; peak-normalize -6 dBFS; safety limit 0.56; PCM16 mono48kHz'; packs=$packUrls; compatibility=$compatibility; clips=@($records)}
     $manifest | ConvertTo-Json -Depth 9 | Set-Content -LiteralPath "$manifestFolder/manifest.json" -Encoding utf8
     Write-Output "Imported $($records.Count) processed clips and replaced four legacy recordings."
 } finally { Pop-Location }

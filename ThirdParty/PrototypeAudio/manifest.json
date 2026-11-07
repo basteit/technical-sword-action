@@ -15,7 +15,7 @@
   "sampleRate": 48000,
   "channels": 1,
   "bits": 16,
-  "preprocessing": "Per-layer trim/tempo/pitch/EQ/reverse/delay/tremolo/gain as recorded; remove leading silence below -48 dB; mix; high-pass 65 Hz; fade 3/25 ms; peak-normalize -6 dBFS; safety limit 0.56; PCM16 mono48kHz",
+  "preprocessing": "Per-layer trim/tempo/pitch/EQ/reverse/delay/compression/gain as recorded; remove leading silence below -48 dB; mix; high-pass 65 Hz; fade 3/25 ms; peak-normalize -6 dBFS; safety limit 0.56; PCM16 mono48kHz",
   "packs": {
     "rpg-audio": "https://kenney.nl/assets/rpg-audio",
     "impact-sounds": "https://kenney.nl/assets/impact-sounds",
@@ -406,15 +406,15 @@
       "name": "CounterImpact",
       "asset": "Assets/Audio/PrototypeFreeSfx/CounterImpact.wav",
       "license": "CC-BY-3.0",
-      "seconds": 0.24,
+      "seconds": 0.34,
       "peakTargetDb": -6,
-      "gainDb": -0.66,
-      "sha256": "336b844ed85db3c0ac1fb2bb2f9bf5f6d729f31e0d904871061e7e95707ab010",
+      "gainDb": -4.66,
+      "sha256": "4f4351e292ca5d964f877e918b790c65dd7d1fbc0fa3994b065d0a915e5140b3",
       "sources": [
         {
           "path": "ThirdParty/AdditionalAudio/SoundBible/Realistic_Punch.wav",
           "sha256": "c04bdef72208d0aa3e7c74f8225e9f9e00f4eee8d3ed845a897d3454f3932cd2",
-          "filter": "atrim=start=0.08:end=0.25,asetpts=PTS-STARTPTS,asetrate=57600,aresample=48000,highpass=f=500,lowpass=f=7500,equalizer=f=2000:t=q:w=0.8:g=2",
+          "filter": "atrim=start=0.08:end=0.27,asetpts=PTS-STARTPTS,asetrate=55200,aresample=48000,highpass=f=190,lowpass=f=9400,equalizer=f=2200:t=q:w=1:g=3,acompressor=threshold=0.13:ratio=2.6:attack=1.5:release=40:makeup=1.5",
           "title": "Realistic Punch",
           "author": "Mark DiAngelo",
           "license": "CC-BY-3.0",
@@ -422,24 +422,34 @@
           "download": "https://soundbible.com/grab.php?id=2069&type=wav"
         },
         {
-          "path": "ThirdParty/KenneyAudio/impact-sounds/impactPunch_medium_000.ogg",
-          "sha256": "486988aa2d6440ffc4c62a0e8ccf3c23673ba84424bd4723378d451b7255eb5c",
-          "filter": "atrim=0:0.09,atempo=1.4,highpass=f=1200,lowpass=f=8000,volume=0.5",
-          "title": "impactPunch_medium_000",
+          "path": "ThirdParty/KenneyAudio/impact-sounds/impactPunch_heavy_004.ogg",
+          "sha256": "f4c0c3eb8ab6517583b8218ed03f28923d1b687379aab4c1d5a6d4c10cf8e500",
+          "filter": "atrim=0:0.17,highpass=f=150,lowpass=f=1500,equalizer=f=400:t=q:w=1.1:g=-4,volume=0.85",
+          "title": "impactPunch_heavy_004",
           "author": "Kenney",
           "license": "CC0-1.0",
           "url": "https://kenney.nl/assets/impact-sounds",
           "download": null
         },
         {
-          "path": "ThirdParty/KenneyAudio/impact-sounds/impactPunch_heavy_004.ogg",
-          "sha256": "f4c0c3eb8ab6517583b8218ed03f28923d1b687379aab4c1d5a6d4c10cf8e500",
-          "filter": "atrim=0:0.20,asetrate=55200,aresample=48000,highpass=f=450,lowpass=f=7000,volume=0.45",
-          "title": "impactPunch_heavy_004",
+          "path": "ThirdParty/KenneyAudio/impact-sounds/impactPlate_medium_000.ogg",
+          "sha256": "b670d30452983369771081319c268475edaaafe782bf4e8d70bd7eef09d8823c",
+          "filter": "atrim=0:0.16,asetrate=57600,aresample=48000,highpass=f=1600,lowpass=f=9500,adelay=8:all=1,volume=0.52",
+          "title": "impactPlate_medium_000",
           "author": "Kenney",
           "license": "CC0-1.0",
           "url": "https://kenney.nl/assets/impact-sounds",
           "download": null
+        },
+        {
+          "path": "ThirdParty/AdditionalAudio/SoundBible/Woosh.wav",
+          "sha256": "438915b14b2f394f4404f02cacf970a3b1a08295eff0dee77e98910da031cb30",
+          "filter": "atrim=start=0.065:end=0.255,asetpts=PTS-STARTPTS,atempo=0.72,highpass=f=700,lowpass=f=8000,afade=t=in:d=0.012,afade=t=out:st=0.16:d=0.09,adelay=25:all=1,volume=0.55",
+          "title": "Woosh",
+          "author": "Mark DiAngelo",
+          "license": "CC-BY-3.0",
+          "url": "https://soundbible.com/2068-Woosh.html",
+          "download": "https://soundbible.com/grab.php?id=2068&type=wav"
         }
       ]
     },
