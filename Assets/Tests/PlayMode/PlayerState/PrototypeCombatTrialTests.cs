@@ -356,7 +356,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [UnityTest] public IEnumerator AttackTempoCyclesBackToPreviousFastInOneActionAndKeepsEnemyAxesIndependent()
         {
-            Call(arena, "ResetStrongEncounter", true); yield return null;
+            Call(arena, "ResetTrainingEncounter", true); yield return null;
             var counterProfile = Get<object>(player.GetComponent(T("PlayerParryCounter2D")), "CinematicProfile");
             for (int repeat = 0; repeat < 3; repeat++)
                 foreach (var expected in new[] { "FastTrial", "Original", "SnappyFirstTwo" })
@@ -541,7 +541,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [TestCase(false)] [TestCase(true)] public void SwitchPreservesSelectedEncounterAndAxesStayIndependent(bool mixed)
         {
-            if (mixed) Call(arena, "ResetStrongEncounter", true); else Call(arena, "ResetArena", false);
+            if (mixed) Call(arena, "ResetTrainingEncounter", true); else Call(arena, "ResetArena", false);
             for (int i = 0; i < 10; i++)
             {
                 Call(trial, "SetModes", false, true, false);
@@ -554,7 +554,15 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<int>(health, "MotionOwnerCount"), Is.Zero); Assert.That(Get<int>(health, "DeathPresentationOwnerCount"), Is.Zero);
             }
             var strong = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "StrongMelee");
-            Assert.That(strong.activeSelf, Is.EqualTo(mixed));
+            var dummy = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "TrainingDummy");
+            Assert.That(strong.activeSelf, Is.False);
+            Assert.That(dummy.activeSelf, Is.EqualTo(mixed));
+            if (mixed)
+            {
+                Assert.That(Get<bool>(dummy.GetComponent(T("Damageable2D")), "HasInfiniteHealth"), Is.True);
+                Assert.That(Get<object>(dummy.GetComponent(T("EnemyMeleeChaser2D")), "Definition"), Is.SameAs(Get<object>(ai, "Definition")));
+                Assert.That(Get<bool>(dummy.GetComponent(T("PrototypeEnemyArtPresentation")), "UsesDownParryPose"), Is.False);
+            }
         }
     }
 }

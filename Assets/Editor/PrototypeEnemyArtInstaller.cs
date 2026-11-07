@@ -44,7 +44,8 @@ public static class PrototypeEnemyArtInstaller
         }
         var normals = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<EnemyMeleeChaser2D>(true))
             .Where(e => e.Definition != null && e.Definition.name == "NormalMelee").ToArray();
-        if (normals.Length != 2) throw new InvalidOperationException("Expected the two normal-enemy preset instances.");
+        if (normals.Count(enemy => !enemy.GetComponent<Damageable2D>().HasInfiniteHealth) != 2)
+            throw new InvalidOperationException("Expected the two finite normal-enemy preset instances.");
         foreach (var enemy in normals)
         {
             var launch = enemy.GetComponent<EnemyCounterLaunch2D>();

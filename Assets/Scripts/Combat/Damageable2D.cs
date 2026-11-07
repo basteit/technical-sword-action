@@ -13,6 +13,8 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     }
 
     [SerializeField] private int maxHp = 5;
+    [SerializeField, Tooltip("Practice target only: accept hits and reactions without reducing HP or dying.")]
+    private bool infiniteHealth;
     [SerializeField] private string individualId;
     [SerializeField] private EnemyCombatRank combatRank;
     [SerializeField] private EnemyCombatDefinition combatDefinition;
@@ -171,6 +173,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     public float BreakThreshold => breakThreshold;
     public int CurrentHp => currentHp;
     public int MaxHp => maxHp;
+    public bool HasInfiniteHealth => infiniteHealth;
     public float HpNormalized => maxHp > 0 ? (float)currentHp / maxHp : 0f;
     public int CombatTickOrder => 190;
 
@@ -314,8 +317,10 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
             return false;
         }
 
-        LastDamageTaken = Mathf.Min(currentHp, damage);
-        currentHp = Mathf.Max(0, currentHp - damage);
+        // A confirmed hit, not invulnerability: feedback, stun and knockback
+        // still resolve, but the practice target does not lose HP or die.
+        LastDamageTaken = infiniteHealth ? 0 : Mathf.Min(currentHp, damage);
+        currentHp -= LastDamageTaken;
         HitCount++;
         if (combatDefinition == null)
         {

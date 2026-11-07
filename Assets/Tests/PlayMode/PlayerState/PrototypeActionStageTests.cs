@@ -43,7 +43,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [Test] public void StartsWithoutEnemiesAndDoesNotSpawnThemWhilePracticing()
         {
-            Assert.That(Enemies(true).Length, Is.EqualTo(3), "Keep existing combat targets for explicit QA presets.");
+            Assert.That(Enemies(true).Length, Is.EqualTo(4), "Keep two normals, the training dummy and the inactive strong fixture.");
             Frames(180);
             Assert.That(Enemies(false), Is.Empty);
         }
@@ -52,7 +52,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             for (int i = 0; i < 3; i++)
             {
-                Call(arena, "ResetStrongEncounter", true);
+                Call(arena, "ResetTrainingEncounter", true);
                 Assert.That(Enemies(false).Length, Is.EqualTo(2));
                 Call(arena, "ResetActionsOnly");
                 Frames(1);
@@ -62,6 +62,18 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
             Call(arena, "ResetArena", false);
             Assert.That(Enemies(false).Length, Is.EqualTo(1), "Retain the single-normal combat preset API.");
+        }
+
+        [Test] public void PlayablePresetsNeverActivateTheReservedStrongEnemy()
+        {
+            void Active(params string[] expected) => CollectionAssert.AreEquivalent(expected, Enemies(false).Select(e => e.name));
+            Call(arena, "ResetArena", false); Active("Melee_1");
+            Call(arena, "ResetArena", true); Active("Melee_1", "Melee_2");
+            Call(arena, "ResetTrainingEncounter", false); Active("TrainingDummy");
+            Call(arena, "ResetCurrentEncounter"); Active("TrainingDummy");
+            Call(arena, "ResetTrainingEncounter", true); Active("Melee_1", "TrainingDummy");
+            Call(arena, "ResetCurrentEncounter"); Active("Melee_1", "TrainingDummy");
+            Call(arena, "ResetActionsOnly"); Active();
         }
 
         [Test] public void UsesExistingVideoGridAndThreeGroundLayerPlatforms()

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -9,7 +10,8 @@ using Object = UnityEngine.Object;
 public static class PrototypeCombatPolishInstaller
 {
     private const string Folder = "Assets/Settings/PrototypeCombat/";
-    [MenuItem("Tools/Technical Sword Action/Prototype/Install Strong Enemy and Feedback")]
+    internal const string TrainingDummyName = "TrainingDummy";
+    [MenuItem("Tools/Technical Sword Action/Prototype/Install Training Enemies and Feedback")]
     public static void Install()
     {
         if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode first.");
@@ -72,7 +74,8 @@ public static class PrototypeCombatPolishInstaller
             strong.targetLayers = playerMask; strong.obstacleLayers = groundMask;
             strong.attacks = new[] { slash, sweep }; Save(strong);
         }
-        EnemyAttackCoordinator2D coordinator = null; EnemyMeleeChaser2D strongEnemy = null;
+        EnemyAttackCoordinator2D coordinator = null;
+        EnemyMeleeChaser2D strongEnemy = null, trainingDummy = null;
         var normal = new System.Collections.Generic.List<Damageable2D>();
         foreach (var root in scene.GetRootGameObjects())
         {
@@ -80,6 +83,7 @@ public static class PrototypeCombatPolishInstaller
             if (root.TryGetComponent<EnemyMeleeChaser2D>(out var enemy))
             {
                 if (root.name == "StrongMelee") strongEnemy = enemy;
+                else if (root.name == TrainingDummyName) trainingDummy = enemy;
                 else normal.Add(root.GetComponent<Damageable2D>());
             }
         }
@@ -106,7 +110,32 @@ public static class PrototypeCombatPolishInstaller
             root.SetActive(false);
         }
         Set(strongEnemy, "attackCoordinator", coordinator);
+        strongEnemy.gameObject.SetActive(false);
         foreach (var enemy in normal) Set(enemy.GetComponent<EnemyMeleeChaser2D>(), "attackCoordinator", coordinator);
+        if (trainingDummy == null)
+        {
+            // Independent scene instance: share the normal combat and artwork data, not its HP state.
+            var sample = normal.Single(enemy => enemy.name == "Melee_1");
+            var root = Object.Instantiate(sample.gameObject);
+            SceneManager.MoveGameObjectToScene(root, scene);
+            root.name = TrainingDummyName;
+            root.transform.position = strongEnemy.transform.position;
+            root.SetActive(false);
+            trainingDummy = root.GetComponent<EnemyMeleeChaser2D>();
+        }
+        var trainingHealth = trainingDummy.GetComponent<Damageable2D>();
+        Set(trainingHealth, "individualId", "prototype-training-dummy");
+        Set(trainingHealth, "infiniteHealth", true);
+        Set(trainingDummy, "attackCoordinator", coordinator);
+        if (arena.TryGetComponent<PrototypeCombatTrial>(out var trial))
+        {
+            var comparison = new SerializedObject(trial);
+            var trialEnemies = comparison.FindProperty("normalEnemies");
+            var actors = normal.Select(enemy => enemy.GetComponent<EnemyMeleeChaser2D>()).Append(trainingDummy).ToArray();
+            trialEnemies.arraySize = actors.Length;
+            for (int i = 0; i < actors.Length; i++) trialEnemies.GetArrayElementAtIndex(i).objectReferenceValue = actors[i];
+            comparison.ApplyModifiedPropertiesWithoutUndo();
+        }
         var profile = LoadOrCreate<CombatFeedbackProfile>("CombatFeedback", out bool createProfile);
         if (createProfile)
         {
@@ -127,10 +156,12 @@ public static class PrototypeCombatPolishInstaller
         if (feedback == null) feedback = player.gameObject.AddComponent<CombatFeedback2D>();
         Set(feedback, "profile", profile); Set(feedback, "settings", settings); Set(feedback, "feedbackCamera", camera);
         normal.Add(strongEnemy.GetComponent<Damageable2D>());
+        normal.Add(trainingHealth);
         var data = new SerializedObject(feedback); var enemies = data.FindProperty("enemies"); enemies.arraySize = normal.Count;
         for (int i = 0; i < normal.Count; i++) enemies.GetArrayElementAtIndex(i).objectReferenceValue = normal[i];
         data.ApplyModifiedPropertiesWithoutUndo();
-        Set(arena, "strongEnemy", strongEnemy); Set(arena, "coordinator", coordinator); Set(arena, "feedback", feedback);
+        Set(arena, "strongEnemy", strongEnemy); Set(arena, "trainingDummy", trainingDummy);
+        Set(arena, "coordinator", coordinator); Set(arena, "feedback", feedback);
     }
     private static CombatFeedbackProfile.Entry Entry(CombatFeedbackKind kind, int stop, float pixels, float seconds,
         int lifetime, float size, Color tint, float pitch) => new() {
@@ -158,6 +189,8 @@ public static class PrototypeCombatPolishInstaller
         if (property == null) throw new InvalidOperationException(name + " not found");
         if (value is Object obj) property.objectReferenceValue = obj;
         else if (value is int integer) property.intValue = integer;
+        else if (value is string text) property.stringValue = text;
+        else if (value is bool flag) property.boolValue = flag;
         data.ApplyModifiedPropertiesWithoutUndo();
     }
 }

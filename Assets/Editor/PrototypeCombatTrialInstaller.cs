@@ -98,7 +98,8 @@ public static class PrototypeCombatTrialInstaller
             var player = roots.SelectMany(root => root.GetComponentsInChildren<PlayerAttack2D>(true)).Single();
             var normals = roots.SelectMany(root => root.GetComponentsInChildren<EnemyMeleeChaser2D>(true))
                 .Where(value => value.Definition == enemy).OrderBy(value => value.name).ToArray();
-            if (normals.Length != 2) throw new InvalidOperationException("Expected exactly two original normal enemies.");
+            if (normals.Count(value => !value.GetComponent<Damageable2D>().HasInfiniteHealth) != 2)
+                throw new InvalidOperationException("Expected exactly two finite original normal enemies.");
             var trial = arena.GetComponent<PrototypeCombatTrial>();
             if (trial == null) trial = arena.gameObject.AddComponent<PrototypeCombatTrial>();
             var so = new SerializedObject(trial);
