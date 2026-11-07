@@ -26,6 +26,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private static void Pause(bool value)=>T("CombatTimeController").GetMethod("SetPaused").Invoke(null,new object[]{value});
         private void Frames(int count,int fps=60){for(int i=0;i<count;i++)Call(clock,"AdvanceFrame",1d/fps);Call(art,"RefreshVisual");}
         private void Request(PlayerActionRequest action)=>Assert.That(Call(player,"RequestAction",action),Is.True);
+        private SpriteRenderer[] Ghosts()=>player.gameObject.scene.GetRootGameObjects()
+            .Where(root=>root.name=="PrototypeDashAfterimages")
+            .SelectMany(root=>root.GetComponentsInChildren<SpriteRenderer>())
+            .Where(renderer=>renderer.enabled).ToArray();
         [UnitySetUp] public IEnumerator Setup()
         {
             clock=(Component)Object.FindFirstObjectByType(T("CombatTimeController"));manual=Get<bool>(clock,"ManualAdvanceOnly");
@@ -135,7 +139,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [Test] public void AirDashStillUsesTwentyTicksAndCannotRestartBeforeLanding()
         {
             Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);Frames(5);
-            Request(PlayerActionRequest.Dash);Frames(14);Assert.That(Get<bool>(motor,"IsDashing"),Is.True);
+            float start=body.position.x;
+            Request(PlayerActionRequest.Dash);Frames(12);
+            Assert.That(Mathf.Abs(body.position.x-start),Is.EqualTo(4.5f).Within(.12f));
+            Assert.That(Get<bool>(motor,"IsDashInvincible"),Is.False);
+            Frames(2);Assert.That(Get<bool>(motor,"IsDashing"),Is.True);
             Frames(6);Assert.That(Get<bool>(motor,"IsDashing"),Is.False);Assert.That(Get<bool>(motor,"AirDashUsed"),Is.True);
             Assert.That(Get<float>(motor,"DashCooldownRemaining")*60,Is.EqualTo(14f).Within(.001f));
             Frames(14);Assert.That(Get<bool>(motor,"CanStartDash"),Is.False);
@@ -153,12 +161,15 @@ namespace TechnicalSwordAction.PlayerState.Tests
         public void InterruptedGroundDashNeverAppliesTheNaturalMovementHandoff(string reason)
         {
             Call(motor,"SetMoveInput",Vector2.right);Request(PlayerActionRequest.Dash);Frames(13);
+            Assert.That(Ghosts(),Is.Not.Empty);
             if(reason=="Hit")Call(player,"ForceHit","MobilityRefinementTest");
             if(reason=="Dead")Call(player,"SetDead","MobilityRefinementTest");
             if(reason=="Reset")Call(arena,"ResetActionsOnly");
             if(reason=="Disable")((Behaviour)motor).enabled=false;
             Assert.That(Get<bool>(motor,"IsDashing"),Is.False);Assert.That(Get<bool>(motor,"IsDashInvincible"),Is.False);
             Assert.That(body.linearVelocity.x,Is.Zero.Within(.001f));
+            Call(player.GetComponent(T("PrototypeDashTrail")),"LateUpdate");
+            Assert.That(Ghosts(),Is.Empty);
             ((Behaviour)motor).enabled=true;
         }
         [Test] public void RemovedDialogueTestLeavesSharedBAsDashAtItsFormerLocation()
@@ -186,14 +197,74 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(arena,"ResetActionsOnly");Frames(2);Assert.That(Get<string>(art,"MobilityPhase"),Is.EqualTo("None"));
             Assert.That(AssetDatabase.GetAssetPath(source.sprite),Does.Contain("IdleReference"));
         }
-        [TestCase(-1)] [TestCase(1)] public void GroundDashShowsAllThreeReceivedCelsAndKeepsItsOriginalDistance(int direction)
+        [TestCase(-1)] [TestCase(1)] public void GroundDashShowsAllThreeReceivedCelsAndTravelsFourPointFiveUnits(int direction)
         {
             Call(motor,"SetFacing",direction);Request(PlayerActionRequest.Dash);
             float start=body.position.x;var seen=new HashSet<string>();int limit=50;
             do {Frames(1);if(Get<bool>(motor,"IsDashing"))seen.Add(source.sprite.name);}while(Get<bool>(motor,"IsDashing")&&--limit>0);
             Assert.That(limit,Is.GreaterThan(0));Assert.That(seen.Count,Is.EqualTo(3));
-            Assert.That(direction*(body.position.x-start),Is.InRange(3.3f,3.8f));
+            Assert.That(direction*(body.position.x-start),Is.EqualTo(4.5f).Within(.12f));
             Assert.That(Get<bool>(motor,"IsDashInvincible"),Is.False);
+        }
+        [TestCase(-1,false)] [TestCase(1,true)]
+        public void DashGhostsSnapshotActualTravelAndTheAuthoredPose(int direction,bool air)
+        {
+            if(air){Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);Frames(5);}
+            Call(motor,"SetFacing",direction);float start=body.position.x;
+            Request(PlayerActionRequest.Dash);Frames(1);
+            var first=Ghosts().Single();var drawing=Get<SpriteRenderer>(art,"Artwork");
+            Assert.That(first.sprite,Is.SameAs(drawing.sprite));
+            Assert.That(AssetDatabase.GetAssetPath(first.sprite),Does.Contain("/MobilitySubmitted/Dash_"));
+            Assert.That(Mathf.Sign(first.transform.lossyScale.x)*(first.flipX?-1:1),Is.EqualTo(direction));
+            Assert.That(first.sortingLayerID,Is.EqualTo(drawing.sortingLayerID));
+            Assert.That(first.sortingOrder,Is.LessThan(drawing.sortingOrder));
+            Assert.That(first.GetComponent<Collider2D>(),Is.Null);
+            Assert.That(first.transform.position.x,Is.EqualTo(start).Within(.02f));
+            float initialAlpha=first.color.a;Vector3 previous=first.transform.position;
+            Frames(4);
+            Assert.That(Ghosts().Length,Is.EqualTo(3));
+            Assert.That(first.transform.position,Is.EqualTo(previous));
+            Assert.That(first.color.a,Is.GreaterThan(0).And.LessThan(initialAlpha));
+            Assert.That(Ghosts().All(g=>direction*(body.position.x-g.transform.position.x)>.02f),Is.True);
+            Frames(20);
+            Assert.That(Ghosts(),Is.Empty);
+        }
+        [Test] public void DashGhostsFreezeOnPauseAndHitstopAndClearAtZeroVfx()
+        {
+            Request(PlayerActionRequest.Dash);Frames(5);
+            var ghosts=Ghosts();Assert.That(ghosts,Is.Not.Empty);
+            var alpha=ghosts.Select(g=>g.color.a).ToArray();var position=body.position;
+            Pause(true);Frames(20);
+            CollectionAssert.AreEqual(alpha,Ghosts().Select(g=>g.color.a).ToArray());
+            Assert.That(body.position,Is.EqualTo(position));Pause(false);
+            T("CombatTimeController").GetMethod("RequestHitstop").Invoke(null,new object[]{this,4f/60});
+            Frames(2);
+            CollectionAssert.AreEqual(alpha,Ghosts().Select(g=>g.color.a).ToArray());
+            Assert.That(body.position,Is.EqualTo(position));
+            var settings=Get<object>(Object.FindFirstObjectByType(T("CombatFeedback2D")),"Settings");
+            settings.GetType().GetField("vfx").SetValue(settings,0f);
+            Call(player.GetComponent(T("PrototypeDashTrail")),"LateUpdate");
+            Assert.That(Ghosts(),Is.Empty);
+            Frames(30);Assert.That(Ghosts(),Is.Empty);
+        }
+        [TestCase(-1)] [TestCase(1)]
+        public void LongerDashCannotPassAWallOrEmitStationaryGhosts(int direction)
+        {
+            var wall=new GameObject("DashTestWall");wall.layer=LayerMask.NameToLayer("Ground");
+            wall.transform.position=new Vector3(direction*1.4f,1);
+            wall.AddComponent<BoxCollider2D>().size=new Vector2(.2f,2f);
+            Physics2D.SyncTransforms();
+            try
+            {
+                Call(motor,"SetFacing",direction);Request(PlayerActionRequest.Dash);Frames(6);
+                float stopped=body.position.x;Assert.That(direction*stopped,Is.InRange(.85f,1.05f));
+                var existing=Ghosts().Select(g=>g.transform.position).ToArray();Assert.That(existing,Is.Not.Empty);
+                Frames(6);
+                Assert.That(body.position.x,Is.EqualTo(stopped).Within(.01f));
+                Assert.That(Ghosts().All(g=>existing.Contains(g.transform.position)),Is.True);
+                Frames(10);Assert.That(Ghosts(),Is.Empty);
+            }
+            finally {Object.Destroy(wall);}
         }
         [Test] public void PauseFreezesTheMobilityCelAndResetClearsItsPhase()
         {

@@ -8,6 +8,7 @@ using Object = UnityEngine.Object;
 public static class PrototypeCombatSceneBuilder
 {
     public const string ScenePath = "Assets/Scenes/PrototypeCombatValidation.unity";
+    public const float DashSpeed = 22.5f;
     private const string SettingsPath = "Assets/Settings/PrototypeCombat";
 
     [MenuItem("Tools/Technical Sword Action/Prototype/Build Combat Validation Scene")]
@@ -74,7 +75,7 @@ public static class PrototypeCombatSceneBuilder
             var hit = new GameObject("HitPoint"); hit.transform.SetParent(player.transform, false); hit.transform.localPosition = Vector3.right * .9f;
             Set(motor, "groundCheck", feet.transform); Set(motor, "groundLayer", groundMask);
             Set(motor, "dashDuration", 20f / 60f); Set(motor, "dashCooldown", 34f / 60f); Set(motor, "ignoreCollisionLayersWhileDashing", enemyMask);
-            Set(motor, "dashMoveFrames", 12); Set(motor, "preserveAirDashVertical", true);
+            Set(motor, "dashSpeed", DashSpeed); Set(motor, "dashMoveFrames", 12); Set(motor, "preserveAirDashVertical", true);
             Set(motor, "moveSpeed", PlayerMotor2D.PrototypeMoveSpeed); Set(motor, "groundDashRecoveryFrames", 2);
             Set(health, "maxHp", 100); Set(health, "hitStopMoveDuration", .3f); Set(health, "ignoreCollisionLayersWhileInvincible", enemyMask);
             Set(health, "normalParryHitStop", 3f / 60f); Set(health, "justParryHitStop", 5f / 60f);

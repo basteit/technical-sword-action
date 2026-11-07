@@ -8241,6 +8241,7 @@ GameObject:
   - component: {fileID: 1882940598}
   - component: {fileID: 1882940597}
   - component: {fileID: 1882940599}
+  - component: {fileID: 1882940600}
   m_Layer: 7
   m_Name: PrototypePlayer
   m_TagString: Player
@@ -8720,7 +8721,7 @@ MonoBehaviour:
   jumpReleaseMultiplier: 0.5
   floorDropFrames: 18
   coyoteFrames: 6
-  dashSpeed: 18
+  dashSpeed: 22.5
   dashDuration: 0.33333334
   dashCooldown: 0.56666666
   dashMoveFrames: 12
@@ -8981,6 +8982,22 @@ MonoBehaviour:
   - {fileID: 689758911}
   - {fileID: 907002370}
   - {fileID: 1208784948}
+--- !u!114 &1882940600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882940575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 686575492e18f5f449684d031741fe2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PrototypeDashTrail
+  feedback: {fileID: 1882940595}
+  intervalFrames: 2
+  lifetimeFrames: 9
+  tint: {r: 0.28, g: 0.69, b: 0.94, a: 0.48}
 --- !u!1 &1903729382
 GameObject:
   m_ObjectHideFlags: 0

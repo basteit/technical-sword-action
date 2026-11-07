@@ -159,6 +159,15 @@ public static class PrototypePlayerArtInstaller
             if (presentation == null) presentation = player.gameObject.AddComponent<PrototypePlayerArtPresentation>();
             presentation.Configure(source, visual, player.GetComponent<BoxCollider2D>(), set);
             if (presentation.Artwork == null) throw new InvalidOperationException("Artwork renderer was not connected.");
+            var feedback = scene.GetRootGameObjects().Select(root => root.GetComponentInChildren<CombatFeedback2D>(true)).SingleOrDefault(f => f != null);
+            if (feedback != null)
+            {
+                var trail = player.GetComponent<PrototypeDashTrail>();
+                if (trail == null) trail = player.gameObject.AddComponent<PrototypeDashTrail>();
+                var serializedTrail = new SerializedObject(trail);
+                serializedTrail.FindProperty("feedback").objectReferenceValue = feedback;
+                serializedTrail.ApplyModifiedPropertiesWithoutUndo();
+            }
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             ValidateOrThrow();
