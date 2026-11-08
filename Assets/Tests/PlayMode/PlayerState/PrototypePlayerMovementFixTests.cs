@@ -51,7 +51,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(true, -1)] [TestCase(true, 1)]
         public void HeldMovementStopsThroughoutParryAndMissThenResumes(bool airborne, int direction)
         {
-            Place(0, airborne ? 4.8f : .81f);
+            // Leave enough height to sample a still-falling body after the whole miss lock.
+            Place(0, airborne ? 6.8f : .81f);
             if (airborne) body.linearVelocity = new Vector2(direction * 4, -1);
             Call(motor, "SetMoveInput", Vector2.right * direction);
             Vector2 start = body.position; float gravity = body.gravityScale;

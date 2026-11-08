@@ -9028,7 +9028,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMotor2D
   moveSpeed: 5.28228
   flipSpriteByMoveInput: 1
-  jumpForce: 12
+  jumpForce: 13.2
   groundCheck: {fileID: 1056788165}
   groundCheckRadius: 0.15
   groundLayer:
@@ -9143,7 +9143,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 0bbcb4817a2944d09fafc8b9d826988d, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -9194,7 +9194,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 3
+  m_GravityScale: 3.63
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2

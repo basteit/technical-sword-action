@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 /// <summary>Opt-in encounter presentation. Filming/legacy scenes keep their existing owners.</summary>
 [DefaultExecutionOrder(11000)]
-public sealed class CombatFeedback2D : MonoBehaviour
+public sealed class CombatFeedback2D : MonoBehaviour, ICombatTickListener
 {
     private sealed class Effect
     {
@@ -15,6 +15,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
         public Vector2 position;
         public float age, duration, size, decoration;
         public Color tint;
+        public bool landing;
     }
     private sealed class Flash
     {
@@ -41,6 +42,9 @@ public sealed class CombatFeedback2D : MonoBehaviour
     private PlayerParry2D parry;
     private PlayerDamageReceiver2D health;
     private PlayerSpecialSkill2D special;
+    private PlayerMotor2D motor;
+    private Collider2D playerCollider;
+    private bool landingArmed;
     private AudioSource sound;
     private CombatFeedbackSettings runtimeSettings;
     private Vector3 baseCameraPosition;
@@ -85,6 +89,8 @@ public sealed class CombatFeedback2D : MonoBehaviour
         }
     }
     public int EmissionCount { get; private set; }
+    public int LandingBurstCount { get; private set; }
+    public int CombatTickOrder => 250;
     public int EssentialGlyphCount { get; private set; }
     public int ActiveEffectCount { get { int n = 0; foreach (var e in pool) if (e.root.activeSelf) n++; return n; } }
     public int ActiveFlashCount => flashes.Count;
@@ -107,6 +113,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
         attack = GetComponent<PlayerAttack2D>(); counter = GetComponent<PlayerParryCounter2D>();
         parry = GetComponent<PlayerParry2D>(); health = GetComponent<PlayerDamageReceiver2D>();
         special = GetComponent<PlayerSpecialSkill2D>();
+        motor = GetComponent<PlayerMotor2D>(); playerCollider = GetComponent<Collider2D>();
         sound = gameObject.AddComponent<AudioSource>(); sound.playOnAwake = false; sound.spatialBlend = 0;
         if (settings != null) runtimeSettings = Instantiate(settings);
         if (feedbackCamera == null) feedbackCamera = Camera.main;
@@ -127,6 +134,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     }
     private void OnEnable()
     {
+        CombatTimeController.Register(this);
         if (attack != null) attack.HitConfirmed += OnAttack;
         if (counter != null) counter.HitConfirmed += OnCounter;
         if (parry != null) { parry.Succeeded += OnParry; parry.Failed += OnParryMiss; }
@@ -139,6 +147,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     }
     private void OnDisable()
     {
+        CombatTimeController.Unregister(this);
         if (attack != null) attack.HitConfirmed -= OnAttack;
         if (counter != null) counter.HitConfirmed -= OnCounter;
         if (parry != null) { parry.Succeeded -= OnParry; parry.Failed -= OnParryMiss; }
@@ -157,6 +166,33 @@ public sealed class CombatFeedback2D : MonoBehaviour
         if (ownedMaterial != null) Destroy(ownedMaterial);
     }
     private void OnSceneChanged(Scene before, Scene after) => ResetPresentation();
+    public void CombatTick()
+    {
+        if (motor == null || playerCollider == null || (health != null && health.CurrentHp <= 0) ||
+            (counter != null && counter.IsActive) || motor.IsDroppingThrough)
+        { landingArmed = false; return; }
+
+        float verticalSpeed = motor.Velocity.y;
+        if (!motor.IsGrounded)
+        {
+            landingArmed |= verticalSpeed < -2f;
+            return;
+        }
+        // The ground probe can enter range before actual contact. Wait for the downward velocity to stop.
+        if (!landingArmed || verticalSpeed < -.05f) return;
+        landingArmed = false;
+        if (!IsReady || Settings.vfx <= 0) return;
+        var effect = pool.Find(item => !item.root.activeSelf);
+        if (effect == null) return;
+        var bounds = playerCollider.bounds;
+        effect.landing = true;
+        effect.position = new Vector2(bounds.center.x, bounds.min.y + .025f);
+        effect.age = 0;
+        effect.duration = .20f;
+        effect.root.SetActive(true);
+        DrawEffect(effect);
+        LandingBurstCount++;
+    }
     private void OnAttack(Damageable2D target, int step, Vector2 position) =>
         PresentFeedback(step == 4 ? CombatFeedbackKind.HeavyHit : CombatFeedbackKind.LightHit, position, target, false, GetAttackHitstopFrames(step));
     private void OnCounter(Damageable2D target, Vector2 position)
@@ -209,7 +245,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
         if (!authored)
         {
             var effect = pool.Find(x => !x.root.activeSelf) ?? pool[EmissionCount % pool.Count];
-            effect.kind = kind; effect.position = position; effect.age = 0;
+            effect.landing = false; effect.kind = kind; effect.position = position; effect.age = 0;
             effect.duration = entry.lifetimeFrames / 60f; effect.size = entry.glyphSize;
             effect.decoration = Mathf.Clamp01(Settings.vfx); effect.tint = entry.tint;
             effect.root.SetActive(true); DrawEffect(effect);
@@ -333,6 +369,13 @@ public sealed class CombatFeedback2D : MonoBehaviour
     private void DrawEffect(Effect effect)
     {
         float life = Mathf.Clamp01(1 - effect.age / effect.duration);
+        if (effect.landing)
+        {
+            DrawLandingPuff(effect.core, effect.position, -1, life);
+            effect.accent.enabled = true;
+            DrawLandingPuff(effect.accent, effect.position, 1, life);
+            return;
+        }
         float size = effect.size * (1 + (1 - life) * .45f);
         int points = effect.kind == CombatFeedbackKind.LightHit ? 2 : effect.kind == CombatFeedbackKind.JustParry ? 9 :
             effect.kind == CombatFeedbackKind.Counter ? 7 : effect.kind == CombatFeedbackKind.PlayerHit ? 3 :
@@ -355,6 +398,17 @@ public sealed class CombatFeedback2D : MonoBehaviour
         color.a = life * .35f * effect.decoration;
         effect.accent.startColor = effect.accent.endColor = color;
     }
+    private void DrawLandingPuff(LineRenderer line, Vector2 position, int side, float life)
+    {
+        float age = 1 - life;
+        float offset = side * (.16f + .29f * age);
+        line.loop = false;
+        line.positionCount = 3;
+        line.SetPosition(0, position + new Vector2(offset, 0));
+        line.SetPosition(1, position + new Vector2(offset + side * .13f, .09f + .07f * age));
+        line.SetPosition(2, position + new Vector2(offset + side * .23f, .05f + .07f * age));
+        line.startColor = line.endColor = new Color(.32f, .40f, .44f, life * .72f * Mathf.Clamp01(Settings.vfx));
+    }
     public void AdvanceVisuals(float realSeconds)
     {
         parryShockwave.Advance(realSeconds, Settings != null && Settings.parryShockwave > 0 && Settings.vfx > 0);
@@ -363,7 +417,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
         {
             if (!e.root.activeSelf) continue;
             e.age += realSeconds;
-            if (e.age >= e.duration) e.root.SetActive(false); else DrawEffect(e);
+            if (e.age >= e.duration || (e.landing && Settings.vfx <= 0)) e.root.SetActive(false); else DrawEffect(e);
         }
         for (int i = flashes.Count - 1; i >= 0; i--)
         {
@@ -429,6 +483,7 @@ public sealed class CombatFeedback2D : MonoBehaviour
     }
     public void ResetPresentation()
     {
+        landingArmed = false;
         parryShockwave.Reset();
         foreach (var e in pool) if (e.root != null) e.root.SetActive(false);
         foreach (var f in flashes) if (f.renderer != null) f.renderer.color = f.original;

@@ -46,8 +46,11 @@ public static class PrototypeCombatSceneBuilder
 
             var player = new GameObject("PrototypePlayer"); player.tag = "Player"; player.layer = playerLayer;
             player.SetActive(false); player.transform.position = new Vector3(-3, .85f);
-            var body = player.AddComponent<Rigidbody2D>(); body.gravityScale = 3; body.constraints = RigidbodyConstraints2D.FreezeRotation;
-            player.AddComponent<BoxCollider2D>().size = new Vector2(.65f, 1.6f);
+            var body = player.AddComponent<Rigidbody2D>(); body.gravityScale = 3.63f; body.constraints = RigidbodyConstraints2D.FreezeRotation;
+            var playerCollider = player.AddComponent<BoxCollider2D>();
+            playerCollider.size = new Vector2(.65f, 1.6f);
+            playerCollider.sharedMaterial = AssetDatabase.LoadAssetAtPath<PhysicsMaterial2D>(
+                SettingsPath + "/PrototypePlayerGripless.physicsMaterial2D");
             var renderer = player.AddComponent<SpriteRenderer>();
             renderer.sharedMaterial = GetUnlitMaterial();
             var animator = player.AddComponent<Animator>();
@@ -74,6 +77,7 @@ public static class PrototypeCombatSceneBuilder
             var feet = new GameObject("GroundCheck"); feet.transform.SetParent(player.transform, false); feet.transform.localPosition = Vector3.down * .8f;
             var hit = new GameObject("HitPoint"); hit.transform.SetParent(player.transform, false); hit.transform.localPosition = Vector3.right * .9f;
             Set(motor, "groundCheck", feet.transform); Set(motor, "groundLayer", groundMask);
+            Set(motor, "jumpForce", 13.2f);
             Set(motor, "dashDuration", 20f / 60f); Set(motor, "dashCooldown", 34f / 60f); Set(motor, "ignoreCollisionLayersWhileDashing", enemyMask);
             Set(motor, "dashSpeed", DashSpeed); Set(motor, "dashMoveFrames", 12); Set(motor, "preserveAirDashVertical", true);
             Set(motor, "moveSpeed", PlayerMotor2D.PrototypeMoveSpeed); Set(motor, "groundDashRecoveryFrames", 2);

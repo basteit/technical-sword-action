@@ -140,6 +140,75 @@ namespace TechnicalSwordAction.PlayerState.Tests
             start=body.position.x;Frames(30);float baseline=direction*(body.position.x-start);
             Assert.That(tuned/baseline,Is.EqualTo(1.2f).Within(.015f));
         }
+        [UnityTest] public IEnumerator HeldJumpRisesAndFallsFasterWithNearlyTheSamePeak()
+        {
+            (int up, int down, float height) Measure()
+            {
+                float start=body.position.y,peak=start;int up=0,elapsed=0;
+                Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);
+                do
+                {
+                    Frames(1);elapsed++;
+                    if(body.position.y>peak){peak=body.position.y;up=elapsed;}
+                }while((!Get<bool>(motor,"IsGrounded")||body.linearVelocity.y<-.05f)&&elapsed<90);
+                Assert.That(elapsed,Is.LessThan(90));
+                return (up,elapsed-up,peak-start);
+            }
+            var tuned=Measure();
+            Call(arena,"ResetActionsOnly");
+            yield return null; // Reset deliberately rejects new input until the next rendered frame.
+            body.position=new Vector2(0,.81f);player.transform.position=body.position;body.linearVelocity=Vector2.zero;
+            body.gravityScale=3f;motor.GetType().GetField("jumpForce",Flags).SetValue(motor,12f);
+            Physics2D.SyncTransforms();Frames(4);
+            var original=Measure();
+            Assert.That(tuned.up,Is.LessThan(original.up));
+            Assert.That(tuned.down,Is.LessThan(original.down));
+            Assert.That(tuned.height,Is.EqualTo(original.height).Within(.1f));
+        }
+        [TestCase(-1)] [TestCase(1)]
+        public void JumpSlidesDownWhenInputKeepsPushingIntoASolidWall(int direction)
+        {
+            var wall=new GameObject("JumpTestWall");wall.layer=LayerMask.NameToLayer("Ground");
+            wall.transform.position=new Vector3(direction*1.4f,2);
+            wall.AddComponent<BoxCollider2D>().size=new Vector2(.2f,4);
+            Physics2D.SyncTransforms();
+            try
+            {
+                Call(motor,"SetMoveInput",Vector2.right*direction);Call(motor,"SetJumpHeld",true);
+                Request(PlayerActionRequest.Jump);
+                bool fellAlongWall=false;
+                for(int i=0;i<60;i++)
+                {
+                    Frames(1);
+                    if(direction*body.position.x>.9f&&body.position.y>1.2f&&body.linearVelocity.y<-2f)
+                        fellAlongWall=true;
+                }
+                Assert.That(fellAlongWall,Is.True);
+                Assert.That(direction*body.position.x,Is.InRange(.9f,1f));
+                Assert.That(Get<bool>(motor,"IsGrounded"),Is.True);
+            }
+            finally {Object.DestroyImmediate(wall);}
+        }
+        [TestCase(1f,1)] [TestCase(0f,0)]
+        public void LandingEmitsOnlyOnPhysicalContactAndHonorsTheEffectSetting(float vfx,int bursts)
+        {
+            var feedback=player.GetComponent(T("CombatFeedback2D"));
+            var settings=Get<object>(feedback,"Settings");
+            settings.GetType().GetField("vfx").SetValue(settings,vfx);
+            int initial=Get<int>(feedback,"LandingBurstCount");
+            Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);Frames(8);
+            int limit=80;
+            while((!Get<bool>(motor,"IsGrounded")||body.linearVelocity.y<-.05f)&&--limit>0)
+            {
+                Assert.That(Get<int>(feedback,"LandingBurstCount"),Is.EqualTo(initial));
+                Frames(1);
+            }
+            Assert.That(limit,Is.GreaterThan(0));
+            Frames(1); // Landing feedback samples the settled body on the next combat tick.
+            Assert.That(Get<int>(feedback,"LandingBurstCount"),Is.EqualTo(initial+bursts));
+            Frames(20);
+            Assert.That(Get<int>(feedback,"LandingBurstCount"),Is.EqualTo(initial+bursts));
+        }
         [TestCase(-1)] [TestCase(1)] public void GroundDashEndsAtFourteenTicksAndHandsOffToHeldMovement(int direction)
         {
             Call(motor,"SetMoveInput",Vector2.right*direction);Request(PlayerActionRequest.Dash);Frames(12);
