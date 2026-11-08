@@ -52,6 +52,8 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
     {
         controls = new InputActionMap("PrototypeCombatTrial");
         for (int key = 10; key <= 12; key++) controls.AddAction("F" + key, InputActionType.Button, "<Keyboard>/f" + key);
+        controls.FindAction("F10").AddBinding("<Keyboard>/0");
+        controls.FindAction("F10").AddBinding("<Keyboard>/numpad0");
         controls.Enable();
     }
     private void Update()
@@ -114,8 +116,8 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
             AttackTempo == PrototypeAttackTempo.FastTrial ? "FAST" : "ORIGINAL";
         if (attack != null && attack.Definition != null)
             tempo += " " + string.Join("/", attack.Definition.steps.Take(attack.MaxComboStep).Select(step => step.activeStart)) + "F";
-        if (GUILayout.Button("F10 Attack: " + tempo)) CycleAttackTempo();
-        GUILayout.Label("Cycle: SNAPPY -> previous FAST -> ORIGINAL");
+        if (GUILayout.Button("0 / F10 Attack: " + tempo)) CycleAttackTempo();
+        GUILayout.Label("Cycle: FAST -> ORIGINAL -> SNAPPY");
         var feedback = attack != null ? attack.GetComponent<CombatFeedback2D>() : null;
         string impact = feedback != null ? feedback.GetAttackHitstopFrames(1) + "/" + feedback.GetAttackHitstopFrames(2) + "F" : "unconfigured";
         if (GUILayout.Button("Attack 1/2 hitstop: " + (strongAttackHits ? "TRIAL " : "BASE ") + impact))
@@ -125,7 +127,6 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
         if (GUILayout.Button("F12: " + (referenceReaction ? "DOWN / DEFEAT HOP" : "CHANCE / DEFEAT SPIN")))
             SetEnemyReaction(!referenceReaction);
         if (GUILayout.Button("Restore ALL original settings")) RestoreOriginals();
-        GUILayout.Label("No parry / counter / special changes");
         GUILayout.EndArea();
     }
     private void OnDisable() { controls?.Dispose(); controls = null; }

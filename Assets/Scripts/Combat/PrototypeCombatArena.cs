@@ -38,7 +38,12 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     private void OnEnable()
     {
         controls = new InputActionMap("PrototypeValidation");
-        for (int i = 1; i <= 9; i++) controls.AddAction("F" + i, InputActionType.Button, "<Keyboard>/f" + i);
+        for (int i = 1; i <= 9; i++)
+        {
+            var action = controls.AddAction("F" + i, InputActionType.Button, "<Keyboard>/f" + i);
+            action.AddBinding("<Keyboard>/" + i);
+            action.AddBinding("<Keyboard>/numpad" + i);
+        }
         controls.Enable(); reset = controls.FindAction("F2");
     }
     private void Update()
@@ -103,21 +108,21 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     {
         GUILayout.BeginArea(new Rect(Screen.width - 310, 12, 298, 280), GUI.skin.box);
         GUILayout.Label("Prototype action / combat acceptance");
-        if (GUILayout.Button("F1: Parry practice (one normal)")) ResetArena(false);
-        if (GUILayout.Button("F2: Reset actions only (no enemies)")) ResetActionsOnly();
+        if (GUILayout.Button("1: Parry practice (one normal)")) ResetArena(false);
+        if (GUILayout.Button("2: Reset actions only (no enemies)")) ResetActionsOnly();
         using (new GUILayout.HorizontalScope())
         {
-            if (GUILayout.Button("F3: Two normals")) ResetArena(true);
-            if (GUILayout.Button("F4: Infinite HP dummy")) ResetTrainingEncounter(false);
+            if (GUILayout.Button("3: Two normals")) ResetArena(true);
+            if (GUILayout.Button("4: Infinite HP dummy")) ResetTrainingEncounter(false);
         }
-        if (GUILayout.Button("F5: Normal + infinite HP dummy")) ResetTrainingEncounter(true);
+        if (GUILayout.Button("5: Normal + infinite HP dummy")) ResetTrainingEncounter(true);
         GUILayout.Label("K / RMB: Parry - J / LMB: Counter");
         if (coordinator != null) GUILayout.Label($"Attack roles: {coordinator.ActiveAttackers}/{coordinator.MaximumAttackers}");
         if (feedback != null && feedback.Settings != null)
         {
             var s = feedback.Settings;
-            GUILayout.Label($"F6 Camera {s.shake:P0} / F7 Flash {s.flash:P0}");
-            GUILayout.Label($"F8 VFX {s.vfx:P0} / F9 Sound {s.masterVolume:P0}");
+            GUILayout.Label($"6 Camera {s.shake:P0} / 7 Flash {s.flash:P0}");
+            GUILayout.Label($"8 VFX {s.vfx:P0} / 9 Sound {s.masterVolume:P0}");
             GUILayout.Label($"Feedback: {feedback.LastKind} @{feedback.LastEmissionTick}");
         }
         GUILayout.Label("B: Interact in range / Dash otherwise");
