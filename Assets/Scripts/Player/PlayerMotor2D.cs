@@ -192,10 +192,12 @@ public class PlayerMotor2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
 
         if (stateMachine != null && stateMachine.ActionState == PlayerActionState.Attack && attack != null)
         {
+            // Turn after input arbitration, before the same tick's movement and hit resolution.
+            if (attack.CanTurnDuringAttack && flipSpriteByMoveInput && Mathf.Abs(moveInput) > .01f)
+                SetFacing(moveInput > 0 ? 1 : -1);
             if (isGrounded)
             {
-                // Ground attacks ignore live movement input. The current attack step
-                // owns its signed forward/backward motion for the configured window.
+                // The attack step still owns the amount of ground travel.
                 rb.linearVelocity = new Vector2(attack.GroundMotionVelocity, rb.linearVelocity.y);
             }
             else

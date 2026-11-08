@@ -21,7 +21,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(profile, "blinkStartFrame"), Is.EqualTo(10)); Assert.That(Get<int>(profile, "BlinkArrivalFrame"), Is.EqualTo(12));
             Assert.That(Get<int>(profile, "chargeFrame"), Is.EqualTo(12)); Assert.That(Get<int>(profile, "releaseFrame"), Is.EqualTo(20));
             Assert.That(Get<int>(profile, "hitFrame"), Is.EqualTo(21)); Assert.That(Get<int>(profile, "endFrame"), Is.EqualTo(45));
-            Assert.That(Get<float>(profile, "chargeScale"), Is.EqualTo(.15f)); Assert.That(Get<int>(profile, "launchFrames"), Is.EqualTo(22));
+            Assert.That(Get<float>(profile, "chargeScale"), Is.EqualTo(.5f)); Assert.That(Get<int>(profile, "launchFrames"), Is.EqualTo(22));
             Assert.That(Get<float>(profile, "launchDistance"), Is.EqualTo(3.2f));
             Assert.That(Get<float>(profile, "cameraOrthographicSize"), Is.EqualTo(3.75f));
             Assert.That(Get<float>(profile, "cameraBlendSeconds"), Is.EqualTo(.1f));

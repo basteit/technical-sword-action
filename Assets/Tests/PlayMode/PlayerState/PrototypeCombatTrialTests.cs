@@ -6,6 +6,8 @@ using System.Reflection;
 using NUnit.Framework;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
@@ -72,22 +74,68 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(arena, "ResetActionsOnly"); clock.GetType().GetProperty("ManualAdvanceOnly").SetValue(clock, savedManual); yield return null;
         }
 
-        [Test] public void StartsInSlowerOriginalWithoutEnemiesAndKeepsFastModesAsExplicitComparisons()
+        [Test] public void StartsInFastModeWithoutEnemiesAndKeepsOriginalAsAComparison()
         {
             Assert.That(Get<bool>(trial, "IsConfigured"), Is.True);
-            Assert.That(sceneDefaultTempo, Is.EqualTo("Original"));
-            Assert.That(sceneDefaultHitFrames, Is.EqualTo(new[] { 15, 12, 15, 38 }));
+            Assert.That(sceneDefaultTempo, Is.EqualTo("FastTrial"));
+            Assert.That(sceneDefaultHitFrames, Is.EqualTo(new[] { 12, 9, 12, 30 }));
             Assert.That(sceneDefaultController, Is.SameAs(sceneExpectedController));
+            Assert.That(Get<float>(Get<object>(Feedback, "Settings"), "shake"), Is.Zero);
             Assert.That(Get<bool>(trial, "StrongAttackHits"), Is.True);
             Assert.That(Call(Feedback, "GetAttackHitstopFrames", 1), Is.EqualTo(8));
             Assert.That(Call(Feedback, "GetAttackHitstopFrames", 2), Is.EqualTo(8));
             Assert.That(Get<bool>(trial, "FastAttacks"), Is.True); Assert.That(ai.gameObject.activeSelf, Is.False);
             Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo("SnappyFirstTwo"));
             Assert.That(Steps.Select(s => Get<int>(s, "activeStart")), Is.EqualTo(new[] { 9, 7, 12, 30 }));
+            Call(trial, "CycleAttackTempo");
+            Call(trial, "CycleAttackTempo");
+            Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo("Original"));
+            Assert.That(Steps.Select(s => Get<int>(s, "activeStart")), Is.EqualTo(new[] { 15, 12, 15, 38 }));
             Assert.That(Get<int>(Get<object>(ai, "Definition"), "windupFrames"), Is.EqualTo(96));
             var strong = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "StrongMelee");
             Assert.That(Get<int>(Get<object>(strong.GetComponent(T("EnemyMeleeChaser2D")), "Definition"), "maxHp"), Is.EqualTo(120));
             Assert.That(strong.GetComponent(T("PrototypeEnemyArtPresentation")), Is.Null);
+        }
+
+        [Test] public void NumberRowNumpadAndFunctionKeysKeepTheSamePracticeActions()
+        {
+            var keyboard = InputSystem.AddDevice<Keyboard>();
+            var second = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "Melee_2");
+            try
+            {
+                void Press(Key key, Component owner)
+                {
+                    InputSystem.QueueStateEvent(keyboard, new KeyboardState(key));
+                    InputSystem.Update();
+                    Call(owner, "Update");
+                    InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                    InputSystem.Update();
+                }
+
+                Press(Key.Digit1, arena);
+                Assert.That(ai.gameObject.activeSelf, Is.True);
+                Assert.That(second.activeSelf, Is.False);
+                Press(Key.Numpad3, arena);
+                Assert.That(second.activeSelf, Is.True);
+                Press(Key.F2, arena);
+                Assert.That(ai.gameObject.activeSelf || second.activeSelf, Is.False);
+                Press(Key.Digit1, arena);
+                Assert.That(ai.gameObject.activeSelf, Is.True);
+                Press(Key.Digit2, arena);
+                Assert.That(ai.gameObject.activeSelf || second.activeSelf, Is.False);
+                var settings = Get<object>(Feedback, "Settings");
+                Press(Key.Digit6, arena);
+                Assert.That(Get<float>(settings, "shake"), Is.EqualTo(.5f));
+                Press(Key.Numpad6, arena);
+                Assert.That(Get<float>(settings, "shake"), Is.EqualTo(1f));
+                Press(Key.F6, arena);
+                Assert.That(Get<float>(settings, "shake"), Is.Zero);
+                Press(Key.Digit0, trial);
+                Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo("FastTrial"));
+                Press(Key.Numpad0, trial);
+                Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo("Original"));
+            }
+            finally { InputSystem.RemoveDevice(keyboard); }
         }
 
         [TestCase(30, 1)] [TestCase(30, -1)] [TestCase(60, 1)] [TestCase(60, -1)] [TestCase(120, 1)] [TestCase(120, -1)]

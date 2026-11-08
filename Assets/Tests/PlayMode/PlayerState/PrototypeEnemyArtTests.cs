@@ -139,7 +139,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 pixels.ReadPixels(new Rect(0, 0, resolution, resolution), 0, 0);
                 var colors = pixels.GetPixels32();
                 Assert.That(colors.Any(IsYellow), Is.True, "The existing yellow cue must render in front of the cover.");
-                Assert.That(colors.All(p => IsYellow(p) || (p.r > 230 && p.g < 30 && p.b > 230)), Is.True,
+                Assert.That(colors.Any(IsForecastOutline), Is.True, "The yellow cue needs a contrasting edge on the white stage.");
+                Assert.That(colors.All(p => IsYellow(p) || IsForecastOutline(p) || (p.r > 230 && p.g < 30 && p.b > 230)), Is.True,
                     "No blue/grey body pixels may render in front of the cover.");
             }
             finally
@@ -155,6 +156,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
 
         private static bool IsYellow(Color32 pixel) => pixel.r > 230 && pixel.g > 220 && pixel.b < 175;
+        private static bool IsForecastOutline(Color32 pixel) => pixel.r > 35 && pixel.r < 155 &&
+            pixel.r > pixel.g + 12 && pixel.g > pixel.b + 8;
 
         [Test]
         public void LivingHitOutsideAnAttackUsesChance()

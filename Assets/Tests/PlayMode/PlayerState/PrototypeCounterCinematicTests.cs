@@ -121,15 +121,15 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That((body.position.x - target.transform.position.x) * direction, Is.EqualTo(2.125f).Within(.02f));
             Assert.That(Get<int>(counter, "KickFacingSign"), Is.EqualTo(-direction));
             int chargeStart = realFrames; ToFrame(14);
-            Assert.That(Get<float>(presentation, "DimAlpha"), Is.GreaterThan(.9f));
+            Assert.That(Get<float>(presentation, "DimAlpha"), Is.EqualTo(.35f).Within(.01f));
             Assert.That(Get<bool>(presentation, "IsSpotlightVisible"), Is.True);
-            Assert.That(TimeValue<float>("SlowScale"), Is.EqualTo(.15f).Within(.00001f));
+            Assert.That(TimeValue<float>("SlowScale"), Is.EqualTo(.5f).Within(.00001f));
             var receiver = player.GetComponent(T("PlayerDamageReceiver2D"));
             Assert.That((bool)Call(receiver, "TryReceiveHit", 20, (Vector2)target.transform.position, 0f), Is.False);
             foreach (var action in new[] { PlayerActionRequest.Dash, PlayerActionRequest.Parry, PlayerActionRequest.Special })
                 Call(player, "RequestAction", action);
             Frames(1); Assert.That(Get<PlayerActionState>(player, "ActionState"), Is.EqualTo(PlayerActionState.ParryCounter));
-            ToFrame(20); Assert.That((realFrames - chargeStart) / 60f, Is.EqualTo(.9f).Within(.035f));
+            ToFrame(20); Assert.That((realFrames - chargeStart) / 60f, Is.EqualTo(8f / 30f).Within(.035f));
             var gauge = player.GetComponent(T("PlayerSpecialGauge"));
             Assert.That((bool)Call(gauge, "Consume", 100f), Is.True, "Special had enough gauge but could not cancel the cinematic; empty it to measure the counter award.");
             ToFrame(21);
@@ -245,7 +245,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Set(Get<object>(feedback, "Settings"), "shake", 1f);
             var camera = Camera.main; Vector3 original = camera.transform.position;
-            Begin(direction); ToFrame(14);
+            Begin(direction); ToFrame(16); // The blend lasts .1 real seconds even with the shorter charge.
             var profile = Get<object>(counter, "CinematicProfile");
             Assert.That(camera.orthographicSize, Is.EqualTo(Get<float>(profile, "cameraOrthographicSize")).Within(.00001f));
             Vector2 offset = Get<Vector2>(profile, "cameraFocusOffset");
@@ -282,7 +282,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Set(Get<object>(feedback, "Settings"), "shake", 1f);
             var camera = Camera.main; Vector3 original = camera.transform.position;
-            var target = Begin(); ToFrame(14);
+            var target = Begin(); ToFrame(16);
             Assert.That(camera.orthographicSize, Is.EqualTo(3.75f).Within(.00001f));
             Set(Get<object>(feedback, "Settings"), "shake", 0f); Frames(1);
             Assert.That(camera.orthographicSize, Is.EqualTo(5.625f));
@@ -321,13 +321,37 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Until(() => !Get<bool>(counter, "IsActive")); Frames(6); AssertClean();
         }
 
-        [TestCase(1)] [TestCase(-1)]
-        public void UnsafeRearPositionKeepsStockAndFallsBackToOrdinaryAttack(int direction)
+        [TestCase(1, true)] [TestCase(-1, true)] [TestCase(1, false)] [TestCase(-1, false)]
+        public void WallBehindEnemyAllowsAFrontCounter(int direction, bool roomToBackUp)
         {
             body.position = new Vector2(0, .81f); player.transform.position = body.position; Call(motor, "SetFacing", direction);
             var target = Enemy("StrongMelee", new Vector2(direction * 1.15f, .81f), 120); Wall(direction * 2.5f);
+            if (!roomToBackUp) Wall(-direction * .7f);
+            var cameraPosition = Camera.main.transform.position;
+            float cameraSize = Camera.main.orthographicSize;
             Call(counter, "RegisterParriedEnemy", target);
-            Assert.That((string)Call(counter, "EligibilityReason", target), Is.EqualTo("RearPositionBlocked"));
+            Assert.That((string)Call(counter, "EligibilityReason", target), Is.EqualTo("Eligible"));
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True); Frames(1);
+            Assert.That(Get<bool>(counter, "UsesFrontApproach"), Is.True);
+            Assert.That(Get<int>(counter, "KickFacingSign"), Is.EqualTo(direction));
+            ToFrame(12);
+            Assert.That((target.transform.position.x - body.position.x) * direction,
+                Is.EqualTo(roomToBackUp ? 2.125f : 1.15f).Within(.02f));
+            ToFrame(21);
+            Assert.That(Get<int>(target, "HitCount"), Is.EqualTo(1));
+            Assert.That(Get<int>(counter, "StockCount"), Is.Zero);
+            Assert.That(Get<int>(counter, "ConsumedCount"), Is.EqualTo(1));
+            Assert.That(Camera.main.transform.position, Is.EqualTo(cameraPosition));
+            Assert.That(Camera.main.orthographicSize, Is.EqualTo(cameraSize));
+        }
+
+        [TestCase(1)] [TestCase(-1)]
+        public void WallBetweenActorsKeepsStockAndRejectsTheCounter(int direction)
+        {
+            body.position = new Vector2(0, .81f); player.transform.position = body.position; Call(motor, "SetFacing", direction);
+            var target = Enemy("StrongMelee", new Vector2(direction * 1.15f, .81f), 120); Wall(direction * .58f);
+            Call(counter, "RegisterParriedEnemy", target);
+            Assert.That((string)Call(counter, "EligibilityReason", target), Is.EqualTo("Obstructed"));
             Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True); Frames(1);
             Assert.That(Get<bool>(counter, "IsActive"), Is.False); Assert.That(Get<int>(counter, "StockCount"), Is.EqualTo(1));
             Assert.That(Get<int>(counter, "ConsumedCount"), Is.Zero);
@@ -436,7 +460,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Set(Get<object>(feedback, "Settings"), "flash", 0f); Set(Get<object>(feedback, "Settings"), "vfx", 0f);
             realFrames = 0; target = Begin(); ToFrame(14);
             Assert.That(Get<float>(presentation, "DimAlpha"), Is.Zero); Assert.That(Get<bool>(presentation, "IsSpotlightVisible"), Is.False);
-            Assert.That(Get<int>(presentation, "ActiveEffectCount"), Is.Zero); Assert.That(TimeValue<float>("SlowScale"), Is.EqualTo(.15f).Within(.00001f));
+            Assert.That(Get<int>(presentation, "ActiveEffectCount"), Is.Zero); Assert.That(TimeValue<float>("SlowScale"), Is.EqualTo(.5f).Within(.00001f));
             Until(() => !Get<bool>(counter, "IsActive"));
             Assert.That(realFrames, Is.EqualTo(duration)); Assert.That(Vector2.Distance(body.position, finalPlayer), Is.LessThan(.001f));
             Assert.That(Vector2.Distance(target.transform.position, finalEnemy), Is.LessThan(.001f)); Assert.That(Get<int>(target, "CurrentHp"), Is.EqualTo(hp));
@@ -497,7 +521,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 if(Get<string>(presentation,"CounterLightPhase")=="Charge")
                 {float pulse=Get<float>(presentation,"CounterRimPulse");low=Mathf.Min(low,pulse);high=Mathf.Max(high,pulse);samples++;}
             }
-            Assert.That(samples,Is.GreaterThan(fps*.7f));Assert.That(low,Is.LessThan(.18f));Assert.That(high,Is.GreaterThan(.98f));
+            Assert.That(samples,Is.GreaterThan(fps*.19f));Assert.That(high-low,Is.GreaterThan(.2f));Assert.That(high,Is.GreaterThan(.98f));
             Assert.That(Get<string>(presentation,"CounterLightPhase"),Is.EqualTo("Flash"));
             Assert.That(Get<Vector3>(feedback,"ShakeOffset").magnitude,Is.InRange(.42f,.54f));
             Assert.That(Get<int>(target,"CurrentHp"),Is.EqualTo(30));Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));

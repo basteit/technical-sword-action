@@ -53,6 +53,8 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     [Header("Combo")]
     [SerializeField, Range(1, ComboStepCount), Tooltip("Playable combo length. Does not remove the remaining attack definitions.")]
     private int maxComboStep = ComboStepCount;
+    [SerializeField, Tooltip("Let horizontal input turn a normal attack and its hitbox before the combat tick resolves.")]
+    private bool turnWithMoveInput;
     [SerializeField, Min(0f)] private float inputBufferDuration = SixFramesAtSixtyFps;
     [SerializeField, Min(0f)] private float fallbackGraceDuration = 0.12f;
 
@@ -114,11 +116,13 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
     private float groundMotionRemaining;
     private float groundMotionElapsed;
     private int attackFacingSign = 1;
+    private int AttackFacing => turnWithMoveInput && motor != null ? motor.FacingSign : attackFacingSign;
     private int attackTriggerHash;
     private int comboStepHash;
     private PlayerAttackCancelWindow openCancelWindows;
 
     public bool IsAttacking => isAttacking;
+    public bool CanTurnDuringAttack => turnWithMoveInput && isAttacking;
     public int ComboStep => comboStep;
     public int MaxComboStep => Mathf.Clamp(maxComboStep, 1, ComboStepCount);
     public bool IsComboWindowOpen => comboStep < MaxComboStep &&
@@ -153,10 +157,10 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
             {
                 float end = data.groundMotionCurve[data.groundMotionCurve.length - 1].time;
                 float next = Mathf.Min(end, groundMotionElapsed + tick);
-                return (data.groundMotionCurve.Evaluate(next) - data.groundMotionCurve.Evaluate(groundMotionElapsed)) / tick * attackFacingSign;
+                return (data.groundMotionCurve.Evaluate(next) - data.groundMotionCurve.Evaluate(groundMotionElapsed)) / tick * AttackFacing;
             }
             float duration = Mathf.Max(CombatTimeController.StepSeconds, data.groundMotionDuration);
-            return data.groundMotionDistance / duration * Mathf.Min(tick, groundMotionRemaining) / tick * attackFacingSign;
+            return data.groundMotionDistance / duration * Mathf.Min(tick, groundMotionRemaining) / tick * AttackFacing;
         }
     }
     public PlayerAttackCancelWindow OpenCancelWindows => definition != null ?
@@ -381,10 +385,10 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
         int hitTargetCount = 0;
         float radius = data.radius > 0f ? data.radius : attackRadius;
         bool useBox=definition==null&&data.useBoxHitbox;
-        Vector2 boxCenter=(Vector2)transform.position+new Vector2(data.hitboxOffset.x*attackFacingSign,data.hitboxOffset.y);
+        Vector2 boxCenter=(Vector2)transform.position+new Vector2(data.hitboxOffset.x*AttackFacing,data.hitboxOffset.y);
         bool extended = definition != null && CurrentDefinition.forwardExtension > 0;
         Collider2D[] hits = extended
-            ? Physics2D.OverlapCapsuleAll(CurrentDefinition.HitboxCenter(hitPoint.position, attackFacingSign),
+            ? Physics2D.OverlapCapsuleAll(CurrentDefinition.HitboxCenter(hitPoint.position, AttackFacing),
                 CurrentDefinition.HitboxSize, CapsuleDirection2D.Horizontal, 0, targetLayers)
             : useBox
             ? Physics2D.OverlapBoxAll(boxCenter,data.hitboxSize,0,targetLayers)
@@ -687,7 +691,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
         if (definition != null && CurrentDefinition.forwardExtension > 0)
         {
-            int facing = isAttacking ? attackFacingSign : motor != null ? motor.FacingSign : 1;
+            int facing = isAttacking ? AttackFacing : motor != null ? motor.FacingSign : 1;
             Vector2 center = CurrentDefinition.HitboxCenter(hitPoint.position, facing);
             float halfSegment = CurrentDefinition.forwardExtension * .5f;
             Vector2 left = center + Vector2.left * halfSegment, right = center + Vector2.right * halfSegment;
@@ -712,7 +716,7 @@ public class PlayerAttack2D : MonoBehaviour, ICombatTickListener, ICombatTimerLi
 
         if(definition==null&&data.useBoxHitbox)
         {
-            int facing=isAttacking?attackFacingSign:motor!=null?motor.FacingSign:1;
+            int facing=isAttacking?AttackFacing:motor!=null?motor.FacingSign:1;
             Vector2 center=(Vector2)transform.position+new Vector2(data.hitboxOffset.x*facing,data.hitboxOffset.y);
             if(isAttacking) { Gizmos.color=activeFillColor;Gizmos.DrawCube(center,data.hitboxSize); }
             Gizmos.color=isAttacking?activeHitboxColor:idleHitboxColor;Gizmos.DrawWireCube(center,data.hitboxSize);return;

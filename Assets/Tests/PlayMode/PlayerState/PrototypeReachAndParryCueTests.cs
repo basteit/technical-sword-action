@@ -125,6 +125,28 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 "The far-tip hit spark belongs on the struck collider, not at the old HitPoint next to the hand.");
         }
 
+        [TestCase(false, 1)] [TestCase(true, -1)]
+        public void ReversingTheMoveInputDuringAnAttackTurnsTheDrawingAndHit(bool airborne, int startFacing)
+        {
+            Position(startFacing, airborne);
+            var motor = player.GetComponent(T("PlayerMotor2D"));
+            Request(PlayerActionRequest.Attack);
+            Until(() => Get<int>(attack, "ComboStep") == 1);
+            Assert.That(Get<int>(motor, "FacingSign"), Is.EqualTo(startFacing));
+            Call(motor, "SetMoveInput", Vector2.left * startFacing);
+            Frames(1);
+            Call(motor, "SetMoveInput", Vector2.zero);
+            Assert.That(Get<int>(motor, "FacingSign"), Is.EqualTo(-startFacing));
+            Assert.That(Mathf.Sign(player.transform.localScale.x), Is.EqualTo(-startFacing));
+            Vector2 root = player.transform.position;
+            var oldFront = Probe("original-facing", root + Vector2.right * startFacing * 1.2f);
+            var newFront = Probe("reversed-facing", root + Vector2.left * startFacing * 1.2f);
+            Physics2D.SyncTransforms();
+            Until(() => Get<object>(attack, "Phase").ToString() == "Cancel");
+            Assert.That(Get<int>(oldFront, "HitCount"), Is.Zero);
+            Assert.That(Get<int>(newFront, "HitCount"), Is.EqualTo(1));
+        }
+
         private Component Probe(string name, Vector2 position)
         {
             var go = new GameObject(name); probes.Add(go); go.layer = LayerMask.NameToLayer("Enemy"); go.transform.position = position;

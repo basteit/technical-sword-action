@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32cd3db9e0842d3489afb646ddd463f1, type: 3}
   m_Name: FeedbackSettings
   m_EditorClassIdentifier: Assembly-CSharp::CombatFeedbackSettings
-  shake: 1
+  shake: 0
   flash: 1
   vfx: 1
   parryShockwave: 0.65

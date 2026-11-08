@@ -19,6 +19,7 @@ Shader "TechnicalSwordAction/EnemyForecastLight"
 
             TEXTURE2D(_MainTex);
             SAMPLER(sampler_MainTex);
+            float4 _MainTex_TexelSize;
             struct Attributes { COMMON_2D_INPUTS half4 color : COLOR; };
             struct Varyings { COMMON_2D_OUTPUTS half4 color : COLOR; };
             Varyings vert(Attributes input)
@@ -32,13 +33,25 @@ Shader "TechnicalSwordAction/EnemyForecastLight"
                 output.color = input.color * unity_SpriteColor;
                 return output;
             }
+            bool IsCue(half4 pixel)
+            {
+                // #FFFA96 is the authored cue; the body uses blue and grey.
+                return pixel.a > .5h && min(pixel.r, pixel.g) - pixel.b > .20h;
+            }
             float4 frag(Varyings input) : SV_Target
             {
                 half4 texel = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
-                // #FFFA96 is the authored cue; all other opaque colors are blue/grey.
-                // Compare before tinting, with a margin for compression and sRGB sampling.
-                clip(min(texel.r, texel.g) - texel.b - 0.20);
-                return texel * input.color;
+                if (IsCue(texel)) return texel * input.color;
+                // A one-texel dark gold edge makes the same flash readable over white tiles.
+                float2 dx = float2(_MainTex_TexelSize.x, 0);
+                float2 dy = float2(0, _MainTex_TexelSize.y);
+                if (IsCue(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv + dx)) ||
+                    IsCue(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv - dx)) ||
+                    IsCue(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv + dy)) ||
+                    IsCue(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv - dy)))
+                    return half4(.18h, .07h, .015h, 1) * input.color;
+                discard;
+                return 0;
             }
             ENDHLSL
         }
