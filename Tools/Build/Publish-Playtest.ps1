@@ -59,7 +59,12 @@ try {
         if (-not $release.draft) { throw 'This tag is already published. Use a new tag for a new archive.' }
     } else {
         Invoke-GitHub -Arguments @('release', 'create', $Tag, '--repo', $Repository, '--target', $info.sourceCommit, '--draft', '--title', $Title, '--notes-file', $notesPath) | Out-Null
-        $release = Find-TaggedRelease
+        # The release list can briefly lag behind a successful creation.
+        for ($lookupAttempt = 0; $lookupAttempt -lt 5; $lookupAttempt++) {
+            $release = Find-TaggedRelease
+            if ($null -ne $release) { break }
+            if ($lookupAttempt -lt 4) { Start-Sleep -Seconds 2 }
+        }
         if ($null -eq $release -or -not $release.draft) { throw 'The newly created draft could not be found.' }
     }
 
@@ -79,7 +84,11 @@ try {
 
     # Publish only after upload verification so a failed upload keeps the previous latest release available.
     Invoke-GitHub -Arguments @('release', 'edit', $Tag, '--repo', $Repository, '--draft=false', '--latest') | Out-Null
-    $latest = (Invoke-GitHub -Arguments @('api', "repos/$Repository/releases/latest")) | ConvertFrom-Json
+    for ($latestAttempt = 0; $latestAttempt -lt 5; $latestAttempt++) {
+        $latest = (Invoke-GitHub -Arguments @('api', "repos/$Repository/releases/latest")) | ConvertFrom-Json
+        if ($latest.tag_name -eq $Tag) { break }
+        if ($latestAttempt -lt 4) { Start-Sleep -Seconds 2 }
+    }
     if ($latest.tag_name -ne $Tag) { throw 'The published release is not the current latest release.' }
     [pscustomobject]@{
         release = $latest.html_url
