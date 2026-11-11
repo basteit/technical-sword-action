@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="記憶を失った旅人は、機械の遺構が残る世界をゆく。華麗な剣技で道を切り開く、2D剣戟アクションRPG『ケラウノス（仮）』。Windows試遊版を配布中。">
+  <meta name="theme-color" content="#080f19">
+  <title>ケラウノス（仮）｜2D剣戟アクションRPG</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23080f19' d='M0 0h32v32H0z'/%3E%3Cpath fill='%236edbff' d='M22 6h7l-5 9-7 2z'/%3E%3Cpath fill='%23f4f7fc' d='M16 19l7-2-5 7-9 4H3l9-6z'/%3E%3C/svg%3E">
+</head>
+<body id="top">
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="#top" aria-label="ケラウノス ページ先頭">
+        <img src="assets/logo.svg" alt="" width="584" height="152">
+      </a>
+      <nav aria-label="ページ内メニュー">
+        <a href="#playtest">試遊版</a>
+        <a href="#battle">バトル</a>
+        <a href="#world">世界観</a>
+      </nav>
+      <span class="status">開発中</span>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="game-title">
+      <div class="hero-art" aria-hidden="true">
+        <img src="assets/key-visual.png" alt="" width="500" height="500" fetchpriority="high">
+      </div>
+      <div class="shell hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow hero-genre">2D剣戟アクションRPG</p>
+          <h1 id="game-title" class="hero-logo">
+            <img src="assets/logo.svg" alt="ケラウノス（仮）" width="584" height="152">
+          </h1>
+          <p class="hero-headline">記憶を失った旅人と、<br>機械の遺構が残る世界へ。</p>
+          <p class="hero-description">華麗な剣技で道を切り開く、2D剣戟アクションRPG。<br class="desktop-break">開発中の戦闘プロトタイプを、Windowsで遊べます。</p>
+          <div class="hero-actions">
+            <a class="button" href="https://github.com/basteit/technical-sword-action/releases/latest/download/Keraunos-Windows.zip">Windows試遊版をダウンロード <span aria-hidden="true">↓</span></a>
+            <a class="text-link" href="#battle">戦闘映像を見る <span aria-hidden="true">↘</span></a>
+          </div>
+        </div>
+        <span class="art-label">制作中のキービジュアル</span>
+      </div>
+    </section>
+
+    <section id="playtest" class="playtest section" aria-labelledby="playtest-title">
+      <div class="shell playtest-inner">
+        <div>
+          <p class="eyebrow section-label">PLAYTEST</p>
+          <h2 id="playtest-title">まずは一戦、<br>剣の手応えを。</h2>
+          <p class="section-copy">移動・ジャンプ・ダッシュ・2段攻撃・パリィ・反撃を試せる、開発中の戦闘プロトタイプです。公開版の内容と変更点は更新履歴にまとめています。</p>
+          <a class="button" href="https://github.com/basteit/technical-sword-action/releases/latest/download/Keraunos-Windows.zip">最新の公開版をダウンロード <span aria-hidden="true">↓</span></a>
+          <p class="download-platform">Windows 10 / 11・64bit ／ ZIP形式</p>
+          <p class="release-details" id="latest-release">公開日と変更内容は更新履歴をご覧ください。</p>
+          <a class="text-link release-link" href="https://github.com/basteit/technical-sword-action/releases/latest">更新履歴・既知の問題 <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="playtest-guide">
+          <h3>遊びはじめるまで</h3>
+          <ol class="start-steps">
+            <li>ダウンロードしたZIPを「すべて展開」する。</li>
+            <li>フォルダ内の <code>TechnicalSwordAction.exe</code> を起動する。</li>
+            <li>画面をクリックし、右上の敵を出すボタンで戦闘を始める。</li>
+          </ol>
+          <dl class="controls">
+            <div><dt>移動</dt><dd>A / D</dd></div>
+            <div><dt>ジャンプ</dt><dd>Space</dd></div>
+            <div><dt>攻撃・反撃</dt><dd>J ／ 左クリック</dd></div>
+            <div><dt>パリィ</dt><dd>K ／ 右クリック</dd></div>
+            <div><dt>ダッシュ</dt><dd>Shift</dd></div>
+          </dl>
+          <p class="guide-note">Xbox互換ゲームパッドにも対応しています。詳しい操作方法は同梱のREADME.txtをご覧ください。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="battle" class="battle section" aria-labelledby="battle-title">
+      <div class="shell">
+        <div class="battle-intro">
+          <div>
+            <p class="eyebrow section-label"><span>01</span> COMBAT</p>
+            <h2 id="battle-title">パリィから、<br>電撃の一撃へ。</h2>
+            <p class="section-copy">攻撃が当たる瞬間に弾くと、敵がよろめきます。その隙に背後へ回り込み、電撃キックで敵を吹き飛ばす。攻防がつながる瞬間を、ドット絵のアニメーションで描きます。</p>
+          </div>
+          <figure class="battle-media">
+            <div class="video-frame">
+              <video id="combat-video" controls playsinline preload="metadata" poster="assets/combat-poster.webp" width="1920" height="1080" aria-label="開発中の戦闘映像">
+                <source src="assets/combat.mp4" type="video/mp4">
+                <a href="assets/combat.mp4">戦闘映像を開く（MP4）</a>
+              </video>
+              <button class="video-play" id="video-play" type="button" aria-label="戦闘映像を再生" hidden>
+                <svg width="21" height="21" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M4 2.5v11L13 8z"/></svg>
+              </button>
+            </div>
+            <figcaption><span>撮影用の演出サンプル・2026.10</span><span>約5秒 ／ 音声なし</span></figcaption>
+          </figure>
+        </div>
+
+        <ol class="battle-steps" aria-label="戦闘の流れ">
+          <li>
+            <h3>見切る</h3>
+            <p>姿勢や動きから、次の攻撃と間合いを読む。</p>
+          </li>
+          <li>
+            <h3>弾く・かわす</h3>
+            <p>タイミングを合わせてパリィ。攻撃に応じてダッシュやジャンプでかわす。</p>
+          </li>
+          <li>
+            <h3>隙を突く</h3>
+            <p>敵が立て直す前に踏み込み、反撃を決める。</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="world" class="world section" aria-labelledby="world-title">
+      <div class="shell world-inner">
+        <figure class="world-media">
+          <img src="assets/city-detail.webp" alt="古い石造りの街並みの奥に、青く光る機械の塔がそびえる" width="430" height="470" loading="lazy">
+          <figcaption>世界観コンセプト（ラフ）</figcaption>
+        </figure>
+        <div class="world-copy">
+          <p class="eyebrow section-label"><span>02</span> WORLD</p>
+          <h2 id="world-title">大戦の跡を、<br>剣と旅する。</h2>
+          <p class="section-copy">機械技術が引き起こした大戦から数十年。記憶を失った旅人が手にしたのは、言葉を交わせる一本の剣。</p>
+          <p class="section-copy">古い街や機械の遺構を巡り、出会った人々や剣との会話から、世界と旅人自身の過去が少しずつ見えてきます。</p>
+          <dl class="game-info">
+            <div><dt>ジャンル</dt><dd>2D剣戟アクションRPG</dd></div>
+            <div><dt>開発中の試遊版</dt><dd>Windows PC</dd></div>
+            <div><dt>ゲームエンジン</dt><dd>Unity</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <p><strong>ケラウノス（仮）</strong><span>開発中のゲームです。</span></p>
+      <a href="#top">ページ先頭へ <span aria-hidden="true">↑</span></a>
+    </div>
+  </footer>
+
+  <script>
+    const video = document.getElementById('combat-video');
+    const playButton = document.getElementById('video-play');
+
+    playButton.hidden = false;
+    playButton.addEventListener('click', () => {
+      video.play().catch(() => {
+        playButton.hidden = true;
+        video.focus({ preventScroll: true });
+      });
+    });
+    video.addEventListener('play', () => {
+      if (document.activeElement === playButton) {
+        video.focus({ preventScroll: true });
+      }
+      playButton.hidden = true;
+    }, { once: true });
+
+    if (location.protocol === 'https:' || location.protocol === 'http:') {
+      fetch('https://api.github.com/repos/basteit/technical-sword-action/releases/latest', {
+        headers: { Accept: 'application/vnd.github+json' }
+      })
+        .then(response => {
+          if (!response.ok) throw new Error('Release metadata is unavailable');
+          return response.json();
+        })
+        .then(release => {
+          const archive = release.assets.find(asset => asset.name === 'Keraunos-Windows.zip');
+          if (!archive) return;
+          const size = (archive.size / 1024 / 1024).toFixed(1);
+          document.getElementById('latest-release').textContent = release.name + ' ／ ' + size + ' MiB';
+        })
+        .catch(() => {});
+    }
+  </script>
+</body>
+</html>
