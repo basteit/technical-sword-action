@@ -1,5 +1,7 @@
 # ケラウノス紹介サイト
 
+[公開サイト](https://basteit.github.io/technical-sword-action/)
+
 公開する静的ファイルは `dist/` にあります。ローカルでは `dist/index.html` をブラウザで開けます。
 
 ## 試遊版の更新
@@ -17,7 +19,7 @@ UnityでWindows試遊版をビルドし、既存の `Tools/Build/Package-Prototy
 このリポジトリ内でサイトの変更をコミットし、公開用ブランチへ反映します。
 
 ```powershell
-$siteCommit = git subtree split --prefix=sites/keraunos/dist HEAD
+$siteCommit = git subtree split --quiet --prefix=sites/keraunos/dist HEAD
 git push origin "${siteCommit}:refs/heads/gh-pages"
 ```
 
