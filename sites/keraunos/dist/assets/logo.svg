@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="584" height="152" viewBox="0 0 584 152" role="img" aria-labelledby="title">
+  <title id="title">ケラウノス / KERAUNOS</title>
+  <g fill="#F4F7FC">
+    <!-- ケ -->
+    <path transform="translate(23 11)" d="M 24 9 L 43 9 L 33 32 L 96 32 L 90 47 L 76 47 L 65 67 L 43 88 L 21 88 L 51 60 L 58 47 L 27 47 L 21 61 L 3 61 Z"/>
+    <!-- ラ -->
+    <path transform="translate(132 11)" d="M 17 12 L 91 12 L 85 27 L 17 27 Z M 8 36 L 97 36 L 88 59 L 74 73 L 50 88 L 25 88 L 65 62 L 75 51 L 8 51 Z"/>
+    <!-- ウ -->
+    <path transform="translate(241 11)" d="M 44 7 L 61 7 L 61 24 L 96 24 L 87 55 L 75 70 L 49 88 L 25 88 L 65 60 L 73 49 L 76 39 L 27 39 L 27 58 L 10 58 L 10 24 L 44 24 Z"/>
+    <!-- ノ -->
+    <path transform="translate(350 11)" d="M 64 39 L 84 35 L 70 58 L 50 75 L 25 88 L 4 88 L 38 66 L 55 50 Z"/>
+    <!-- ス -->
+    <path transform="translate(459 11)" d="M 10 15 L 92 15 L 81 39 L 70 53 L 99 88 L 78 88 L 59 65 L 35 88 L 10 88 L 57 45 L 67 30 L 10 30 Z"/>
+  </g>
+  <g fill="#6EDBFF">
+    <path transform="translate(350 11)" d="M 76 8 L 94 8 L 86 28 L 67 32 Z"/>
+  </g>
+  <g fill="#F4F7FC" fill-rule="evenodd">
+    <!-- KERAUNOS -->
+    <path transform="translate(199 119)" d="M 0 0 L 3 0 L 3 6.6 L 9.2 0 L 13.2 0 L 6.9 6.6 L 13.7 15 L 9.7 15 L 4.9 8.8 L 3 10.8 L 3 15 L 0 15 Z"/>
+    <path transform="translate(224 119)" d="M 0 0 L 12.2 0 L 12.2 2.8 L 3 2.8 L 3 6 L 10.8 6 L 10.8 8.7 L 3 8.7 L 3 12.2 L 12.2 12.2 L 12.2 15 L 0 15 Z"/>
+    <path transform="translate(248 119)" d="M 0 0 L 10 0 L 13 3 L 13 6.6 L 10.4 9.2 L 13.6 15 L 10.1 15 L 7 9.7 L 3 9.7 L 3 15 L 0 15 Z M 3 2.7 L 3 7 L 8.8 7 L 10 5.8 L 10 3.9 L 8.8 2.7 Z"/>
+    <path transform="translate(272 119)" d="M 6.1 0 L 9.4 0 L 15.5 15 L 12.2 15 L 10.8 11.5 L 4.6 11.5 L 3.2 15 L 0 15 Z M 7.7 3.5 L 5.7 8.8 L 9.7 8.8 Z"/>
+    <path transform="translate(298 119)" d="M 0 0 L 3 0 L 3 10.8 L 4.4 12.2 L 9.5 12.2 L 10.9 10.8 L 10.9 0 L 13.9 0 L 13.9 12 L 10.9 15 L 3 15 L 0 12 Z"/>
+    <path transform="translate(324 119)" d="M 0 0 L 3 0 L 11.1 10.1 L 11.1 0 L 14.1 0 L 14.1 15 L 11.1 15 L 3 4.9 L 3 15 L 0 15 Z"/>
+    <path transform="translate(350 119)" d="M 3 0 L 11.2 0 L 14.2 3 L 14.2 12 L 11.2 15 L 3 15 L 0 12 L 0 3 Z M 4.4 2.8 L 3 4.2 L 3 10.8 L 4.4 12.2 L 9.8 12.2 L 11.2 10.8 L 11.2 4.2 L 9.8 2.8 Z"/>
+    <path transform="translate(376 119)" d="M 2.7 0 L 12.4 0 L 12.4 2.8 L 4 2.8 L 3 3.8 L 3 5.1 L 3.8 5.9 L 10.2 6.5 L 13 9.1 L 13 12.3 L 10.3 15 L 0.2 15 L 0.2 12.2 L 9 12.2 L 10 11.2 L 10 9.9 L 9.2 9.1 L 2.8 8.5 L 0 5.9 L 0 2.7 Z"/>
+  </g>
+</svg>
