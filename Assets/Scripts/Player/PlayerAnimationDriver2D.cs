@@ -2,7 +2,7 @@ using UnityEngine;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Animator))]
-public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
+public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
     [Header("References")]
     [SerializeField] private Animator animator;
@@ -30,6 +30,8 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
     private PlayerAttack2D attack;
     private PlayerParry2D parry;
     private TechnicalSwordAction.PlayerState.PlayerActionState lastExtendedAction;
+    private TechnicalSwordAction.PlayerState.PlayerActionState sampledAction;
+    private TechnicalSwordAction.PlayerState.PlayerLifeState sampledLife;
 
     private void Awake()
     {
@@ -59,6 +61,9 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
         {
             return;
         }
+
+        sampledAction = stateMachine.ActionState;
+        sampledLife = stateMachine.LifeState;
 
         if (stateMachine.LifeState == TechnicalSwordAction.PlayerState.PlayerLifeState.Dead)
         {
@@ -131,6 +136,17 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener
 
         animator.Play(GetStateHash(state), 0, 0f);
         lastDrivenState = state;
+    }
+
+    public void CombatTickTimers()
+    {
+        // Counter/Hit/Parry can finish after Animator.Update in the same combat tick.
+        // Select the resulting pose now, rather than exposing the generic counter clip
+        // for one render frame after its authored presentation owner has released it.
+        if (animator == null || stateMachine == null ||
+            sampledAction == stateMachine.ActionState && sampledLife == stateMachine.LifeState) return;
+        CombatTick();
+        animator.Update(0);
     }
 
     private bool TryPlayNewParrySuccess()

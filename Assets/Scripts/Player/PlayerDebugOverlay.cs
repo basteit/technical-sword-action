@@ -51,6 +51,7 @@ public class PlayerDebugOverlay : MonoBehaviour
             {
                 text.AppendLine($"{stateMachine.LifeState} / {stateMachine.ActionState} / {stateMachine.LocomotionState} / Lock {stateMachine.RemainingLock * 60:0}F");
                 text.AppendLine($"Transition: {stateMachine.PreviousActionState} -> {stateMachine.ActionState} ({stateMachine.LastTransitionReason})");
+                text.AppendLine($"Inactive action recoveries: {stateMachine.InactiveActionRecoveryCount}");
                 text.AppendLine($"Decision @{stateMachine.LastDecisionTick}: {stateMachine.LastRequestedActions} -> {stateMachine.LastAcceptedRequest} / Priority {stateMachine.LastAcceptedPriority}");
                 text.AppendLine($"Rejected: {stateMachine.LastRejectionReason}\n{stateMachine.LastDecision}");
                 text.AppendLine($"Shared B: {stateMachine.LastSharedInputResolution} ({stateMachine.LastSharedInputReason}), target ID {stateMachine.LastSharedInputTargetInstanceId}");
@@ -68,7 +69,7 @@ public class PlayerDebugOverlay : MonoBehaviour
             if (attack == null) text.AppendLine("Attack: N/A (PlayerAttack2D missing)");
             else
             {
-                text.AppendLine($"Step {attack.ComboStep}/4 / Phase {attack.Phase} / Frame {attack.ElapsedFrames} / Next {attack.HasQueuedAttack}");
+                text.AppendLine($"Step {attack.ComboStep}/{attack.MaxComboStep} / Phase {attack.Phase} / Frame {attack.ElapsedFrames} / Next {attack.HasQueuedAttack}");
                 text.AppendLine(attack.UsesFrameDefinition ? $"Common cancel: [{attack.CancelStartFrame}..{attack.CancelEndFrame}] / Open {attack.OpenCancelWindows}" : $"Legacy event profile / Windows {attack.OpenCancelWindows}");
                 text.AppendLine($"Buffer {attack.InputBufferRemaining * 60:0}F / End {attack.LastEndReason} / Full {attack.FullComboCount}/{attack.ComboAttemptCount} / Fallback {attack.TimeoutFallbackCount}");
                 if (attack.Definition != null)
@@ -124,25 +125,69 @@ public class PlayerDebugOverlay : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!visible)
+        using (PrototypeDebugPanel.ReadableSkin())
         {
-            if (GUI.Button(new Rect(12, 12, 120, 28), "Show Debug")) visible = true;
-            return;
+            if (!visible)
+            {
+                if (GUI.Button(new Rect(12, 12, 120, 28), "Show Debug")) visible = true;
+                return;
+            }
+            if (labelStyle == null) labelStyle = new GUIStyle(GUI.skin.label) { wordWrap = true };
+            labelStyle.fontSize = fontSize;
+            labelStyle.normal.textColor = Color.white;
+            float width = Mathf.Min(640, Screen.width * .42f);
+            float height = Mathf.Min(700, Screen.height - 24);
+            var area = new Rect(12, 12, width, height);
+            PrototypeDebugPanel.DrawBackground(area);
+            GUILayout.BeginArea(area, "Combat Debug", GUI.skin.window);
+            if (GUILayout.Button("Hide Debug")) visible = false;
+            int selected = GUILayout.Toolbar(group, Groups);
+            if (selected != group) { group = selected; nextRefresh = 0; }
+            if (GUILayout.Button("Reset damage measurements")) { telemetry?.ResetMeasurements(); nextRefresh = 0; }
+            if (snapshot == null || Time.unscaledTime >= nextRefresh)
+            { snapshot = BuildSnapshot(group); nextRefresh = Time.unscaledTime + .1f; }
+            scroll = GUILayout.BeginScrollView(scroll);
+            GUILayout.Label(snapshot, labelStyle);
+            GUILayout.EndScrollView();
+            GUILayout.EndArea();
         }
-        if (labelStyle == null) labelStyle = new GUIStyle(GUI.skin.label) { wordWrap = true };
-        labelStyle.fontSize = fontSize;
-        float width = Mathf.Min(640, Screen.width * .42f);
-        float height = Mathf.Min(700, Screen.height - 24);
-        GUILayout.BeginArea(new Rect(12, 12, width, height), "Combat Debug", GUI.skin.window);
-        if (GUILayout.Button("Hide Debug")) visible = false;
-        int selected = GUILayout.Toolbar(group, Groups);
-        if (selected != group) { group = selected; nextRefresh = 0; }
-        if (GUILayout.Button("Reset damage measurements")) { telemetry?.ResetMeasurements(); nextRefresh = 0; }
-        if (snapshot == null || Time.unscaledTime >= nextRefresh)
-        { snapshot = BuildSnapshot(group); nextRefresh = Time.unscaledTime + .1f; }
-        scroll = GUILayout.BeginScrollView(scroll);
-        GUILayout.Label(snapshot, labelStyle);
-        GUILayout.EndScrollView();
-        GUILayout.EndArea();
+    }
+}
+
+/// <summary>An opaque, scene-independent backdrop for the prototype's diagnostic panels.</summary>
+public static class PrototypeDebugPanel
+{
+    private static GUISkin readableSkin;
+    public static readonly Color Background = new Color(.025f, .03f, .045f, .97f);
+    public static SkinScope ReadableSkin() => new SkinScope(GUI.skin);
+    public readonly struct SkinScope : System.IDisposable
+    {
+        private readonly GUISkin previous;
+        private readonly Color previousColor, previousContent;
+        public SkinScope(GUISkin skin)
+        {
+            previous = skin; previousColor = GUI.color; previousContent = GUI.contentColor;
+            if (readableSkin == null)
+            {
+                readableSkin = Object.Instantiate(previous);
+                readableSkin.hideFlags = HideFlags.HideAndDontSave;
+                foreach (var style in new[] { readableSkin.label, readableSkin.button, readableSkin.box, readableSkin.window })
+                {
+                    style.fontSize = 14;
+                    foreach (var state in new[] { style.normal, style.hover, style.active, style.focused,
+                        style.onNormal, style.onHover, style.onActive, style.onFocused }) state.textColor = Color.white;
+                }
+            }
+            GUI.skin = readableSkin; GUI.color = GUI.contentColor = Color.white;
+        }
+        public void Dispose()
+        { GUI.skin = previous; GUI.color = previousColor; GUI.contentColor = previousContent; }
+    }
+    public static void DrawBackground(Rect area)
+    {
+        Color previous = GUI.color;
+        GUI.color = Background;
+        GUI.DrawTexture(area, Texture2D.whiteTexture);
+        GUI.color = previous;
     }
 }

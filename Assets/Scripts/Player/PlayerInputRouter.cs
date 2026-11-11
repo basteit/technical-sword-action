@@ -55,6 +55,8 @@ public sealed class PlayerInputRouter : MonoBehaviour
         InputAction shared = actions.FindAction("Context/SharedDashInteract", false);
         if (shared != null) Subscribe(shared);
         actions.FindActionMap("Gameplay", true).Enable();
+        if (GetComponent<PlayerSpecialSkill2D>() is { isActiveAndEnabled: false })
+            actions.FindAction("Gameplay/Special", true).Disable();
         actions.FindActionMap("Context", false)?.Enable();
         CombatTimeController.PauseChanged += OnPauseChanged;
         InputSystem.onAfterUpdate += AfterInputUpdate;

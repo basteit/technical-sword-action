@@ -171,6 +171,95 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(counter, "StockCount"), Is.Zero);
         }
 
+        [TestCase(1)] [TestCase(-1)]
+        public void RepeatedOrdinaryHitsKeepThePrototypeEnemyGroundedAndDoNotStagger(int direction)
+        {
+            Call(arena, "ResetTrainingEncounter", false);
+            Call(player, "ResetToSafeState", "ArmoredHitTest", true);
+            var enemy = (Component)Object.FindFirstObjectByType(T("EnemyMeleeChaser2D"));
+            Call(enemy, "ResetForCapture", player.transform, true);
+            var health = enemy.GetComponent(T("Damageable2D"));
+            Assert.That(Get<bool>(health, "SuppressesOrdinaryHitReaction"), Is.True);
+            Vector3 initial = enemy.transform.position;
+            for (int i = 0; i < 50; i++)
+            {
+                Assert.That((bool)Call(health, "TryTakeHit", 10, new Vector2(direction, -1)), Is.True);
+                Frames(4);
+                Assert.That(enemy.transform.position, Is.EqualTo(initial), "Ordinary hits must not translate or sink the target.");
+                Assert.That(Get<bool>(health, "IsStunned"), Is.False);
+                Assert.That(Get<string>(enemy.GetComponent(T("PrototypeEnemyArtPresentation")), "MotionName"), Is.Not.EqualTo("Hit"));
+            }
+            var counter = player.GetComponent(T("PlayerParryCounter2D"));
+            Place(initial.x - direction * 1.15f, initial.y);
+            Call(motor, "SetFacing", direction);
+            Call(counter, "RegisterParriedEnemy", health);
+            Assert.That((string)Call(counter, "EligibilityReason", health), Is.EqualTo("Eligible"));
+            Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
+            Frames(1); Assert.That(Get<bool>(counter, "IsActive"), Is.True);
+        }
+
+        [Test]
+        public void RetainedHitKnockbackCannotTranslateAnEnemyDownThroughTheFloor()
+        {
+            Call(arena, "ResetTrainingEncounter", false);
+            var enemy = (Component)Object.FindFirstObjectByType(T("EnemyMeleeChaser2D"));
+            Call(enemy, "ResetForCapture", player.transform, true);
+            var health = enemy.GetComponent(T("Damageable2D"));
+            var armor = health.GetType().GetField("suppressOrdinaryHitReaction", Flags);
+            armor.SetValue(health, false);
+            float feet = enemy.GetComponent<Collider2D>().bounds.min.y;
+            try
+            {
+                for (int i = 0; i < 20; i++) { Call(health, "TryTakeHit", 1, Vector2.down); Frames(6); }
+                Assert.That(enemy.GetComponent<Collider2D>().bounds.min.y, Is.GreaterThanOrEqualTo(feet - .02f));
+            }
+            finally { armor.SetValue(health, true); }
+        }
+
+        [Test]
+        public void FallingThroughAnEnemyDoesNotLandOnOrPauseAtItsBody()
+        {
+            Call(arena, "ResetTrainingEncounter", false);
+            var enemy = (Component)Object.FindFirstObjectByType(T("EnemyMeleeChaser2D"));
+            Call(enemy, "ResetForCapture", player.transform, true);
+            var own = player.GetComponent<Collider2D>(); var other = enemy.GetComponent<Collider2D>();
+            Place(enemy.transform.position.x, enemy.transform.position.y + 4);
+            body.linearVelocity = Vector2.down * 5;
+            Assert.That(Physics2D.GetIgnoreCollision(own, other), Is.True, "Ignore the body before the first contact, not in OnCollisionEnter.");
+            bool crossed = false;
+            for (int i = 0; i < 60; i++)
+            {
+                Frames(1);
+                Assert.That(Physics2D.GetIgnoreCollision(own, other), Is.True);
+                if (body.position.y > 1.2f)
+                {
+                    Assert.That(Get<bool>(motor, "IsGrounded"), Is.False);
+                    Assert.That(body.linearVelocity.y, Is.LessThan(-1f));
+                }
+                if (own.bounds.min.y < other.bounds.max.y && own.bounds.max.y > other.bounds.min.y) crossed = true;
+            }
+            Assert.That(crossed, Is.True);
+            Assert.That(body.position.y, Is.EqualTo(.81f).Within(.05f));
+        }
+
+        [Test]
+        public void PrototypeDisablesSpecialAtTheExecutorAndInputActionButKeepsTheSystem()
+        {
+            var special = (Behaviour)player.GetComponent(T("PlayerSpecialSkill2D"));
+            Assert.That(special, Is.Not.Null); Assert.That(special.enabled, Is.False);
+            Assert.That(Get<bool>(special, "CanStartSkill"), Is.False);
+            Call(player, "RequestAction", PlayerActionRequest.Special); Frames(5);
+            Assert.That(Get<PlayerActionState>(player, "ActionState"), Is.EqualTo(PlayerActionState.Neutral));
+            var router = (Behaviour)player.GetComponent(T("PlayerInputRouter"));
+            try
+            {
+                router.enabled = true;
+                var actions = Get<UnityEngine.InputSystem.InputActionAsset>(router, "Actions");
+                Assert.That(actions.FindAction("Gameplay/Special", true).enabled, Is.False);
+            }
+            finally { router.enabled = false; }
+        }
+
         private void Place(float x, float y)
         {
             body.position = new Vector2(x, y); player.transform.position = body.position; body.linearVelocity = Vector2.zero;

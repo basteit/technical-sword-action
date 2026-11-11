@@ -92,12 +92,14 @@ namespace TechnicalSwordAction.PlayerState.Tests
             }
         }
         [Test]
-        public void UnlimitedPracticeHitsStillReactAndNormalEnemiesStillDie()
+        public void UnlimitedPracticeHitsKeepHpWithoutFlinchingAndNormalEnemiesStillDie()
         {
             Call(arena, "ResetTrainingEncounter", true);
             var dummy = Root("TrainingDummy"); var target = dummy.GetComponent(T("Damageable2D"));
             var normal = Root("Melee_1").GetComponent(T("Damageable2D"));
             int hp = Get<int>(target, "CurrentHp");
+            Vector3 position = dummy.transform.position;
+            Assert.That(Get<bool>(target, "SuppressesOrdinaryHitReaction"), Is.True);
             Assert.That(Get<bool>(normal, "HasInfiniteHealth"), Is.False);
             Assert.That(Get<string>(normal, "IndividualId"), Is.Not.EqualTo(Get<string>(target, "IndividualId")));
             var strongHit = Enum.Parse(T("EnemyHitStrength"), "Strong");
@@ -107,7 +109,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<int>(target, "HitCount"), Is.EqualTo(i));
                 Assert.That(Get<int>(target, "CurrentHp"), Is.EqualTo(hp));
                 Assert.That(Get<int>(target, "LastDamageTaken"), Is.Zero);
-                Assert.That(Get<bool>(target, "IsStunned"), Is.True);
+                Assert.That(Get<bool>(target, "IsStunned"), Is.False);
+                Assert.That(dummy.transform.position, Is.EqualTo(position));
                 Assert.That(Get<int>(target, "DeathCount"), Is.Zero);
                 Assert.That(dummy.GetComponent<Collider2D>().enabled, Is.True);
             }
@@ -115,6 +118,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(normal, "CurrentHp"), Is.Zero);
             Assert.That(Get<int>(normal, "DeathCount"), Is.EqualTo(1));
             Assert.That(Get<bool>(target, "ParticipatingInCombat"), Is.True);
+            Call(target, "ApplyParryStun", Enum.Parse(T("ParryResult"), "Just"));
+            Assert.That(Get<bool>(target, "IsParryStaggered"), Is.True, "Parry still opens the counter opportunity.");
         }
         [UnityTest]
         public IEnumerator SameDummyCanBeParriedAndCounterKickedTwiceWithoutResettingHp()

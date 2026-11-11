@@ -106,27 +106,32 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     }
     private void OnGUI()
     {
-        GUILayout.BeginArea(new Rect(Screen.width - 310, 12, 298, 280), GUI.skin.box);
-        GUILayout.Label("Prototype action / combat acceptance");
-        if (GUILayout.Button("1: Parry practice (one normal)")) ResetArena(false);
-        if (GUILayout.Button("2: Reset actions only (no enemies)")) ResetActionsOnly();
-        using (new GUILayout.HorizontalScope())
+        using (PrototypeDebugPanel.ReadableSkin())
         {
-            if (GUILayout.Button("3: Two normals")) ResetArena(true);
-            if (GUILayout.Button("4: Infinite HP dummy")) ResetTrainingEncounter(false);
+            var area = new Rect(Screen.width - 310, 12, 298, 280);
+            PrototypeDebugPanel.DrawBackground(area);
+            GUILayout.BeginArea(area, GUI.skin.box);
+            GUILayout.Label("Prototype combat / practice");
+            if (GUILayout.Button("1: Parry practice (one normal)")) ResetArena(false);
+            if (GUILayout.Button("2: Reset actions only (no enemies)")) ResetActionsOnly();
+            using (new GUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("3: Two normals")) ResetArena(true);
+                if (GUILayout.Button("4: Infinite HP dummy")) ResetTrainingEncounter(false);
+            }
+            if (GUILayout.Button("5: Normal + infinite HP dummy")) ResetTrainingEncounter(true);
+            GUILayout.Label("K / RMB: Parry - J / LMB: Counter");
+            if (coordinator != null) GUILayout.Label($"Attack roles: {coordinator.ActiveAttackers}/{coordinator.MaximumAttackers}");
+            if (feedback != null && feedback.Settings != null)
+            {
+                var s = feedback.Settings;
+                GUILayout.Label($"6 Camera {s.shake:P0} / 7 Flash {s.flash:P0}");
+                GUILayout.Label($"8 VFX {s.vfx:P0} / 9 Sound {s.masterVolume:P0}");
+                GUILayout.Label($"Feedback: {feedback.LastKind} @{feedback.LastEmissionTick}");
+            }
+            GUILayout.Label("B: Interact nearby / otherwise Dash");
+            GUILayout.EndArea();
         }
-        if (GUILayout.Button("5: Normal + infinite HP dummy")) ResetTrainingEncounter(true);
-        GUILayout.Label("K / RMB: Parry - J / LMB: Counter");
-        if (coordinator != null) GUILayout.Label($"Attack roles: {coordinator.ActiveAttackers}/{coordinator.MaximumAttackers}");
-        if (feedback != null && feedback.Settings != null)
-        {
-            var s = feedback.Settings;
-            GUILayout.Label($"6 Camera {s.shake:P0} / 7 Flash {s.flash:P0}");
-            GUILayout.Label($"8 VFX {s.vfx:P0} / 9 Sound {s.masterVolume:P0}");
-            GUILayout.Label($"Feedback: {feedback.LastKind} @{feedback.LastEmissionTick}");
-        }
-        GUILayout.Label("B: Interact in range / Dash otherwise");
-        GUILayout.EndArea();
     }
     private void OnDisable() { controls?.Dispose(); controls = null; reset = null; }
 }

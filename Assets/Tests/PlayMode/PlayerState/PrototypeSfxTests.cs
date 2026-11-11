@@ -308,6 +308,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [Test] public void SpecialCastHasNoHitSoundWhenItWhiffs()
         {
+            // Retained product SFX contract; Special is disabled in the actual prototype.
+            ((Behaviour)player.GetComponent(T("PlayerSpecialSkill2D"))).enabled = true;
             Request(PlayerActionRequest.Special); Frames(120);
             Assert.That(Count("SpecialCast"),Is.EqualTo(1)); Assert.That(Count("SpecialHit"),Is.Zero);
         }

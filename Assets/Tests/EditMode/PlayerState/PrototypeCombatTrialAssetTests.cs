@@ -183,6 +183,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(field.GetValue(reference), Is.EqualTo(field.GetValue(original)), field.Name);
             }
             var baseline = Load("CounterCinematic"); var launch = Load("CounterLaunch_ReferenceTrial");
+            Assert.That(Get<bool>(baseline, "crossThroughFromPlayerSide"), Is.True);
+            Assert.That(Get<bool>(launch, "crossThroughFromPlayerSide"), Is.True);
             Assert.That(Get<bool>(launch, "IsValid"), Is.True);
             Assert.That(Get<float>(baseline, "launchDistance"), Is.EqualTo(3.2f));
             Assert.That(Get<float>(baseline, "launchRotationDegrees"), Is.EqualTo(95));

@@ -1272,7 +1272,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5.625
+  orthographic size: 5
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -3095,6 +3095,7 @@ MonoBehaviour:
   maxHp: 30
   infiniteHealth: 0
   individualId: prototype-melee-1
+  suppressOrdinaryHitReaction: 1
   combatRank: 0
   combatDefinition: {fileID: 0}
   overrideMaxHp: 0
@@ -4236,6 +4237,7 @@ MonoBehaviour:
   maxHp: 30
   infiniteHealth: 0
   individualId: prototype-melee-2
+  suppressOrdinaryHitReaction: 1
   combatRank: 0
   combatDefinition: {fileID: 0}
   overrideMaxHp: 0
@@ -5209,7 +5211,7 @@ MonoBehaviour:
   referenceTiming: 1
   referenceReaction: 1
   fastAttacks: 1
-  snappyFirstTwo: 0
+  snappyFirstTwo: 1
   strongAttackHits: 1
 --- !u!1 &1048344828
 GameObject:
@@ -8796,7 +8798,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1882940575}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 98ed1d9d252b2d14c9138713cac0a9c9, type: 3}
   m_Name: 
@@ -9795,6 +9797,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Damageable2D
   maxHp: 30
   infiniteHealth: 1
+  suppressOrdinaryHitReaction: 1
   individualId: prototype-training-dummy
   combatRank: 0
   combatDefinition: {fileID: 0}
