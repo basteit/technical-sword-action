@@ -99,10 +99,17 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [Test] public void NumberRowNumpadAndFunctionKeysKeepTheSamePracticeActions()
         {
-            var keyboard = InputSystem.AddDevice<Keyboard>();
+            var inputSettings = InputSystem.settings;
+            var previousEditorInput = inputSettings.editorInputBehaviorInPlayMode;
+            var previousBackground = inputSettings.backgroundBehavior;
+            Keyboard keyboard = null;
             var second = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "Melee_2");
             try
             {
+                // Injected test input must also reach actions without a focused Game View in batch mode.
+                inputSettings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+                inputSettings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+                keyboard = InputSystem.AddDevice<Keyboard>();
                 void Press(Key key, Component owner)
                 {
                     InputSystem.QueueStateEvent(keyboard, new KeyboardState(key));
@@ -135,7 +142,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Press(Key.Numpad0, trial);
                 Assert.That(Get<object>(trial, "AttackTempo").ToString(), Is.EqualTo("Original"));
             }
-            finally { InputSystem.RemoveDevice(keyboard); }
+            finally
+            {
+                if (keyboard != null) InputSystem.RemoveDevice(keyboard);
+                inputSettings.editorInputBehaviorInPlayMode = previousEditorInput;
+                inputSettings.backgroundBehavior = previousBackground;
+            }
         }
 
         [TestCase(30, 1)] [TestCase(30, -1)] [TestCase(60, 1)] [TestCase(60, -1)] [TestCase(120, 1)] [TestCase(120, -1)]
