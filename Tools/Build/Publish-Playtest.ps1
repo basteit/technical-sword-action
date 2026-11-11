@@ -38,17 +38,29 @@ function Invoke-GitHub([string[]]$Arguments) {
     return ($response -join [Environment]::NewLine)
 }
 
+function Find-TaggedRelease {
+    # The tag endpoint only resolves published releases; list releases to include drafts.
+    $pages = (Invoke-GitHub -Arguments @('api', "repos/$Repository/releases", '--paginate', '--slurp')) | ConvertFrom-Json
+    $taggedReleases = @(foreach ($page in $pages) {
+        foreach ($item in $page) {
+            if ($item.tag_name -eq $Tag) { $item }
+        }
+    })
+    if ($taggedReleases.Count -gt 1) { throw 'More than one release uses the selected tag.' }
+    if ($taggedReleases.Count -eq 1) { return $taggedReleases[0] }
+    return $null
+}
+
 # A local single-flight lock keeps concurrent publication attempts from replacing the same draft.
 $publicationLock = [IO.File]::Open((Join-Path $builds '.publication.lock'), [IO.FileMode]::OpenOrCreate, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
 try {
-    $releaseResponse = & gh api "repos/$Repository/releases/tags/$Tag" 2>&1
-    $lookupExit = $LASTEXITCODE
-    if ($lookupExit -eq 0) {
-        $release = ($releaseResponse -join [Environment]::NewLine) | ConvertFrom-Json
+    $release = Find-TaggedRelease
+    if ($null -ne $release) {
         if (-not $release.draft) { throw 'This tag is already published. Use a new tag for a new archive.' }
     } else {
-        if (($releaseResponse -join ' ') -notmatch 'HTTP 404') { throw ($releaseResponse -join [Environment]::NewLine) }
         Invoke-GitHub -Arguments @('release', 'create', $Tag, '--repo', $Repository, '--target', $info.sourceCommit, '--draft', '--title', $Title, '--notes-file', $notesPath) | Out-Null
+        $release = Find-TaggedRelease
+        if ($null -eq $release -or -not $release.draft) { throw 'The newly created draft could not be found.' }
     }
 
     $staging = Join-Path $root ('.codex-tmp/release/' + $Tag)
@@ -60,7 +72,7 @@ try {
 
     Invoke-GitHub -Arguments @('release', 'edit', $Tag, '--repo', $Repository, '--title', $Title, '--notes-file', $notesPath) | Out-Null
     Invoke-GitHub -Arguments @('release', 'upload', $Tag, $downloadArchive, '--repo', $Repository, '--clobber') | Out-Null
-    $draft = (Invoke-GitHub -Arguments @('api', "repos/$Repository/releases/tags/$Tag")) | ConvertFrom-Json
+    $draft = (Invoke-GitHub -Arguments @('api', "repos/$Repository/releases/$($release.id)")) | ConvertFrom-Json
     $asset = @($draft.assets | Where-Object { $_.name -eq 'Keraunos-Windows.zip' -and $_.state -eq 'uploaded' })
     if (-not $draft.draft -or $draft.prerelease -or $asset.Count -ne 1 -or
         $asset[0].size -ne (Get-Item -LiteralPath $downloadArchive).Length) { throw 'The draft or uploaded archive could not be verified.' }
