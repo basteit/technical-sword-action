@@ -87,6 +87,9 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
     public PlayerActionRequest PendingRequests => pendingRequests;
     public PlayerActionRequest LastSharedInputResolution { get; private set; }
     public int LastSharedInputTargetInstanceId { get; private set; }
+    public string LastSharedInputReason { get; private set; } = "NotPressed";
+    public long LastDecisionTick { get; private set; }
+    public PlayerActionDecision LastDecision { get; private set; }
     public int CombatTickOrder => 100;
     public bool CanCollectGameplayInput => isActiveAndEnabled &&
         CombatTimeController.AcceptsGameplayInput &&
@@ -101,6 +104,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         LifeState == PlayerLifeState.Dead ||
         CombatSuspended ||
         DialogueController.GameplayInputBlocked ||
+        ActionState == PlayerActionState.Parry ||
         ActionState == PlayerActionState.ParrySuccess ||
         ActionState == PlayerActionState.ParryFail ||
         ActionState == PlayerActionState.ParryCounter ||
@@ -230,6 +234,12 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
 
         if ((normalized & PlayerActionRequest.Pause) != 0)
         {
+            // Escape / View belongs to dialogue Skip, including its release guard.
+            if (DialogueController.GameplayInputBlocked)
+            {
+                LastRejectionReason = PlayerActionRejectionReason.GameplayBlocked;
+                return false;
+            }
             LastRequestedActions = normalized | pendingRequests;
             LastAcceptedRequest = PlayerActionRequest.Pause;
             LastAcceptedPriority = -1;
@@ -247,6 +257,12 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
             return false;
         }
 
+        if ((normalized & PlayerActionRequest.Attack) != 0 &&
+            GetComponent<PrototypeCounterPresentation>() is { } parryPresentation && parryPresentation.TryQueueParryCounter())
+        {
+            normalized &= ~PlayerActionRequest.Attack;
+            if (normalized == PlayerActionRequest.None) return true;
+        }
         pendingRequests |= normalized;
         for (int index = 0; index < bufferedRequestFrames.Length; index++)
         {
@@ -276,6 +292,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         pendingSharedRequest = PlayerActionResolver.ResolveSharedDashInteract(pendingSharedTarget != null);
         LastSharedInputResolution = pendingSharedRequest;
         LastSharedInputTargetInstanceId = pendingSharedTarget is MonoBehaviour target ? target.GetInstanceID() : 0;
+        LastSharedInputReason = pendingSharedTarget != null ? "TargetInRange" : "NoTarget";
         return RequestAction(pendingSharedRequest);
     }
 
@@ -331,7 +348,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
             return;
         }
 
-        TransitionTo(PlayerActionState.Neutral, reason, true);
+        TransitionTo(PlayerActionState.Neutral, reason, !(expectedAction == PlayerActionState.Attack && attack != null && attack.IsRecovering));
     }
 
     public void CompleteParryAction(string reason)
@@ -499,6 +516,8 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         {
             handler?.CancelAction();
         }
+        GetComponent<PlayerParryCounter2D>()?.ClearStocks();
+        GetComponent<PlayerVisualRecovery2D>()?.Cancel();
 
         ReleaseAllCollisionIgnores();
         ClearActionRequests();
@@ -556,10 +575,23 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
             return;
         }
 
+        // Preserve an Attack still inside its original 6F buffer when success
+        // acquired an adaptive presentation lead after that input was sampled.
+        if ((requests & PlayerActionRequest.Attack) != 0 &&
+            GetComponent<PrototypeCounterPresentation>() is { } parryPresentation && parryPresentation.TryQueueParryCounter())
+        {
+            pendingRequests &= ~PlayerActionRequest.Attack;
+            requests &= ~PlayerActionRequest.Attack;
+            for (int i = 0; i < bufferedRequestFrames.Length; i++)
+                if ((PlayerActionRequest)(1 << i) == PlayerActionRequest.Attack) bufferedRequestFrames[i] = 0;
+            if (requests == PlayerActionRequest.None) return;
+        }
         PlayerActionRequest legalRequests = BuildLegalRequests();
         PlayerAttackCancelWindow cancelWindows = attack != null
             ? attack.OpenCancelWindows
             : PlayerAttackCancelWindow.None;
+        if (ActionState == PlayerActionState.ParryCounter && GetComponent<PlayerParryCounter2D>() is { CanDefenseCancel: true })
+            cancelWindows |= PlayerAttackCancelWindow.Defense;
         PlayerActionDecision decision = PlayerActionResolver.Resolve(
             ActionState,
             requests,
@@ -615,10 +647,13 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         if (motor != null && motor.CanStartDash) legal |= PlayerActionRequest.Dash;
         if (parry != null && parry.CanStartParry) legal |= PlayerActionRequest.Parry;
         if (specialSkill != null && specialSkill.CanStartSkill) legal |= PlayerActionRequest.Special;
-        if (ActionState == PlayerActionState.ParrySuccess)
+        if (ActionState == PlayerActionState.ParrySuccess || ActionState == PlayerActionState.Neutral)
         {
             if (actionHandlers.TryGetValue(PlayerActionState.ParryCounter, out IPlayerActionStateHandler counter) && counter.CanStartAction)
                 legal |= PlayerActionRequest.Attack;
+            else if (ActionState == PlayerActionState.Neutral && actionHandlers.TryGetValue(PlayerActionState.OpportunityStrike, out IPlayerActionStateHandler opportunity) && opportunity.CanStartAction)
+                legal |= PlayerActionRequest.Attack;
+            else if (attack != null && attack.CanStartAttackFromStateMachine) legal |= PlayerActionRequest.Attack;
         }
         else if (attack != null && attack.CanStartAttackFromStateMachine) legal |= PlayerActionRequest.Attack;
         if (motor != null && motor.CanStartJump) legal |= PlayerActionRequest.Jump;
@@ -631,6 +666,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
             legal |= PlayerActionRequest.Heal;
         }
 
+        if (GetComponent<PrototypeCounterPresentation>() is { IsParrySequenceActive: true }) legal &= ~PlayerActionRequest.Attack;
         return legal;
     }
 
@@ -639,13 +675,32 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
         PlayerActionRequest request = decision.SelectedRequest;
         PlayerActionState nextAction = decision.NextAction;
 
-        if (request == PlayerActionRequest.Attack && ActionState == PlayerActionState.ParrySuccess)
+        if (request == PlayerActionRequest.Attack &&
+            (ActionState == PlayerActionState.ParrySuccess || ActionState == PlayerActionState.Neutral) &&
+            actionHandlers.TryGetValue(PlayerActionState.ParryCounter, out IPlayerActionStateHandler counterCandidate) && counterCandidate.CanStartAction)
         {
             if (!actionHandlers.TryGetValue(PlayerActionState.ParryCounter, out IPlayerActionStateHandler counter) ||
                 !counter.TryStartAction()) return false;
             TransitionTo(PlayerActionState.ParryCounter, "AcceptedParryCounter", true);
             return true;
         }
+        if (request == PlayerActionRequest.Attack && ActionState == PlayerActionState.ParrySuccess)
+        {
+            if (attack == null || !attack.TryStartAttackFromStateMachine()) return false;
+            TransitionTo(PlayerActionState.Attack, "AcceptedAttackWithoutCounterTarget", true);
+            return true;
+        }
+
+        if (request == PlayerActionRequest.Attack && ActionState == PlayerActionState.Neutral &&
+            actionHandlers.TryGetValue(PlayerActionState.OpportunityStrike, out IPlayerActionStateHandler opportunity) && opportunity.CanStartAction)
+        {
+            if (!opportunity.TryStartAction()) return false;
+            TransitionTo(PlayerActionState.OpportunityStrike, "AcceptedOpportunity", true);
+            return true;
+        }
+
+        if (request == PlayerActionRequest.Attack && ActionState == PlayerActionState.Attack && attack != null)
+            return attack.TryAdvanceConfiguredCombo();
 
         switch (request)
         {
@@ -698,6 +753,8 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
 
     private void RecordDecision(PlayerActionDecision decision)
     {
+        LastDecision = decision;
+        LastDecisionTick = CombatTimeController.TickCount;
         LastAcceptedRequest = decision.SelectedRequest;
         LastAcceptedPriority = PlayerActionResolver.GetPriority(decision.SelectedRequest);
 

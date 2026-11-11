@@ -1,0 +1,71 @@
+{
+  "dateJst": "2026-11-02",
+  "issue": 33,
+  "branch": "issue/33-parry-shockwave",
+  "baselineCommit": "f07b22dd54c0f61ea0741d3bc9b67652c26ce72a",
+  "implementationCommit": "3e17d7b",
+  "mediaCommit": "89c2b910a509176ac223de4b00c95104b0f6b0b7",
+  "draftPullRequest": 98,
+  "dependencyPullRequests": [81],
+  "userRequest": "Stronger dimming, actual gameplay camera framing, shorter attack-to-parry interval, slightly shorter hitstop",
+  "trialValuesNotFinalHumanApproval": true,
+  "settings": {
+    "previousDimMaximum": 0.2, "dimMaximum": 0.3,
+    "previousHitstopTicks": 40, "hitstopTicks": 36, "hitstopSeconds": 0.6,
+    "previousCurrentEnemyApproachTicks": 15, "maximumApproachTicks": 8,
+    "deflectionFollowThroughTicks": 8,
+    "lightRiseSeconds": 0.0333333333, "lightHoldSeconds": 0.0333333333, "lightFadeSeconds": 0.2,
+    "actorLight": 0.4, "repeatLightSuppressionSeconds": 0.4,
+    "waveSeconds": 0.4, "wavePixelsParameter": 32, "waveGain": 1.55,
+    "logicalStaggerTicks": 180, "staggerRemainingAtVisibleReaction": 164
+  },
+  "preserved": ["Parry acceptance and Just boundary", "Pre-success enemy AI and authored cue", "Damage, gauge and stock rules", "Counter hitstop and close-up camera", "Received art, PNGs, completed filming scenes and libraries"],
+  "rollback": {
+    "previousSynchronizedTrial": "Reset with stop=40, dim=0.2, parryApproachMaxFrames=15",
+    "beforeSynchronization": "Reset with synchronizedParryImpact=false; immediate legacy normal9/Just10 hitstop and 99-percent/4F backdrop"
+  },
+  "compile": {"errors": 0, "warnings": 0},
+  "editMode": {"total": 278, "passed": 278, "failed": 0, "completedAtUtc": "2026-11-02T09:50:32.3848730Z"},
+  "focusedPrototypePlayMode": {"total": 108, "passed": 108, "failed": 0, "completedAtUtc": "2026-11-02T09:51:26.1566830Z"},
+  "fullPlayMode": {
+    "status": "Completed with existing failures", "total": 775, "passed": 762, "failed": 13, "skipped": 0,
+    "durationSeconds": 191.912, "completedAtUtc": "2026-11-02T09:57:44Z",
+    "localXml": ".uloop/outputs/TestResults/20261102_185744.xml",
+    "baselineXml": ".uloop/outputs/TestResults/20261026_195251.xml",
+    "allFailureFullNamesMatchBaseline": true, "newFailures": [],
+    "knownFailureGroups": {"videoKickHeight": 2, "videoChargeTiming": 3, "fourStageDefenseCancelVideo": 7, "legacyJustBoundaryExpectation": 1},
+    "focusedCounterTestsInFullRun": 108, "focusedCounterFailuresInFullRun": 0,
+    "cliTimedOutAt180Seconds": true, "recoveredFinalXmlWithoutDuplicateRun": true
+  },
+  "capture": {
+    "localRawDirectory": ".uloop/outputs/video/adaptive-parry-20261102-sync-v2/adaptive",
+    "frameCount": 180, "fps": 60, "seconds": 3,
+    "successFrame": 17, "impactFrame": 25, "visibleStaggerFrame": 69,
+    "impactEnemySprite": "EnemySample_attack_14", "approachTicks": 8, "maximumStopTicks": 36,
+    "maximumBackgroundAlpha": 0.30000001192092898,
+    "cameraOrthographicSize": 5.625, "cameraAspect": 1.7777777910232545, "cameraBasePosition": [0, 3, -10],
+    "cameraSizeUnchangedThroughoutCapture": true, "cropOrAddedZoom": false,
+    "cameraRenderingNotHudCapture": true,
+    "parrySuccesses": 1, "enemyHp": 30, "playerHp": 100, "damageHits": 0, "counters": 0,
+    "presentationResidueAtEnd": false,
+    "comparisonSource": ".uloop/outputs/video/adaptive-parry-20261102-sync-v1/adaptive"
+  },
+  "media": [
+    {"file": "parry-adaptive-20261102-v2-on.mp4", "size": [1280,720], "fps": 30, "seconds": 3, "bytes": 214763, "sha256": "AAF4E9B5064E8E8FA772C8469D3F2A1F8D737721B6B8E326D5B45CD4E1CA7B4C"},
+    {"file": "parry-adaptive-20261102-v2-comparison.mp4", "size": [640,720], "fps": 30, "seconds": 3, "bytes": 186104, "sha256": "850829E7DF67C70BC6CD861FEFFD3590EAD22F777C072BC599E39129956C328C"},
+    {"file": "parry-adaptive-20261102-v2-detail.mp4", "size": [1280,720], "fps": 30, "seconds": 2.2666667, "bytes": 267009, "sha256": "9238ADC11451CDCCA9919B84DC5F692355D21C4ED4C5B824E0454DE78CB0BBC4", "inspectionSpeed": 0.5},
+    {"file": "parry-adaptive-20261102-v2-detail.gif", "size": [640,360], "fps": 20, "seconds": 2.25, "bytes": 400721, "sha256": "81790D92CC2DB824A112D959BF711BCCEC3177D02BC774E92C5F01A08DEEEAD5", "inspectionSpeed": 0.5}
+  ],
+  "mediaVerification": {
+    "mp4Encoding": "H.264 Constrained Baseline, Level3.1, yuv420p, faststart, no audio",
+    "allFourFilesFullyDecoded": true, "deliveredMp4ContactSheetVisuallyInspected": true,
+    "cdnBase": "https://cdn.jsdelivr.net/gh/basteit/technical-sword-action@89c2b910a509176ac223de4b00c95104b0f6b0b7/docs/video/previews/",
+    "onMp4HttpStatus": 200, "onMp4Mime": "video/mp4", "onMp4RangeStatus": 206,
+    "onMp4ContentRange": "bytes 0-1023/214763", "onMp4DownloadedSha256Matches": true,
+    "comparisonMp4HeadStatus": 200, "gifHeadStatus": 200, "physicalPhonePlayback": "Not tested"
+  },
+  "finalUnityState": {"scene": "Assets/Scenes/PrototypeCombatValidation.unity", "dirty": false, "playing": false, "paused": false, "missingScripts": 0, "counterValidationErrors": 0, "commonValidationErrors": 0, "consoleErrors": 0, "consoleWarnings": 0},
+  "requirementsStaging": "Only this task's four changed lines staged; existing unrelated 645 additions / 171 deletions preserved",
+  "humanChecksStillRequired": ["30-percent dim and 0.60-second stop at gameplay distance", "Compressed temporary windup and mouth-closure timing", "Readability with multiple enemies and repeated parries", "Keyboard and physical gamepad 15 minutes each", "Development/Release Build performance on minimum hardware"],
+  "newBuildOrZipCreated": false
+}

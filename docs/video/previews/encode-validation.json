@@ -1,0 +1,29 @@
+[
+  {
+    "file": "combat-2stage-rough-hybrid.mp4",
+    "width": 1920,
+    "height": 1080,
+    "fps": 60.0,
+    "decodedFrames": 234,
+    "duration": 3.9,
+    "audioStreams": 0
+  },
+  {
+    "file": "combat-4stage-rough-hybrid.mp4",
+    "width": 1920,
+    "height": 1080,
+    "fps": 60.0,
+    "decodedFrames": 295,
+    "duration": 4.916666666666667,
+    "audioStreams": 0
+  },
+  {
+    "file": "combat-4stage-rough-pixel.mp4",
+    "width": 1920,
+    "height": 1080,
+    "fps": 60.0,
+    "decodedFrames": 295,
+    "duration": 4.916666666666667,
+    "audioStreams": 0
+  }
+]

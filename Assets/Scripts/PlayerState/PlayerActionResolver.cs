@@ -90,12 +90,17 @@ namespace TechnicalSwordAction.PlayerState
             if (currentAction == PlayerActionState.ParrySuccess)
                 return PlayerActionRequest.Attack;
 
+            if (currentAction == PlayerActionState.ParryCounter)
+                return (openCancelWindows & PlayerAttackCancelWindow.Defense) != 0 ? DefenseCancelRequests : PlayerActionRequest.None;
+
             if (currentAction != PlayerActionState.Attack)
             {
                 return PlayerActionRequest.None;
             }
 
             PlayerActionRequest result = PlayerActionRequest.None;
+            if ((openCancelWindows & PlayerAttackCancelWindow.Common) != 0)
+                result |= PlayerActionRequest.Attack | PlayerActionRequest.Dash | PlayerActionRequest.Parry | PlayerActionRequest.Special;
             if ((openCancelWindows & PlayerAttackCancelWindow.Defense) != 0)
             {
                 result |= DefenseCancelRequests;

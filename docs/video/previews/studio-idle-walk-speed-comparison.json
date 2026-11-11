@@ -1,0 +1,23 @@
+{
+  "frameCount": 360,
+  "fps": 60,
+  "duration": 6,
+  "width": 1920,
+  "height": 1080,
+  "audio": false,
+  "top": "studio-idle-walk-speed-1p5x.mp4",
+  "bottom": "studio-idle-walk-speed-2x.mp4",
+  "sourceCrop": [
+    0,
+    300,
+    1920,
+    540
+  ],
+  "resized": false,
+  "animationSpeedMultiplier": 1,
+  "baseline": "studio-idle-walk-game-scale.mp4",
+  "actualSpeedMultipliers": [
+    1.500001072883606,
+    2.0000011920928955
+  ]
+}

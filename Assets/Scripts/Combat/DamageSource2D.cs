@@ -67,7 +67,10 @@ public class DamageSource2D : MonoBehaviour
 
         if (other.TryGetComponent(out IDamageReceiver2D receiver))
         {
-            bool applied = receiver.TryReceiveHit(damage, transform.position, knockbackForce);
+            var source=GetComponentInParent<Damageable2D>();
+            bool applied=receiver is IContextDamageReceiver2D contextual
+                ? contextual.TryReceiveContextHit(damage,transform.position,knockbackForce,new CombatHitContext2D(source,CombatTimeController.TickCount))
+                : receiver.TryReceiveHit(damage, transform.position, knockbackForce);
             if (applied)
             {
                 lastHitTickByTarget[id] = CombatTimeController.TickCount;

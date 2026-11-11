@@ -1,0 +1,52 @@
+{
+  "validatedAtUtc": "2026-10-15T20:04:59.805098+00:00",
+  "video": "studio-idle-walk-original.mp4",
+  "scene": "Assets/Scenes/CombatVideoStudio.unity",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "fps": 60,
+  "durationSeconds": 6,
+  "decodedFrames": 360,
+  "audioStreams": 0,
+  "nativeSpritePixelsMatchedFrames": 360,
+  "integerScale": 10,
+  "idleFramesSeen": 6,
+  "walkFramesSeen": 8,
+  "sourceFileSha256": {
+    "idle": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
+    "walk": "92FC9E07636331D2D6B5AAC363DC3AC6A53E030608DB1533D9CAE1505AE5F107"
+  },
+  "characterPixelsChanged": 0,
+  "guidePixelsHiddenPerFrame": {
+    "idle": 0,
+    "walk": 64
+  },
+  "allCharacterFramesInsideCamera": true,
+  "frameTiming": "100ms idle / 80ms walk, sampled by absolute segment time at 60fps",
+  "unityCompile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "unityPostCaptureConsole": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "restored": {
+    "cameraSize": 2.109375,
+    "followCamera": true,
+    "moveSpeed": 6.5,
+    "manualAdvanceOnly": false,
+    "animationDriver": true,
+    "recovery": true,
+    "inputRouter": true,
+    "enemyActive": true,
+    "customContentActive": true,
+    "action": "Neutral",
+    "slowScale": 1,
+    "slowOwners": 0,
+    "hitstopOwners": 0,
+    "activeVfx": 0
+  }
+}

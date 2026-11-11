@@ -21,6 +21,18 @@ public sealed class PlayerInteractor2D : MonoBehaviour
 
     public IInteractable2D CurrentInteractable => currentInteractable;
 
+    public void RefreshAfterTeleport()
+    {
+        overlapSources.Clear(); candidates.Clear(); currentInteractable = null;
+        Collider2D own = GetComponent<Collider2D>();
+        if (own == null || !own.enabled || !isActiveAndEnabled) return;
+        Physics2D.SyncTransforms();
+        foreach (Collider2D other in Physics2D.OverlapBoxAll(own.bounds.center, own.bounds.size, 0))
+            if (other != own && other.enabled && own.Distance(other).distance <= .01f)
+                OnTriggerEnter2D(other);
+        SelectCurrentInteractable();
+    }
+
     private void Awake()
     {
         ResolvePlayerActions();

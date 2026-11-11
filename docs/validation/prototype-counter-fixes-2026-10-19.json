@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-19",
+  "issues": [33, 49],
+  "branch": "issue/33-52-38-combat-polish",
+  "baseCommit": "6f5474c",
+  "implementationCommit": "c82d869fddeb87f8c140e8469f5a1eae49454e87",
+  "environment": {
+    "unity": "6000.3.9f1",
+    "uloop": "2.1.3",
+    "cli": "C:/Users/hirot/AppData/Roaming/npm/uloop.cmd",
+    "scene": "Assets/Scenes/PrototypeCombatValidation.unity"
+  },
+  "compile": { "success": true, "errors": 0, "warnings": 0 },
+  "tests": [
+    {
+      "mode": "EditMode",
+      "filter": "PrototypeCounterCinematicAssetTests",
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0,
+      "completedAt": "2026-10-19T02:23:52.1295446Z"
+    },
+    {
+      "mode": "PlayMode",
+      "filter": "PrototypeCounterCinematicTests",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "completedAt": "2026-10-19T02:24:15.4650842Z"
+    },
+    {
+      "mode": "PlayMode",
+      "filter": "PrototypeCombatContractTests|CombatPolishContractTests|CombatPolishSceneTests|CombatVideoIntegrationTests|VideoStudioTests",
+      "passed": 319,
+      "failed": 0,
+      "skipped": 0,
+      "completedAt": "2026-10-19T02:26:03.4399359Z"
+    }
+  ],
+  "coverage": [
+    "Buffered attack immediately after normal and Just parry does not replay the parry-success pose or its recovery after the counter.",
+    "Left/right impacts retain their emitted world contact and facing after player movement and turning.",
+    "Afterimages, transit silhouettes and eye trails copy the displayed art transform once in both directions.",
+    "The counter camera focuses on the hero, freezes on Pause and restores its original position and size on completion.",
+    "Reset, disable, death, target loss and active-scene change restore camera ownership.",
+    "Camera motion set to zero restores the normal view without changing counter damage or timing.",
+    "Existing counter phases, damage, launch, stocks, obstacles, common feedback, parry reactions, filming and Studio remain covered by related regression tests."
+  ],
+  "postTestChange": "Only the F6 label was clarified to Camera (shake / zoom); compilation and the displayed Game View were checked afterward.",
+  "screenshots": {
+    "resolution": [1920, 1080],
+    "captureMode": "rendering",
+    "charge14": "prototype-counter-fixes-2026-10-19/Rendering_20261019_112809_578.png",
+    "leftHit21": "prototype-counter-fixes-2026-10-19/Rendering_20261019_112826_422.png",
+    "rightHit21": "prototype-counter-fixes-2026-10-19/Rendering_20261019_112857_980.png"
+  },
+  "observed": {
+    "chargeFrame": 14,
+    "chargeDimAlpha": 0.965,
+    "closeUpOrthographicSize": 1.875,
+    "normalOrthographicSize": 5.625,
+    "hitFrame": 21,
+    "leftContact": [1.37, 1.20],
+    "rightContact": [-1.37, 1.20],
+    "enemyHpBefore": 120,
+    "enemyHpAfterEachCounter": 30,
+    "damageApplicationsPerCounter": 1
+  },
+  "cleanup": {
+    "counterActive": false,
+    "cameraFocus": false,
+    "cameraOrthographicSize": 5.625,
+    "dimAlpha": 0,
+    "activeCounterEffects": 0,
+    "counterStocks": 0,
+    "slowOwners": 0,
+    "manualClock": false,
+    "playerInputEnabled": true,
+    "defaultEnemies": 0,
+    "editorPlaying": false,
+    "sceneDirty": false,
+    "consoleErrors": 0,
+    "consoleWarnings": 0
+  },
+  "connectionRecovery": {
+    "before": "Unity was responding, but no uLoop listener was present on port 8701 and get-version reported server not running.",
+    "action": "Opened Window > Unity CLI Loop > Server with Computer Use.",
+    "after": "The server displayed Running on port 8701; get-version, compile, dynamic code, tests and screenshots succeeded.",
+    "packageOrSecuritySettingsChanged": false
+  },
+  "limitations": [
+    "Related suites were run, not the entire project test suite.",
+    "Screenshots and gameplay progression used the combat clock and action API, not a human play-feel acceptance.",
+    "Physical gamepad, 15-minute human playtest and standalone Development Build were not performed.",
+    "Existing unrelated uncommitted scene, art, input settings and requirements edits were preserved."
+  ]
+}

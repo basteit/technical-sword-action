@@ -13,7 +13,10 @@ namespace TechnicalSwordAction.Tests
         public bool Active { get; private set; }
         public int Starts { get; private set; }
         public PlayerActionState ActionState => State;
-        public bool CanStartAction => Available && !Active && isActiveAndEnabled;
+        // This fixture has no enemy-stock model. A counter grant is represented by
+        // ParrySuccess; neutral stock selection is covered by the real video tests.
+        public bool CanStartAction => Available && !Active && isActiveAndEnabled &&
+            (State != PlayerActionState.ParryCounter || GetComponent<PlayerStateMachine>().ActionState == PlayerActionState.ParrySuccess);
         public float LockRemaining => Active ? 1f : 0f;
         public bool TryStartAction()
         {

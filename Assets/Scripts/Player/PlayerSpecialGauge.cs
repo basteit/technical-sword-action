@@ -27,6 +27,7 @@ public class PlayerSpecialGauge : MonoBehaviour
     }
 
     public void ResetGauge() => CurrentGauge = Mathf.Clamp(startGauge, 0f, maxGauge);
+    public void RetainAfterDeath() => CurrentGauge = Mathf.Min(CurrentGauge, 50f);
 
     public void AddOnAttackHit()
     {

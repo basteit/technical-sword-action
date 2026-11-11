@@ -1,0 +1,135 @@
+{
+  "capture": {
+    "scene": "Assets/Scenes/CombatVideoStudio.unity",
+    "takeKind": "original-idle-walk",
+    "sampling": "native milliseconds, sampled at 60 fps",
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "frameCount": 360,
+    "duration": 6.0,
+    "walkSpeed": 4.401899814605713,
+    "cameraSize": 2.8125,
+    "finalX": -5.960464477539063e-08,
+    "requestedSpeedMultiplier": 1.0,
+    "baselineMeasuredSpeed": 4.205699920654297,
+    "measuredMoveSpeed": 4.205703258514404,
+    "actualSpeedMultiplier": 1.0000007152557373,
+    "cameraCenter": {
+      "x": 3.3645598888397217,
+      "y": 1.0499999523162842
+    },
+    "cameraReferenceScene": "",
+    "audio": false,
+    "originalArtwork": true,
+    "sourceFloorGuideHidden": true,
+    "standardWalkSpeed": true,
+    "speedReference": "approved-2026-10-16",
+    "motions": [
+      {
+        "source": "Assets/Art/Player/Player_idle.aseprite",
+        "durationsMs": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ]
+      },
+      {
+        "source": "Assets/Art/Player/Player_walk.aseprite",
+        "durationsMs": [
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80,
+          80
+        ]
+      }
+    ],
+    "segments": [
+      {
+        "motion": "idle",
+        "frameCount": 72,
+        "direction": 0
+      },
+      {
+        "motion": "walk",
+        "frameCount": 96,
+        "direction": 1
+      },
+      {
+        "motion": "idle",
+        "frameCount": 36,
+        "direction": 0
+      },
+      {
+        "motion": "walk",
+        "frameCount": 96,
+        "direction": -1
+      },
+      {
+        "motion": "idle",
+        "frameCount": 60,
+        "direction": 0
+      }
+    ]
+  },
+  "compile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "console": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "restoration": {
+    "output": "C:/Users/hirot/GitHub/technical-sword-action/.uloop/outputs/video/studio-idle-walk-standard-medium",
+    "captureSettingsRestored": true,
+    "moveSpeed": 4.4019,
+    "restoredCameraSize": 2.109375
+  },
+  "nativeSpriteFramesCompared": 360,
+  "opaqueSourcePixelsMatchExactly": true,
+  "renderBoundingBoxAlignmentCorrections": [
+    {
+      "frame": 83,
+      "boundingBoxAlignmentCorrection": [
+        1,
+        0
+      ]
+    }
+  ],
+  "sourcePixelScreenScale": 6,
+  "renderBounds": [
+    133,
+    413,
+    1782,
+    742
+  ],
+  "sources": {
+    "Assets/Art/Player/Player_idle.aseprite": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
+    "Assets/Art/Player/Player_walk.aseprite": "92FC9E07636331D2D6B5AAC363DC3AC6A53E030608DB1533D9CAE1505AE5F107"
+  },
+  "previousVideosByteIdentical": [
+    "docs/video/previews/studio-idle-walk-game-scale.mp4",
+    "docs/video/previews/studio-idle-walk-original.mp4",
+    "docs/video/previews/studio-idle-walk-speed-1p5x.mp4",
+    "docs/video/previews/studio-idle-walk-speed-2x.mp4",
+    "docs/video/previews/studio-idle-walk-speed-comparison.mp4",
+    "docs/video/previews/studio-idle-walk-standard.mp4"
+  ],
+  "media": {
+    "framesDecoded": 360,
+    "duration": 6.0,
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "audioStreams": 0,
+    "sha256": "3B1AE360514C03442083DBD5BE0088CBCF6B3C9957BE9F81B40788AEF34280A5"
+  }
+}

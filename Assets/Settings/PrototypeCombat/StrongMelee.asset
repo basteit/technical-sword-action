@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bedd1ff9438c1644498ee3af7dac279e, type: 3}
+  m_Name: StrongMelee
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyCombatDefinition
+  rank: 1
+  maxHp: 120
+  overrideCounterMultiplier: 0
+  counterMultiplier: 3
+  lightHitStunFrames: 0
+  strongHitStunFrames: 16
+  lightStunResistanceFrames: 18
+  hitKnockback: 0.2
+  normalParryStunFrames: 32
+  justParryStunFrames: 44
+  parryStaggerFrames: 180
+  attacks:
+  - {fileID: 11400000, guid: d6976c44fe7d651439397b636863b007, type: 2}
+  - {fileID: 11400000, guid: 7901b57c3b4b14d448241ef6b480178c, type: 2}
+  moveSpeed: 1.25
+  windupFrames: 30
+  parryCueLeadFrames: 12
+  activeFrames: 3
+  recoveryFrames: 30
+  cooldownFrames: 32
+  damage: 10
+  knockback: 4.5
+  parryable: 1
+  hitOffset: {x: 0.7, y: 0}
+  hitSize: {x: 1.4, y: 1.3}
+  attackRange: 1.45
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 8
+  allowOffscreenStart: 0
+  countermeasure: Parry or Dash; punish recovery

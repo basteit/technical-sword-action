@@ -1,0 +1,268 @@
+{
+  "dateJst": "2026-10-18",
+  "issues": [
+    49,
+    50,
+    30
+  ],
+  "branch": "issue/33-52-38-combat-polish",
+  "implementationCommit": "f071850361b67c1818511dee6447fc5217a5729c",
+  "unity": "6000.3.9f1",
+  "uloop": "2.1.3",
+  "scope": "PrototypeCombatValidation artwork only; original source files and video scenes/controllers retained.",
+  "completedArtwork": false,
+  "overrideCount": 24,
+  "artSet": "Assets/Settings/PrototypeCombat/PrototypePlayerArtSet.asset",
+  "sources": [
+    {
+      "id": "idle",
+      "action": "Idle",
+      "source": "Assets/Art/Player/Player_idle.aseprite",
+      "sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
+      "status": "received"
+    },
+    {
+      "id": "walk",
+      "action": "Move",
+      "source": "Assets/Art/Player/Player_walk.aseprite",
+      "sha256": "92fc9e07636331d2d6b5aac363dc3ac6a53e030608db1533d9cae1505ae5f107",
+      "status": "received"
+    },
+    {
+      "id": "attack_1",
+      "action": "Attack_1",
+      "source": "Assets/Art/Player/VideoSubmitted/20261016/Player_attack_1.aseprite",
+      "sha256": "d994e5fdba1d091018c8ba1b2e4029068aa2a1f6351485aade2124be80bf2650",
+      "status": "provisional"
+    },
+    {
+      "id": "attack_2",
+      "action": "Attack_2",
+      "source": "Assets/Art/Player/VideoSubmitted/20261017/Player_attack_2.aseprite",
+      "sha256": "ccdb5da3908f8dc0fd730291036964c5b6c2380991cf1def238e13a5fa5ce781",
+      "status": "provisional"
+    },
+    {
+      "id": "parry_wait",
+      "action": "Parry",
+      "source": "Assets/Art/Player/VideoSubmitted/20261017/Player_parry_wait.aseprite",
+      "sha256": "01adf3b9dfcc81dff09749a7362b77971ddef73afcd5077468526f5327411d1d",
+      "status": "received"
+    },
+    {
+      "id": "parry_light",
+      "action": "ParrySuccess",
+      "source": "Assets/Art/Player/VideoSubmitted/20261018/Player_parry_light.aseprite",
+      "sha256": "cc31cbbf9b40901cc230f9985a24043fd58b8e46330cacb4d8db0aa9cafd3366",
+      "status": "provisional"
+    },
+    {
+      "id": "counter_kick",
+      "action": "ParryCounter",
+      "source": "Assets/Art/Player/VideoSubmitted/20261018/Player_counter_kick.aseprite",
+      "sha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db",
+      "status": "provisional"
+    },
+    {
+      "id": "jump_start",
+      "action": "Jump",
+      "source": "Assets/Art/Player_jamp_start_sample.aseprite",
+      "sha256": "6cda4621e97cd420d8999513bd3cbdf384dbdfb57e0e3779b74173196aaa33c0",
+      "status": "sample"
+    },
+    {
+      "id": "jump_up",
+      "action": "Jump/Fall/DropThrough/AirRecovery",
+      "source": "Assets/Art/Player_jamp_up_sample.aseprite",
+      "sha256": "c88edc2b0c0b9cd52195efd8edfd09f959856059f11213e572c3e28b1d94f063",
+      "status": "sample"
+    }
+  ],
+  "sourceCatalog": "ArtSource/Player/catalog.json",
+  "prototypeUseRecords": {
+    "count": 9,
+    "consumer": "prototype",
+    "command": "Tools/Art/player_source_library.py record-use",
+    "sourceLibraryBaseCommit": "b9d7677",
+    "catalogValidationPassed": true,
+    "currentAndHistoryUnchanged": true,
+    "sourceCompletionStatusesUnchanged": true
+  },
+  "roughActions": [
+    "Attack_3",
+    "Attack_4",
+    "Dash"
+  ],
+  "substituteActions": [
+    "AirDashSlash",
+    "AirRecovery",
+    "ComboBranch",
+    "Death",
+    "DropThrough",
+    "Fall",
+    "Heal",
+    "Hit",
+    "LandingShock",
+    "ParryFail",
+    "Respawn",
+    "Rest",
+    "Special"
+  ],
+  "excludedVideoOnlyMotion": "CounterTransfer: no teleport/overhead displacement or video slow applied to ground counter.",
+  "gameplayPreserved": {
+    "attackDamage": [
+      10,
+      10,
+      15,
+      25
+    ],
+    "attackHitFrame": [
+      15,
+      12,
+      15,
+      38
+    ],
+    "attackEndFrame": [
+      38,
+      32,
+      38,
+      62
+    ],
+    "counterHitFrame": 18,
+    "counterDamageToNormal": 90,
+    "airborneCounterEnabled": false,
+    "colliderSize": [
+      0.65,
+      1.6
+    ]
+  },
+  "presentationFixes": [
+    "Prototype-only controller prevents AnyState self-restart after a direct attack Play; original controller untouched.",
+    "Clip length and all attack AnimationEvents unchanged.",
+    "Contact cel onset aligned to configured hit with sub-tick float tolerance; ground counter artwork compensates its existing 1F driver start delay.",
+    "Visual child normalizes 100PPU bottom-pivot jump samples to 32px/unit without editing sprites or physics."
+  ],
+  "focusedTests": {
+    "editMode": 10,
+    "playModeArt": 6,
+    "playModeActionStage": 19
+  },
+  "fullRegression": {
+    "startedAt": "2026-10-18T09:12:30.9761186Z",
+    "commit": "f071850361b67c1818511dee6447fc5217a5729c",
+    "checks": [
+      {
+        "name": "compile",
+        "result": {
+          "Success": true,
+          "ErrorCount": 0,
+          "WarningCount": 0,
+          "Errors": [],
+          "Warnings": [],
+          "Message": null
+        }
+      },
+      {
+        "name": "assets",
+        "result": {
+          "Success": true,
+          "Result": "True",
+          "Logs": [
+            "Execution completed successfully"
+          ],
+          "CompilationErrors": [],
+          "ErrorMessage": "",
+          "SecurityLevel": "Restricted",
+          "Error": "",
+          "UpdatedCode": null,
+          "DiagnosticsSummary": null,
+          "Diagnostics": []
+        }
+      },
+      {
+        "name": "EditMode",
+        "result": {
+          "Success": true,
+          "Message": "Test execution completed with status: Passed",
+          "CompletedAt": "2026-10-18T09:12:42.008617Z",
+          "TestCount": 196,
+          "PassedCount": 196,
+          "FailedCount": 0,
+          "SkippedCount": 0,
+          "XmlPath": null
+        }
+      },
+      {
+        "name": "PlayMode",
+        "result": {
+          "Success": true,
+          "Message": "Test execution completed with status: Passed",
+          "CompletedAt": "2026-10-18T09:14:08.7158569Z",
+          "TestCount": 381,
+          "PassedCount": 381,
+          "FailedCount": 0,
+          "SkippedCount": 0,
+          "XmlPath": null
+        }
+      },
+      {
+        "name": "Console",
+        "result": {
+          "TotalCount": 0,
+          "DisplayedCount": 0,
+          "LogType": "Error",
+          "MaxCount": 100,
+          "SearchText": "",
+          "IncludeStackTrace": true,
+          "Logs": []
+        }
+      }
+    ],
+    "success": true,
+    "completedAt": "2026-10-18T09:14:09.169127Z",
+    "localReport": ".uloop/outputs/PrototypeValidation/20261018-181230.json"
+  },
+  "idempotentInstall": {
+    "passed": true,
+    "scope": [
+      "PrototypeCombatValidation.unity",
+      "Submitted animation assets",
+      "PrototypePlayerArtSet.asset"
+    ],
+    "sha256Unchanged": true
+  },
+  "gameView": {
+    "resolution": [
+      1920,
+      1080
+    ],
+    "inputOverlayUsed": false,
+    "inspected": [
+      "idle contact with floor",
+      "attack1 VerticalSlash_05 at clock16",
+      "jump silhouette with 32px/unit display",
+      "ground counter CounterKick_09 at clock18, target HP1000 to910"
+    ],
+    "screenshots": {
+      "idle": "docs/validation/prototype-player-art-2026-10-18.png",
+      "attack1": ".uloop/outputs/Screenshots/Rendering_20261018_181617_556.png",
+      "jump": ".uloop/outputs/Screenshots/Rendering_20261018_181638_831.png",
+      "counter": ".uloop/outputs/Screenshots/Rendering_20261018_181734_222.png"
+    }
+  },
+  "consoleAfterVisualSmoke": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "temporaryPreviewTargetRemoved": true,
+  "manualClockAndInputOverridesReleased": true,
+  "finalActiveEnemies": 0,
+  "playModeStopped": true,
+  "preExistingAndParallelChangesPreserved": true,
+  "cleanCheckoutValidated": false,
+  "developmentBuildValidated": false,
+  "humanAcceptanceCompleted": false,
+  "humanChecklist": "docs/prototype-player-art.md",
+  "draftPullRequest": "https://github.com/basteit/technical-sword-action/pull/78",
+  "merged": false
+}

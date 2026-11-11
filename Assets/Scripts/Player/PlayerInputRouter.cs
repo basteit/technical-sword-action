@@ -52,7 +52,10 @@ public sealed class PlayerInputRouter : MonoBehaviour
         move.performed += ObserveDevice;
         foreach (string name in new[] { "Jump", "Attack", "Dash", "Parry", "Special", "Heal", "Interact", "Pause" })
             Subscribe(actions.FindAction("Gameplay/" + name, true));
+        InputAction shared = actions.FindAction("Context/SharedDashInteract", false);
+        if (shared != null) Subscribe(shared);
         actions.FindActionMap("Gameplay", true).Enable();
+        actions.FindActionMap("Context", false)?.Enable();
         CombatTimeController.PauseChanged += OnPauseChanged;
         InputSystem.onAfterUpdate += AfterInputUpdate;
     }
@@ -109,6 +112,14 @@ public sealed class PlayerInputRouter : MonoBehaviour
         MoveValue = move.ReadValue<Vector2>();
         motor?.SetMoveInput(MoveValue);
         motor?.SetJumpHeld(IsHeld("Jump"));
+        if (buttons.ContainsKey("SharedDashInteract") && TakePress("SharedDashInteract"))
+        {
+            if (state.RequestSharedDashInteract())
+            {
+                SharedPressCount++;
+                NotifyRequest(state.LastSharedInputResolution);
+            }
+        }
         Route("Dash", PlayerActionRequest.Dash);
         Route("Parry", PlayerActionRequest.Parry);
         Route("Special", PlayerActionRequest.Special);

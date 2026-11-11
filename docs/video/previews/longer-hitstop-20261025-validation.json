@@ -1,0 +1,212 @@
+{
+  "date": "2026-10-25",
+  "hitstop": {
+    "parryBefore": 4,
+    "parryAfter": 7,
+    "justBefore": 5,
+    "justAfter": 8,
+    "kickBefore": 10,
+    "kickAfter": 16,
+    "parryThirdCelVideoFrames": 8,
+    "kickContactCelVideoFrames": 17,
+    "parryImpactPeakAndEnemyDownStillSynchronized": true,
+    "kickPoseEnemyAndElectricityFrozenForEntireStop": true
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T19:06:34.9812253Z",
+    "TestCount": 27,
+    "PassedCount": 27,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "completionRetest": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T19:11:01.7627547Z",
+    "TestCount": 5,
+    "PassedCount": 5,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "uniquePlayModeCasesPassed": 27,
+  "mirroredTenResetRunsPassed": 20,
+  "fullSuiteRerun": false,
+  "legacyEightyResetSweepRerun": false,
+  "initialCapture": {
+    "durationSeconds": 4.5,
+    "endedBeforeEnemyFadeCompleted": true
+  },
+  "completionFix": "Wait for both enemies to disappear and VFX to clear, in addition to the original minimum tail and idle checks. Re-ran affected five cases after the initial 27 passed.",
+  "events": {
+    "allTargetsKindsAndCombatTicksUnchanged": true,
+    "realTimeDeltas": [
+      {
+        "kind": "RearApproach",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "RearWindup",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "Slash1",
+        "target": "Enemy_A",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "Death",
+        "target": "Enemy_A",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "Slash2",
+        "target": "Enemy_A",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "ParryReady",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "Parry",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "ParryImpact",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.0
+      },
+      {
+        "kind": "CounterStart",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.04999999999999982
+      },
+      {
+        "kind": "ChargeStart",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.04999999999999982
+      },
+      {
+        "kind": "ChargeRelease",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.04999999999999982
+      },
+      {
+        "kind": "Death",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.04999999999999982
+      },
+      {
+        "kind": "Kick",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.04999999999999982
+      },
+      {
+        "kind": "Landing",
+        "target": "Enemy_B",
+        "tickDelta": 0,
+        "realSecondsDelta": 0.14999999999999947
+      }
+    ],
+    "chargeSeconds": 1
+  },
+  "counterCelVideoFrames": {
+    "CounterKick_01": 14,
+    "CounterKick_02": 6,
+    "CounterKick_03": 7,
+    "CounterKick_04": 7,
+    "CounterKick_05": 6,
+    "CounterKick_06": 7,
+    "CounterKick_07": 7,
+    "CounterKick_08": 7,
+    "CounterKick_09": 17,
+    "CounterKick_10": 4,
+    "CounterKick_11": 4,
+    "CounterKick_12": 4,
+    "CounterKick_13": 4,
+    "CounterKick_14": 4,
+    "CounterKick_15": 4
+  },
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 20,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-longer-hitstop-20261025.mp4",
+    "sha256": "6cc8bee694a453e261764928791167520fb863453d75ae592fbde15c0a6c749b",
+    "decodedFrames": 273,
+    "durationSeconds": 4.55,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "bothEnemiesHiddenAtEnd": true,
+    "vfxActiveAtEnd": 0
+  },
+  "preview": {
+    "crf": 22,
+    "bytes": 864825,
+    "nativeVideoControls": true
+  },
+  "trialSettingsAccepted": false,
+  "overallVideoAccepted": false,
+  "preservation": {
+    "baselineFiles": 2392,
+    "changedIntentionally": 10,
+    "byteIdentical": 2382,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 15,
+    "originalDirtyChangesKept": true,
+    "allSourcesPngClipsControllersAndSharedArtUnchanged": true,
+    "sourceCurrentHistoryAndCatalogUnchanged": true,
+    "prototypeCinematicProfileUnchanged": true,
+    "captureSceneDiffOnlyThreeHitstopValuesEach": true
+  },
+  "repositoryStaged": {
+    "branch": "issue/33-52-38-combat-polish",
+    "base": "",
+    "staged": true,
+    "changedFiles": 15,
+    "attributes": [
+      "Assets/Scenes/PrototypeCombatValidation.unity: merge: unityyamlmerge",
+      "Assets/Art/test.aseprite: merge: unset"
+    ],
+    "problems": [],
+    "success": true
+  }
+}

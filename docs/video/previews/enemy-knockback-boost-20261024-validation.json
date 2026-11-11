@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-24",
+  "enemyPresentation": {
+    "parryAndDefeatUseSameDownCel": true,
+    "parriedHeldFrames": 80,
+    "parriedPositionRotationAndFacingHeld": true,
+    "knockbackCombatFrames": 18,
+    "fadeCombatFrames": 39,
+    "ratioRearToFrontDistance": 1.9999995000000002,
+    "arcs": [
+      {
+        "actor": "front",
+        "distance": 0.7999999999999998,
+        "height": 0.17999999999999994,
+        "origin": [
+          2.95,
+          1.0
+        ],
+        "endpoint": [
+          3.75,
+          1.0
+        ],
+        "firstStoppedFrame": 83,
+        "stationaryFadeFrames": 13,
+        "sprite": "EnemySample_down_01",
+        "rotationDegrees": 0,
+        "facingAttacker": true
+      },
+      {
+        "actor": "rear",
+        "distance": 1.5999995999999999,
+        "height": 0.27,
+        "origin": [
+          -0.5600016,
+          1.002561
+        ],
+        "endpoint": [
+          1.039998,
+          1.002561
+        ],
+        "firstStoppedFrame": 286,
+        "stationaryFadeFrames": 14,
+        "sprite": "EnemySample_down_01",
+        "rotationDegrees": 0,
+        "facingAttacker": true
+      }
+    ],
+    "stopBeforeFading": true
+  },
+  "cameraAndTiming": {
+    "normalUnchanged": 3.375,
+    "chargeUnchanged": 2.8125,
+    "impactMinimumUnchanged": 2.64375,
+    "parryHitstopFramesUnchanged": 4,
+    "kickHitstopFramesUnchanged": 10,
+    "chargeSecondsUnchanged": 0.9
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T02:49:37.0508485Z",
+    "TestCount": 12,
+    "PassedCount": 12,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "multipliersFromPrevious": {
+    "backwardDistance": 2,
+    "riseHeight": 1.5
+  },
+  "mirroredTenResetRunsPassed": 20,
+  "fullSuiteRerun": false,
+  "legacyEightyResetSweepRerun": false,
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 5,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-enemy-knockback-boost-20261024.mp4",
+    "sha256": "1cf0282a02f8d72b55a67b1d5ada31fb26cc41cb6c37f35a997989131e4ff576",
+    "decodedFrames": 310,
+    "durationSeconds": 5.166666666666667,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "allLayoutEventsTargetsTicksAndRealTimingUnchanged": true,
+    "floorFullWidth": true
+  },
+  "preview": {
+    "crf": 22,
+    "bytes": 848367,
+    "nativeVideoControls": true
+  },
+  "overallVideoAccepted": false,
+  "preservation": {
+    "baselineFiles": 2355,
+    "changedIntentionally": 6,
+    "byteIdentical": 2349,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 11,
+    "playerSourcesSceneLayoutAndCameraCodeUnchanged": true
+  }
+}

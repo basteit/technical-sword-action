@@ -1,0 +1,71 @@
+{
+  "submission": {
+    "name": "VerticalSlash",
+    "provisional": true,
+    "canvasWidth": 128,
+    "canvasHeight": 128,
+    "pivotX": 32,
+    "pivotY": 38,
+    "count": 9,
+    "totalFrames": 38,
+    "hitFrame": 17,
+    "branchFrame": 34,
+    "recoveryFrame": 34,
+    "frames": [
+      {
+        "frames": 4,
+        "start": 0
+      },
+      {
+        "frames": 4,
+        "start": 4
+      },
+      {
+        "frames": 5,
+        "start": 8
+      },
+      {
+        "frames": 4,
+        "start": 13
+      },
+      {
+        "frames": 4,
+        "start": 17
+      },
+      {
+        "frames": 4,
+        "start": 21
+      },
+      {
+        "frames": 4,
+        "start": 25
+      },
+      {
+        "frames": 5,
+        "start": 29
+      },
+      {
+        "frames": 4,
+        "start": 34
+      }
+    ]
+  },
+  "heelEditable": {
+    "reopened": true,
+    "tagRangesChecked": true,
+    "layers": 8,
+    "tags": 2,
+    "frames": 26,
+    "sourceFilesModified": false,
+    "actionPixelsRedrawn": true,
+    "referencePixelsOnlyInHiddenReference": true
+  },
+  "eyeMasksChecked": 26,
+  "allSlowPosesHaveEyeMasks": true,
+  "hashes": {
+    "Assets/Art/Player/VideoSubmitted/20261016/Player_attack_1.aseprite": "D994E5FDBA1D091018C8BA1B2E4029068AA2A1F6351485AADE2124BE80BF2650",
+    "Assets/Art/Player/Player_idle.aseprite": "A37F061FD656A8234CCE091349C573DA49C92558EE6C88EAD1F3DFAE2691F076",
+    "Assets/Art/Player/Player_walk.aseprite": "92FC9E07636331D2D6B5AAC363DC3AC6A53E030608DB1533D9CAE1505AE5F107",
+    "Assets/Art/Player/VideoRough/Player_actions_rough.aseprite": "D9890E846903CC024CB6F2B56459A163D2CB2E036AA2B77ACFB2E1334A29D7C3"
+  }
+}

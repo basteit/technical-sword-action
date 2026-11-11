@@ -1,0 +1,136 @@
+{
+  "dateJst": "2026-11-02",
+  "issue": 33,
+  "branch": "issue/33-parry-shockwave",
+  "baselineCommit": "5816d9c109a6d0493165154c7e57252ac35a3e38",
+  "implementationCommits": ["f674b03", "930edef"],
+  "draftPullRequest": 98,
+  "dependencyPullRequests": [81],
+  "scope": "Camera-local radial screen refraction on successful normal/Just parry; presentation trial only",
+  "defaults": {"strength": 0.65, "durationRealSeconds": 0.24, "zeroDisablesOnlyNewEffect": true},
+  "compile": {"errors": 0, "warnings": 0},
+  "editModeFinal": {
+    "total": 253,
+    "passed": 253,
+    "failed": 0,
+    "skipped": 0,
+    "completedAtUtc": "2026-11-02T05:22:35.1541635Z"
+  },
+  "prototypeCounterRegression": {
+    "total": 81,
+    "passed": 81,
+    "failed": 0,
+    "completedAtUtc": "2026-11-02T05:06:47Z",
+    "note": "This full fixture run preceded the additional other-camera GPU assertion; all shockwave cases were rerun afterward."
+  },
+  "shockwavePlayModeFinal": {
+    "filter": "ParryShockwave",
+    "total": 11,
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0,
+    "completedAtUtc": "2026-11-02T05:20:18.9168228Z",
+    "covers": ["both facing directions and authored contact", "pause and lifetime", "reset and disable", "strength/VFX zero", "unchanged success tick and 10F Just hitstop", "video presenter", "GPU projection, residue and second-camera isolation"]
+  },
+  "videoRegressionFinal": {
+    "fixture": "CombatVideoIntegrationTests",
+    "total": 230,
+    "passed": 225,
+    "failed": 5,
+    "skipped": 0,
+    "completedAtUtc": "2026-11-02T05:21:53.3581903Z",
+    "localXml": ".uloop/outputs/TestResults/20261102_142153.xml",
+    "comparedWith": ".uloop/outputs/TestResults/20261026_195251.xml",
+    "newFailureNames": [],
+    "knownFailuresUnresolved": true,
+    "knownFailureNames": [
+      "KickKnocksBackOnlyItsTargetAndPauseFreezesTheFixedPose(False)",
+      "KickKnocksBackOnlyItsTargetAndPauseFreezesTheFixedPose(True)",
+      "ReleasePrecedesImpactAndFollowThroughReachesGroundAtEveryRenderRate(30)",
+      "ReleasePrecedesImpactAndFollowThroughReachesGroundAtEveryRenderRate(60)",
+      "ReleasePrecedesImpactAndFollowThroughReachesGroundAtEveryRenderRate(120)"
+    ],
+    "knownFailureGroups": {"kickHeightExpected021To027Actual0": 2, "chargeTicksExpected8Actual9": 3},
+    "lightingTests": "Four fixed-pixel color tests disable refraction explicitly; a separate real GPU test proves refraction does not affect another camera. All four lighting cases pass in the final fixture run."
+  },
+  "gpuProjection": {
+    "resolution": [1920, 1080],
+    "viewportCenter": [0.58, 0.30],
+    "elapsedRealSeconds": 0.02,
+    "correctCenterPixels": 3553,
+    "mirroredCenterPixels": 0,
+    "residualPixelsAfterReset": 0,
+    "otherCameraChangedPixels": 0,
+    "otherCameraValueAssertedInFinalShockwaveRun": true,
+    "initialDoubleUvFlipFoundAndFixed": true,
+    "initialIncorrectCaptureUsedInPublishedMedia": false
+  },
+  "capture": {
+    "source": "Unity URP rendering of real prototype AI parry and 90-damage counter, not offline refraction compositing",
+    "localRawRoot": ".uloop/outputs/video/parry-shockwave-20261102-v2",
+    "takes": ["strength-000", "strength-065"],
+    "framesEach": 210,
+    "fps": 60,
+    "enemyStartingHp": 120,
+    "enemyEndingHpBoth": 30,
+    "playerEndingHpBoth": 100,
+    "traceRowsCompared": 210,
+    "equalTraceColumns": ["enemyState", "enemyHp", "enemyHits", "parryBacklit", "counterPhase", "counterLight", "camera", "shakeX", "shakeY", "hitstop", "slowScale"],
+    "combatCameraLightingDifferences": 0,
+    "spriteMatchesFromFrameInclusive": 42,
+    "spriteMatchesThroughFrameInclusive": 209,
+    "idlePhaseNote": "Frames 0..41 may use different idle-loop cels because separate captures start on different Editor frames. Do not attribute those cels to refraction."
+  },
+  "media": [
+    {
+      "path": "docs/video/previews/parry-shockwave-mobile-20261102.mp4",
+      "resolution": [480, 648], "fps": 30, "frames": 189, "seconds": 6.3, "audio": false,
+      "bytes": 636194,
+      "sha256": "0366B683E0728510E9B928CCD9C9D25C67BF78BC719CB2EFF651269F0C15AB01",
+      "codec": "H.264 Constrained Baseline, Level 3.1, yuv420p, faststart",
+      "fullDecodePassed": true,
+      "physicalMobilePlaybackConfirmed": false
+    },
+    {
+      "path": "docs/video/previews/parry-shockwave-on-20261102.mp4",
+      "resolution": [1920, 1080], "fps": 60, "frames": 210, "seconds": 3.5, "audio": false,
+      "bytes": 683541,
+      "sha256": "A9DA6DB4EFE8AC2C9D35EB571AE1C8F87378C971B282FA22F79AE728B9CD5CF8",
+      "fullDecodePassed": true
+    },
+    {
+      "path": "docs/video/previews/parry-shockwave-comparison-20261102.mp4",
+      "resolution": [960, 1296], "fps": 60, "frames": 378, "seconds": 6.3, "audio": false,
+      "bytes": 1431726,
+      "sha256": "A0C45690F97A52B49CCCBD15AF545BB736346E99800A235EC930C5CCD107721E",
+      "layout": "Top OFF / bottom ON; first 3.5 seconds 1x, then 2.8 seconds 0.25x close-up",
+      "fullDecodePassed": true
+    },
+    {
+      "path": "docs/video/previews/parry-shockwave-close-20261102.gif",
+      "resolution": [800, 540], "fps": 20, "frames": 56, "seconds": 2.8,
+      "bytes": 403508,
+      "sha256": "8DFC40B9F7F50E4DC5BF27FC7F215321393F346178F3EE0469D82546DA8A3B5C"
+    }
+  ],
+  "testRunnerIncident": {
+    "fixtureNotCompleted": "PrototypeReachAndParryCueTests",
+    "cliWaitLimitSeconds": 180,
+    "resultXmlProduced": false,
+    "countedAsPass": false,
+    "frameworkErrors": ["Invalid SceneManagerSetup: missing Test Runner InitTestScene asset", "Test tree is not available for PostbuildCleanupTask", "ReloadScene cannot be used without a SceneAsset"],
+    "consoleErrorEntriesRecordedBeforeClearing": 10,
+    "recovery": "Confirmed TestRunnerApi.IsRunActive false; closed only the generated temporary scene without saving and reopened the saved prototype scene. Subsequent isolated runs restored the scene normally.",
+    "duplicateTestRunStartedWhileActive": false
+  },
+  "preserved": ["parry acceptance and Just window", "damage and enemy AI", "hitstop and counter", "camera transform and zoom", "received art, clips, scenes and prefabs", "unrelated uncommitted changes"],
+  "finalEditorState": {
+    "scene": "Assets/Scenes/PrototypeCombatValidation.unity",
+    "sceneDirty": false,
+    "playModeStopped": true,
+    "editorPaused": false,
+    "consoleErrors": 0,
+    "consoleWarnings": 0
+  },
+  "notPerformed": ["full PlayMode suite", "completed reach/telegraph fixture after Test Runner incident", "physical keyboard/gamepad and 15-minute readability/fatigue acceptance", "minimum-spec Development/Release Build performance", "new Build/ZIP", "merge or issue close"]
+}

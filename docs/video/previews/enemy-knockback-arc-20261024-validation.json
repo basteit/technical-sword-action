@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-24",
+  "enemyPresentation": {
+    "parryAndDefeatUseSameDownCel": true,
+    "parriedHeldFrames": 80,
+    "parriedPositionRotationAndFacingHeld": true,
+    "knockbackCombatFrames": 18,
+    "fadeCombatFrames": 39,
+    "ratioRearToFrontDistance": 2.0000000000000004,
+    "arcs": [
+      {
+        "actor": "front",
+        "distance": 0.3999999999999999,
+        "height": 0.1200000000000001,
+        "origin": [
+          2.95,
+          1.0
+        ],
+        "endpoint": [
+          3.35,
+          1.0
+        ],
+        "firstStoppedFrame": 83,
+        "stationaryFadeFrames": 13,
+        "sprite": "EnemySample_down_01",
+        "rotationDegrees": 0,
+        "facingAttacker": true
+      },
+      {
+        "actor": "rear",
+        "distance": 0.8,
+        "height": 0.17999999999999994,
+        "origin": [
+          -0.5600016,
+          1.002561
+        ],
+        "endpoint": [
+          0.2399984,
+          1.002561
+        ],
+        "firstStoppedFrame": 286,
+        "stationaryFadeFrames": 14,
+        "sprite": "EnemySample_down_01",
+        "rotationDegrees": 0,
+        "facingAttacker": true
+      }
+    ],
+    "stopBeforeFading": true
+  },
+  "cameraAndTiming": {
+    "normalUnchanged": 3.375,
+    "chargeUnchanged": 2.8125,
+    "impactMinimumUnchanged": 2.64375,
+    "parryHitstopFramesUnchanged": 4,
+    "kickHitstopFramesUnchanged": 10,
+    "chargeSecondsUnchanged": 0.9
+  },
+  "compile": {
+    "Success": true,
+    "ErrorCount": 0,
+    "WarningCount": 0,
+    "Errors": [],
+    "Warnings": [],
+    "Message": null
+  },
+  "playMode": {
+    "Success": true,
+    "Message": "Test execution completed with status: Passed",
+    "CompletedAt": "2026-10-24T02:37:23.1250906Z",
+    "TestCount": 28,
+    "PassedCount": 28,
+    "FailedCount": 0,
+    "SkippedCount": 0,
+    "XmlPath": null
+  },
+  "initialPlayMode": {
+    "Success": false,
+    "Message": "Test execution completed with status: Failed",
+    "CompletedAt": "2026-10-24T02:35:19.6519630Z",
+    "TestCount": 28,
+    "PassedCount": 24,
+    "FailedCount": 4,
+    "SkippedCount": 0,
+    "XmlPath": "C:\\Users\\hirot\\GitHub\\technical-sword-action\\.uloop/outputs\\TestResults\\20261024_113519.xml"
+  },
+  "initialFailureCorrection": "Eliminate the old Animator cel at contact: explicitly hold the authored down cel from lethal contact and after Animator evaluation.",
+  "mirroredTenResetRunsPassed": 20,
+  "fullSuiteRerun": false,
+  "legacyEightyResetSweepRerun": false,
+  "console": {
+    "TotalCount": 0,
+    "DisplayedCount": 0,
+    "LogType": "All",
+    "MaxCount": 5,
+    "SearchText": "",
+    "IncludeStackTrace": false,
+    "Logs": []
+  },
+  "editorRestored": "{ scene = Assets/Scenes/PrototypeCombatValidation.unity, dirty = False, playing = False }",
+  "movie": {
+    "path": "docs/video/previews/combat-2stage-hybrid-enemy-knockback-arc-20261024.mp4",
+    "sha256": "10acb86feb3448749901efb3d897a80b96397603575e9db5160c606f3df56e7e",
+    "decodedFrames": 310,
+    "durationSeconds": 5.166666666666667,
+    "fps": 60,
+    "width": 1920,
+    "height": 1080,
+    "audioStreams": 0,
+    "allLayoutEventsTargetsTicksAndRealTimingUnchanged": true,
+    "floorFullWidth": true
+  },
+  "preview": {
+    "crf": 22,
+    "bytes": 838086,
+    "nativeVideoControls": true
+  },
+  "overallVideoAccepted": false,
+  "preservation": {
+    "baselineFiles": 2350,
+    "changedIntentionally": 6,
+    "byteIdentical": 2344,
+    "unexpectedChanges": [],
+    "ownChangedFiles": 11,
+    "playerSourcesSceneLayoutAndCameraCodeUnchanged": true
+  }
+}

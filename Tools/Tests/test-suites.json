@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "suites": {
+    "daily": "Every-change gameplay regression: time, input, actions, combat rules, mobility, stage and received artwork.",
+    "movement": "Jump, dash, walking, platforms, artwork and time ownership.",
+    "input": "Input routing and mutually exclusive action ownership.",
+    "combat": "Attack/parry/counter rules, reach, cues, enemy state and comparison profiles.",
+    "presentation": "Counter/parry cinematics, camera, VFX, enemy and player artwork.",
+    "audio": "Motion/result SFX, silence, cancellation and audio ownership.",
+    "dialogue": "Optional dialogue runtime fixtures; not installed in the playable prototype.",
+    "all": "All maintained PlayMode tests."
+  },
+  "fixtures": [
+    { "name": "CombatTimeIntegrationTests", "suites": ["daily", "movement", "combat", "presentation"] },
+    { "name": "CombatPolishContractTests", "suites": ["daily", "combat"] },
+    { "name": "CombatPolishSceneTests", "suites": ["daily", "combat"] },
+    { "name": "PlayerAttackMotionTests", "suites": ["daily", "movement", "combat"] },
+    { "name": "PlayerBasicActionsTests", "suites": ["daily", "movement"] },
+    { "name": "PlayerInputRouterTests", "suites": ["daily", "input"] },
+    { "name": "PlayerStateContractTests", "suites": ["daily", "input", "combat"] },
+    { "name": "PrototypeActionStageTests", "suites": ["daily", "movement"] },
+    { "name": "PrototypeCombatContractTests", "suites": ["daily", "combat"] },
+    { "name": "PrototypeEnemyArtTests", "suites": ["daily", "combat", "presentation"] },
+    { "name": "PrototypeMobilityArtTests", "suites": ["daily", "movement"] },
+    { "name": "PrototypePlayerArtIntegrationTests", "suites": ["daily", "movement", "presentation"] },
+    { "name": "PrototypePlayerMovementFixTests", "suites": ["daily", "movement", "combat"] },
+    { "name": "ProximityParryTests", "suites": ["daily", "combat"] },
+    { "name": "PrototypeReachAndParryCueTests", "suites": ["combat", "presentation"] },
+    { "name": "PrototypeCounterCinematicTests", "suites": ["combat", "presentation"] },
+    { "name": "PrototypeCombatTrialTests", "suites": ["combat"] },
+    { "name": "PrototypeSfxTests", "suites": ["audio"] },
+    { "name": "PrototypeDialogueTests", "suites": ["dialogue"] }
+  ]
+}

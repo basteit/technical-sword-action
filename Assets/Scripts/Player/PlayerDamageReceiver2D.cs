@@ -4,7 +4,7 @@ using TechnicalSwordAction.PlayerState;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Collider2D))]
-public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatTickListener, ICombatTimerListener
+public class PlayerDamageReceiver2D : MonoBehaviour, IContextDamageReceiver2D, ICombatTickListener, ICombatTimerListener
 {
     [Header("Health")]
     [SerializeField] private int maxHp = 5;
@@ -49,6 +49,14 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
     private int blockedByParry;
     private int blockedByInvincible;
     private int blockedByDash;
+    private readonly Dictionary<int, long> lastAttackBySource = new();
+    private PlayerParryCounter2D counter;
+    public float InvincibleRemaining => Mathf.Max(0, invincibleTimer);
+    public string LastDamageCause { get; private set; } = "None";
+    public string LastDamageSourceId { get; private set; } = "None";
+    public long LastDamageAttackId { get; private set; }
+    public long LastDamageTick { get; private set; }
+    public event System.Action<int, string, long> DamageReceived;
 
     public bool IsInvincible => invincibleTimer > 0f;
     public bool IsHitLocked => hitLockTimer > 0f;
@@ -62,7 +70,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
         currentHp = Mathf.Min(maxHp, currentHp + amount);
         return true;
     }
-    public void ResetHealth() { CancelHitFromStateMachine(); currentHp = maxHp; }
+    public void ResetHealth() { CancelHitFromStateMachine(); currentHp = maxHp; lastAttackBySource.Clear(); }
     public ParryResult LastParryResult { get; private set; } = ParryResult.None;
     public int TotalHitsTaken => totalHitsTaken;
     public int BlockedByParry => blockedByParry;
@@ -75,6 +83,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
         rb = GetComponent<Rigidbody2D>();
         ownCollider = GetComponent<Collider2D>();
         motor = GetComponent<PlayerMotor2D>();
+        counter = GetComponent<PlayerParryCounter2D>();
         currentHp = maxHp;
 
         if (parry == null)
@@ -149,6 +158,39 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
 
     public bool TryReceiveHit(int damage, Vector2 sourcePosition, float knockbackForce)
     {
+        return TryReceiveContextHit(damage, sourcePosition, knockbackForce, new CombatHitContext2D(null, 0));
+    }
+
+    /// <summary>Parry-only proximity probe from an active attack. A miss never creates damage or consumes its hit ID.</summary>
+    public bool TryParryContextHit(int damage, Vector2 sourcePosition, CombatHitContext2D context)
+    {
+        if (damage <= 0 || !isActiveAndEnabled || currentHp <= 0 ||
+            (stateMachine != null && stateMachine.LifeState == PlayerLifeState.Dead) ||
+            (CombatTimeController.IsSuspended && !CombatTimeController.IsExecutingTick)) return false;
+        if (context.Source != null && (!context.Source.IsAlive ||
+            (lastAttackBySource.TryGetValue(context.Source.GetInstanceID(), out long id) && id == context.AttackId))) return false;
+        if (counter == null) counter = GetComponent<PlayerParryCounter2D>();
+        if (counter != null && counter.IsCounterInvincible) return false;
+        if (!TryBlockWithParry(sourcePosition, context)) return false;
+        if (context.Source != null) lastAttackBySource[context.Source.GetInstanceID()] = context.AttackId;
+        return true;
+    }
+
+    private bool TryBlockWithParry(Vector2 sourcePosition, CombatHitContext2D context)
+    {
+        if (parry == null || !parry.TryResolveContextParry(sourcePosition, context, out ParryResult result)) return false;
+        LastParryResult = result;
+        blockedByParry++;
+        if (parry.LastResolvedAsPrimary)
+        {
+            ApplyParryEffects(result);
+            specialGauge?.AddOnParry(result);
+        }
+        return true;
+    }
+
+    public bool TryReceiveContextHit(int damage, Vector2 sourcePosition, float knockbackForce, CombatHitContext2D context)
+    {
         LastParryResult = ParryResult.None;
         if (damage <= 0 || !isActiveAndEnabled || currentHp <= 0 ||
             (stateMachine != null && stateMachine.LifeState == PlayerLifeState.Dead) ||
@@ -157,17 +199,18 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
             return false;
         }
 
-        if (parry != null && parry.TryResolveParry(sourcePosition, out ParryResult parryResult))
+        if (context.Source != null)
         {
-            LastParryResult = parryResult;
-            blockedByParry++;
-            ApplyParryEffects(sourcePosition, parryResult);
+            int sourceId = context.Source.GetInstanceID();
+            if (!context.Source.IsAlive || (lastAttackBySource.TryGetValue(sourceId, out long id) && id == context.AttackId)) return false;
+            lastAttackBySource[sourceId] = context.AttackId;
+        }
 
-            if (specialGauge != null)
-            {
-                specialGauge.AddOnParry(parryResult);
-            }
+        if (counter == null) counter = GetComponent<PlayerParryCounter2D>();
+        if (counter != null && counter.IsCounterInvincible) { blockedByInvincible++; return false; }
 
+        if (TryBlockWithParry(sourcePosition, context))
+        {
             return false;
         }
 
@@ -177,13 +220,19 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
             return false;
         }
 
-        if (motor != null && motor.IsDashing)
+        if (motor != null && motor.IsDashInvincible)
         {
             blockedByDash++;
             return false;
         }
 
+        int actualDamage = Mathf.Min(currentHp, damage);
+        LastDamageSourceId = context.Source != null ? context.Source.IndividualId : "UnknownSource";
+        LastDamageAttackId = context.AttackId;
+        LastDamageTick = CombatTimeController.TickCount;
+        LastDamageCause = context.Parryable ? "UnprotectedHit" : "UnparryableHit";
         currentHp = Mathf.Max(0, currentHp - damage);
+        DamageReceived?.Invoke(actualDamage, LastDamageSourceId, context.AttackId);
         totalHitsTaken++;
         invincibleTimer = Mathf.Max(0f, invincibleDuration);
         hitLockTimer = Mathf.Max(0f, hitStopMoveDuration);
@@ -216,18 +265,18 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(direction * finalKnockback, ForceMode2D.Impulse);
 
-        if (audioSource != null && hitClip != null)
+        if (!CombatFeedback2D.IsManaging(gameObject) && audioSource != null && hitClip != null)
         {
             audioSource.PlayOneShot(hitClip, 1f);
         }
 
-        if (spriteRenderer != null)
+        if (!CombatFeedback2D.IsManaging(gameObject) && spriteRenderer != null)
         {
             spriteRenderer.color = hitFlashColor;
             flashTimer = hitFlashDuration;
         }
 
-        CombatCameraFeedback2D.PlayHitShake();
+        if (!CombatFeedback2D.IsManaging(gameObject)) CombatCameraFeedback2D.PlayHitShake();
 
         if (invincibleTimer > 0f)
         {
@@ -243,60 +292,24 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
         return true;
     }
 
-    private void ApplyParryEffects(Vector2 sourcePosition, ParryResult result)
+    // An optional animation presenter can place feedback on its authored contact cel.
+    // Without a subscriber, the normal gameplay feedback remains immediate.
+    public event System.Action<ParryResult,float> ParryFeedbackRequested;
+    private void ApplyParryEffects(ParryResult result)
     {
-        EnemyProjectile2D projectile = FindClosestProjectile(sourcePosition, 1.2f);
-        if (projectile != null && projectile.Owner != null)
-        {
-            if (projectile.Owner.TryGetComponent(out Damageable2D ownerDamageable))
-            {
-                ownerDamageable.ApplyParryStun(result);
-            }
-        }
-        else
-        {
-            float radius = 1.8f;
-            Collider2D[] hits = Physics2D.OverlapCircleAll(sourcePosition, radius);
-            for (int i = 0; i < hits.Length; i++)
-            {
-                if (hits[i].TryGetComponent(out Damageable2D damageable))
-                {
-                    damageable.ApplyParryStun(result);
-                }
-            }
-        }
-
+        if (CombatFeedback2D.IsManaging(gameObject)) return;
         float stop = result == ParryResult.Just ? justParryHitStop : normalParryHitStop;
+        if (ParryFeedbackRequested != null)
+        {
+            ParryFeedbackRequested.Invoke(result, stop);
+            return;
+        }
         if (stop > 0f)
         {
             CombatTimeController.RequestHitstop(this, stop);
         }
 
         CombatCameraFeedback2D.PlayParryShake(result);
-    }
-
-    private EnemyProjectile2D FindClosestProjectile(Vector2 center, float radius)
-    {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(center, radius);
-        float bestDist = float.MaxValue;
-        EnemyProjectile2D best = null;
-
-        for (int i = 0; i < hits.Length; i++)
-        {
-            if (!hits[i].TryGetComponent(out EnemyProjectile2D p))
-            {
-                continue;
-            }
-
-            float d = Vector2.Distance(center, p.transform.position);
-            if (d < bestDist)
-            {
-                bestDist = d;
-                best = p;
-            }
-        }
-
-        return best;
     }
 
     private void IgnoreCurrentOverlaps()
@@ -381,6 +394,7 @@ public class PlayerDamageReceiver2D : MonoBehaviour, IDamageReceiver2D, ICombatT
         CombatTimeController.Unregister(this);
         CombatTimeController.ResetSession();
         CancelHitFromStateMachine();
+        lastAttackBySource.Clear();
         stateMachine?.CompleteAction(PlayerActionState.Hit, "DamageReceiverDisabled");
     }
 }

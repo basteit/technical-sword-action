@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 36d1f4538a36ef74e965385542eb3f6c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7131729372430523883
+    second: Fx_Kick_0
+  - first:
+      213: 1305032238490185511
+    second: Fx_Kick_1
+  - first:
+      213: 2952398809823905196
+    second: Fx_Kick_2
+  - first:
+      213: 8692049010798526829
+    second: Fx_Kick_3
+  - first:
+      213: -6760663541297003416
+    second: Fx_Kick_4
+  - first:
+      213: -7023722869025189943
+    second: Fx_Kick_5
+  - first:
+      213: -1769987736553631650
+    second: Fx_Kick_6
+  - first:
+      213: -8594706922277106975
+    second: Fx_Kick_7
+  - first:
+      213: 5589859747488322000
+    second: Fx_Kick_8
+  - first:
+      213: 8159242553009535597
+    second: Fx_Kick_9
+  - first:
+      213: -2799092348485381936
+    second: Fx_Kick_10
+  - first:
+      213: 5309190625857277397
+    second: Fx_Kick_11
+  - first:
+      213: -2163805271568555329
+    second: Fx_Kick_12
+  - first:
+      213: 2506345469314925708
+    second: Fx_Kick_13
+  - first:
+      213: -8646295578816185924
+    second: Fx_Kick_14
+  - first:
+      213: -363537633327057799
+    second: Fx_Kick_15
+  - first:
+      213: -1567290802505319549
+    second: Fx_Kick_16
+  - first:
+      213: 7324622178054921204
+    second: Fx_Kick_17
+  - first:
+      213: 4736168760943272663
+    second: Fx_Kick_18
+  - first:
+      213: 2013020732458869064
+    second: Fx_Kick_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Fx_Kick_0
+      rect:
+        serializedVersion: 2
+        x: 156
+        y: 31
+        width: 74
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5122f0adbe1070d90800000000000000
+      internalID: -7131729372430523883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_1
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 28
+        width: 82
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72fe3a318e76c1210800000000000000
+      internalID: 1305032238490185511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_2
+      rect:
+        serializedVersion: 2
+        x: 404
+        y: 25
+        width: 90
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca507d6331709f820800000000000000
+      internalID: 2952398809823905196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_3
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 22
+        width: 98
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d618eead58c50a870800000000000000
+      internalID: 8692049010798526829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_4
+      rect:
+        serializedVersion: 2
+        x: 652
+        y: 30
+        width: 38
+        height: 67
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 864ce07245c4d22a0800000000000000
+      internalID: -6760663541297003416
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_5
+      rect:
+        serializedVersion: 2
+        x: 683
+        y: 85
+        width: 34
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9cf47fe8349b68e90800000000000000
+      internalID: -7023722869025189943
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_6
+      rect:
+        serializedVersion: 2
+        x: 705
+        y: 89
+        width: 19
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e505ce9088dbf67e0800000000000000
+      internalID: -1769987736553631650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_7
+      rect:
+        serializedVersion: 2
+        x: 716
+        y: 30
+        width: 42
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ea0515479779b880800000000000000
+      internalID: -8594706922277106975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_8
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 21
+        width: 55
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d1db41f2db239d40800000000000000
+      internalID: 5589859747488322000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_9
+      rect:
+        serializedVersion: 2
+        x: 814
+        y: 92
+        width: 36
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6a72685fd37b3170800000000000000
+      internalID: 8159242553009535597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_10
+      rect:
+        serializedVersion: 2
+        x: 826
+        y: 24
+        width: 64
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d0d30bd650a729d0800000000000000
+      internalID: -2799092348485381936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_11
+      rect:
+        serializedVersion: 2
+        x: 901
+        y: 17
+        width: 49
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5dd8e03beb80ea940800000000000000
+      internalID: 5309190625857277397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_12
+      rect:
+        serializedVersion: 2
+        x: 942
+        y: 95
+        width: 37
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb2e901e19e98f1e0800000000000000
+      internalID: -2163805271568555329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_13
+      rect:
+        serializedVersion: 2
+        x: 962
+        y: 93
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c840de6dce358c220800000000000000
+      internalID: 2506345469314925708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_14
+      rect:
+        serializedVersion: 2
+        x: 976
+        y: 20
+        width: 45
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb971a92bff220880800000000000000
+      internalID: -8646295578816185924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_15
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 34
+        width: 68
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 974fd07d27474faf0800000000000000
+      internalID: -363537633327057799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_16
+      rect:
+        serializedVersion: 2
+        x: 683
+        y: 26
+        width: 21
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38bfee8a15ddf3ae0800000000000000
+      internalID: -1567290802505319549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_17
+      rect:
+        serializedVersion: 2
+        x: 697
+        y: 18
+        width: 29
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4fb59ec301946a560800000000000000
+      internalID: 7324622178054921204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_18
+      rect:
+        serializedVersion: 2
+        x: 824
+        y: 15
+        width: 29
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d2635015604ab140800000000000000
+      internalID: 4736168760943272663
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fx_Kick_19
+      rect:
+        serializedVersion: 2
+        x: 946
+        y: 12
+        width: 39
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84125b3d0bfafeb10800000000000000
+      internalID: 2013020732458869064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Fx_Kick_0: -7131729372430523883
+      Fx_Kick_1: 1305032238490185511
+      Fx_Kick_10: -2799092348485381936
+      Fx_Kick_11: 5309190625857277397
+      Fx_Kick_12: -2163805271568555329
+      Fx_Kick_13: 2506345469314925708
+      Fx_Kick_14: -8646295578816185924
+      Fx_Kick_15: -363537633327057799
+      Fx_Kick_16: -1567290802505319549
+      Fx_Kick_17: 7324622178054921204
+      Fx_Kick_18: 4736168760943272663
+      Fx_Kick_19: 2013020732458869064
+      Fx_Kick_2: 2952398809823905196
+      Fx_Kick_3: 8692049010798526829
+      Fx_Kick_4: -6760663541297003416
+      Fx_Kick_5: -7023722869025189943
+      Fx_Kick_6: -1769987736553631650
+      Fx_Kick_7: -8594706922277106975
+      Fx_Kick_8: 5589859747488322000
+      Fx_Kick_9: 8159242553009535597
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

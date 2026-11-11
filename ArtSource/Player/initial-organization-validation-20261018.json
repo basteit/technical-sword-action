@@ -1,0 +1,101 @@
+{
+  "recordedAt": "2026-10-18T18:13:13.855897+09:00",
+  "baseCommit": "c7927e65f4c23fe23bb1a4d58d0169585ed84df2",
+  "sourceCount": 11,
+  "humanSubmittedSources": 8,
+  "existingSamples": 3,
+  "videoUsesRecorded": 8,
+  "unitTests": {
+    "passed": 20,
+    "failed": 0,
+    "skipped": 0
+  },
+  "sources": [
+    {
+      "id": "idle",
+      "sha256": "a37f061fd656a8234cce091349c573da49c92558ee6c88ead1f3dfae2691f076",
+      "originalCurrentHistoryMatch": true,
+      "nativeReopenMetadataMatches": true,
+      "frames": 6
+    },
+    {
+      "id": "walk",
+      "sha256": "92fc9e07636331d2d6b5aac363dc3ac6a53e030608db1533d9cae1505ae5f107",
+      "originalCurrentHistoryMatch": true,
+      "nativeReopenMetadataMatches": true,
+      "frames": 8
+    },
+    {
+      "id": "attack_1",
+      "sha256": "d994e5fdba1d091018c8ba1b2e4029068aa2a1f6351485aade2124be80bf2650",
+      "originalCurrentHistoryMatch": true,
+      "nativeReopenMetadataMatches": true,
+      "frames": 9
+    },
+    {
+      "id": "attack_2",
+      "sha256": "ccdb5da3908f8dc0fd730291036964c5b6c2380991cf1def238e13a5fa5ce781",
+      "originalCurrentHistoryMatch": true,
+      "nativeReopenMetadataMatches": true,
+      "frames": 8
+    },
+    {
+      "id": "parry_wait",
+      "sha256": "01adf3b9dfcc81dff09749a7362b77971ddef73afcd5077468526f5327411d1d",
+      "originalCurrentHistoryMatch": true,
+      "nativeReopenMetadataMatches": true,
+      "frames": 8
+    },
+    {
+      "id": "parry_light",
+      "sha256": "cc31cbbf9b40901cc230f9985a24043fd58b8e46330cacb4d8db0aa9cafd3366",
+      "originalCurrentHistoryMatch": true,
+      "nativeReopenMetadataMatches": true,
+      "frames": 7
+    },
+    {
+      "id": "counter_transfer",
+      "sha256": "299dc68428aa7653ea56bfad548cbde0f737bbd5a36f10afe964b93261a41b2b",
+      "originalCurrentHistoryMatch": true,
+      "nativeReopenMetadataMatches": true,
+      "frames": 8
+    },
+    {
+      "id": "counter_kick",
+      "sha256": "705817e748266c3c2f1071aa4c977aae4f1e84e5d87bac35f2ff306bf43339db",
+      "originalCurrentHistoryMatch": true,
+      "nativeReopenMetadataMatches": true,
+      "frames": 15
+    },
+    {
+      "id": "jump_start",
+      "sha256": "6cda4621e97cd420d8999513bd3cbdf384dbdfb57e0e3779b74173196aaa33c0",
+      "originalCurrentHistoryMatch": true,
+      "nativeReopenMetadataMatches": true,
+      "frames": 5
+    },
+    {
+      "id": "jump_up",
+      "sha256": "c88edc2b0c0b9cd52195efd8edfd09f959856059f11213e572c3e28b1d94f063",
+      "originalCurrentHistoryMatch": true,
+      "nativeReopenMetadataMatches": true,
+      "frames": 1
+    },
+    {
+      "id": "idle_legacy_48",
+      "sha256": "4c0ac058934cd5f18dc9758aa70b7b47e4dfa80c685c84bd4c4a57ececaa3e01",
+      "originalCurrentHistoryMatch": true,
+      "nativeReopenMetadataMatches": true,
+      "frames": 4
+    }
+  ],
+  "catalogValid": true,
+  "indexSynchronized": true,
+  "localMarkdownLinksExist": true,
+  "unityRuntimeAssetsMovedOrModified": false,
+  "notes": "Source grouping and tooling only; parallel prototype runtime changes are separate.",
+  "validatedWithSharedHead": "f071850361b67c1818511dee6447fc5217a5729c",
+  "existingArtFilesUnchanged": 572,
+  "preexistingSceneAndSettingDraftsPreserved": true,
+  "unityRuntimeValidationRunForThisSourceOnlyChange": false
+}
