@@ -271,6 +271,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(PlayerActionRequest.Special)] [TestCase(PlayerActionRequest.Dash)]
         public void AirActionsOwnTheirArtworkInsteadOfBeingOverwrittenByJump(PlayerActionRequest action)
         {
+            // Verify the retained product Special animation explicitly; player input cannot enable it in the prototype.
+            if (action == PlayerActionRequest.Special) ((Behaviour)player.GetComponent(T("PlayerSpecialSkill2D"))).enabled = true;
             Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);Frames(5);Request(action);Frames(2);
             Assert.That(Get<string>(art,"MobilityPhase"),Is.EqualTo(action==PlayerActionRequest.Dash?"Dash":"None"));
             Assert.That(AssetDatabase.GetAssetPath(source.sprite),Does.Not.Contain("/Jump_"));
