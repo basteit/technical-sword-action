@@ -142,6 +142,8 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     {
         ResetImpactOffset();
         parryDrawingOwner = null;
+        // A counter consumes the parry pose even when ordinary-hit armor skipped OnHit.
+        parried = attackRecoveryVisible = false;
         if (launch.IsSurvivorRetreat) hitRemaining = 0;
         // The kick travels away from its attacker. Keep the drawing facing back toward them,
         // without changing the AI direction that determined the rear approach.

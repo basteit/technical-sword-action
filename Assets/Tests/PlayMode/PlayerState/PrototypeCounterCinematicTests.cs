@@ -814,6 +814,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Until(()=>Get<bool>(counter,"IsActive"));
             Assert.That(Get<bool>(presentation,"IsParrySequenceActive"),Is.False);
             Assert.That(Get<int>(counter,"ConsumedCount"),Is.EqualTo(1));
+            var enemyLaunch=target.GetComponent(T("EnemyCounterLaunch2D"));
+            Until(()=>Get<bool>(enemyLaunch,"IsActive"));
+            Until(()=>!Get<bool>(enemyLaunch,"IsActive"));
+            Assert.That(Get<bool>(counter,"IsActive"),Is.True,"The short retreat finishes before the counter's final hold.");
+            Assert.That(Get<string>(target.GetComponent(T("PrototypeEnemyArtPresentation")),"MotionName"),Is.Not.EqualTo("Parried"),
+                "Consumed parry artwork must not reappear after the surviving enemy finishes retreating.");
             Until(()=>!Get<bool>(counter,"IsActive"));Frames(20);
             Assert.That(Get<int>(target,"HitCount"),Is.EqualTo(1));Assert.That(Get<int>(target,"CurrentHp"),Is.EqualTo(30));
             Assert.That(Get<bool>(presentation,"HasQueuedParryCounter"),Is.False);AssertClean();
