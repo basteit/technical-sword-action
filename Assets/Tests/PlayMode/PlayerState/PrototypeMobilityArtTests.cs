@@ -131,11 +131,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [TestCase(-1)] [TestCase(1)] public void FasterWalkingCoversTwentyPercentMoreDistanceWithoutRetimingTheArt(int direction)
         {
-            Assert.That(Get<float>(motor,"MoveSpeed"),Is.EqualTo(5.28228f).Within(.00001f));
+            Assert.That(Get<float>(motor,"MoveSpeed"),Is.EqualTo(6.338736f).Within(.00001f));
+            Assert.That(Camera.main.orthographicSize,Is.EqualTo(6f));
             Call(motor,"SetMoveInput",Vector2.right*direction);float start=body.position.x;Frames(30);
             float tuned=direction*(body.position.x-start);
             Call(arena,"ResetActionsOnly");body.position=new Vector2(0,.81f);player.transform.position=body.position;
-            motor.GetType().GetField("moveSpeed",Flags).SetValue(motor,4.4019f);
+            motor.GetType().GetField("moveSpeed",Flags).SetValue(motor,5.28228f);
             Call(motor,"SetMoveInput",Vector2.right*direction);Physics2D.SyncTransforms();Frames(4);
             start=body.position.x;Frames(30);float baseline=direction*(body.position.x-start);
             Assert.That(tuned/baseline,Is.EqualTo(1.2f).Within(.015f));

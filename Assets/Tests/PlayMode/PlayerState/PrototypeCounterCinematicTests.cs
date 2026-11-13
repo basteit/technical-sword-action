@@ -19,6 +19,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         private Rigidbody2D body;
         private bool savedManual;
         private int realFrames;
+        private float normalCameraSize;
         private readonly List<GameObject> owned = new();
         private static Type T(string name) => Type.GetType(name + ", Assembly-CSharp", true);
         private static object Call(object obj, string name, params object[] args) => obj.GetType().GetMethod(name, Flags).Invoke(obj, args);
@@ -76,7 +77,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(TimeValue<int>("SlowOwnerCount"), Is.Zero);
             Assert.That(TimeValue<float>("SlowScale"), Is.EqualTo(1));
             Assert.That(body.gravityScale, Is.GreaterThan(0));
-            Assert.That(Camera.main.orthographicSize, Is.EqualTo(5f));
+            Assert.That(Camera.main.orthographicSize, Is.EqualTo(normalCameraSize));
             Assert.That(Get<bool>(feedback, "HasCameraFocus"), Is.False);
             Assert.That(Get<bool>(presentation,"IsParryBacklit"),Is.False);
             Assert.That(Get<string>(presentation,"CounterLightPhase"),Is.EqualTo("None"));
@@ -99,6 +100,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             art = player.GetComponent(T("PrototypePlayerArtPresentation")); presentation = player.GetComponent(T("PrototypeCounterPresentation"));
             arena = (Component)Object.FindFirstObjectByType(T("PrototypeCombatArena")); feedback = player.GetComponent(T("CombatFeedback2D"));
             body = player.GetComponent<Rigidbody2D>(); ((Behaviour)player.GetComponent(T("PlayerInputRouter"))).enabled = false;
+            normalCameraSize = Camera.main.orthographicSize;
             Set(Get<object>(feedback, "Settings"), "masterVolume", 0f); Set(Get<object>(feedback, "Settings"), "shake", 0f);
             Frames(2); yield return null; realFrames = 0;
         }
@@ -273,7 +275,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             else if (operation == "Death") { Call(player, "SetDead", "CounterCameraTest"); Call(player, "Revive", "CounterCameraTest"); }
             else { target.gameObject.SetActive(false); Until(() => !Get<bool>(counter, "IsActive")); }
             Assert.That(Get<bool>(feedback, "HasCameraFocus"), Is.False);
-            Assert.That(camera.orthographicSize, Is.EqualTo(5f));
+            Assert.That(camera.orthographicSize, Is.EqualTo(normalCameraSize));
             Assert.That(Vector3.Distance(camera.transform.position - Get<Vector3>(feedback, "ShakeOffset"), original), Is.LessThan(.0001f));
             Frames(8); AssertClean();
         }
@@ -285,7 +287,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             var target = Begin(); ToFrame(16);
             Assert.That(camera.orthographicSize, Is.EqualTo(3.75f).Within(.00001f));
             Set(Get<object>(feedback, "Settings"), "shake", 0f); Frames(1);
-            Assert.That(camera.orthographicSize, Is.EqualTo(5f));
+            Assert.That(camera.orthographicSize, Is.EqualTo(normalCameraSize));
             Assert.That(Vector3.Distance(camera.transform.position, original), Is.LessThan(.0001f));
             Until(() => !Get<bool>(counter, "IsActive")); Frames(6);
             Assert.That(Get<int>(target, "CurrentHp"), Is.EqualTo(30)); AssertClean();
@@ -1119,7 +1121,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Set(Get<object>(feedback,"Settings"),"shake",1f);Vector3 original=Camera.main.transform.position;
             BeginAuthoredAdaptiveParry(direction);
             Assert.That(Get<string>(presentation,"ParryCameraPhase"),Is.EqualTo("Preparation"));
-            Assert.That(Camera.main.orthographicSize,Is.EqualTo(5f),"The first preparation frame holds zoom while position leads.");
+            Assert.That(Camera.main.orthographicSize,Is.EqualTo(normalCameraSize),"The first preparation frame holds zoom while position leads.");
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
             Assert.That(Camera.main.orthographicSize,Is.EqualTo(4.25f).Within(.0001f));
             Vector2 center=Get<Vector2>(presentation,"ParryCameraCenter");
@@ -1134,10 +1136,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<string>(presentation,"ParryCameraPhase"),Is.EqualTo("Returning"));
             Assert.That(Get<bool>(presentation,"IsParrySequenceActive"),Is.True,"Do not wait for deflection follow-through or the old hold timer.");
             Assert.That(Camera.main.orthographicSize,Is.GreaterThan(4.25f));
-            Assert.That(Camera.main.orthographicSize,Is.LessThan(4.5f),"The return starts immediately without pulling out sharply.");
+            Assert.That(Camera.main.orthographicSize,Is.LessThan(Mathf.Lerp(4.25f,normalCameraSize,1f/3f)),"The return starts immediately without pulling out sharply.");
             Assert.That(Get<Vector3>(feedback,"ShakeOffset").magnitude,Is.Zero.Within(.0001f));
             Until(()=>!Get<bool>(presentation,"IsParryCameraActive"));
-            Assert.That(Camera.main.transform.position,Is.EqualTo(original));Assert.That(Camera.main.orthographicSize,Is.EqualTo(5f));AssertClean();
+            Assert.That(Camera.main.transform.position,Is.EqualTo(original));Assert.That(Camera.main.orthographicSize,Is.EqualTo(normalCameraSize));AssertClean();
         }
         [TestCase(true)] [TestCase(false)]
         public void PreviousPostDeflectionHoldCanBeRestoredIndependently(bool expressive)
@@ -1162,7 +1164,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Set(Get<object>(feedback,"Settings"),"shake",strength);BeginAuthoredAdaptiveParry(1);
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
-            Assert.That(Camera.main.orthographicSize,Is.EqualTo(Mathf.Lerp(5f,4.25f,strength)).Within(.0001f));
+            Assert.That(Camera.main.orthographicSize,Is.EqualTo(Mathf.Lerp(normalCameraSize,4.25f,strength)).Within(.0001f));
             Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(30));Assert.That(Get<int>(counter,"StockCount"),Is.EqualTo(1));
             Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));Until(()=>!Get<bool>(presentation,"IsParryCameraActive"));AssertClean();
         }
@@ -1176,7 +1178,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Static("SetPaused",true);Vector3 held=Camera.main.transform.position;float size=Camera.main.orthographicSize;Frames(20);
             Assert.That(Camera.main.transform.position,Is.EqualTo(held));Assert.That(Camera.main.orthographicSize,Is.EqualTo(size));
             Set(settings,"shake",0f);Call(presentation,"AdvanceVisuals",0f);
-            Assert.That(Camera.main.transform.position,Is.EqualTo(original));Assert.That(Camera.main.orthographicSize,Is.EqualTo(5f));
+            Assert.That(Camera.main.transform.position,Is.EqualTo(original));Assert.That(Camera.main.orthographicSize,Is.EqualTo(normalCameraSize));
             Set(settings,"shake",1f);Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Get<bool>(presentation,"IsParryCameraActive"),Is.False);Static("SetPaused",false);
         }
@@ -1196,7 +1198,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<float>(target.GetComponent(T("PrototypeEnemyArtPresentation")),"ImpactOffsetX"),Is.Zero);
             var drawing=Get<SpriteRenderer>(target.GetComponent(T("PrototypeEnemyArtPresentation")),"Artwork");
             Assert.That(Mathf.DeltaAngle(0,drawing.transform.localEulerAngles.z),Is.Zero.Within(.001f));
-            Assert.That(Camera.main.transform.position,Is.EqualTo(original));Assert.That(Camera.main.orthographicSize,Is.EqualTo(5f));
+            Assert.That(Camera.main.transform.position,Is.EqualTo(original));Assert.That(Camera.main.orthographicSize,Is.EqualTo(normalCameraSize));
             Assert.That(Get<bool>(presentation,"IsParryCameraActive"),Is.False);Assert.That(Get<bool>(feedback,"HasCameraFocus"),Is.False);
         }
         [TestCase(false)] [TestCase(true)]
@@ -1220,7 +1222,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             {
                 Set(profile,"parryExpressiveCamera",expressive);Set(profile,"parryReferenceAccent",reference);
                 Set(Get<object>(feedback,"Settings"),"shake",1f);BeginAuthoredAdaptiveParry(1);
-                Assert.That(Camera.main.orthographicSize,expressive?Is.EqualTo(5f):Is.LessThan(5f));
+                Assert.That(Camera.main.orthographicSize,expressive?Is.EqualTo(normalCameraSize):Is.LessThan(normalCameraSize));
                 Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
                 Assert.That(Get<int>(presentation,"ParryParticleCount"),Is.EqualTo(reference?32:14));
                 Assert.That(Get<bool>(presentation,"IsParryFlareVisible"),Is.EqualTo(reference));
@@ -1260,7 +1262,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Vector3.Distance(Camera.main.transform.position,pose),Is.LessThan(.1f));
             Assert.That(Camera.main.orthographicSize,Is.LessThanOrEqualTo(size));
             Until(()=>!Get<bool>(presentation,"IsCounterCameraBridgeActive"));
-            Assert.That(Camera.main.orthographicSize,Is.EqualTo(Mathf.Lerp(5f,3.75f,strength)).Within(.0001f));
+            Assert.That(Camera.main.orthographicSize,Is.EqualTo(Mathf.Lerp(normalCameraSize,3.75f,strength)).Within(.0001f));
             Until(()=>!Get<bool>(counter,"IsActive"));Frames(24);AssertClean();
         }
         [TestCase("Reset")] [TestCase("TargetLost")] [TestCase("Disable")] [TestCase("Death")]
@@ -1317,7 +1319,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Set(Get<object>(feedback,"Settings"),"shake",1f);BeginAuthoredAdaptiveParry(direction);
             Vector3 normal=Camera.main.transform.position;Vector2 root=body.position;Frames(2);
-            Assert.That(body.position,Is.EqualTo(root));Assert.That(Camera.main.orthographicSize,Is.EqualTo(5f));
+            Assert.That(body.position,Is.EqualTo(root));Assert.That(Camera.main.orthographicSize,Is.EqualTo(normalCameraSize));
             Assert.That(Mathf.Abs(Camera.main.transform.position.x-normal.x),Is.GreaterThan(.01f));
             Frames(4);Vector2 center=Get<Vector2>(presentation,"ParryCameraCenter");
             Assert.That((Vector2)Camera.main.transform.position,Is.EqualTo(center));
