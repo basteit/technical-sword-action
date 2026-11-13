@@ -8754,14 +8754,14 @@ MonoBehaviour:
   parryCooldown: 0.22
   failLockDuration: 0.3
   successLockDuration: 0.16
-  parrySnapDistance: 1.9
+  parrySnapDistance: 2.5
   specialSkill: {fileID: 0}
   stateMachine: {fileID: 0}
   audioSource: {fileID: 0}
   normalParryClip: {fileID: 0}
   justParryClip: {fileID: 0}
   parryMissClip: {fileID: 0}
-  maxParryHeightDifference: 1.25
+  maxParryHeightDifference: 1.5
 --- !u!114 &1882940586
 MonoBehaviour:
   m_ObjectHideFlags: 0

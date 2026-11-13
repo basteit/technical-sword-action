@@ -89,7 +89,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("TooEarly")] [TestCase("NoInput")] [TestCase("Wall")]
         public void ProximityDoesNotBypassOtherAcceptanceRules(string reason)
         {
-            Vector2 offset=reason=="Distance"?new Vector2(2.1f,0):reason=="Height"?new Vector2(.5f,1.4f):new Vector2(1.6f,0);
+            Vector2 offset=reason=="Distance"?new Vector2(2.6f,0):reason=="Height"?new Vector2(.5f,1.6f):new Vector2(1.6f,0);
             Begin(ai,body.position+offset,1);
             if(reason=="Unparryable")Set(ai,"configuredParryable",false);
             if(reason=="Wall")
@@ -106,6 +106,51 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(counter,"StockCount"),Is.Zero);
             Assert.That(Get<int>(health,"BlockedByParry"),Is.Zero);
         }
+        [TestCase(2.5f,0f,true)] [TestCase(-2.5f,0f,true)]
+        [TestCase(1.5f,1.5f,true)] [TestCase(-1.5f,-1.5f,true)]
+        [TestCase(2.51f,0f,false)] [TestCase(.5f,1.51f,false)]
+        public void ExpandedSpatialBoundaryParriesAndCanStartItsCounter(float x,float y,bool accepted)
+        {
+            Assert.That(Get<float>(parry,"SourceRange"),Is.EqualTo(2.5f));
+            Assert.That(Get<float>(parry,"MaxSourceHeightDifference"),Is.EqualTo(1.5f));
+            Assert.That(Get<int>(parry,"AcceptanceStartFrame"),Is.Zero);
+            Assert.That(Get<int>(parry,"AcceptanceEndFrame"),Is.EqualTo(13));
+            // Keep the lower-left counter route above the upper platform, including the enemy's parry retreat.
+            body.position=new Vector2(0,10);player.transform.position=body.position;body.gravityScale=0;
+            Begin(ai,body.position+new Vector2(x,y),x>0?1:-1); // Swing away: do not rely on the damage hitbox.
+            ReadyParry();
+            if(!accepted)
+            {
+                Frames(130);Assert.That(Get<int>(parry,"SuccessCount"),Is.Zero);
+                Assert.That(Get<int>(counter,"StockCount"),Is.Zero);return;
+            }
+            Until(()=>Get<int>(parry,"SuccessCount")==1);
+            Assert.That(Get<int>(health,"CurrentHp"),Is.EqualTo(100));
+            Assert.That(Get<int>(counter,"StockCount"),Is.EqualTo(1));
+            Assert.That(Call(counter,"EligibilityReason",enemy),Is.EqualTo("Eligible"),
+                $"Counter path from {player.transform.position} to {enemy.transform.position}");
+            Assert.That(Call(player,"RequestAction",PlayerActionRequest.Attack),Is.True);
+            Until(()=>Get<bool>(counter,"IsActive"));
+            Assert.That(Get<object>(counter,"SelectedTarget"),Is.SameAs(enemy));
+            Until(()=>Get<int>(counter,"HitCount")==1);
+            Assert.That(Get<int>(enemy,"CurrentHp"),Is.EqualTo(910));
+        }
+
+        [Test]
+        public void CounterReadsLiveParryRangeAndHeightInsteadOfAnIndependentFixedLimit()
+        {
+            Begin(ai,body.position+Vector2.right*2.8f,1);
+            Call(counter,"RegisterParriedEnemy",enemy);
+            Assert.That(Call(counter,"EligibilityReason",enemy),Is.EqualTo("OutOfRange"));
+            Set(parry,"parrySnapDistance",3f);
+            Assert.That(Call(counter,"EligibilityReason",enemy),Is.EqualTo("Eligible"));
+            enemy.transform.position=player.transform.position+new Vector3(1.5f,1.4f);
+            Set(parry,"maxParryHeightDifference",1.3f);Physics2D.SyncTransforms();
+            Assert.That(Call(counter,"EligibilityReason",enemy),Is.EqualTo("Height"));
+            Set(parry,"maxParryHeightDifference",1.5f);
+            Assert.That(Call(counter,"EligibilityReason",enemy),Is.EqualTo("Eligible"));
+        }
+
         [Test] public void AFailedProximityProbeDoesNotEatTheOrdinaryDamageHit()
         {
             Begin(ai,body.position+Vector2.right, -1);Frames(130);

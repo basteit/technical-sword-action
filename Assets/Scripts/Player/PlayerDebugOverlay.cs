@@ -79,6 +79,7 @@ public class PlayerDebugOverlay : MonoBehaviour
                 }
             }
             text.AppendLine(parry != null ? $"Parry {parry.ElapsedFrames}F / Accept [{parry.AcceptanceStartFrame}..{parry.AcceptanceEndFrame}] / CD {parry.ParryCooldownRemaining * 60:0}F\nSuccess {parry.SuccessCount}/{parry.AttemptCount} / Just {parry.JustSuccessCount} / Miss {parry.MissCount}" : "Parry: N/A (PlayerParry2D missing)");
+            if (parry != null) text.AppendLine($"Parry range {parry.SourceRange:0.00}u / height {parry.MaxSourceHeightDifference:0.00}u (shared with counter)");
             if (counter == null) text.AppendLine("Counter: N/A (PlayerParryCounter2D missing)");
             else
             {

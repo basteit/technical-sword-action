@@ -33,6 +33,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     [SerializeField] private float heelTargetHeadOffsetX = 7f/32f;
     [SerializeField] private LayerMask obstacleLayers;
     private PlayerStateMachine state;
+    private PlayerParry2D parry;
     private PlayerMotor2D motor;
     private Rigidbody2D body;
     private Collider2D bodyCollider;
@@ -110,6 +111,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     private void OnEnable()
     {
         state = GetComponent<PlayerStateMachine>(); motor = GetComponent<PlayerMotor2D>();
+        parry = GetComponent<PlayerParry2D>();
         body = GetComponent<Rigidbody2D>(); bodyCollider = GetComponent<Collider2D>();
         if (definition != null && !airborneKick)
         {
@@ -172,8 +174,10 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         // Use the real positions for facing, height, walls and the rear approach.
         float retreatAway = Mathf.Max(0, Mathf.Sign(delta.x) * enemy.ParryRetreatDisplacementX);
         Vector2 reach = new Vector2(Mathf.Max(0, Mathf.Abs(delta.x) - retreatAway), delta.y);
-        if (reach.magnitude > 1.9f) return "OutOfRange";
-        if (Mathf.Abs(delta.y) > 1.25f) return "Height";
+        float range = parry != null ? parry.SourceRange : PlayerParry2D.DefaultSourceRange;
+        float height = parry != null ? parry.MaxSourceHeightDifference : PlayerParry2D.DefaultSourceHeightDifference;
+        if (reach.magnitude > range) return "OutOfRange";
+        if (Mathf.Abs(delta.y) > height) return "Height";
         int direction = motor != null ? motor.FacingSign : 1;
         if (delta.sqrMagnitude > .0001f && Vector2.Dot(delta.normalized, Vector2.right * direction) < .5f) return "Behind";
         if (Physics2D.Linecast(transform.position, enemy.transform.position, obstacleLayers).collider != null) return "Obstructed";
