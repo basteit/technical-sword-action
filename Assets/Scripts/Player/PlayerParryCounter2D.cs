@@ -33,6 +33,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     [SerializeField] private float heelTargetHeadOffsetX = 7f/32f;
     [SerializeField] private LayerMask obstacleLayers;
     private PlayerStateMachine state;
+    private PlayerParry2D parry;
     private PlayerMotor2D motor;
     private Rigidbody2D body;
     private Collider2D bodyCollider;
@@ -69,7 +70,8 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public bool IsAirborneKick => airborneKick;
     public bool UsesBlinkApproach => airborneKick && blinkApproach;
     public bool IsOverheadHeelDrop => airborneKick && overheadHeelDrop;
-    public bool AttacksFromBehind => airborneKick && behindTarget && !usesFrontApproach;
+    public bool CrossesTarget => cinematicProfile != null && cinematicProfile.crossThroughFromPlayerSide && !usesFrontApproach;
+    public bool AttacksFromBehind => airborneKick && behindTarget && !CrossesTarget && !usesFrontApproach;
     public bool UsesFrontApproach => active && usesFrontApproach;
     public bool HasAuthoredTransfer => UsesBlinkApproach && blinkStartFrame > 0;
     public int BlinkStartFrame => blinkStartFrame;
@@ -109,6 +111,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     private void OnEnable()
     {
         state = GetComponent<PlayerStateMachine>(); motor = GetComponent<PlayerMotor2D>();
+        parry = GetComponent<PlayerParry2D>();
         body = GetComponent<Rigidbody2D>(); bodyCollider = GetComponent<Collider2D>();
         if (definition != null && !airborneKick)
         {
@@ -171,8 +174,10 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         // Use the real positions for facing, height, walls and the rear approach.
         float retreatAway = Mathf.Max(0, Mathf.Sign(delta.x) * enemy.ParryRetreatDisplacementX);
         Vector2 reach = new Vector2(Mathf.Max(0, Mathf.Abs(delta.x) - retreatAway), delta.y);
-        if (reach.magnitude > 1.9f) return "OutOfRange";
-        if (Mathf.Abs(delta.y) > 1.25f) return "Height";
+        float range = parry != null ? parry.SourceRange : PlayerParry2D.DefaultSourceRange;
+        float height = parry != null ? parry.MaxSourceHeightDifference : PlayerParry2D.DefaultSourceHeightDifference;
+        if (reach.magnitude > range) return "OutOfRange";
+        if (Mathf.Abs(delta.y) > height) return "Height";
         int direction = motor != null ? motor.FacingSign : 1;
         if (delta.sqrMagnitude > .0001f && Vector2.Dot(delta.normalized, Vector2.right * direction) < .5f) return "Behind";
         if (Physics2D.Linecast(transform.position, enemy.transform.position, obstacleLayers).collider != null) return "Obstructed";
@@ -190,14 +195,16 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         var profile = cinematicProfile;
         Vector2 center = target.transform.position;
         float spacing = profile.targetHeadOffsetX + profile.contactOffset.x;
-        kickDirection = RearFacing(target);
+        int towardTarget = Mathf.Abs(center.x - transform.position.x) > .001f
+            ? (center.x > transform.position.x ? 1 : -1) : motor != null ? motor.FacingSign : 1;
+        kickDirection = profile.crossThroughFromPlayerSide ? -towardTarget : RearFacing(target);
         fromFront = false;
         destination = center + new Vector2(-kickDirection * spacing, profile.hoverHeight);
         if (HasClearApproach(destination)) return true;
 
         // The target is already in range and visible. If the rear route is blocked,
         // try the same kick from the current side without crossing the wall.
-        kickDirection = motor != null ? motor.FacingSign : (center.x < transform.position.x ? -1 : 1);
+        kickDirection = towardTarget;
         fromFront = true;
         destination = center + new Vector2(-kickDirection * spacing, profile.hoverHeight);
         if (HasClearApproach(destination)) return true;
@@ -317,7 +324,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         float x = origin.x + facing * approach * Mathf.Clamp01(frame / travelFrames);
         x+=facing*landingRollDistance*Mathf.Clamp01((frame-landingFrame)/4f);
         Vector2 desired = new Vector2(x, origin.y + height);
-        bool usesHover = overheadHeelDrop || AttacksFromBehind || usesFrontApproach;
+        bool usesHover = cinematicProfile != null || overheadHeelDrop || AttacksFromBehind || usesFrontApproach;
         if (usesHover)
         {
             float arrive=Mathf.Clamp01((frame-blinkStartFrame)/Mathf.Max(1,blinkTravelFrames));
@@ -355,7 +362,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         elapsed++;
         if (UsesBlinkApproach && elapsed == BlinkArrivalFrame)
         {
-            if (AttacksFromBehind || usesFrontApproach) motor?.SetFacing(facing);
+            if (cinematicProfile != null || AttacksFromBehind || usesFrontApproach) motor?.SetFacing(facing);
             BlinkArrived?.Invoke();
         }
         if (airborneKick && !charged && elapsed >= chargeFrame)

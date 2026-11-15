@@ -44,6 +44,9 @@ namespace TechnicalSwordAction.PlayerState.Tests
             body = player.GetComponent<Rigidbody2D>();
             var root = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "Melee_1");
             ai = root.GetComponent(T("EnemyMeleeChaser2D")); health = root.GetComponent(T("Damageable2D"));
+            // This fixture verifies the retained configurable #43 hit animations.
+            // The current prototype's all-phase armor is covered by PrototypePlayerMovementFixTests.
+            health.GetType().GetField("suppressOrdinaryHitReaction", Flags).SetValue(health, false);
             art = root.GetComponent(T("PrototypeEnemyArtPresentation")); drawing = Get<SpriteRenderer>(art, "Artwork");
             Frames(2); yield return null;
         }

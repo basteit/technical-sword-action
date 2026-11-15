@@ -15,6 +15,8 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     [SerializeField] private int maxHp = 5;
     [SerializeField, Tooltip("Practice target only: accept hits and reactions without reducing HP or dying.")]
     private bool infiniteHealth;
+    [SerializeField, Tooltip("Prototype tuning: ordinary damage keeps the enemy's pose, position and action. Parry and counter launch still react.")]
+    private bool suppressOrdinaryHitReaction;
     [SerializeField] private string individualId;
     [SerializeField] private EnemyCombatRank combatRank;
     [SerializeField] private EnemyCombatDefinition combatDefinition;
@@ -30,6 +32,8 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     [SerializeField] private LayerMask playerBodyLayers;
     [SerializeField] private float knockbackPower = 5.5f;
     [SerializeField] private float knockbackDamping = 18f;
+    [SerializeField, Tooltip("Terrain fallback for legacy targets without an EnemyCombatDefinition.")]
+    private LayerMask knockbackObstacleLayers;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip hitClip;
     [SerializeField] private SpriteRenderer spriteRenderer;
@@ -65,6 +69,9 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     private float deathTimer;
     private Collider2D[] bodyColliders;
     private bool[] initialColliderStates;
+    private Collider2D movementCollider;
+    private readonly RaycastHit2D[] knockbackHits = new RaycastHit2D[16];
+    private readonly Dictionary<Collider2D, bool> playerCollisionStates = new();
     private readonly Dictionary<object,float> stunHolds=new();
     private readonly List<object> stunHoldOwners=new();
     private readonly Dictionary<object, float> deathPresentationHolds = new();
@@ -174,16 +181,22 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
     public int CurrentHp => currentHp;
     public int MaxHp => maxHp;
     public bool HasInfiniteHealth => infiniteHealth;
+    public bool SuppressesOrdinaryHitReaction => suppressOrdinaryHitReaction;
     public float HpNormalized => maxHp > 0 ? (float)currentHp / maxHp : 0f;
     public int CombatTickOrder => 190;
 
     private void OnEnable()
     {
+        IgnorePlayerBodiesBeforePhysics();
         CombatTimeController.Register(this);
     }
 
     private void OnDisable()
     {
+        foreach (var pair in playerCollisionStates)
+            if (movementCollider != null && pair.Key != null)
+                Physics2D.IgnoreCollision(movementCollider, pair.Key, pair.Value);
+        playerCollisionStates.Clear();
         SetCombatParticipation(false);
         CombatTimeController.Unregister(this);
         CombatTimeController.ReleaseOwner(this);
@@ -211,6 +224,8 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         if (combatDefinition != null) ConfigureDefinition(combatDefinition);
         currentHp = maxHp;
         bodyColliders = GetComponentsInChildren<Collider2D>(true);
+        movementCollider = GetComponent<Collider2D>();
+        if (knockbackObstacleLayers.value == 0) knockbackObstacleLayers = LayerMask.GetMask("Ground");
         initialColliderStates = new bool[bodyColliders.Length];
         for (int i = 0; i < bodyColliders.Length; i++) initialColliderStates[i] = bodyColliders[i].enabled;
 
@@ -232,10 +247,50 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
 
     public void CombatTick()
     {
+        IgnorePlayerBodiesBeforePhysics();
         if (motionOwners.Count == 0 && knockbackVelocity.sqrMagnitude > 0.0001f)
         {
-            transform.position += (Vector3)(knockbackVelocity * CombatTimeController.StepSeconds);
+            MoveKnockbackSafely(knockbackVelocity * CombatTimeController.StepSeconds);
         }
+    }
+
+    private void IgnorePlayerBodiesBeforePhysics()
+    {
+        if (!blockContactPushFromPlayer) return;
+        if (movementCollider == null) movementCollider = GetComponent<Collider2D>();
+        if (movementCollider == null) return;
+        if (playerCollisionStates.Count == 0)
+            foreach (var player in FindObjectsByType<PlayerMotor2D>(FindObjectsSortMode.None))
+                if (player.TryGetComponent<Collider2D>(out var other) && other != movementCollider)
+                    playerCollisionStates[other] = Physics2D.GetIgnoreCollision(movementCollider, other);
+        // Reapply before simulation: temporary Dash collision leases can have ended this tick.
+        foreach (var pair in playerCollisionStates)
+            if (pair.Key != null) Physics2D.IgnoreCollision(movementCollider, pair.Key, true);
+    }
+
+    private void MoveKnockbackSafely(Vector2 delta)
+    {
+        float distance = delta.magnitude;
+        if (distance < .000001f) return;
+        LayerMask terrain = combatDefinition != null ? combatDefinition.obstacleLayers : knockbackObstacleLayers;
+        if (movementCollider != null && terrain.value != 0)
+        {
+            var filter = new ContactFilter2D { useLayerMask = true, layerMask = terrain, useTriggers = false };
+            // Enemy bodies are static colliders. Collider2D.Cast returns no hits
+            // without an attached Rigidbody2D, so sweep their world shape explicitly.
+            int count = Physics2D.BoxCast(movementCollider.bounds.center, movementCollider.bounds.size, 0,
+                delta.normalized, filter, knockbackHits, distance + .005f);
+            for (int i = 0; i < count; i++)
+            {
+                var hit = knockbackHits[i];
+                if (hit.collider == null || Vector2.Dot(delta.normalized, hit.normal) >= -.001f) continue;
+                var platform = hit.collider.GetComponent<PlatformEffector2D>();
+                if (platform != null && platform.enabled && platform.useOneWay && hit.collider.usedByEffector &&
+                    (delta.y >= 0 || hit.normal.y <= .5f || movementCollider.bounds.min.y < hit.collider.bounds.max.y - .03f)) continue;
+                distance = Mathf.Min(distance, Mathf.Max(0, hit.distance - .005f));
+            }
+        }
+        transform.position += (Vector3)(delta.normalized * distance);
     }
 
     public void CombatTickTimers()
@@ -322,11 +377,16 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
         LastDamageTaken = infiniteHealth ? 0 : Mathf.Min(currentHp, damage);
         currentHp -= LastDamageTaken;
         HitCount++;
-        bool armored = currentHp > 0 && TryGetComponent<EnemyMeleeChaser2D>(out var melee) && melee.ResistsHitStun;
+        bool armored = suppressOrdinaryHitReaction ||
+            currentHp > 0 && TryGetComponent<EnemyMeleeChaser2D>(out var melee) && melee.ResistsHitStun;
         if (combatDefinition == null)
         {
-            AddBreak(damage * hitBreakMultiplier);
-            stunTimer = Mathf.Max(stunTimer, lightHitStunDuration);
+            if (!armored)
+            {
+                AddBreak(damage * hitBreakMultiplier);
+                stunTimer = Mathf.Max(stunTimer, lightHitStunDuration);
+            }
+            LastHitReaction = suppressOrdinaryHitReaction ? "OrdinaryHitArmor" : armored ? "AttackArmor" : "LegacyHit";
         }
         else
         {
@@ -338,7 +398,7 @@ public class Damageable2D : MonoBehaviour, ICombatTickListener, ICombatTimerList
                 lightResistanceTimer = (frames + combatDefinition.lightStunResistanceFrames) / 60f;
                 LastHitReaction = strength + "Stun";
             }
-            else LastHitReaction = armored ? "AttackArmor" : resistsLight ? "LightResistance" : "NoStun";
+            else LastHitReaction = suppressOrdinaryHitReaction ? "OrdinaryHitArmor" : armored ? "AttackArmor" : resistsLight ? "LightResistance" : "NoStun";
         }
 
         Vector2 dir = direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.right;

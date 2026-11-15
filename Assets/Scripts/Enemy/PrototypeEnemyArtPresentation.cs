@@ -83,7 +83,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     private void OnHit(Damageable2D _, int damage, Vector2 direction)
     {
         // Keep the authored telegraph/contact pose on a non-lethal armored hit.
-        if (health.IsAlive && ai.ResistsHitStun) return;
+        if (health.IsAlive && (ai.ResistsHitStun || health.SuppressesOrdinaryHitReaction)) return;
         ResetImpactOffset();
         parryDrawingOwner = null;
         hitRemaining = library?.Find("Enemy_Hit")?.TotalFrames ?? 6;
@@ -142,6 +142,8 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
     {
         ResetImpactOffset();
         parryDrawingOwner = null;
+        // A counter consumes the parry pose even when ordinary-hit armor skipped OnHit.
+        parried = attackRecoveryVisible = false;
         if (launch.IsSurvivorRetreat) hitRemaining = 0;
         // The kick travels away from its attacker. Keep the drawing facing back toward them,
         // without changing the AI direction that determined the rear approach.
@@ -216,7 +218,7 @@ public sealed class PrototypeEnemyArtPresentation : MonoBehaviour, ICombatTickLi
             MotionName = "CounterRetreat";
             sprite = library.Find("Enemy_Parried")?.At(0); // The authored diagonal chance pose, held for the slide.
         }
-        else if (hitRemaining > 0 && !ai.ResistsHitStun) { MotionName = "Hit"; sprite = library.Find("Enemy_Hit")?.At(0); }
+        else if (hitRemaining > 0 && !ai.ResistsHitStun && !health.SuppressesOrdinaryHitReaction) { MotionName = "Hit"; sprite = library.Find("Enemy_Hit")?.At(0); }
         else if (parryDrawingOwner != null && health.IsParryStaggered)
         {
             var attack = library.Find("Enemy_Attack");

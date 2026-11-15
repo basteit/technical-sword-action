@@ -110,24 +110,29 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
     }
     private void OnGUI()
     {
-        GUILayout.BeginArea(new Rect(Screen.width - 310, 302, 298, 240), GUI.skin.box);
-        GUILayout.Label("#34 Combat trial (switch = safe reset)");
-        string tempo = AttackTempo == PrototypeAttackTempo.SnappyFirstTwo ? "SNAPPY" :
-            AttackTempo == PrototypeAttackTempo.FastTrial ? "FAST" : "ORIGINAL";
-        if (attack != null && attack.Definition != null)
-            tempo += " " + string.Join("/", attack.Definition.steps.Take(attack.MaxComboStep).Select(step => step.activeStart)) + "F";
-        if (GUILayout.Button("0 / F10 Attack: " + tempo)) CycleAttackTempo();
-        GUILayout.Label("Cycle: FAST -> ORIGINAL -> SNAPPY");
-        var feedback = attack != null ? attack.GetComponent<CombatFeedback2D>() : null;
-        string impact = feedback != null ? feedback.GetAttackHitstopFrames(1) + "/" + feedback.GetAttackHitstopFrames(2) + "F" : "unconfigured";
-        if (GUILayout.Button("Attack 1/2 hitstop: " + (strongAttackHits ? "TRIAL " : "BASE ") + impact))
-            SetStrongAttackHits(!strongAttackHits);
-        if (GUILayout.Button("F11 Enemy: " + (referenceTiming ? "VIDEO 96/24F" : "ORIGINAL 30/30F")))
-            SetEnemyTiming(!referenceTiming);
-        if (GUILayout.Button("F12: " + (referenceReaction ? "DOWN / DEFEAT HOP" : "CHANCE / DEFEAT SPIN")))
-            SetEnemyReaction(!referenceReaction);
-        if (GUILayout.Button("Restore ALL original settings")) RestoreOriginals();
-        GUILayout.EndArea();
+        using (PrototypeDebugPanel.ReadableSkin())
+        {
+            var area = new Rect(Screen.width - 310, 302, 298, 240);
+            PrototypeDebugPanel.DrawBackground(area);
+            GUILayout.BeginArea(area, GUI.skin.box);
+            GUILayout.Label("#34 Combat trial (switch = safe reset)");
+            string tempo = AttackTempo == PrototypeAttackTempo.SnappyFirstTwo ? "SNAPPY" :
+                AttackTempo == PrototypeAttackTempo.FastTrial ? "FAST" : "ORIGINAL";
+            if (attack != null && attack.Definition != null)
+                tempo += " " + string.Join("/", attack.Definition.steps.Take(attack.MaxComboStep).Select(step => step.activeStart)) + "F";
+            if (GUILayout.Button("0 / F10 Attack: " + tempo)) CycleAttackTempo();
+            GUILayout.Label("Cycle: FAST -> ORIGINAL -> SNAPPY");
+            var feedback = attack != null ? attack.GetComponent<CombatFeedback2D>() : null;
+            string impact = feedback != null ? feedback.GetAttackHitstopFrames(1) + "/" + feedback.GetAttackHitstopFrames(2) + "F" : "unconfigured";
+            if (GUILayout.Button("Attack 1/2 hitstop: " + (strongAttackHits ? "TRIAL " : "BASE ") + impact))
+                SetStrongAttackHits(!strongAttackHits);
+            if (GUILayout.Button("F11 Enemy: " + (referenceTiming ? "VIDEO 96/24F" : "ORIGINAL 30/30F")))
+                SetEnemyTiming(!referenceTiming);
+            if (GUILayout.Button("F12: " + (referenceReaction ? "DOWN / DEFEAT HOP" : "CHANCE / DEFEAT SPIN")))
+                SetEnemyReaction(!referenceReaction);
+            if (GUILayout.Button("Restore original trial settings")) RestoreOriginals();
+            GUILayout.EndArea();
+        }
     }
     private void OnDisable() { controls?.Dispose(); controls = null; }
 }

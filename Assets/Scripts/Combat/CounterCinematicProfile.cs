@@ -16,6 +16,8 @@ public sealed class CounterCinematicProfile : ScriptableObject
     [Min(1)] public int hitFrame = 21;
     [Min(1)] public int endFrame = 45;
     public Vector2 contactOffset = new Vector2(51f / 32f, .325f);
+    [Tooltip("Choose the far side from the player's starting position, not the enemy's facing. Keep a safe near-side fallback at walls.")]
+    public bool crossThroughFromPlayerSide;
     [Min(0)] public float hoverHeight = .125f;
     [Min(0)] public float impactHeight = .0625f;
     [Min(0)] public float targetHeadOffsetX = 17f / 32f;

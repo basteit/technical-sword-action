@@ -22,6 +22,7 @@ MonoBehaviour:
   hitFrame: 21
   endFrame: 45
   contactOffset: {x: 1.59375, y: 0.325}
+  crossThroughFromPlayerSide: 1
   hoverHeight: 0.125
   impactHeight: 0.0625
   targetHeadOffsetX: 0.53125

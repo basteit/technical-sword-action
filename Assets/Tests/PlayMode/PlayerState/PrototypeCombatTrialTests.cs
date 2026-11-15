@@ -60,7 +60,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             sceneDefaultHitFrames = Steps.Select(s => Get<int>(s, "activeStart")).ToArray();
             sceneDefaultController = player.GetComponent<Animator>().runtimeAnimatorController;
             sceneExpectedController = Get<RuntimeAnimatorController>(trial, "ExpectedController");
-            // Exercise the retained experimental mode explicitly; it is no longer the scene default.
+            // Exercise the selected SNAPPY mode explicitly; preserve the captured scene defaults too.
             Call(trial, "SetAttackTempo", Enum.Parse(T("PrototypeAttackTempo"), "SnappyFirstTwo"));
             ((Behaviour)player.GetComponent(T("PlayerInputRouter"))).enabled = false; body = player.GetComponent<Rigidbody2D>();
             var root = player.gameObject.scene.GetRootGameObjects().Single(go => go.name == "Melee_1");
@@ -74,11 +74,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(arena, "ResetActionsOnly"); clock.GetType().GetProperty("ManualAdvanceOnly").SetValue(clock, savedManual); yield return null;
         }
 
-        [Test] public void StartsInFastModeWithoutEnemiesAndKeepsOriginalAsAComparison()
+        [Test] public void StartsInSnappyModeWithoutEnemiesAndKeepsOriginalAsAComparison()
         {
             Assert.That(Get<bool>(trial, "IsConfigured"), Is.True);
-            Assert.That(sceneDefaultTempo, Is.EqualTo("FastTrial"));
-            Assert.That(sceneDefaultHitFrames, Is.EqualTo(new[] { 12, 9, 12, 30 }));
+            Assert.That(sceneDefaultTempo, Is.EqualTo("SnappyFirstTwo"));
+            Assert.That(sceneDefaultHitFrames, Is.EqualTo(new[] { 9, 7, 12, 30 }));
             Assert.That(sceneDefaultController, Is.SameAs(sceneExpectedController));
             Assert.That(Get<float>(Get<object>(Feedback, "Settings"), "shake"), Is.Zero);
             Assert.That(Get<bool>(trial, "StrongAttackHits"), Is.True);
@@ -451,6 +451,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
 
         [UnityTest] public IEnumerator EverySnappyStepCanCancelAtItsBoundaryToAllDefenseActions()
         {
+            // The distributed prototype disables Special. Test the retained product action explicitly.
+            ((Behaviour)player.GetComponent(T("PlayerSpecialSkill2D"))).enabled = true;
             EnableFullCombo();
             foreach (var request in new[] { PlayerActionRequest.Dash, PlayerActionRequest.Parry, PlayerActionRequest.Special })
                 for (int desired = 1; desired <= 4; desired++)

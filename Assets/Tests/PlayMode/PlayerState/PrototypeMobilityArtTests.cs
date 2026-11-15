@@ -131,11 +131,12 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [TestCase(-1)] [TestCase(1)] public void FasterWalkingCoversTwentyPercentMoreDistanceWithoutRetimingTheArt(int direction)
         {
-            Assert.That(Get<float>(motor,"MoveSpeed"),Is.EqualTo(5.28228f).Within(.00001f));
+            Assert.That(Get<float>(motor,"MoveSpeed"),Is.EqualTo(6.338736f).Within(.00001f));
+            Assert.That(Camera.main.orthographicSize,Is.EqualTo(6f));
             Call(motor,"SetMoveInput",Vector2.right*direction);float start=body.position.x;Frames(30);
             float tuned=direction*(body.position.x-start);
             Call(arena,"ResetActionsOnly");body.position=new Vector2(0,.81f);player.transform.position=body.position;
-            motor.GetType().GetField("moveSpeed",Flags).SetValue(motor,4.4019f);
+            motor.GetType().GetField("moveSpeed",Flags).SetValue(motor,5.28228f);
             Call(motor,"SetMoveInput",Vector2.right*direction);Physics2D.SyncTransforms();Frames(4);
             start=body.position.x;Frames(30);float baseline=direction*(body.position.x-start);
             Assert.That(tuned/baseline,Is.EqualTo(1.2f).Within(.015f));
@@ -271,6 +272,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(PlayerActionRequest.Special)] [TestCase(PlayerActionRequest.Dash)]
         public void AirActionsOwnTheirArtworkInsteadOfBeingOverwrittenByJump(PlayerActionRequest action)
         {
+            // Verify the retained product Special animation explicitly; player input cannot enable it in the prototype.
+            if (action == PlayerActionRequest.Special) ((Behaviour)player.GetComponent(T("PlayerSpecialSkill2D"))).enabled = true;
             Call(motor,"SetJumpHeld",true);Request(PlayerActionRequest.Jump);Frames(5);Request(action);Frames(2);
             Assert.That(Get<string>(art,"MobilityPhase"),Is.EqualTo(action==PlayerActionRequest.Dash?"Dash":"None"));
             Assert.That(AssetDatabase.GetAssetPath(source.sprite),Does.Not.Contain("/Jump_"));

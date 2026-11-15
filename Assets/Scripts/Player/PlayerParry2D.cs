@@ -10,6 +10,8 @@ public enum ParryResult
 
 public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerListener
 {
+    public const float DefaultSourceRange = 1.9f;
+    public const float DefaultSourceHeightDifference = 1.25f;
     [Header("Parry Window")]
     [SerializeField] private ParryTimingDefinition timing;
     [SerializeField] private float parryWindowDuration = 0.2f;
@@ -21,7 +23,7 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     [SerializeField, Min(0f)] private float successLockDuration = 0.16f;
 
     [Header("Parry Snap")]
-    [SerializeField] private float parrySnapDistance = 1.9f;
+    [SerializeField] private float parrySnapDistance = DefaultSourceRange;
 
     [Header("References")]
     [SerializeField] private PlayerSpecialSkill2D specialSkill;
@@ -51,7 +53,9 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
     public int ElapsedFrames => Mathf.RoundToInt(parryElapsed * 60);
     public int AcceptanceStartFrame => timing != null ? timing.startFrame : 0;
     public int AcceptanceEndFrame => timing != null ? timing.endFrame : Mathf.RoundToInt(parryWindowDuration * 60);
-    [SerializeField, Min(0f)] private float maxParryHeightDifference = 1.25f;
+    [SerializeField, Min(0f)] private float maxParryHeightDifference = DefaultSourceHeightDifference;
+    public float SourceRange => parrySnapDistance;
+    public float MaxSourceHeightDifference => maxParryHeightDifference;
     public Damageable2D LastParriedEnemy { get; private set; }
     public ParryReactionWeight LastReactionWeight { get; private set; } = ParryReactionWeight.Light;
     public event System.Action<Damageable2D, ParryResult> Succeeded;
@@ -225,7 +229,7 @@ public class PlayerParry2D : MonoBehaviour, ICombatTickListener, ICombatTimerLis
         }
 
         float dist = Vector2.Distance(transform.position, sourcePosition);
-        if (dist > parrySnapDistance || Mathf.Abs(transform.position.y - sourcePosition.y) > maxParryHeightDifference)
+        if (dist > SourceRange || Mathf.Abs(transform.position.y - sourcePosition.y) > MaxSourceHeightDifference)
         {
             result = ParryResult.None;
             return false;

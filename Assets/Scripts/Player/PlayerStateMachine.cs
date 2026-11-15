@@ -80,6 +80,7 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
     public string LastTransitionReason { get; private set; } = "Initialized";
     public int LastAcceptedPriority { get; private set; } = -1;
     public int TransitionCount { get; private set; }
+    public int InactiveActionRecoveryCount { get; private set; }
     public int PauseRequestCount { get; private set; }
     public bool CombatSuspended { get; private set; }
     public int ActiveActionOwnerCount => ActionState == PlayerActionState.Neutral ? 0 : 1;
@@ -188,10 +189,30 @@ public class PlayerStateMachine : MonoBehaviour, ICombatTickListener, ICombatTim
 
     public void CombatTick()
     {
+        RecoverInactiveCombatAction();
         UpdateLocomotionState();
         UpdateInteractionState();
         ResolvePendingRequests();
         motor?.ApplyCombatVelocity();
+    }
+
+    private void RecoverInactiveCombatAction()
+    {
+        // An expiry/cancellation must not leave a movement-blocking state without
+        // its executor. Preserve pending input and other enemies' valid stocks.
+        bool inactive = ActionState switch
+        {
+            PlayerActionState.Parry => parry == null || !parry.IsParryActive,
+            PlayerActionState.ParrySuccess => parry == null || !parry.IsSuccessLocked,
+            PlayerActionState.ParryFail => parry == null || !parry.IsFailLocked,
+            PlayerActionState.ParryCounter => !actionHandlers.TryGetValue(PlayerActionState.ParryCounter, out var owner) || owner.LockRemaining <= 0f,
+            _ => false
+        };
+        if (!inactive) return;
+        var previous = ActionState;
+        InactiveActionRecoveryCount++;
+        TransitionTo(PlayerActionState.Neutral, "InactiveExecutorRecovered:" + previous, true);
+        GetComponent<PrototypeCounterPresentation>()?.ResetPresentation();
     }
 
     public void CombatTickTimers()
