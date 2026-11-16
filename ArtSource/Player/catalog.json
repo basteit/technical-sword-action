@@ -2748,6 +2748,214 @@
           "evidence": "docs/prototype-mobility-and-proximity-parry.md"
         }
       ]
+    },
+    "parry_heavy": {
+      "name": "パリィ成功（重）",
+      "status": "provisional",
+      "notes": "2026-11-17ユーザー制作の受領ラフ。刀を相手の攻撃に合わせて構え、ヒットストップ後、衝撃で剣を地面に突き立てながら後ずさって吸収する。軽/重は攻撃重量でNormal/Justとは別軸。反撃可能な成功は共通の短反撃へ接続。移動量・接触コマ・停止尺・接地/壁際はUnity統合時に調整/検証する。2026-11-17に本編プロトタイプへ仮接続し、関連自動テストと実AIの画面撮影を確認。人の15分操作・物理パッド・清書と手触りの採否は未完了。",
+      "current": "Current/Player_parry_heavy.aseprite",
+      "current_sha256": "77f897598fb8f7e1f5601a8e83e9a145d8a62cba8951a17c30d3c892f47bbd7d",
+      "revisions": [
+        {
+          "sha256": "77f897598fb8f7e1f5601a8e83e9a145d8a62cba8951a17c30d3c892f47bbd7d",
+          "file": "History/parry_heavy/77f897598fb8f7e1f5601a8e83e9a145d8a62cba8951a17c30d3c892f47bbd7d.aseprite",
+          "original_name": "Player_parry_heavy.aseprite",
+          "registered_at": "2026-11-16T19:39:26+00:00",
+          "received_on": "2026-11-17",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 80,
+                "frame": 1
+              },
+              {
+                "duration_ms": 80,
+                "frame": 2
+              },
+              {
+                "duration_ms": 80,
+                "frame": 3
+              },
+              {
+                "duration_ms": 80,
+                "frame": 4
+              },
+              {
+                "duration_ms": 80,
+                "frame": 5
+              },
+              {
+                "duration_ms": 80,
+                "frame": 6
+              },
+              {
+                "duration_ms": 80,
+                "frame": 7
+              },
+              {
+                "duration_ms": 80,
+                "frame": 8
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Sword",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 255,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "prototype",
+          "motion": "ParrySuccessHeavy",
+          "source_sha256": "77f897598fb8f7e1f5601a8e83e9a145d8a62cba8951a17c30d3c892f47bbd7d",
+          "references": [
+            "Assets/Settings/PrototypeCombat/HeavyParry.asset",
+            "Assets/Animations/Player/Submitted/PlayerPrototype_ParrySuccessHeavy.anim",
+            "Assets/Art/Player/QuickHeavySubmitted/export-manifest.json"
+          ],
+          "evidence": "docs/prototype-quick-counter-heavy-parry-20261117.md"
+        }
+      ]
+    },
+    "counter_quick": {
+      "name": "短い反撃（通り抜け・納刀斬撃）",
+      "status": "provisional",
+      "notes": "2026-11-17ユーザー制作の受領ラフ。既存の反撃移行モーションの後を想定。敵を通り抜け、刀を鞘に納めた瞬間に対象へ大きな斬撃を一撃だけ与え、そのまま通常の立ち姿へ戻る。通過中の多段ヒットにしない。先頭/末尾500msを含む原稿時間は保持し、ゲーム用尺・納刀/命中同期・地形越しの安全性・復帰はUnity統合時に調整/検証する。旧キックと移行原稿は保持。2026-11-17に本編プロトタイプへ仮接続し、関連自動テストと実AIの画面撮影を確認。人の15分操作・物理パッド・清書と手触りの採否は未完了。",
+      "current": "Current/Player_counter_quick.aseprite",
+      "current_sha256": "557555b099946c3a9941532f9ccf3407551dd1e497db3357b2688f41b8430f5f",
+      "revisions": [
+        {
+          "sha256": "557555b099946c3a9941532f9ccf3407551dd1e497db3357b2688f41b8430f5f",
+          "file": "History/counter_quick/557555b099946c3a9941532f9ccf3407551dd1e497db3357b2688f41b8430f5f.aseprite",
+          "original_name": "Player_counter_quick.aseprite",
+          "registered_at": "2026-11-16T19:39:26+00:00",
+          "received_on": "2026-11-17",
+          "kind": "submission",
+          "metadata": {
+            "color_mode": 0,
+            "frames": [
+              {
+                "duration_ms": 500,
+                "frame": 1
+              },
+              {
+                "duration_ms": 100,
+                "frame": 2
+              },
+              {
+                "duration_ms": 50,
+                "frame": 3
+              },
+              {
+                "duration_ms": 50,
+                "frame": 4
+              },
+              {
+                "duration_ms": 50,
+                "frame": 5
+              },
+              {
+                "duration_ms": 500,
+                "frame": 6
+              }
+            ],
+            "height": 128,
+            "layers": [
+              {
+                "is_group": false,
+                "name": "Layer 1",
+                "opacity": 255,
+                "visible": true
+              },
+              {
+                "is_group": false,
+                "name": "Hair",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Body",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Effect",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Eye",
+                "opacity": 255,
+                "visible": false
+              },
+              {
+                "is_group": false,
+                "name": "Sample",
+                "opacity": 255,
+                "visible": true
+              }
+            ],
+            "tags": [],
+            "width": 128
+          }
+        }
+      ],
+      "uses": [
+        {
+          "consumer": "prototype",
+          "motion": "CounterQuick",
+          "source_sha256": "557555b099946c3a9941532f9ccf3407551dd1e497db3357b2688f41b8430f5f",
+          "references": [
+            "Assets/Settings/PrototypeCombat/QuickCounter.asset",
+            "Assets/Animations/Player/Submitted/PlayerPrototype_CounterQuick.anim",
+            "Assets/Art/Player/QuickHeavySubmitted/export-manifest.json"
+          ],
+          "evidence": "docs/prototype-quick-counter-heavy-parry-20261117.md"
+        }
+      ]
     }
   },
   "references": [

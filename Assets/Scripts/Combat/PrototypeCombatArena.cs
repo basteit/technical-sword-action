@@ -11,6 +11,7 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     [SerializeField, Tooltip("Inactive strong-enemy fixture retained for regression tests; not a selectable encounter.")]
     private EnemyMeleeChaser2D strongEnemy;
     [SerializeField] private EnemyMeleeChaser2D trainingDummy;
+    [SerializeField] private EnemyCombatDefinition heavyTrainingDefinition;
     [SerializeField] private EnemyAttackCoordinator2D coordinator;
     [SerializeField] private CombatFeedback2D feedback;
     private Vector3 trainingPosition;
@@ -20,13 +21,14 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     private int[] enemyHp;
     private InputAction reset;
     private Encounter encounterPreset;
+    private EnemyCombatDefinition originalTrainingDefinition;
     private void Start()
     {
         if (GetComponent<PrototypeCombatTrial>() != null) ResetActionsOnly();
     }
     private void Awake()
     {
-        if (trainingDummy != null) trainingPosition = trainingDummy.transform.position;
+        if (trainingDummy != null) { trainingPosition = trainingDummy.transform.position; originalTrainingDefinition = trainingDummy.Definition; }
         playerPosition = player.transform.position;
         enemyPositions = new Vector3[enemies.Length]; enemyHp = new int[enemies.Length];
         for (int i = 0; i < enemies.Length; i++)
@@ -79,6 +81,11 @@ public sealed class PrototypeCombatArena : MonoBehaviour
         if (strongEnemy != null) strongEnemy.gameObject.SetActive(false);
         if (trainingDummy != null) trainingDummy.gameObject.SetActive(false);
         player.ResetToSafeState("PrototypeArenaReset", true);
+        if (trainingDummy != null && originalTrainingDefinition != null)
+        {
+            trainingDummy.ConfigureDefinition(originalTrainingDefinition);
+            trainingDummy.GetComponent<Damageable2D>().ConfigureDefinition(originalTrainingDefinition);
+        }
         GetComponent<PrototypeCombatTrial>()?.ApplyAfterPlayerReset();
         var body = player.GetComponent<Rigidbody2D>();
         player.transform.position = playerPosition; body.position = playerPosition; body.linearVelocity = Vector2.zero;
@@ -97,6 +104,11 @@ public sealed class PrototypeCombatArena : MonoBehaviour
         if (trainingDummy != null && (preset is Encounter.Training or Encounter.MixedTraining))
         {
             var health = trainingDummy.GetComponent<Damageable2D>();
+            if (preset == Encounter.MixedTraining && heavyTrainingDefinition != null)
+            {
+                trainingDummy.ConfigureDefinition(heavyTrainingDefinition);
+                health.ConfigureDefinition(heavyTrainingDefinition);
+            }
             health.ResetForCapture(trainingPosition, health.ConfiguredMaxHp);
             trainingDummy.ResetForCapture(player.transform, false);
         }
@@ -108,7 +120,7 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     {
         using (PrototypeDebugPanel.ReadableSkin())
         {
-            var area = new Rect(Screen.width - 310, 12, 298, 280);
+            var area = new Rect(Screen.width - 310, 12, 298, 310);
             PrototypeDebugPanel.DrawBackground(area);
             GUILayout.BeginArea(area, GUI.skin.box);
             GUILayout.Label("Prototype combat / practice");
@@ -119,8 +131,15 @@ public sealed class PrototypeCombatArena : MonoBehaviour
                 if (GUILayout.Button("3: Two normals")) ResetArena(true);
                 if (GUILayout.Button("4: Infinite HP dummy")) ResetTrainingEncounter(false);
             }
-            if (GUILayout.Button("5: Normal + infinite HP dummy")) ResetTrainingEncounter(true);
+            if (GUILayout.Button("5: Normal + HEAVY infinite HP")) ResetTrainingEncounter(true);
             GUILayout.Label("K / RMB: Parry - J / LMB: Counter");
+            var counter = player != null ? player.GetComponent<PlayerParryCounter2D>() : null;
+            if (counter != null && counter.QuickProfile != null &&
+                GUILayout.Button(counter.UsesQuickCounter ? "Counter: QUICK (click for old kick)" : "Counter: OLD KICK (click for quick)"))
+            {
+                bool next = !counter.UsesQuickCounter;
+                ResetCurrentEncounter(); counter.TrySetQuickCounter(next);
+            }
             if (coordinator != null) GUILayout.Label($"Attack roles: {coordinator.ActiveAttackers}/{coordinator.MaximumAttackers}");
             if (feedback != null && feedback.Settings != null)
             {

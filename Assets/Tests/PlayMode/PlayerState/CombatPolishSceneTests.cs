@@ -124,6 +124,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [UnityTest]
         public IEnumerator SameDummyCanBeParriedAndCounterKickedTwiceWithoutResettingHp()
         {
+            Call(counter, "TrySetQuickCounter", false); // Preserve the retained kick's survivor launch contract.
             Call(arena.GetComponent(T("PrototypeCombatTrial")), "SetEnemyTiming", false);
             Call(arena, "ResetTrainingEncounter", false);
             yield return null; // Release the reset render-frame input guard.

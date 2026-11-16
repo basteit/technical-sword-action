@@ -121,7 +121,7 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener, ICombat
         var cue = kind switch {
             CombatFeedbackKind.LightHit => PrototypeSfxCue.LightHit,
             CombatFeedbackKind.HeavyHit => state != null && state.ActionState == PlayerActionState.Special ? PrototypeSfxCue.SpecialHit : PrototypeSfxCue.HeavyHit,
-            CombatFeedbackKind.Counter => PrototypeSfxCue.CounterHit,
+            CombatFeedbackKind.Counter => counter != null && counter.UsesQuickCounter ? PrototypeSfxCue.HeavyHit : PrototypeSfxCue.CounterHit,
             CombatFeedbackKind.Parry => PrototypeSfxCue.Parry,
             CombatFeedbackKind.JustParry => PrototypeSfxCue.JustParry,
             CombatFeedbackKind.PlayerHit => PrototypeSfxCue.PlayerHit,
@@ -129,6 +129,7 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener, ICombat
             _ => PrototypeSfxCue.ParryMiss
         };
         if (kind == CombatFeedbackKind.Counter) StopCharge();
+        if (kind == CombatFeedbackKind.Counter && counter != null && counter.UsesQuickCounter) Play(PrototypeSfxCue.Sheathe);
         Play(cue, true); return true;
     }
 

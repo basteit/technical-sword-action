@@ -97,6 +97,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             yield return null;
             player = (Component)Object.FindFirstObjectByType(T("PlayerStateMachine"));
             motor = player.GetComponent(T("PlayerMotor2D")); counter = player.GetComponent(T("PlayerParryCounter2D"));
+            // This fixture preserves the old cinematic comparison. The default quick path has its own regression fixture.
+            Assert.That((bool)Call(counter, "TrySetQuickCounter", false), Is.True);
             art = player.GetComponent(T("PrototypePlayerArtPresentation")); presentation = player.GetComponent(T("PrototypeCounterPresentation"));
             arena = (Component)Object.FindFirstObjectByType(T("PrototypeCombatArena")); feedback = player.GetComponent(T("CombatFeedback2D"));
             body = player.GetComponent<Rigidbody2D>(); ((Behaviour)player.GetComponent(T("PlayerInputRouter"))).enabled = false;

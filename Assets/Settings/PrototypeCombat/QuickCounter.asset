@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7784ae9e30618f647afdfc2fcc101310, type: 3}
+  m_Name: QuickCounter
+  m_EditorClassIdentifier: Assembly-CSharp::QuickCounterProfile
+  transfer:
+    name: CounterTransfer
+    provisional: 1
+    includesSlashTrail: 0
+    includesParryEffect: 0
+    includesCounterTrail: 0
+    counterContactOffset: {x: 0, y: 0}
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 0ef45a7a49dfb6f48b45804a6e6f878b, type: 3}
+    - {fileID: 21300000, guid: 52abe37d804f2a7468e711d758f2543d, type: 3}
+    - {fileID: 21300000, guid: 9cd0c7c517ca19b43b32529f09a5208f, type: 3}
+    - {fileID: 21300000, guid: acec0b62300819844baa492e25aaaa5f, type: 3}
+    - {fileID: 21300000, guid: 30eef267c81787e408ca6d53a8c7ba57, type: 3}
+    - {fileID: 21300000, guid: 29bbd32cd90680b48872c1dcb86f38b1, type: 3}
+    - {fileID: 21300000, guid: 07d0556466a11b7408a0646bfe482ec2, type: 3}
+    - {fileID: 21300000, guid: ade02a9410a66b34aa44e5c22cb8ab94, type: 3}
+    eyeFrames: []
+    durations: 0100000001000000020000000200000002000000010000000100000002000000
+    hitFrame: 0
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+    hasParryCue: 0
+    parryCueFrame: 0
+    hasParryImpact: 0
+    parryImpactFrame: 0
+  strike:
+    name: CounterQuick
+    provisional: 1
+    includesSlashTrail: 0
+    includesParryEffect: 0
+    includesCounterTrail: 0
+    counterContactOffset: {x: 0, y: 0}
+    hasTrailHitbox: 0
+    hitboxMin: {x: 0, y: 0}
+    hitboxMax: {x: 0, y: 0}
+    hasParryContact: 0
+    parryContactOffset: {x: 0, y: 0}
+    frames:
+    - {fileID: 21300000, guid: 4406d32a4935f3245b8423895d57198e, type: 3}
+    - {fileID: 21300000, guid: a1989653dac0ea84c8b0c8aa1c29bcd4, type: 3}
+    - {fileID: 21300000, guid: aec287d558d8d2045974bb0b02a4f30d, type: 3}
+    - {fileID: 21300000, guid: a50f0e5f36117b84ba0faa561d29ffb6, type: 3}
+    - {fileID: 21300000, guid: d6bed50f3cb64fc4f855664718a4432a, type: 3}
+    - {fileID: 21300000, guid: c0c176e9e73e47540813fff5c3fff24f, type: 3}
+    eyeFrames: []
+    durations: 020000000200000002000000020000000100000007000000
+    hitFrame: 8
+    branchFrame: 0
+    chargeFrame: 0
+    releaseFrame: 0
+    landingFrame: 0
+    recoveryFrame: 0
+    hasParryCue: 0
+    parryCueFrame: 0
+    hasParryImpact: 0
+    parryImpactFrame: 0
+  clip: {fileID: 7400000, guid: 3cd78babe3ff69f4f94f2fc8c606213b, type: 2}
+  transferFrames: 8
+  travelStartFrame: 4
+  travelFrames: 4
+  hitFrame: 16
+  hitstopFrames: 8
+  targetSpacing: 1.2
+  hitRange: 2.2

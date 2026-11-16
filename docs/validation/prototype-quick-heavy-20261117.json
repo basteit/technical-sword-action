@@ -1,0 +1,116 @@
+{
+  "date": "2026-11-17",
+  "branch": "issue/101-quick-counter-heavy-parry",
+  "base": "d36de77981a97d86b7dba10926a2cbf4c8ee13d4",
+  "scope": [
+    "received quick counter rough",
+    "received heavy parry rough",
+    "preset 5 normal + heavy-only infinite HP enemy",
+    "forest tutorial documentation"
+  ],
+  "compile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "assetValidator": true,
+  "editMode": {
+    "passed": 338,
+    "total": 338
+  },
+  "playMode": {
+    "suite": "daily+combat+presentation+audio",
+    "total": 745,
+    "passed": 743,
+    "failed": 2,
+    "skipped": 0,
+    "durationSeconds": 202.775,
+    "xml": ".uloop/outputs/TestResults/20261117_055046.xml",
+    "initialFailures": [
+      "TechnicalSwordAction.PlayerState.Tests.CombatPolishSceneTests.SameDummyCanBeParriedAndCounterKickedTwiceWithoutResettingHp",
+      "TechnicalSwordAction.PlayerState.Tests.PrototypeCombatTrialTests.SwitchPreservesSelectedEncounterAndAxesStayIndependent(True)"
+    ],
+    "followup": {
+      "filter": "SameDummyCanBeParriedAndCounterKickedTwiceWithoutResettingHp|SwitchPreservesSelectedEncounterAndAxesStayIndependent",
+      "passed": 3,
+      "total": 3,
+      "note": "Updated two obsolete expectations; not a single 745/745 run."
+    }
+  },
+  "quickHeavyCases": {
+    "passed": 29,
+    "total": 29,
+    "includedInPlayMode": true,
+    "additionalInterruptionCases": 3,
+    "totalVerifiedAcrossRuns": 32
+  },
+  "realGameplayCaptures": {
+    "quick": {
+      "ticks": 200,
+      "durationSeconds": 3.3333333333333335,
+      "enemyHits": 1,
+      "enemyHpAfter": 30,
+      "playerHp": 100,
+      "weightAtImpact": "Light",
+      "sheathingSpriteAtHit": "CounterQuick_05",
+      "noSlow": true,
+      "trace": ".uloop\\outputs\\quick-heavy-integration-20261117\\quick\\trace.csv"
+    },
+    "heavy": {
+      "ticks": 210,
+      "durationSeconds": 3.5,
+      "enemyHits": 1,
+      "enemyHpAfter": 120,
+      "playerHp": 100,
+      "weightAtImpact": "Heavy",
+      "sheathingSpriteAtHit": "CounterQuick_05",
+      "noSlow": true,
+      "trace": ".uloop\\outputs\\quick-heavy-integration-20261117\\heavy\\trace.csv"
+    }
+  },
+  "preset5KeyboardSmoke": {
+    "input": "Digit5",
+    "activeEnemies": [
+      {
+        "name": "Melee_1",
+        "infiniteHp": false,
+        "reaction": "Light"
+      },
+      {
+        "name": "TrainingDummy",
+        "infiniteHp": true,
+        "attackCount": 1,
+        "reaction": "Heavy"
+      }
+    ]
+  },
+  "notPerformed": [
+    "human 15-minute feel acceptance",
+    "physical gamepad",
+    "separate PC",
+    "new Build/ZIP",
+    "story scene implementation"
+  ],
+  "materialStatus": "user-submitted provisional rough; not finished artwork",
+  "airborneHeavyInterruptionFollowup": {
+    "passed": 3,
+    "total": 3,
+    "cases": [
+      "target lost",
+      "disable",
+      "hit"
+    ],
+    "filter": "AirborneHeavyInterruptionAlwaysRestoresGravity"
+  },
+  "consoleErrorsAfterSmoke": 0,
+  "existingWorkProtection": {
+    "protectedFileCount": 153,
+    "protectedFilesIdentical": true,
+    "changedUnexpectedly": [],
+    "priorRequirementBodyMatches": [
+      "exact",
+      "lf"
+    ],
+    "otherCatalogEntriesIdentical": true,
+    "catalogReferencesIdentical": true
+  }
+}

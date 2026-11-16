@@ -56,6 +56,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             yield return null;
             arena = (Component)Object.FindFirstObjectByType(T("PrototypeCombatArena")); trial = arena.GetComponent(T("PrototypeCombatTrial"));
             player = (Component)Object.FindFirstObjectByType(T("PlayerStateMachine")); attack = player.GetComponent(T("PlayerAttack2D"));
+            // Preserve the legacy launch/timing comparison tested here; quick default behavior has separate coverage.
+            Call(player.GetComponent(T("PlayerParryCounter2D")), "TrySetQuickCounter", false);
             sceneDefaultTempo = Get<object>(trial, "AttackTempo").ToString();
             sceneDefaultHitFrames = Steps.Select(s => Get<int>(s, "activeStart")).ToArray();
             sceneDefaultController = player.GetComponent<Animator>().runtimeAnimatorController;
@@ -687,7 +689,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             if (mixed)
             {
                 Assert.That(Get<bool>(dummy.GetComponent(T("Damageable2D")), "HasInfiniteHealth"), Is.True);
-                Assert.That(Get<object>(dummy.GetComponent(T("EnemyMeleeChaser2D")), "Definition"), Is.SameAs(Get<object>(ai, "Definition")));
+                var heavyAi = dummy.GetComponent(T("EnemyMeleeChaser2D"));
+                Assert.That(Get<object>(heavyAi, "Definition"), Is.SameAs(Get<object>(arena, "heavyTrainingDefinition")));
+                Assert.That((bool)Call(heavyAi, "BeginCaptureAttack"), Is.True);
+                Assert.That(Get<object>(heavyAi, "AttackParryReaction").ToString(), Is.EqualTo("Heavy"));
                 Assert.That(Get<bool>(dummy.GetComponent(T("PrototypeEnemyArtPresentation")), "UsesDownParryPose"), Is.False);
             }
         }

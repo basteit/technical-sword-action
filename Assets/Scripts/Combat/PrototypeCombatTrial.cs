@@ -112,7 +112,7 @@ public sealed class PrototypeCombatTrial : MonoBehaviour
     {
         using (PrototypeDebugPanel.ReadableSkin())
         {
-            var area = new Rect(Screen.width - 310, 302, 298, 240);
+            var area = new Rect(Screen.width - 310, 332, 298, 240);
             PrototypeDebugPanel.DrawBackground(area);
             GUILayout.BeginArea(area, GUI.skin.box);
             GUILayout.Label("#34 Combat trial (switch = safe reset)");

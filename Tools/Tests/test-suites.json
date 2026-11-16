@@ -27,6 +27,7 @@
     { "name": "ProximityParryTests", "suites": ["daily", "combat"] },
     { "name": "PrototypeReachAndParryCueTests", "suites": ["combat", "presentation"] },
     { "name": "PrototypeCounterCinematicTests", "suites": ["combat", "presentation"] },
+    { "name": "PrototypeQuickHeavyTests", "suites": ["daily", "movement", "combat", "presentation"] },
     { "name": "PrototypeCombatTrialTests", "suites": ["combat"] },
     { "name": "PrototypeSfxTests", "suites": ["audio"] },
     { "name": "PrototypeDialogueTests", "suites": ["dialogue"] }
