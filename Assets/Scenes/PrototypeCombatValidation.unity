@@ -8767,7 +8767,7 @@ MonoBehaviour:
   parryCooldown: 0.22
   failLockDuration: 0.3
   successLockDuration: 0.16
-  parrySnapDistance: 2.5
+  parrySnapDistance: 3
   specialSkill: {fileID: 0}
   stateMachine: {fileID: 0}
   audioSource: {fileID: 0}

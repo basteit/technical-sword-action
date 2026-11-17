@@ -9,6 +9,9 @@ public static class PrototypeCombatSceneBuilder
 {
     public const string ScenePath = "Assets/Scenes/PrototypeCombatValidation.unity";
     public const float DashSpeed = 22.5f;
+    public const int ParryAcceptanceEndFrame = 17;
+    public const float ParrySourceRange = 3f;
+    public const float ParryHeightDifference = 1.5f;
     private const string SettingsPath = "Assets/Settings/PrototypeCombat";
 
     [MenuItem("Tools/Technical Sword Action/Prototype/Build Combat Validation Scene")]
@@ -91,7 +94,10 @@ public static class PrototypeCombatSceneBuilder
             Set(attack, "animator", animator); Set(attack, "lightHitstopFrames", 3); Set(attack, "maxComboStep", 2);
             Set(attack, "turnWithMoveInput", true);
 
-            var timing = LoadOrCreate<ParryTimingDefinition>("ParryTiming"); Set(parry, "timing", timing);
+            var timing = LoadOrCreate<ParryTimingDefinition>("ParryTiming");
+            timing.startFrame = 0; timing.justEndFrame = 3; timing.endFrame = ParryAcceptanceEndFrame;
+            EditorUtility.SetDirty(timing); Set(parry, "timing", timing);
+            Set(parry, "parrySnapDistance", ParrySourceRange); Set(parry, "maxParryHeightDifference", ParryHeightDifference);
             var counterData = LoadOrCreate<ParryCounterDefinition>("ParryCounter"); counterData.obstacleLayers = groundMask;
             EditorUtility.SetDirty(counterData); Set(counter, "definition", counterData);
             var attackData = LoadOrCreate<PlayerAttackDefinition>("FourStepAttack");

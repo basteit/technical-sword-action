@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ParryTimingDefinition
   startFrame: 0
   justEndFrame: 3
-  endFrame: 13
+  endFrame: 17
   failEndFrame: 26
   successFrames: 10
   justSuccessFrames: 8

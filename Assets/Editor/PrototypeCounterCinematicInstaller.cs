@@ -71,7 +71,8 @@ public static class PrototypeCounterCinematicInstaller
         if (!profile.IsValid) throw new InvalidOperationException("Invalid impact presentation references.");
         EditorUtility.SetDirty(profile); AssetDatabase.SaveAssetIfDirty(profile);
         var timing=AssetDatabase.LoadAssetAtPath<ParryTimingDefinition>("Assets/Settings/PrototypeCombat/ParryTiming.asset");
-        timing.startFrame=0;timing.justEndFrame=3;timing.endFrame=13;
+        // Presentation tuning must preserve the currently selected acceptance end.
+        timing.startFrame=0;timing.justEndFrame=3;
         EditorUtility.SetDirty(timing);AssetDatabase.SaveAssetIfDirty(timing);
     }
 
