@@ -21,6 +21,7 @@ public static class PrototypeCombatValidator
         errors.AddRange(PrototypePlayerArtInstaller.Validate());
         errors.AddRange(PrototypeCounterCinematicInstaller.Validate());
         errors.AddRange(PrototypeCombatTrialInstaller.Validate());
+        errors.AddRange(PrototypeQuickHeavyInstaller.Validate());
         const string folder = "Assets/Settings/PrototypeCombat/";
         var attack = AssetDatabase.LoadAssetAtPath<PlayerAttackDefinition>(folder + "FourStepAttack.asset");
         var counter = AssetDatabase.LoadAssetAtPath<ParryCounterDefinition>(folder + "ParryCounter.asset");

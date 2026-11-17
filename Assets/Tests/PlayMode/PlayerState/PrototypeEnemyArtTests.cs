@@ -285,6 +285,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         {
             Place(1, 30);
             var counter = player.GetComponent(T("PlayerParryCounter2D"));
+            Call(counter, "TrySetQuickCounter", false); // Retained kick/launch comparison.
             Call(counter, "RegisterParriedEnemy", health);
             Assert.That((bool)Call(player, "RequestAction", PlayerActionRequest.Attack), Is.True);
             Until(() => Get<int>(counter, "HitCount") == 1);
