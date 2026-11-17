@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: FeedbackSettings
   m_EditorClassIdentifier: Assembly-CSharp::CombatFeedbackSettings
   shake: 0
+  actorJitter: 1
   flash: 1
   vfx: 1
   parryShockwave: 0.65

@@ -495,7 +495,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     Assert.That(Get<object>(attack, "Definition"), Is.SameAs(Get<object>(trial, "ExpectedAttack")));
                     Assert.That(Get<bool>(trial, "ReferenceTiming"), Is.True);
                     Assert.That(Get<bool>(trial, "ReferenceReaction"), Is.True);
-                    Assert.That(ai.gameObject.activeSelf, Is.True);
+                    Assert.That(ai.gameObject.activeSelf, Is.False, "Preset 5 contains only the heavy training enemy.");
                     Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(30));
                     Assert.That(Get<object>(player.GetComponent(T("PlayerParryCounter2D")), "CinematicProfile"), Is.SameAs(counterProfile));
                     Call(trial, "SetEnemyTiming", false); Call(trial, "SetEnemyReaction", false);
@@ -674,7 +674,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for (int i = 0; i < 10; i++)
             {
                 Call(trial, "SetModes", false, true, false);
-                Assert.That(ai.gameObject.activeSelf, Is.True); Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(30));
+                Assert.That(ai.gameObject.activeSelf, Is.EqualTo(!mixed)); Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(30));
                 Assert.That(Get<int>(Get<object>(ai, "Definition"), "windupFrames"), Is.EqualTo(30));
                 Assert.That(Get<bool>(art, "UsesDownParryPose"), Is.True);
                 Call(trial, "SetModes", true, false, true);

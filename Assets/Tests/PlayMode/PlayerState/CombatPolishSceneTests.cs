@@ -73,12 +73,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(counter, "StockCount"), Is.Zero);
         }
         [Test]
-        public void TenCombinedResetsRestoreNormalAndUnlimitedDummyAndClearTimeAndPresentation()
+        public void TenHeavyResetsRestoreOneUnlimitedEnemyAndClearTimeAndPresentation()
         {
             for (int i = 0; i < 10; i++)
             {
                 Call(arena, "ResetTrainingEncounter", true);
                 Assert.That(Root("StrongMelee").activeSelf, Is.False);
+                Assert.That(Root("Melee_1").activeSelf || Root("Melee_2").activeSelf, Is.False);
                 var dummy = Root("TrainingDummy"); var dummyHealth = dummy.GetComponent(T("Damageable2D"));
                 Assert.That(dummy.activeSelf && Get<bool>(dummyHealth, "HasInfiniteHealth"), Is.True);
                 Assert.That(Get<int>(dummyHealth, "CurrentHp"), Is.EqualTo(Get<int>(dummyHealth, "MaxHp")));
@@ -114,9 +115,11 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 Assert.That(Get<int>(target, "DeathCount"), Is.Zero);
                 Assert.That(dummy.GetComponent<Collider2D>().enabled, Is.True);
             }
+            Call(arena, "ResetArena", false);
             Assert.That(Call(normal, "TryTakeCombatHit", 900, Vector2.right, strongHit), Is.True);
             Assert.That(Get<int>(normal, "CurrentHp"), Is.Zero);
             Assert.That(Get<int>(normal, "DeathCount"), Is.EqualTo(1));
+            Call(arena, "ResetTrainingEncounter", true);
             Assert.That(Get<bool>(target, "ParticipatingInCombat"), Is.True);
             Call(target, "ApplyParryStun", Enum.Parse(T("ParryResult"), "Just"));
             Assert.That(Get<bool>(target, "IsParryStaggered"), Is.True, "Parry still opens the counter opportunity.");

@@ -66,6 +66,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     private float FlashStrength => feedback != null && feedback.Settings != null ? Mathf.Clamp01(feedback.Settings.flash) : 1;
     private float VfxStrength => feedback != null && feedback.Settings != null ? Mathf.Clamp01(feedback.Settings.vfx) : 1;
     private float ShakeStrength => feedback != null && feedback.Settings != null ? Mathf.Clamp01(feedback.Settings.shake) : 1;
+    private float ActorJitterStrength => feedback != null && feedback.Settings != null ? Mathf.Clamp01(feedback.Settings.actorJitter) : 1;
     public int CombatTickOrder => 400;
     public float DimAlpha => dimmer != null && dimmer.enabled ? dimmer.color.a : 0;
     public bool IsCharged => charged;
@@ -195,8 +196,12 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
             state.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.ParryFail)
             source.sprite = Profile.parryWaitSprite;
         // Hit resolution precedes Animator.Update. Preserve the success cel at the end of this tick too.
-        else if (state.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.ParrySuccess && ParryImpactTick == CombatTimeController.TickCount)
-            source.sprite = ParryContactSprite;
+        else if (state.ActionState == TechnicalSwordAction.PlayerState.PlayerActionState.ParrySuccess)
+        {
+            if (parry.LastReactionWeight == ParryReactionWeight.Heavy && heavyParryProfile != null && heavyParryProfile.IsValid)
+                source.sprite = heavyParryProfile.reaction.At(heavyParryProfile.reaction.TotalFrames - 1);
+            else if (ParryImpactTick == CombatTimeController.TickCount) source.sprite = ParryContactSprite;
+        }
     }
     public bool TryPresentParryImpact(Damageable2D target, ParryResult result)
     {
@@ -385,7 +390,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     private void AdvanceParryJitter(float seconds)
     {
         if (parryJitterAge < 0 && !parryEnemyRecoilPose) return;
-        if (!parrySequenceActive || ShakeStrength <= 0 ||
+        if (!parrySequenceActive || ActorJitterStrength <= 0 ||
             parryJitterTarget == null || !parryJitterTarget.IsAlive || !parryJitterTarget.gameObject.activeInHierarchy ||
             playerArt == null || !playerArt.isActiveAndEnabled ||
             (parryJitterArt != null && !parryJitterArt.isActiveAndEnabled))
@@ -402,12 +407,12 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
                 parryEnemyRecoilPose = true;
             }
             // The body is already retreating on the combat clock; only the drawing's tilt is visual.
-            parryJitterArt.SetImpactOffset(this, 0, Profile.parryEnemyReleaseLeanDegrees * ShakeStrength * parryJitterFacing);
+            parryJitterArt.SetImpactOffset(this, 0, Profile.parryEnemyReleaseLeanDegrees * ActorJitterStrength * parryJitterFacing);
             return;
         }
         if (!parryJitterFresh) parryJitterAge += seconds;
         parryJitterFresh = false;
-        float offset = Profile.SampleParryJitter(parryJitterAge, ShakeStrength) * parryJitterFacing;
+        float offset = Profile.SampleParryJitter(parryJitterAge, ActorJitterStrength) * parryJitterFacing;
         playerArt.SetImpactOffset(this, -offset);
         if (parryJitterArt != null) parryJitterArt.SetImpactOffset(this, offset);
         if (parryJitterCue != null) parryJitterCue.SetImpactOffset(this, offset);
@@ -504,7 +509,7 @@ public sealed class PrototypeCounterPresentation : MonoBehaviour, ICombatTickLis
     public void AdvanceVisuals(float realSeconds)
     {
         if (parryLight != null && FlashStrength <= 0) { parryLightAge = -1; parryLight.ResetLight(); }
-        if (ShakeStrength <= 0) ClearParryJitter();
+        if (ActorJitterStrength <= 0) ClearParryJitter();
         if (counterCameraBridgeActive && ShakeStrength <= 0)
         { counterCameraBridgeActive = false; feedback?.ReleaseCameraFocus(this, true); }
         if (parryCameraActive && (ShakeStrength <= 0 || Profile == null || !Profile.parryCameraEnabled ||

@@ -10,7 +10,7 @@ public sealed class HeavyParryProfile : ScriptableObject
     public Vector2 contactOffset = new Vector2(1, .25f);
     [Min(1)] public int followThroughFrames = 18;
     [Min(1)] public int recoilFrames = 14;
-    [Min(0)] public float recoilDistance = .625f;
+    [Min(0)] public float recoilDistance = 1.25f;
     public bool holdAirborneHeight = true;
     public LayerMask obstacleLayers;
     public Sprite ContactSprite => reaction?.At(reaction.hitFrame);

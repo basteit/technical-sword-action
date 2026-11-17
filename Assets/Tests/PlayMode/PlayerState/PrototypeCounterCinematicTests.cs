@@ -104,6 +104,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             body = player.GetComponent<Rigidbody2D>(); ((Behaviour)player.GetComponent(T("PlayerInputRouter"))).enabled = false;
             normalCameraSize = Camera.main.orthographicSize;
             Set(Get<object>(feedback, "Settings"), "masterVolume", 0f); Set(Get<object>(feedback, "Settings"), "shake", 0f);
+            Set(Get<object>(feedback, "Settings"), "actorJitter", 0f);
             Frames(2); yield return null; realFrames = 0;
         }
         [UnityTearDown] public IEnumerator Teardown()
@@ -926,7 +927,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(30,-1)] [TestCase(60,-1)] [TestCase(120,-1)]
         public void HitstopJittersBothDrawingsThenTheEnemyRetreatsInAFixedPose(int fps,int direction)
         {
-            Set(Get<object>(feedback,"Settings"),"shake",1f);
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);
             var target=BeginAuthoredAdaptiveParry(direction);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
             var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
             var renderer=Get<SpriteRenderer>(enemyArt,"Artwork");
@@ -986,7 +987,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(0f)] [TestCase(.5f)] [TestCase(1f)]
         public void EnemyRetreatPausesButKeepsTheSameDistanceAtEveryShakeSetting(float shake)
         {
-            var settings=Get<object>(feedback,"Settings");Set(settings,"shake",shake);
+            var settings=Get<object>(feedback,"Settings");Set(settings,"shake",shake);Set(settings,"actorJitter",shake);
             var target=BeginAuthoredAdaptiveParry(1);
             Vector3 initial=target.transform.position;
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));Until(()=>!TimeValue<bool>("IsHitStopped"));
@@ -1007,7 +1008,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(false)] [TestCase(true)]
         public void EnemyRetreatDoesNotCostTheQueuedOrDelayedCounter(bool queued)
         {
-            Set(Get<object>(feedback,"Settings"),"shake",1f);
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);
             var target=BeginAuthoredAdaptiveParry(1);
             float initialX=target.transform.position.x;
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
@@ -1027,7 +1028,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("Reset")] [TestCase("Hit")] [TestCase("TargetDisabled")]
         public void EnemyRetreatStopsWithoutResumingAfterInterruption(string operation)
         {
-            Set(Get<object>(feedback,"Settings"),"shake",1f);
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);
             var target=BeginAuthoredAdaptiveParry(1);
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));Until(()=>!TimeValue<bool>("IsHitStopped"));
             Frames(3);
@@ -1063,7 +1064,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(1f,1f,0f,true,true,false)] [TestCase(.5f,.5f,.5f,true,true,true)] [TestCase(0f,0f,0f,false,false,false)]
         public void OrangeParryVisualSettingsDoNotChangeTheImpactStopOrStock(float vfx,float flash,float shake,bool sparks,bool glow,bool jitter)
         {
-            var settings=Get<object>(feedback,"Settings");Set(settings,"vfx",vfx);Set(settings,"flash",flash);Set(settings,"shake",shake);
+            var settings=Get<object>(feedback,"Settings");Set(settings,"vfx",vfx);Set(settings,"flash",flash);Set(settings,"shake",shake);Set(settings,"actorJitter",shake);
             BeginAuthoredAdaptiveParry(1);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
             Assert.That(Get<bool>(presentation,"IsOrangeParrySparkVisible"),Is.EqualTo(sparks));
             Assert.That(Get<bool>(presentation,"IsOrangeParryGlowVisible"),Is.EqualTo(glow));
@@ -1074,14 +1075,14 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [Test] public void OrangeAccentAndActorJitterPauseThenZeroSettingsCannotResurrectOldEffects()
         {
-            var settings=Get<object>(feedback,"Settings");Set(settings,"shake",1f);
+            var settings=Get<object>(feedback,"Settings");Set(settings,"shake",1f);Set(settings,"actorJitter",1f);
             BeginAuthoredAdaptiveParry(1);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));Frames(3);
             float offset=Get<float>(art,"ImpactOffsetX");var accent=Get<Component>(presentation,"orangeImpact");float age=Get<float>(accent,"Elapsed");
             Static("SetPaused",true);Frames(20);
             Assert.That(Get<float>(art,"ImpactOffsetX"),Is.EqualTo(offset));Assert.That(Get<float>(accent,"Elapsed"),Is.EqualTo(age));
-            Set(settings,"shake",0f);Set(settings,"flash",0f);Call(presentation,"AdvanceVisuals",0f);
+            Set(settings,"shake",0f);Set(settings,"actorJitter",0f);Set(settings,"flash",0f);Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);Assert.That(Get<bool>(presentation,"IsOrangeParryGlowVisible"),Is.False);
-            Set(settings,"shake",1f);Set(settings,"flash",1f);Call(presentation,"AdvanceVisuals",0f);
+            Set(settings,"shake",1f);Set(settings,"actorJitter",1f);Set(settings,"flash",1f);Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Zero);Assert.That(Get<bool>(presentation,"IsOrangeParryGlowVisible"),Is.False);
             Assert.That(Get<bool>(presentation,"IsOrangeParrySparkVisible"),Is.True);
             Set(settings,"vfx",0f);Call(presentation,"AdvanceVisuals",0f);Set(settings,"vfx",1f);Call(presentation,"AdvanceVisuals",0f);
@@ -1092,7 +1093,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("SessionReset")] [TestCase("PlayerArtDisable")] [TestCase("EnemyArtDisable")]
         public void OrangeImpactInterruptionClearsBothDrawingOffsetsAndAdditionalEffects(string operation)
         {
-            Set(Get<object>(feedback,"Settings"),"shake",1f);
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);
             var target=BeginAuthoredAdaptiveParry(1);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
             var enemyArt=target.GetComponent(T("PrototypeEnemyArtPresentation"));
             Assert.That(Get<float>(art,"ImpactOffsetX"),Is.Not.Zero);Assert.That(Get<int>(presentation,"OrangeParryEffectCount"),Is.EqualTo(3));
@@ -1110,7 +1111,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         [Test] public void PlaceholderEnemyDrawingAlsoJittersWithoutMovingItsRoot()
         {
-            Set(Get<object>(feedback,"Settings"),"shake",1f);var target=BeginActualParry(1,true);
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);var target=BeginActualParry(1,true);
             var cue=target.GetComponent(T("EnemyCombatCue2D"));Vector3 root=target.transform.position;
             Assert.That(Get<float>(cue,"ImpactOffsetX"),Is.EqualTo(-Get<float>(art,"ImpactOffsetX")));
             Frames(5);Assert.That(Get<float>(cue,"ImpactOffsetX"),Is.Not.Zero);Assert.That(target.transform.position,Is.EqualTo(root));
@@ -1120,7 +1121,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(30,-1)] [TestCase(60,-1)] [TestCase(120,-1)]
         public void ParryCameraStartsReturningOnTheFirstHitstopReleaseFrame(int fps,int direction)
         {
-            Set(Get<object>(feedback,"Settings"),"shake",1f);Vector3 original=Camera.main.transform.position;
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);Vector3 original=Camera.main.transform.position;
             BeginAuthoredAdaptiveParry(direction);
             Assert.That(Get<string>(presentation,"ParryCameraPhase"),Is.EqualTo("Preparation"));
             Assert.That(Camera.main.orthographicSize,Is.EqualTo(normalCameraSize),"The first preparation frame holds zoom while position leads.");
@@ -1150,7 +1151,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             try
             {
                 Set(profile,"parryCameraReturnOnHitstopEnd",false);Set(profile,"parryExpressiveCamera",expressive);
-                Set(Get<object>(feedback,"Settings"),"shake",1f);BeginAuthoredAdaptiveParry(1);
+                Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);BeginAuthoredAdaptiveParry(1);
                 Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));Until(()=>!TimeValue<bool>("IsHitStopped"));
                 Assert.That(Camera.main.orthographicSize,Is.EqualTo(4.25f));Assert.That(Get<string>(presentation,"ParryCameraPhase"),Is.EqualTo("Impact"));
                 Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));
@@ -1164,7 +1165,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(0f)] [TestCase(.5f)] [TestCase(1f)]
         public void ParryCameraIntensityDoesNotChangeSuccessOrHitstop(float strength)
         {
-            Set(Get<object>(feedback,"Settings"),"shake",strength);BeginAuthoredAdaptiveParry(1);
+            Set(Get<object>(feedback,"Settings"),"shake",strength);Set(Get<object>(feedback,"Settings"),"actorJitter",strength);BeginAuthoredAdaptiveParry(1);
             Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
             Assert.That(Camera.main.orthographicSize,Is.EqualTo(Mathf.Lerp(normalCameraSize,4.25f,strength)).Within(.0001f));
             Assert.That(TimeValue<int>("HitstopRemainingTicks"),Is.EqualTo(30));Assert.That(Get<int>(counter,"StockCount"),Is.EqualTo(1));
@@ -1173,22 +1174,22 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("Preparation")] [TestCase("Impact")] [TestCase("Returning")]
         public void ParryCameraPauseAndZeroSettingRestoreWithoutResurrectingTheOldFocus(string phase)
         {
-            var settings=Get<object>(feedback,"Settings");Set(settings,"shake",1f);Vector3 original=Camera.main.transform.position;
+            var settings=Get<object>(feedback,"Settings");Set(settings,"shake",1f);Set(settings,"actorJitter",1f);Vector3 original=Camera.main.transform.position;
             BeginAuthoredAdaptiveParry(1);
             if(phase!="Preparation")Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
             if(phase=="Returning")Until(()=>Get<string>(presentation,"ParryCameraPhase")=="Returning");
             Static("SetPaused",true);Vector3 held=Camera.main.transform.position;float size=Camera.main.orthographicSize;Frames(20);
             Assert.That(Camera.main.transform.position,Is.EqualTo(held));Assert.That(Camera.main.orthographicSize,Is.EqualTo(size));
-            Set(settings,"shake",0f);Call(presentation,"AdvanceVisuals",0f);
+            Set(settings,"shake",0f);Set(settings,"actorJitter",0f);Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Camera.main.transform.position,Is.EqualTo(original));Assert.That(Camera.main.orthographicSize,Is.EqualTo(normalCameraSize));
-            Set(settings,"shake",1f);Call(presentation,"AdvanceVisuals",0f);
+            Set(settings,"shake",1f);Set(settings,"actorJitter",1f);Call(presentation,"AdvanceVisuals",0f);
             Assert.That(Get<bool>(presentation,"IsParryCameraActive"),Is.False);Static("SetPaused",false);
         }
         [TestCase("Preparation","Reset")] [TestCase("Impact","TargetLost")] [TestCase("Returning","Hit")]
         [TestCase("Returning","Disable")] [TestCase("Returning","Reset")] [TestCase("Preparation","TargetLost")]
         public void ParryCameraInterruptionRestoresItsSavedBaseWithoutALingeringShake(string phase,string operation)
         {
-            Set(Get<object>(feedback,"Settings"),"shake",1f);Vector3 original=Camera.main.transform.position;
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);Vector3 original=Camera.main.transform.position;
             var target=BeginAuthoredAdaptiveParry(1);
             if(phase!="Preparation")Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
             if(phase=="Returning")Until(()=>Get<string>(presentation,"ParryCameraPhase")=="Returning");
@@ -1206,7 +1207,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(false)] [TestCase(true)]
         public void ParryCameraTransfersToCounterWithoutReplacingItsOriginalReturnView(bool requestDuringReturn)
         {
-            Set(Get<object>(feedback,"Settings"),"shake",1f);Vector3 original=Camera.main.transform.position;
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);Vector3 original=Camera.main.transform.position;
             BeginAuthoredAdaptiveParry(1);
             if(requestDuringReturn)Until(()=>Get<string>(presentation,"ParryCameraPhase")=="Returning");
             Call(player,"RequestAction",PlayerActionRequest.Attack);
@@ -1223,7 +1224,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             try
             {
                 Set(profile,"parryExpressiveCamera",expressive);Set(profile,"parryReferenceAccent",reference);
-                Set(Get<object>(feedback,"Settings"),"shake",1f);BeginAuthoredAdaptiveParry(1);
+                Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);BeginAuthoredAdaptiveParry(1);
                 Assert.That(Camera.main.orthographicSize,expressive?Is.EqualTo(normalCameraSize):Is.LessThan(normalCameraSize));
                 Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
                 Assert.That(Get<int>(presentation,"ParryParticleCount"),Is.EqualTo(reference?32:14));
@@ -1238,7 +1239,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(30,-1)] [TestCase(60,-1)] [TestCase(120,-1)]
         public void QueuedCounterCameraMovesDirectlyFromParryToChargeWithoutWidening(int fps,int direction)
         {
-            Set(Get<object>(feedback,"Settings"),"shake",1f);Vector3 original=Camera.main.transform.position;
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);Vector3 original=Camera.main.transform.position;
             var target=BeginAuthoredAdaptiveParry(direction);Until(()=>!Get<bool>(presentation,"IsParryImpactPending"));
             Assert.That((bool)Call(player,"RequestAction",PlayerActionRequest.Attack),Is.True);
             int guard=0;while(!Get<bool>(counter,"IsActive")&&guard++<fps*2)
@@ -1254,7 +1255,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase(1f,1)] [TestCase(.5f,1)] [TestCase(.5f,-1)]
         public void CounterInputDuringCameraReturnContinuesFromItsCurrentPose(float strength,int direction)
         {
-            Set(Get<object>(feedback,"Settings"),"shake",strength);BeginAuthoredAdaptiveParry(direction);
+            Set(Get<object>(feedback,"Settings"),"shake",strength);Set(Get<object>(feedback,"Settings"),"actorJitter",strength);BeginAuthoredAdaptiveParry(direction);
             Until(()=>Get<string>(presentation,"ParryCameraPhase")=="Returning");Frames(2);
             Vector3 pose=Camera.main.transform.position;float size=Camera.main.orthographicSize;
             Call(player,"RequestAction",PlayerActionRequest.Attack);Call(presentation,"AdvanceVisuals",0f);Call(feedback,"AdvanceVisuals",0f);
@@ -1270,7 +1271,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("Reset")] [TestCase("TargetLost")] [TestCase("Disable")] [TestCase("Death")]
         public void CounterCameraBridgeRestoresTheOriginalBaselineWhenInterrupted(string operation)
         {
-            Set(Get<object>(feedback,"Settings"),"shake",1f);Vector3 original=Camera.main.transform.position;
+            Set(Get<object>(feedback,"Settings"),"shake",1f);Set(Get<object>(feedback,"Settings"),"actorJitter",1f);Vector3 original=Camera.main.transform.position;
             var target=BeginAuthoredAdaptiveParry(1);Call(player,"RequestAction",PlayerActionRequest.Attack);
             Until(()=>Get<bool>(counter,"IsActive"));Assert.That(Get<bool>(presentation,"IsCounterCameraBridgeActive"),Is.True);
             if(operation=="Reset")Call(arena,"ResetActionsOnly");

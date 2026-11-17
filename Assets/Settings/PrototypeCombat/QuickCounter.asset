@@ -65,8 +65,8 @@ MonoBehaviour:
     - {fileID: 21300000, guid: d6bed50f3cb64fc4f855664718a4432a, type: 3}
     - {fileID: 21300000, guid: c0c176e9e73e47540813fff5c3fff24f, type: 3}
     eyeFrames: []
-    durations: 020000000200000002000000020000000100000007000000
-    hitFrame: 8
+    durations: 0a000000030000000300000003000000040000000d000000
+    hitFrame: 19
     branchFrame: 0
     chargeFrame: 0
     releaseFrame: 0
@@ -80,7 +80,8 @@ MonoBehaviour:
   transferFrames: 8
   travelStartFrame: 4
   travelFrames: 4
-  hitFrame: 16
+  sheatheFrame: 27
+  hitFrame: 35
   hitstopFrames: 8
   targetSpacing: 1.2
   hitRange: 2.2

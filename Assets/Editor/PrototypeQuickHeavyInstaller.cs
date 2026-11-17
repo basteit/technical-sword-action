@@ -37,13 +37,15 @@ public static class PrototypeQuickHeavyInstaller
                 frames = (Sprite[])legacy.Transfer.frames.Clone(), durations = (int[])legacy.Transfer.durations.Clone() };
             quick.strike = new VideoArtLibrary.Motion {
                 name = "CounterQuick", provisional = true, frames = LoadSprites("CounterQuick", 6),
-                durations = new[] { 2, 2, 2, 2, 1, 7 }, hitFrame = 8 };
+                durations = new[] { 10, 3, 3, 3, 4, 13 }, hitFrame = 19 };
+            quick.sheatheFrame = 27; quick.hitFrame = 35;
             quick.clip = BuildClip("PlayerPrototype_CounterQuick", quick.EndFrame, quick.Sample);
             var heavy = LoadOrCreate<HeavyParryProfile>(HeavyPath);
             heavy.reaction = new VideoArtLibrary.Motion {
                 name = "ParrySuccessHeavy", provisional = true, frames = LoadSprites("ParryHeavy", 8),
                 durations = new[] { 2, 2, 1, 2, 3, 3, 3, 3 }, hitFrame = 4 };
             heavy.obstacleLayers = counter.Definition.obstacleLayers;
+            heavy.recoilDistance = 1.25f;
             heavy.clip = BuildClip("PlayerPrototype_ParrySuccessHeavy", heavy.reaction.TotalFrames, frame => heavy.reaction.At(frame));
             if (!quick.IsValid || !heavy.IsValid) throw new InvalidOperationException("The received rough profiles are invalid.");
             Save(quick); Save(heavy);
@@ -81,13 +83,27 @@ public static class PrototypeQuickHeavyInstaller
             SetReference(arena, "heavyTrainingDefinition", enemy);
             EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene);
             var errors = Validate(); if (errors.Length != 0) throw new InvalidOperationException(string.Join("\n", errors));
-            Debug.Log("[QuickHeavy] Received roughs installed. Quick is default; preset 5 uses a normal enemy and a heavy-only infinite-HP enemy. Originals/video clips preserved.");
+            Debug.Log("[QuickHeavy] Received roughs installed. Quick is default; preset 5 uses one heavy-only infinite-HP enemy. Originals/video clips preserved.");
         }
         finally
         {
             if (opened) EditorSceneManager.CloseScene(scene, true);
             if (previous.IsValid()) SceneManager.SetActiveScene(previous);
         }
+    }
+    [MenuItem("Tools/Technical Sword Action/Prototype/Refresh Quick Heavy Feedback Tuning")]
+    public static void RefreshTuning()
+    {
+        if (Application.isPlaying) throw new InvalidOperationException("Exit PlayMode before tuning assets.");
+        var quick = AssetDatabase.LoadAssetAtPath<QuickCounterProfile>(QuickPath);
+        var heavy = AssetDatabase.LoadAssetAtPath<HeavyParryProfile>(HeavyPath);
+        if (quick == null || heavy == null) throw new InvalidOperationException("Install received roughs first.");
+        quick.strike.durations = new[] { 10, 3, 3, 3, 4, 13 };
+        quick.strike.hitFrame = 19; quick.sheatheFrame = 27; quick.hitFrame = 35;
+        quick.clip = BuildClip("PlayerPrototype_CounterQuick", quick.EndFrame, quick.Sample);
+        heavy.recoilDistance = 1.25f;
+        Save(quick); Save(heavy);
+        var errors = Validate(); if (errors.Length != 0) throw new InvalidOperationException(string.Join("\n", errors));
     }
     public static string[] Validate()
     {
@@ -97,6 +113,7 @@ public static class PrototypeQuickHeavyInstaller
         var enemy = AssetDatabase.LoadAssetAtPath<EnemyCombatDefinition>(HeavyEnemyPath);
         if (quick == null || !quick.IsValid || quick.clip == null ||
             Mathf.Abs(quick.clip.length * 60 - quick.EndFrame) > .001f ||
+            PrototypePlayerArtInstaller.Sample(quick.clip, quick.sheatheFrame / 60f) != quick.Sample(quick.sheatheFrame) ||
             PrototypePlayerArtInstaller.Sample(quick.clip, quick.hitFrame / 60f) != quick.ContactSprite)
             errors.Add("Quick counter contact clip must agree with the single hit tick.");
         if (heavy == null || !heavy.IsValid || heavy.clip == null ||

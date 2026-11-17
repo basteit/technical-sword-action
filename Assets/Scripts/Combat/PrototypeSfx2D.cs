@@ -82,7 +82,7 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener, ICombat
         if (attack != null) attack.StepStarted += OnStep;
         if (counter != null)
         {
-            counter.BlinkStarted += OnTransfer; counter.ChargeStarted += OnCharge;
+            counter.BlinkStarted += OnTransfer; counter.ChargeStarted += OnCharge; counter.Sheathed += OnSheathed;
             counter.ChargeReleased += OnRelease; counter.Finished += OnCounterFinished; counter.Landed += OnCounterLanded;
         }
         if (health != null) health.DamageReceived += OnDamage;
@@ -96,6 +96,7 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener, ICombat
     }
     private void OnStep(int step) { currentStep = step; swingPending = sheathePending = true; }
     private void OnTransfer() => Play(PrototypeSfxCue.CounterTransfer);
+    private void OnSheathed() => Play(PrototypeSfxCue.Sheathe);
     // The authored effect reaches its largest cel six combat ticks after the pose reveal.
     private void OnCharge()
     {
@@ -129,7 +130,6 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener, ICombat
             _ => PrototypeSfxCue.ParryMiss
         };
         if (kind == CombatFeedbackKind.Counter) StopCharge();
-        if (kind == CombatFeedbackKind.Counter && counter != null && counter.UsesQuickCounter) Play(PrototypeSfxCue.Sheathe);
         Play(cue, true); return true;
     }
 
@@ -286,7 +286,7 @@ public sealed class PrototypeSfx2D : MonoBehaviour, ICombatTickListener, ICombat
         if (attack != null) attack.StepStarted -= OnStep;
         if (counter != null)
         {
-            counter.BlinkStarted -= OnTransfer; counter.ChargeStarted -= OnCharge;
+            counter.BlinkStarted -= OnTransfer; counter.ChargeStarted -= OnCharge; counter.Sheathed -= OnSheathed;
             counter.ChargeReleased -= OnRelease; counter.Finished -= OnCounterFinished; counter.Landed -= OnCounterLanded;
         }
         if (health != null) health.DamageReceived -= OnDamage;

@@ -21,7 +21,7 @@ public static class PrototypeQuickHeavyCaptureUtility
         if (heavy) arena.ResetTrainingEncounter(true); else arena.ResetArena(false);
         return "Prepared; capture after the next editor frame.";
     }
-    public static string Capture(bool heavy)
+    public static string Capture(bool heavy, bool performCounter = true)
     {
         if (!Application.isPlaying) throw new InvalidOperationException("PlayMode required.");
         var arena = UnityEngine.Object.FindFirstObjectByType<PrototypeCombatArena>();
@@ -38,9 +38,9 @@ public static class PrototypeQuickHeavyCaptureUtility
         var render = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32); render.Create();
         var image = new Texture2D(1280, 720, TextureFormat.RGB24, false);
         var oldActive = RenderTexture.active;
-        string folder = Path.GetFullPath(".uloop/outputs/quick-heavy-integration-20261117/" + (heavy ? "heavy" : "quick"));
+        string folder = Path.GetFullPath(".uloop/outputs/quick-heavy-tuning-20261117-v2/" + (heavy ? "heavy" : "quick") + (performCounter ? "" : "-idle"));
         Directory.CreateDirectory(folder);
-        var rows = new List<string> { "tick,seconds,playerSprite,enemySprite,enemyState,enemyHp,enemyHits,parryWeight,parryPhase,counterPhase,hitstop,slowScale,playerX,playerY,playerHp" };
+        var rows = new List<string> { "tick,seconds,playerSprite,enemySprite,enemyState,enemyHp,enemyHits,parryWeight,parryPhase,counterPhase,hitstop,slowScale,playerX,playerY,playerHp,counterElapsed,sheatheFrame,hitFrame,actorOffsetX,playerAction" };
         int saved = 0, ticks = 0, counterEndedAt = -1;
         try
         {
@@ -63,14 +63,14 @@ public static class PrototypeQuickHeavyCaptureUtility
                 {
                     if (player.RequestAction(PlayerActionRequest.Parry)) requestedParry = true;
                 }
-                if (!requestedCounter && parry.SuccessCount > initialParries && player.ActionState == PlayerActionState.Neutral)
+                if (performCounter && !requestedCounter && parry.SuccessCount > initialParries && player.ActionState == PlayerActionState.Neutral)
                 {
                     if (player.RequestAction(PlayerActionRequest.Attack)) requestedCounter = true;
                 }
                 clock.AdvanceFrame(1d / 60); presentation.AdvanceVisuals(1f / 60); feedback.AdvanceVisuals(1f / 60);
                 player.GetComponent<PrototypePlayerArtPresentation>().RefreshVisual();
                 var enemyDrawing = target.GetComponent<PrototypeEnemyArtPresentation>();
-                rows.Add(FormattableString.Invariant($"{ticks},{ticks / 60d},{player.GetComponent<SpriteRenderer>().sprite.name},{enemyDrawing?.Artwork.sprite.name},{target.CurrentStateName},{health.CurrentHp},{health.HitCount},{parry.LastReactionWeight},{presentation.ParryPresentationPhase},{counter.CinematicPhase},{CombatTimeController.HitstopRemainingTicks},{CombatTimeController.SlowScale},{body.position.x},{body.position.y},{receiver.CurrentHp}"));
+                rows.Add(FormattableString.Invariant($"{ticks},{ticks / 60d},{player.GetComponent<SpriteRenderer>().sprite.name},{enemyDrawing?.Artwork.sprite.name},{target.CurrentStateName},{health.CurrentHp},{health.HitCount},{parry.LastReactionWeight},{presentation.ParryPresentationPhase},{counter.CinematicPhase},{CombatTimeController.HitstopRemainingTicks},{CombatTimeController.SlowScale},{body.position.x},{body.position.y},{receiver.CurrentHp},{counter.ElapsedFrames},{counter.QuickProfile.sheatheFrame},{counter.HitFrame},{presentation.ParryActorJitterX},{player.ActionState}"));
                 if (ticks % 2 == 0)
                 {
                     RenderPipeline.SubmitRenderRequest(camera, new UniversalRenderPipeline.SingleCameraRequest { destination = render });
@@ -78,10 +78,13 @@ public static class PrototypeQuickHeavyCaptureUtility
                     File.WriteAllBytes(Path.Combine(folder, $"frame-{saved++:D4}.png"), image.EncodeToPNG());
                 }
                 if (counter.StartCount > initialStarts && !counter.IsActive && counterEndedAt < 0) counterEndedAt = ticks;
+                if (!performCounter && parry.SuccessCount > initialParries && !presentation.IsParrySequenceActive &&
+                    player.ActionState == PlayerActionState.Neutral && counterEndedAt < 0) counterEndedAt = ticks;
                 if (counterEndedAt >= 0 && ticks >= counterEndedAt + 24) break;
             }
             File.WriteAllText(Path.Combine(folder, "trace.csv"), string.Join("\n", rows));
-            if (!requestedParry || !requestedCounter || counter.HitCount != initialHits + 1 || receiver.CurrentHp != receiver.MaxHp || counter.IsActive)
+            if (!requestedParry || (performCounter && !requestedCounter) || counter.HitCount != initialHits + (performCounter ? 1 : 0) ||
+                receiver.CurrentHp != receiver.MaxHp || counter.IsActive || counterEndedAt < 0)
                 throw new InvalidOperationException($"Review recording incomplete: parry={requestedParry}, counter={requestedCounter}, hits={counter.HitCount-initialHits}, playerHp={receiver.CurrentHp}, active={counter.IsActive}; inspect trace.csv.");
             return folder;
         }

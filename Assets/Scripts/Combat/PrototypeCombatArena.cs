@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 /// <summary>Repeatable acceptance arena, separate from filming and user scenes.</summary>
 public sealed class PrototypeCombatArena : MonoBehaviour
 {
-    private enum Encounter { ActionsOnly, OneNormal, TwoNormals, Training, MixedTraining }
+    private enum Encounter { ActionsOnly, OneNormal, TwoNormals, Training, HeavyTraining }
 
     [SerializeField] private PlayerStateMachine player;
     [SerializeField] private EnemyMeleeChaser2D[] enemies;
@@ -65,7 +65,7 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     private static float Cycle(float value) => value >= .99f ? 0 : value < .49f ? .5f : 1;
     public void ResetActionsOnly() => SelectEncounter(Encounter.ActionsOnly);
     public void ResetArena(bool twoTargets) => SelectEncounter(twoTargets ? Encounter.TwoNormals : Encounter.OneNormal);
-    public void ResetTrainingEncounter(bool includeNormal) => SelectEncounter(includeNormal ? Encounter.MixedTraining : Encounter.Training);
+    public void ResetTrainingEncounter(bool heavyAttackOnly) => SelectEncounter(heavyAttackOnly ? Encounter.HeavyTraining : Encounter.Training);
     public void ResetCurrentEncounter() => SelectEncounter(encounterPreset);
 
     private void SelectEncounter(Encounter preset)
@@ -74,7 +74,7 @@ public sealed class PrototypeCombatArena : MonoBehaviour
         int normalCount = preset switch
         {
             Encounter.TwoNormals => 2,
-            Encounter.OneNormal or Encounter.MixedTraining => 1,
+            Encounter.OneNormal => 1,
             _ => 0
         };
         coordinator?.ResetEncounter(); feedback?.ResetPresentation();
@@ -101,10 +101,10 @@ public sealed class PrototypeCombatArena : MonoBehaviour
             enemies[i].ResetForCapture(player.transform, false);
             enemies[i].gameObject.SetActive(i < normalCount);
         }
-        if (trainingDummy != null && (preset is Encounter.Training or Encounter.MixedTraining))
+        if (trainingDummy != null && (preset is Encounter.Training or Encounter.HeavyTraining))
         {
             var health = trainingDummy.GetComponent<Damageable2D>();
-            if (preset == Encounter.MixedTraining && heavyTrainingDefinition != null)
+            if (preset == Encounter.HeavyTraining && heavyTrainingDefinition != null)
             {
                 trainingDummy.ConfigureDefinition(heavyTrainingDefinition);
                 health.ConfigureDefinition(heavyTrainingDefinition);
@@ -120,7 +120,7 @@ public sealed class PrototypeCombatArena : MonoBehaviour
     {
         using (PrototypeDebugPanel.ReadableSkin())
         {
-            var area = new Rect(Screen.width - 310, 12, 298, 310);
+            var area = new Rect(Screen.width - 310, 12, 298, 338);
             PrototypeDebugPanel.DrawBackground(area);
             GUILayout.BeginArea(area, GUI.skin.box);
             GUILayout.Label("Prototype combat / practice");
@@ -131,7 +131,7 @@ public sealed class PrototypeCombatArena : MonoBehaviour
                 if (GUILayout.Button("3: Two normals")) ResetArena(true);
                 if (GUILayout.Button("4: Infinite HP dummy")) ResetTrainingEncounter(false);
             }
-            if (GUILayout.Button("5: Normal + HEAVY infinite HP")) ResetTrainingEncounter(true);
+            if (GUILayout.Button("5: HEAVY infinite HP (one enemy)")) ResetTrainingEncounter(true);
             GUILayout.Label("K / RMB: Parry - J / LMB: Counter");
             var counter = player != null ? player.GetComponent<PlayerParryCounter2D>() : null;
             if (counter != null && counter.QuickProfile != null &&
@@ -144,6 +144,7 @@ public sealed class PrototypeCombatArena : MonoBehaviour
             if (feedback != null && feedback.Settings != null)
             {
                 var s = feedback.Settings;
+                if (GUILayout.Button($"Actor jitter {s.actorJitter:P0}")) s.actorJitter = Cycle(s.actorJitter);
                 GUILayout.Label($"6 Camera {s.shake:P0} / 7 Flash {s.flash:P0}");
                 GUILayout.Label($"8 VFX {s.vfx:P0} / 9 Sound {s.masterVolume:P0}");
                 GUILayout.Label($"Feedback: {feedback.LastKind} @{feedback.LastEmissionTick}");

@@ -2853,7 +2853,7 @@
             "Assets/Animations/Player/Submitted/PlayerPrototype_ParrySuccessHeavy.anim",
             "Assets/Art/Player/QuickHeavySubmitted/export-manifest.json"
           ],
-          "evidence": "docs/prototype-quick-counter-heavy-parry-20261117.md"
+          "evidence": "docs/prototype-quick-heavy-tuning-20261117.md"
         }
       ]
     },
@@ -2953,7 +2953,7 @@
             "Assets/Animations/Player/Submitted/PlayerPrototype_CounterQuick.anim",
             "Assets/Art/Player/QuickHeavySubmitted/export-manifest.json"
           ],
-          "evidence": "docs/prototype-quick-counter-heavy-parry-20261117.md"
+          "evidence": "docs/prototype-quick-heavy-tuning-20261117.md"
         }
       ]
     }

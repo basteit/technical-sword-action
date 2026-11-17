@@ -40,7 +40,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     private Rigidbody2D body;
     private Collider2D bodyCollider;
     private int elapsed;
-    private bool active, hitApplied, charged,confirmedHit,chargeReleased,landed;
+    private bool active, hitApplied, charged,confirmedHit,chargeReleased,landed, sheathed;
     private float savedGravity;
     private Vector2 origin;
     private Vector2 hoverPosition;
@@ -65,7 +65,8 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public bool UsesQuickCounter => quickCounterEnabled && quickProfile != null;
     private bool UsesGameplayRules => definition != null && (!airborneKick || cinematicProfile != null);
     public string CinematicPhase => !active ? "Idle" : UsesQuickCounter ?
-        (elapsed < blinkStartFrame ? "Transfer" : elapsed < BlinkArrivalFrame ? "PassThrough" : elapsed < hitFrame ? "Sheathe" : "Recovery") : cinematicProfile == null ? "Legacy" :
+        (elapsed < blinkStartFrame ? "Transfer" : elapsed < BlinkArrivalFrame ? "PassThrough" :
+        elapsed < quickProfile.sheatheFrame ? "SettleAndSheathe" : elapsed < hitFrame ? "AfterSheathe" : "Recovery") : cinematicProfile == null ? "Legacy" :
         elapsed < blinkStartFrame ? "Transfer" : elapsed < BlinkArrivalFrame ? "Blink" :
         elapsed < chargeReleaseFrame ? "Charge" : elapsed < hitFrame ? "Release" : "FollowThrough";
     public IReadOnlyList<Damageable2D> Stocks => stocks;
@@ -107,6 +108,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     public event Action Started;
     public event Action BlinkStarted;
     public event Action BlinkArrived;
+    public event Action Sheathed;
     public event Action ChargeStarted;
     public event Action ChargeReleased;
     public event Action Landed;
@@ -323,7 +325,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         SelectedMultiplier = UsesGameplayRules ? SelectedTarget.CounterMultiplier : 1f;
         selectedDamage = Mathf.Max(1, Mathf.FloorToInt(damage * SelectedMultiplier + .5f));
         queuedCounter = false;
-        active = true; elapsed = 0; hitApplied = charged = confirmedHit = chargeReleased = landed = false; StartCount++;
+        active = true; elapsed = 0; hitApplied = charged = confirmedHit = chargeReleased = landed = sheathed = false; StartCount++;
         LastEndReason = "Running";
         origin = body != null ? body.position : (Vector2)transform.position;
         usesFrontApproach = fromFront;
@@ -432,6 +434,8 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
         { charged = true; ChargeStarted?.Invoke(); }
         if(!UsesQuickCounter&&airborneKick&&charged&&!chargeReleased&&elapsed>=chargeReleaseFrame)
         { chargeReleased=true;CombatTimeController.ReleaseSlow(this);ChargeReleased?.Invoke(); }
+        if (UsesQuickCounter && !sheathed && elapsed >= quickProfile.sheatheFrame)
+        { sheathed = true; Sheathed?.Invoke(); }
         if (!hitApplied && elapsed >= Mathf.Max(1, hitFrame))
         {
             hitApplied = true;
@@ -478,7 +482,7 @@ public sealed class PlayerParryCounter2D : MonoBehaviour, IPlayerActionStateHand
     {
         bool wasActive = active; bool didHit = confirmedHit;
         if (wasActive && LastEndReason == "Running") LastEndReason = "Canceled";
-        active = false; elapsed = 0; queuedCounter = false; hitApplied = charged = confirmedHit = chargeReleased = landed = false;
+        active = false; elapsed = 0; queuedCounter = false; hitApplied = charged = confirmedHit = chargeReleased = landed = sheathed = false;
         usesFrontApproach = false;
         if (wasActive && body != null) { body.gravityScale = savedGravity; body.linearVelocity = Vector2.zero; }
         if(SelectedTarget!=null)

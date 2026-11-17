@@ -29,6 +29,7 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener, IComb
     private PlayerVisualRecovery2D recovery;
     private PlayerAttack2D attack;
     private PlayerParry2D parry;
+    private bool heavyParryPresented;
     private TechnicalSwordAction.PlayerState.PlayerActionState lastExtendedAction;
     private TechnicalSwordAction.PlayerState.PlayerActionState sampledAction;
     private TechnicalSwordAction.PlayerState.PlayerLifeState sampledLife;
@@ -49,6 +50,7 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener, IComb
         CombatTimeController.RegisterAnimator(animator, this);
         observedParryCount = damageReceiver != null ? damageReceiver.BlockedByParry : 0;
         parrySuccessTimer = 0f;
+        heavyParryPresented = false;
         lastDrivenState = (PlayerState)(-1);
         lastExtendedAction = TechnicalSwordAction.PlayerState.PlayerActionState.Neutral;
     }
@@ -101,6 +103,15 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener, IComb
         }
 
         PlayerState state = stateMachine.CurrentState;
+        if (heavyParryPresented)
+        {
+            // The received heavy motion already includes its own follow-through.
+            // Never append the light-only Recovery_Parry clip on returning to neutral.
+            heavyParryPresented = false;
+            lastDrivenState = (PlayerState)(-1);
+            parrySuccessTimer = 0;
+            recovery?.Cancel();
+        }
         if (state == PlayerState.Attack)
         {
             // PlayerAttack2D owns the existing AttackTrigger/ComboStep contract.
@@ -173,6 +184,13 @@ public class PlayerAnimationDriver2D : MonoBehaviour, ICombatTickListener, IComb
         int success = Animator.StringToHash("PlayerPrototype_ParrySuccess" + reaction);
         if (!animator.HasState(0, success)) success = Animator.StringToHash("PlayerPrototype_ParrySuccessLight");
         var impact = GetComponent<PrototypeCounterPresentation>();
+        heavyParryPresented = reaction == "Heavy" && impact != null && impact.UsesEnhancedPresentation && impact.HeavyProfile != null && impact.HeavyProfile.IsValid;
+        if (heavyParryPresented)
+        {
+            parrySuccessTimer = 0;
+            lastDrivenState = (PlayerState)(-1);
+            return true; // PrototypeCounterPresentation owns every heavy cel, including the handoff to neutral.
+        }
         float start = impact != null ? impact.ParrySuccessNormalizedStart : 0;
         animator.Play(animator.HasState(0, success) ? success : ParrySuccessState, 0, start);
         lastDrivenState = (PlayerState)(-1);

@@ -98,6 +98,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             feedback = player.GetComponent(T("CombatFeedback2D")); arena = (Component)Object.FindFirstObjectByType(T("PrototypeCombatArena"));
             body = player.GetComponent<Rigidbody2D>(); ((Behaviour)player.GetComponent(T("PlayerInputRouter"))).enabled = false;
             Set(Get<object>(feedback, "Settings"), "masterVolume", 0f); Set(Get<object>(feedback, "Settings"), "shake", 0f);
+            Set(Get<object>(feedback, "Settings"), "actorJitter", 0f);
             Frames(2); yield return null;
         }
         [UnityTearDown] public IEnumerator Teardown()
@@ -190,7 +191,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(player.GetComponent<SpriteRenderer>().sprite, Is.SameAs(Get<Sprite>(Get<object>(presentation, "HeavyProfile"), "ContactSprite")));
             Frames(20); Assert.That(body.position.x, Is.EqualTo(origin.x).Within(.001f), "The recoil must wait until hitstop ends.");
             Until(() => !Get<bool>(presentation, "IsParrySequenceActive"));
-            Assert.That((origin.x - body.position.x) * direction, Is.InRange(.55f, .65f));
+            Assert.That((origin.x - body.position.x) * direction, Is.InRange(1.2f, 1.3f));
             Assert.That((string)Call(counter, "EligibilityReason", target), Is.EqualTo("Eligible"), "Recoil alone cannot invalidate the reward.");
             Call(player, "RequestAction", PlayerActionRequest.Attack); Frames(1);
             Assert.That(Get<bool>(counter, "UsesQuickCounter"), Is.True); Assert.That(Get<object>(counter, "SelectedTarget"), Is.SameAs(target));
@@ -234,7 +235,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That((bool)Call(dummy, "BeginCaptureAttack"), Is.True);
             Assert.That(Get<object>(dummy, "AttackParryReaction").ToString(), Is.EqualTo("Heavy"));
             Assert.That(Get<string>(dummy, "AttackId"), Is.EqualTo("training-heavy-parry"));
-            Assert.That(Object.FindObjectsByType(T("EnemyMeleeChaser2D"), FindObjectsSortMode.None).Length, Is.EqualTo(2));
+            Assert.That(Object.FindObjectsByType(T("EnemyMeleeChaser2D"), FindObjectsSortMode.None).Length, Is.EqualTo(1));
             Call(arena, "ResetTrainingEncounter", false);
             Assert.That((bool)Call(dummy, "BeginCaptureAttack"), Is.True);
             Assert.That(Get<object>(dummy, "AttackParryReaction").ToString(), Is.EqualTo("Light"));
@@ -267,12 +268,73 @@ namespace TechnicalSwordAction.PlayerState.Tests
             float volume = AudioListener.volume; AudioListener.volume = 0;
             try
             {
-                Begin(); Until(() => !Get<bool>(counter, "IsActive"));
+                var target = Begin(); int hp = Get<int>(target, "CurrentHp");
+                int sheathFrame = Get<int>(Get<object>(counter, "QuickProfile"), "sheatheFrame");
+                Until(() => Get<int>(counter, "ElapsedFrames") == sheathFrame - 1);
+                Assert.That(Count("Sheathe"), Is.Zero); Assert.That(Count("HeavyHit"), Is.Zero);
+                Frames(1);
+                Assert.That(Count("Sheathe"), Is.EqualTo(1)); Assert.That(Count("HeavyHit"), Is.Zero);
+                Assert.That(Get<int>(target, "CurrentHp"), Is.EqualTo(hp));
+                Until(() => Get<int>(counter, "ElapsedFrames") == Get<int>(counter, "HitFrame") - 1);
+                Assert.That(Count("HeavyHit"), Is.Zero); Assert.That(Get<int>(target, "CurrentHp"), Is.EqualTo(hp));
+                Frames(1); Assert.That(Count("HeavyHit"), Is.EqualTo(1));
+                Until(() => !Get<bool>(counter, "IsActive"));
                 Assert.That(Count("Sheathe"), Is.EqualTo(1)); Assert.That(Count("HeavyHit"), Is.EqualTo(1));
                 Assert.That(Count("CounterCharge"), Is.Zero); Assert.That(Count("CounterHit"), Is.Zero);
                 Assert.That(Count("CounterRelease"), Is.Zero); Assert.That(Count("Land"), Is.Zero);
             }
             finally { AudioListener.volume = volume; }
+        }
+        [TestCase(1)] [TestCase(-1)] public void QuickHoldsFirstCelAfterCrossingThenWaitsAfterSheathing(int direction)
+        {
+            var target = Begin(direction); int hp = Get<int>(target, "CurrentHp");
+            var profile = Get<object>(counter, "QuickProfile");
+            Until(() => Get<int>(counter, "ElapsedFrames") == Get<int>(counter, "BlinkArrivalFrame"));
+            var first = player.GetComponent<SpriteRenderer>().sprite; Vector2 position = body.position;
+            for (int i = 0; i < 9; i++)
+            {
+                Frames(1); Assert.That(player.GetComponent<SpriteRenderer>().sprite, Is.SameAs(first));
+                Assert.That(Vector2.Distance(body.position, position), Is.LessThan(.001f)); Assert.That(Get<int>(target, "CurrentHp"), Is.EqualTo(hp));
+            }
+            Frames(1); Assert.That(player.GetComponent<SpriteRenderer>().sprite, Is.Not.SameAs(first));
+            Until(() => Get<int>(counter, "ElapsedFrames") == Get<int>(profile, "sheatheFrame"));
+            Assert.That(Get<int>(counter, "HitFrame") - Get<int>(counter, "ElapsedFrames"), Is.GreaterThanOrEqualTo(8));
+            Until(() => Get<int>(counter, "ElapsedFrames") == Get<int>(counter, "HitFrame") - 1);
+            Assert.That(Get<int>(target, "CurrentHp"), Is.EqualTo(hp)); Frames(1);
+            Assert.That(Get<int>(counter, "HitCount"), Is.EqualTo(1));
+            Until(() => !Get<bool>(counter, "IsActive")); Frames(20); Clean();
+        }
+        [TestCase(1)] [TestCase(-1)] public void HeavyReturnsDirectlyToIdleWithoutLightParryRecovery(int direction)
+        {
+            Place(direction); var target = Enemy("StrongMelee", new Vector2(direction * 1.2f, .81f)); HeavyParry(target);
+            var animator = player.GetComponent<Animator>();
+            Until(() => !Get<bool>(presentation, "IsParrySequenceActive"));
+            for (int i = 0; i < 32; i++)
+            {
+                Frames(1); var pose = animator.GetCurrentAnimatorStateInfo(0);
+                Assert.That(pose.IsName("PlayerPrototype_Recovery_Parry") || pose.IsName("PlayerPrototype_ParrySuccessLight"), Is.False);
+            }
+            Assert.That(animator.GetCurrentAnimatorStateInfo(0).IsName("PlayerPrototype_Idle"), Is.True); Clean();
+        }
+        [TestCase(1, 30)] [TestCase(-1, 60)] [TestCase(1, 120)]
+        public void HeavyHitstopJittersBothDrawingsWithCameraOffThenReleases(int direction, int fps)
+        {
+            Place(direction); Set(Get<object>(feedback, "Settings"), "actorJitter", 1f);
+            var target = Enemy("Melee_1", new Vector2(direction * 1.2f, .81f)); HeavyParry(target);
+            var art = player.GetComponent(T("PrototypePlayerArtPresentation")); var enemyArt = target.GetComponent(T("PrototypeEnemyArtPresentation"));
+            Vector2 playerPosition = body.position, enemyPosition = target.transform.position;
+            bool positive = false, negative = false; int remaining = fps;
+            while (Time<bool>("IsHitStopped") && remaining-- > 0)
+            {
+                float offset = Get<float>(art, "ImpactOffsetX"); positive |= offset > 0; negative |= offset < 0;
+                Assert.That(offset + Get<float>(enemyArt, "ImpactOffsetX"), Is.Zero.Within(.00001f));
+                Assert.That(body.position, Is.EqualTo(playerPosition)); Assert.That((Vector2)target.transform.position, Is.EqualTo(enemyPosition));
+                Frames(1, fps);
+            }
+            Assert.That(positive && negative, Is.True);
+            Assert.That(Get<float>(art, "ImpactOffsetX"), Is.Zero); Assert.That(Get<float>(enemyArt, "ImpactOffsetX"), Is.Zero);
+            Assert.That(Get<bool>(presentation, "IsParryCameraActive"), Is.False);
+            Until(() => !Get<bool>(presentation, "IsParrySequenceActive")); Frames(24); Clean();
         }
     }
 }
