@@ -53,7 +53,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for (int i = 0; i < 3; i++)
             {
                 Call(arena, "ResetTrainingEncounter", true);
-                Assert.That(Enemies(false).Length, Is.EqualTo(2));
+                Assert.That(Enemies(false).Length, Is.EqualTo(1));
                 Call(arena, "ResetActionsOnly");
                 Frames(1);
                 Assert.That(Enemies(false), Is.Empty);
@@ -71,8 +71,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Call(arena, "ResetArena", true); Active("Melee_1", "Melee_2");
             Call(arena, "ResetTrainingEncounter", false); Active("TrainingDummy");
             Call(arena, "ResetCurrentEncounter"); Active("TrainingDummy");
-            Call(arena, "ResetTrainingEncounter", true); Active("Melee_1", "TrainingDummy");
-            Call(arena, "ResetCurrentEncounter"); Active("Melee_1", "TrainingDummy");
+            Call(arena, "ResetTrainingEncounter", true); Active("TrainingDummy");
+            Call(arena, "ResetCurrentEncounter"); Active("TrainingDummy");
             Call(arena, "ResetActionsOnly"); Active();
         }
 

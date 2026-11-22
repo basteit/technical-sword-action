@@ -56,6 +56,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
             yield return null;
             arena = (Component)Object.FindFirstObjectByType(T("PrototypeCombatArena")); trial = arena.GetComponent(T("PrototypeCombatTrial"));
             player = (Component)Object.FindFirstObjectByType(T("PlayerStateMachine")); attack = player.GetComponent(T("PlayerAttack2D"));
+            // Preserve the legacy launch/timing comparison tested here; quick default behavior has separate coverage.
+            Call(player.GetComponent(T("PlayerParryCounter2D")), "TrySetQuickCounter", false);
             sceneDefaultTempo = Get<object>(trial, "AttackTempo").ToString();
             sceneDefaultHitFrames = Steps.Select(s => Get<int>(s, "activeStart")).ToArray();
             sceneDefaultController = player.GetComponent<Animator>().runtimeAnimatorController;
@@ -493,7 +495,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
                     Assert.That(Get<object>(attack, "Definition"), Is.SameAs(Get<object>(trial, "ExpectedAttack")));
                     Assert.That(Get<bool>(trial, "ReferenceTiming"), Is.True);
                     Assert.That(Get<bool>(trial, "ReferenceReaction"), Is.True);
-                    Assert.That(ai.gameObject.activeSelf, Is.True);
+                    Assert.That(ai.gameObject.activeSelf, Is.False, "Preset 5 contains only the heavy training enemy.");
                     Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(30));
                     Assert.That(Get<object>(player.GetComponent(T("PlayerParryCounter2D")), "CinematicProfile"), Is.SameAs(counterProfile));
                     Call(trial, "SetEnemyTiming", false); Call(trial, "SetEnemyReaction", false);
@@ -672,7 +674,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             for (int i = 0; i < 10; i++)
             {
                 Call(trial, "SetModes", false, true, false);
-                Assert.That(ai.gameObject.activeSelf, Is.True); Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(30));
+                Assert.That(ai.gameObject.activeSelf, Is.EqualTo(!mixed)); Assert.That(Get<int>(health, "CurrentHp"), Is.EqualTo(30));
                 Assert.That(Get<int>(Get<object>(ai, "Definition"), "windupFrames"), Is.EqualTo(30));
                 Assert.That(Get<bool>(art, "UsesDownParryPose"), Is.True);
                 Call(trial, "SetModes", true, false, true);
@@ -687,7 +689,10 @@ namespace TechnicalSwordAction.PlayerState.Tests
             if (mixed)
             {
                 Assert.That(Get<bool>(dummy.GetComponent(T("Damageable2D")), "HasInfiniteHealth"), Is.True);
-                Assert.That(Get<object>(dummy.GetComponent(T("EnemyMeleeChaser2D")), "Definition"), Is.SameAs(Get<object>(ai, "Definition")));
+                var heavyAi = dummy.GetComponent(T("EnemyMeleeChaser2D"));
+                Assert.That(Get<object>(heavyAi, "Definition"), Is.SameAs(Get<object>(arena, "heavyTrainingDefinition")));
+                Assert.That((bool)Call(heavyAi, "BeginCaptureAttack"), Is.True);
+                Assert.That(Get<object>(heavyAi, "AttackParryReaction").ToString(), Is.EqualTo("Heavy"));
                 Assert.That(Get<bool>(dummy.GetComponent(T("PrototypeEnemyArtPresentation")), "UsesDownParryPose"), Is.False);
             }
         }

@@ -1,0 +1,143 @@
+{
+  "date": "2026-11-17",
+  "branch": "issue/101-quick-counter-heavy-parry",
+  "previousHead": "df26effcff115ea5183e4f11cc8565f1171933af",
+  "issues": [
+    101,
+    85
+  ],
+  "compile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "assetValidator": true,
+  "editMode": {
+    "total": 338,
+    "passed": 338
+  },
+  "playMode": {
+    "suite": "daily+combat+presentation+audio",
+    "result": "Passed",
+    "total": "755",
+    "passed": "755",
+    "failed": "0",
+    "skipped": "0",
+    "duration": "196.5271204",
+    "start-time": "2026-11-17 04:21:37Z",
+    "end-time": "2026-11-17 04:24:53Z",
+    "xml": ".uloop/outputs/quick-heavy-tuning-20261117-v2/playmode-final.xml",
+    "cliTimedOutAtSeconds": 180,
+    "duplicateRuns": false,
+    "dedicatedQuickHeavyCases": 39
+  },
+  "testPlanChecks": 143,
+  "realGameplayCaptures": {
+    "quick": {
+      "recordedFrames60fps": 220,
+      "holdFirstCelFrames": 10,
+      "sheatheTick": 170,
+      "hitTick": 178,
+      "spriteAtHit": "CounterQuick_06",
+      "recoilDistance": 0.0,
+      "actorJitterRange": [
+        -0.0625,
+        0.0625
+      ],
+      "finalSprite": "IdleReference_05",
+      "finalAction": "Neutral",
+      "playerHp": 100,
+      "hitCount": 1,
+      "slowScaleOnlyOne": true,
+      "trace": ".uloop/outputs/quick-heavy-tuning-20261117-v2/quick/trace.csv"
+    },
+    "heavy": {
+      "recordedFrames60fps": 230,
+      "holdFirstCelFrames": 10,
+      "sheatheTick": 180,
+      "hitTick": 188,
+      "spriteAtHit": "CounterQuick_06",
+      "recoilDistance": 1.25,
+      "actorJitterRange": [
+        -0.0625,
+        0.0625
+      ],
+      "finalSprite": "IdleReference_05",
+      "finalAction": "Neutral",
+      "playerHp": 100,
+      "hitCount": 1,
+      "slowScaleOnlyOne": true,
+      "trace": ".uloop/outputs/quick-heavy-tuning-20261117-v2/heavy/trace.csv"
+    },
+    "heavy-idle": {
+      "recordedFrames60fps": 178,
+      "holdFirstCelFrames": 0,
+      "sheatheTick": null,
+      "hitTick": null,
+      "spriteAtHit": null,
+      "recoilDistance": 1.25,
+      "actorJitterRange": [
+        -0.0625,
+        0.0625
+      ],
+      "finalSprite": "IdleReference_05",
+      "finalAction": "Neutral",
+      "playerHp": 100,
+      "hitCount": 0,
+      "slowScaleOnlyOne": true,
+      "trace": ".uloop/outputs/quick-heavy-tuning-20261117-v2/heavy-idle/trace.csv"
+    }
+  },
+  "preset5KeyboardSmoke": {
+    "input": "Digit5",
+    "activeEnemies": [
+      {
+        "name": "TrainingDummy",
+        "infiniteHp": true,
+        "reaction": "Heavy",
+        "attackCount": 1
+      }
+    ]
+  },
+  "initialFocusedRun": {
+    "total": 39,
+    "passed": 34,
+    "failed": 5,
+    "reason": "Three tests referenced sprite art on the placeholder fixture; two required exact physics float equality. Test fixture and tolerance corrected before final full run."
+  },
+  "toolDiagnostics": {
+    "inputSimulationOverlayWarnings": 17,
+    "editModeClockInspectionNullError": 1,
+    "gameplayError": false,
+    "finalCleanStartup": {
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "existingWorkProtection": {
+    "baselineFileCount": 153,
+    "byteIdenticalCount": 150,
+    "expectedChangedFiles": [
+      "ArtSource/Player/README.md",
+      "ArtSource/Player/catalog.json",
+      "skills/define-game-requirements/references/current-requirements.md"
+    ],
+    "unexpectedChanges": [],
+    "priorRequirementBytesIdentical": true,
+    "priorArtReadmeBytesIdenticalExceptCurrentTaskParagraph": true,
+    "otherCatalogMotionsAndReferencesIdentical": true,
+    "receivedSourceAndHistoryUnchanged": true
+  },
+  "finalEditor": {
+    "playing": false,
+    "scene": "Assets/Scenes/PrototypeCombatValidation.unity",
+    "dirty": false,
+    "manualClockRestored": true
+  },
+  "notPerformed": [
+    "human 15-minute acceptance",
+    "physical gamepad",
+    "separate PC",
+    "Build/ZIP",
+    "finished artwork and final feel acceptance"
+  ]
+}

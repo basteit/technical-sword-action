@@ -51,14 +51,16 @@ namespace TechnicalSwordAction.PlayerState.Tests
             finally { UnityEngine.Object.DestroyImmediate(copy); }
         }
 
-        [Test] public void ParryCueLeadIsExplicitPerEnemyAndPerAttackAndTimingWindowsAreUnchanged()
+        [Test] public void ParryCueAndJustStayFixedWhileCasualAcceptanceReachesSeventeen()
         {
             foreach (string name in new[] { "NormalMelee", "NormalMelee_ReferenceTrial", "StrongMelee", "StrongSlash", "StrongLowSweep" })
                 Assert.That(Get<int>(Load(name), "parryCueLeadFrames"), Is.EqualTo(name.StartsWith("NormalMelee") ? 14 : 12), name);
             var timing = Load("ParryTiming");
             Assert.That(Get<int>(timing, "startFrame"), Is.Zero);
             Assert.That(Get<int>(timing, "justEndFrame"), Is.EqualTo(3));
-            Assert.That(Get<int>(timing, "endFrame"), Is.EqualTo(13));
+            Assert.That(Get<int>(timing, "endFrame"), Is.EqualTo(17));
+            Assert.That(Get<int>(timing, "failEndFrame"), Is.EqualTo(26));
+            Assert.That(Get<int>(timing, "cooldownFrames"), Is.EqualTo(14));
         }
 
         [Test] public void HeavyImpactTrialIsNormalAttackOnlyAndInheritsLaterSteps()

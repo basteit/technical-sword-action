@@ -15,7 +15,7 @@ public sealed class CombatFeedback2D : MonoBehaviour, ICombatTickListener
         public Vector2 position;
         public float age, duration, size, decoration;
         public Color tint;
-        public bool landing;
+        public bool landing, quickSlash;
     }
     private sealed class Flash
     {
@@ -197,7 +197,9 @@ public sealed class CombatFeedback2D : MonoBehaviour, ICombatTickListener
         PresentFeedback(step == 4 ? CombatFeedbackKind.HeavyHit : CombatFeedbackKind.LightHit, position, target, false, GetAttackHitstopFrames(step));
     private void OnCounter(Damageable2D target, Vector2 position)
     {
-        if (counter != null && counter.CinematicProfile != null && counter.CinematicProfile.enhancedPresentation)
+        if (counter != null && counter.UsesQuickCounter)
+            PresentFeedback(CombatFeedbackKind.Counter, position, target, false, counter.QuickProfile.hitstopFrames);
+        else if (counter != null && counter.CinematicProfile != null && counter.CinematicProfile.enhancedPresentation)
             PresentAuthoredImpact(CombatFeedbackKind.Counter, position, target);
         else Present(CombatFeedbackKind.Counter, position, target);
     }
@@ -246,8 +248,10 @@ public sealed class CombatFeedback2D : MonoBehaviour, ICombatTickListener
         {
             var effect = pool.Find(x => !x.root.activeSelf) ?? pool[EmissionCount % pool.Count];
             effect.landing = false; effect.kind = kind; effect.position = position; effect.age = 0;
+            effect.quickSlash = kind == CombatFeedbackKind.Counter && counter != null && counter.UsesQuickCounter;
             effect.duration = entry.lifetimeFrames / 60f; effect.size = entry.glyphSize;
             effect.decoration = Mathf.Clamp01(Settings.vfx); effect.tint = entry.tint;
+            if (effect.quickSlash) { effect.duration = .20f; effect.size = 1.25f; effect.tint = new Color(1, .75f, .35f); }
             effect.root.SetActive(true); DrawEffect(effect);
         }
         SpriteRenderer sprite = kind == CombatFeedbackKind.PlayerHit ? GetComponentInChildren<SpriteRenderer>() :
@@ -369,6 +373,7 @@ public sealed class CombatFeedback2D : MonoBehaviour, ICombatTickListener
     private void DrawEffect(Effect effect)
     {
         float life = Mathf.Clamp01(1 - effect.age / effect.duration);
+        effect.core.widthMultiplier = .045f; effect.accent.widthMultiplier = .065f;
         if (effect.landing)
         {
             DrawLandingPuff(effect.core, effect.position, -1, life);
@@ -377,6 +382,22 @@ public sealed class CombatFeedback2D : MonoBehaviour, ICombatTickListener
             return;
         }
         float size = effect.size * (1 + (1 - life) * .45f);
+        if (effect.quickSlash)
+        {
+            // One long sheathing slash at the selected target, never a travelling damage hitbox.
+            Vector2 axis = new Vector2(1, .42f).normalized * size;
+            effect.core.loop = effect.accent.loop = false;
+            effect.core.positionCount = effect.accent.positionCount = 2;
+            effect.core.SetPosition(0, effect.position - axis); effect.core.SetPosition(1, effect.position + axis);
+            effect.accent.SetPosition(0, effect.position - axis * 1.2f); effect.accent.SetPosition(1, effect.position + axis * 1.2f);
+            effect.core.widthMultiplier = .08f * life;
+            effect.accent.widthMultiplier = .18f * life;
+            effect.core.startColor = effect.core.endColor = new Color(1, .97f, .85f, life);
+            var tint = effect.tint; tint.a = life * effect.decoration * .7f;
+            effect.accent.startColor = effect.accent.endColor = tint;
+            effect.accent.enabled = effect.decoration > 0;
+            return;
+        }
         int points = effect.kind == CombatFeedbackKind.LightHit ? 2 : effect.kind == CombatFeedbackKind.JustParry ? 9 :
             effect.kind == CombatFeedbackKind.Counter ? 7 : effect.kind == CombatFeedbackKind.PlayerHit ? 3 :
             effect.kind == CombatFeedbackKind.Parry ? 4 : effect.kind == CombatFeedbackKind.ParryMiss ? 3 : 5;

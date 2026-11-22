@@ -60,7 +60,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(collider.offset, Is.EqualTo(Vector2.zero));
             Assert.That(artwork.transform.localPosition.y, Is.EqualTo(.2f).Within(.00001f));
             Assert.That(Get<object>(player.GetComponent(T("PlayerParryCounter2D")), "CinematicProfile"), Is.Not.Null);
-            Assert.That(Get<bool>(player.GetComponent(T("PlayerParryCounter2D")), "IsAirborneKick"), Is.True);
+            Assert.That(Get<bool>(player.GetComponent(T("PlayerParryCounter2D")), "UsesQuickCounter"), Is.True);
             Assert.That(Object.FindObjectsByType(T("EnemyMeleeChaser2D"), FindObjectsSortMode.None), Is.Empty);
         }
 
@@ -204,13 +204,13 @@ namespace TechnicalSwordAction.PlayerState.Tests
                 int limit = 120;
                 while (Get<int>(hp, "HitCount") == 0 && --limit > 0) Frames(1);
                 Assert.That(limit, Is.GreaterThan(0)); Refresh();
-                var entry = Call(Get<object>(presentation, "ArtSet"), "Find", "ParryCounter");
+                var quick = Get<object>(counter, "QuickProfile");
                 var animation = player.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
-                Assert.That(artwork.sprite, Is.SameAs((Sprite)entry.GetType().GetField("contactSprite").GetValue(entry)),
+                Assert.That(artwork.sprite, Is.SameAs(Get<Sprite>(quick, "ContactSprite")),
                     $"Counter clock {Get<int>(counter, "ElapsedFrames")}, animation {animation.normalizedTime * animation.length * 60:0.000}F.");
                 Assert.That(Get<int>(hp, "CurrentHp"), Is.EqualTo(910));
                 Assert.That(Get<int>(counter, "StockCount"), Is.Zero);
-                Assert.That(Get<bool>(counter, "IsAirborneKick"), Is.True);
+                Assert.That(Get<bool>(counter, "UsesQuickCounter"), Is.True);
                 Assert.That(Get<bool>(counter, "UsesBlinkApproach"), Is.True);
                 Assert.That(player.GetComponent(T("VideoCombatPresentation")), Is.Null);
                 Assert.That(player.GetComponent(T("CombatVideoDirector")), Is.Null);

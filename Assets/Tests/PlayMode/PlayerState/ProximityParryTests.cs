@@ -89,7 +89,7 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [TestCase("TooEarly")] [TestCase("NoInput")] [TestCase("Wall")]
         public void ProximityDoesNotBypassOtherAcceptanceRules(string reason)
         {
-            Vector2 offset=reason=="Distance"?new Vector2(2.6f,0):reason=="Height"?new Vector2(.5f,1.6f):new Vector2(1.6f,0);
+            Vector2 offset=reason=="Distance"?new Vector2(3.1f,0):reason=="Height"?new Vector2(.5f,1.6f):new Vector2(1.6f,0);
             Begin(ai,body.position+offset,1);
             if(reason=="Unparryable")Set(ai,"configuredParryable",false);
             if(reason=="Wall")
@@ -107,14 +107,15 @@ namespace TechnicalSwordAction.PlayerState.Tests
             Assert.That(Get<int>(health,"BlockedByParry"),Is.Zero);
         }
         [TestCase(2.5f,0f,true)] [TestCase(-2.5f,0f,true)]
+        [TestCase(3f,0f,true)] [TestCase(-3f,0f,true)]
         [TestCase(1.5f,1.5f,true)] [TestCase(-1.5f,-1.5f,true)]
-        [TestCase(2.51f,0f,false)] [TestCase(.5f,1.51f,false)]
+        [TestCase(2.51f,0f,true)] [TestCase(3.01f,0f,false)] [TestCase(.5f,1.51f,false)]
         public void ExpandedSpatialBoundaryParriesAndCanStartItsCounter(float x,float y,bool accepted)
         {
-            Assert.That(Get<float>(parry,"SourceRange"),Is.EqualTo(2.5f));
+            Assert.That(Get<float>(parry,"SourceRange"),Is.EqualTo(3f));
             Assert.That(Get<float>(parry,"MaxSourceHeightDifference"),Is.EqualTo(1.5f));
             Assert.That(Get<int>(parry,"AcceptanceStartFrame"),Is.Zero);
-            Assert.That(Get<int>(parry,"AcceptanceEndFrame"),Is.EqualTo(13));
+            Assert.That(Get<int>(parry,"AcceptanceEndFrame"),Is.EqualTo(17));
             // Keep the lower-left counter route above the upper platform, including the enemy's parry retreat.
             body.position=new Vector2(0,10);player.transform.position=body.position;body.gravityScale=0;
             Begin(ai,body.position+new Vector2(x,y),x>0?1:-1); // Swing away: do not rely on the damage hitbox.
@@ -139,16 +140,46 @@ namespace TechnicalSwordAction.PlayerState.Tests
         [Test]
         public void CounterReadsLiveParryRangeAndHeightInsteadOfAnIndependentFixedLimit()
         {
-            Begin(ai,body.position+Vector2.right*2.8f,1);
+            Begin(ai,body.position+Vector2.right*3.2f,1);
             Call(counter,"RegisterParriedEnemy",enemy);
             Assert.That(Call(counter,"EligibilityReason",enemy),Is.EqualTo("OutOfRange"));
-            Set(parry,"parrySnapDistance",3f);
+            Set(parry,"parrySnapDistance",3.3f);
             Assert.That(Call(counter,"EligibilityReason",enemy),Is.EqualTo("Eligible"));
             enemy.transform.position=player.transform.position+new Vector3(1.5f,1.4f);
             Set(parry,"maxParryHeightDifference",1.3f);Physics2D.SyncTransforms();
             Assert.That(Call(counter,"EligibilityReason",enemy),Is.EqualTo("Height"));
             Set(parry,"maxParryHeightDifference",1.5f);
             Assert.That(Call(counter,"EligibilityReason",enemy),Is.EqualTo("Eligible"));
+        }
+
+        [TestCase("Light",3,"Just")] [TestCase("Heavy",3,"Just")]
+        [TestCase("Light",4,"Normal")] [TestCase("Heavy",4,"Normal")]
+        [TestCase("Light",13,"Normal")] [TestCase("Heavy",13,"Normal")]
+        [TestCase("Light",14,"Normal")] [TestCase("Heavy",14,"Normal")]
+        [TestCase("Light",17,"Normal")] [TestCase("Heavy",17,"Normal")]
+        [TestCase("Light",18,"None")] [TestCase("Heavy",18,"None")]
+        public void CasualWindowPreservesJustBoundaryAndBothWeightsUseOneCounter(string weight,int frame,string expected)
+        {
+            Begin(ai,body.position+Vector2.right*2.9f,-1);
+            Assert.That(Call(player,"RequestAction",PlayerActionRequest.Parry),Is.True);Frames(1);
+            Until(()=>Get<int>(parry,"ElapsedFrames")>=frame);
+            Assert.That(Get<int>(parry,"ElapsedFrames"),Is.EqualTo(frame));
+            object context=Activator.CreateInstance(T("CombatHitContext2D"),enemy,181134L,true,Enum.Parse(T("ParryReactionWeight"),weight));
+            Call(health,"TryReceiveContextHit",10,(Vector2)enemy.transform.position,0f,context);
+            bool accepted=expected!="None";
+            Assert.That(Get<object>(parry,"LastParryResult").ToString(),Is.EqualTo(expected));
+            Assert.That(Get<int>(health,"CurrentHp"),Is.EqualTo(accepted?100:90));
+            Assert.That(Get<int>(counter,"StockCount"),Is.EqualTo(accepted?1:0));
+            if(!accepted)return;
+            Assert.That(Get<object>(parry,"LastReactionWeight").ToString(),Is.EqualTo(weight));
+            var presentation=player.GetComponent(T("PrototypeCounterPresentation"));
+            Until(()=>!Get<bool>(presentation,"IsParrySequenceActive"));
+            Assert.That(Call(counter,"EligibilityReason",enemy),Is.EqualTo("Eligible"));
+            Assert.That(Call(player,"RequestAction",PlayerActionRequest.Attack),Is.True);
+            Until(()=>Get<bool>(counter,"IsActive"));
+            Assert.That(Get<bool>(counter,"UsesQuickCounter"),Is.True);
+            Until(()=>!Get<bool>(counter,"IsActive"));
+            Assert.That(Get<int>(counter,"HitCount"),Is.EqualTo(1));
         }
 
         [Test] public void AFailedProximityProbeDoesNotEatTheOrdinaryDamageHit()

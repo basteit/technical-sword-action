@@ -20,6 +20,8 @@
 | 反撃キック・独立エフェクト (`counter_kick_effect`) | [Player_counter_kick_effect.aseprite](Current/Player_counter_kick_effect.aseprite) | 受領済み | 256×256 / 15コマ / 1500ms | prototype：登録版一致, video：登録版一致 | [2版](History/counter_kick_effect/) |
 | ジャンプ（踏切・上昇・滞空・落下） (`jump`) | [Player_jamp.aseprite](Current/Player_jamp.aseprite) | 受領済み | 64×64 / 9コマ / 900ms | prototype：登録版一致 | [2版](History/jump/) |
 | ダッシュ (`dash`) | [Player_dash.aseprite](Current/Player_dash.aseprite) | 受領済み | 64×64 / 3コマ / 500ms | prototype：登録版一致 | [1版](History/dash/) |
+| パリィ成功（重） (`parry_heavy`) | [Player_parry_heavy.aseprite](Current/Player_parry_heavy.aseprite) | 仮提出 | 128×128 / 8コマ / 640ms | prototype：登録版一致 | [1版](History/parry_heavy/) |
+| 短い反撃（通り抜け・納刀斬撃） (`counter_quick`) | [Player_counter_quick.aseprite](Current/Player_counter_quick.aseprite) | 仮提出 | 128×128 / 6コマ / 1250ms | prototype：登録版一致 | [1版](History/counter_quick/) |
 
 ## 素材ごとの注意
 
@@ -37,6 +39,8 @@
 - **反撃キック・独立エフェクト**：細部修正した独立電撃の更新原稿。人物との位置とコマを再確認して反映予定。
 - **ジャンプ（踏切・上昇・滞空・落下）**：2026-11-07受領。髪を追加した64px・全9コマ。原稿登録とUnityの使用版は別に記録する。
 - **ダッシュ**：2026-11-07受領。地上・空中Dashの共通表示へ接続し、専用PlayModeで確認済み。移動性能と無敵時間を保持し、人による最終受入とは区別する。
+- **パリィ成功（重）**：2026-11-17ユーザー制作の受領ラフ。刀を相手の攻撃に合わせて構え、ヒットストップ後、衝撃で剣を地面に突き立てながら後ずさって吸収する。軽/重は攻撃重量でNormal/Justとは別軸。反撃可能な成功は共通の短反撃へ接続。移動量・接触コマ・停止尺・接地/壁際はUnity統合時に調整/検証する。2026-11-17に本編プロトタイプへ仮接続し、関連自動テストと実AIの画面撮影を確認。人の15分操作・物理パッド・清書と手触りの採否は未完了。
+- **短い反撃（通り抜け・納刀斬撃）**：2026-11-17ユーザー制作の受領ラフ。既存の反撃移行モーションの後を想定。敵を通り抜け、刀を鞘に納めた瞬間に対象へ大きな斬撃を一撃だけ与え、そのまま通常の立ち姿へ戻る。通過中の多段ヒットにしない。先頭/末尾500msを含む原稿時間は保持し、ゲーム用尺・納刀/命中同期・地形越しの安全性・復帰はUnity統合時に調整/検証する。旧キックと移行原稿は保持。2026-11-17に本編プロトタイプへ仮接続し、関連自動テストと実AIの画面撮影を確認。人の15分操作・物理パッド・清書と手触りの採否は未完了。
 
 ## Codex製ラフ・既存の書き出し
 

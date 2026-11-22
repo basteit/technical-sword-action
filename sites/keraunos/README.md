@@ -4,6 +4,12 @@
 
 公開する静的ファイルは `dist/` にあります。ローカルでは `dist/index.html` をブラウザで開けます。
 
+## タイトル画面の確認
+
+[確認ページ](https://basteit.github.io/technical-sword-action/title-preview/?v=dim4)に、部屋を暗くしてロゴの通常発光を微弱にしたタイトルの12秒・無音動画と、登場直後／通常時の静止画を掲載しています。映像は1280×720・30fpsのH.264 MP4です。動画と画像は版ごとのファイル名にして、前回のキャッシュと区別しています。
+
+ゲーム内では `EggTitleRoomProfile` の画面矩形、ロゴの発光、登場時の強調、部屋の光を調整します。`EggTitlePreviewCapture` はPlayModeの通常GameViewを固定の時間刻みで直接撮影します。撮影用カメラへの切り替えやCanvasの描画方式の変更は行いません。照明座標は `EggRoomLightingCoordinates` がUIメッシュのUV1へ格納し、Overlay描画や拡大時の座標ずれを防ぎます。
+
 ## 試遊版の更新
 
 UnityでWindows試遊版をビルドし、既存の `Tools/Build/Package-Prototype.ps1` でZIPを作成します。起動確認後、変更点と既知の問題を記したUTF-8のテキストを用意して公開します。

@@ -1,0 +1,116 @@
+{
+  "date": "2026-11-18",
+  "timezone": "Asia/Tokyo",
+  "issue": 34,
+  "branch": "issue/101-quick-counter-heavy-parry",
+  "previousHead": "56994d0cd75063a2201d44006bdbfc262fcd62a0",
+  "trialChanges": {
+    "acceptanceEndFrame": [
+      13,
+      17
+    ],
+    "sourceRange": [
+      2.5,
+      3.0
+    ],
+    "startFrame": 0,
+    "justEndFrame": 3,
+    "maxHeightDifference": 1.5,
+    "failEndFrame": 26,
+    "cooldownFrames": 14,
+    "postWindowFailureFrames": [
+      13,
+      9
+    ],
+    "totalWhiffDurationUnchanged": true
+  },
+  "compile": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "assetValidator": true,
+  "editMode": {
+    "total": 338,
+    "passed": 338
+  },
+  "focused": {
+    "total": 47,
+    "passed": 47,
+    "failed": 0
+  },
+  "regression": {
+    "suite": "daily+combat+presentation",
+    "result": "Passed",
+    "total": "732",
+    "passed": "732",
+    "failed": "0",
+    "skipped": "0",
+    "duration": "192.6633292",
+    "start-time": "2026-11-17 17:57:38Z",
+    "end-time": "2026-11-17 18:00:50Z",
+    "xml": ".uloop/outputs/casual-parry-20261118/playmode-final.xml",
+    "cliTimedOutAtSeconds": 180,
+    "duplicateRuns": false,
+    "focusedCasesIncluded": 47,
+    "testPlanChecks": 143
+  },
+  "actualAiSmoke": {
+    "initialDistance": 2.9,
+    "inputBeforeEnemyAttackFrames": 18,
+    "elapsedAtSuccess": 17,
+    "result": "Normal",
+    "reaction": "Light",
+    "parrySuccesses": 1,
+    "stocksAfterParry": 1,
+    "quickCounterHits": 1,
+    "counterHitFrame": 35,
+    "enemyHp": [
+      1000,
+      910
+    ],
+    "playerHp": 100,
+    "finalAction": "Neutral",
+    "finalGravity": 3.63,
+    "timeOwnersAfterEnd": 0,
+    "counterActiveAfterEnd": false,
+    "screenshot": "docs/validation/casual-parry-20261118.png"
+  },
+  "diagnostics": {
+    "firstFocusedRunBeforeConfigurationApplied": {
+      "total": 47,
+      "passed": 26,
+      "failed": 21,
+      "reason": "The multi-line CLI command executed only its first statement. Applied settings with one-line code and verified the saved scene and asset before rerunning."
+    },
+    "debugSnapshotQueryError": "A nonserialized overlay field was first queried as a serialized property; corrected the diagnostic command without changing gameplay code."
+  },
+  "finalConsole": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "finalEditor": {
+    "playing": false,
+    "scene": "Assets/Scenes/PrototypeCombatValidation.unity",
+    "dirty": false,
+    "manualClockRestored": true
+  },
+  "protection": {
+    "baselineFiles": 156,
+    "readableUnchanged": 154,
+    "expectedChanged": [
+      "skills/define-game-requirements/references/current-requirements.md"
+    ],
+    "earlierRequirementBytesIdentical": true,
+    "openWorkbookLocksLeftUntouched": 1,
+    "soundWorkbookUnchanged": true,
+    "receivedArtUnchanged": true
+  },
+  "notPerformed": [
+    "human 15-minute feel comparison",
+    "physical gamepad",
+    "separate PC",
+    "Build/ZIP",
+    "final balance acceptance",
+    "dialogue script writing and introduction scene implementation"
+  ]
+}

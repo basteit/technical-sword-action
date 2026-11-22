@@ -50,6 +50,8 @@ namespace TechnicalSwordAction.PlayerState.Tests
         }
         private void BeginCounter(bool enableAccent = true)
         {
+            // These existing tests exercise the retained kick/charge audio comparison.
+            Assert.That((bool)Call(counter, "TrySetQuickCounter", false), Is.True);
             if (enableAccent)
             {
                 // Exercise the optional path without changing the shared default-OFF asset.

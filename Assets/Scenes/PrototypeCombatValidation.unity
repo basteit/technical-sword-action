@@ -3094,8 +3094,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Damageable2D
   maxHp: 30
   infiniteHealth: 0
-  individualId: prototype-melee-1
   suppressOrdinaryHitReaction: 1
+  individualId: prototype-melee-1
   combatRank: 0
   combatDefinition: {fileID: 0}
   overrideMaxHp: 0
@@ -3112,6 +3112,9 @@ MonoBehaviour:
     m_Bits: 128
   knockbackPower: 0
   knockbackDamping: 18
+  knockbackObstacleLayers:
+    serializedVersion: 2
+    m_Bits: 0
   audioSource: {fileID: 0}
   hitClip: {fileID: 0}
   spriteRenderer: {fileID: 1131051244}
@@ -4236,8 +4239,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Damageable2D
   maxHp: 30
   infiniteHealth: 0
-  individualId: prototype-melee-2
   suppressOrdinaryHitReaction: 1
+  individualId: prototype-melee-2
   combatRank: 0
   combatDefinition: {fileID: 0}
   overrideMaxHp: 0
@@ -4254,6 +4257,9 @@ MonoBehaviour:
     m_Bits: 128
   knockbackPower: 0
   knockbackDamping: 18
+  knockbackObstacleLayers:
+    serializedVersion: 2
+    m_Bits: 0
   audioSource: {fileID: 0}
   hitClip: {fileID: 0}
   spriteRenderer: {fileID: 655731127}
@@ -5164,6 +5170,7 @@ MonoBehaviour:
   - {fileID: 907002370}
   strongEnemy: {fileID: 1208784948}
   trainingDummy: {fileID: 1983144919}
+  heavyTrainingDefinition: {fileID: 11400000, guid: efed4175d1c186048984a93cbd1ced88, type: 2}
   coordinator: {fileID: 1528799909}
   feedback: {fileID: 1882940595}
 --- !u!4 &1042588129
@@ -6015,6 +6022,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Damageable2D
   maxHp: 120
   infiniteHealth: 0
+  suppressOrdinaryHitReaction: 0
   individualId: 
   combatRank: 0
   combatDefinition: {fileID: 11400000, guid: af2a42c7e9d2e4d4193b049faebd7160, type: 2}
@@ -6032,6 +6040,9 @@ MonoBehaviour:
     m_Bits: 128
   knockbackPower: 5.5
   knockbackDamping: 18
+  knockbackObstacleLayers:
+    serializedVersion: 2
+    m_Bits: 0
   audioSource: {fileID: 0}
   hitClip: {fileID: 0}
   spriteRenderer: {fileID: 0}
@@ -8680,6 +8691,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerParryCounter2D
   definition: {fileID: 11400000, guid: edcafb8a80423b84b85f5c503605df87, type: 2}
   cinematicProfile: {fileID: 11400000, guid: ff5d0bf51c617104b8464345e7738878, type: 2}
+  quickProfile: {fileID: 11400000, guid: a450f678f97e2b04f8f950b91a7a8b78, type: 2}
+  quickCounterEnabled: 1
   hitFrame: 6
   endFrame: 24
   damage: 3
@@ -8754,7 +8767,7 @@ MonoBehaviour:
   parryCooldown: 0.22
   failLockDuration: 0.3
   successLockDuration: 0.16
-  parrySnapDistance: 2.5
+  parrySnapDistance: 3
   specialSkill: {fileID: 0}
   stateMachine: {fileID: 0}
   audioSource: {fileID: 0}
@@ -9265,6 +9278,7 @@ MonoBehaviour:
   feedback: {fileID: 1882940595}
   effects: {fileID: 1882940598}
   gameplayCamera: {fileID: 212492668}
+  heavyParryProfile: {fileID: 11400000, guid: 59a473526df092148b9f4bb996456432, type: 2}
 --- !u!114 &1882940598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9815,6 +9829,9 @@ MonoBehaviour:
     m_Bits: 128
   knockbackPower: 0
   knockbackDamping: 18
+  knockbackObstacleLayers:
+    serializedVersion: 2
+    m_Bits: 0
   audioSource: {fileID: 0}
   hitClip: {fileID: 0}
   spriteRenderer: {fileID: 1702093717}

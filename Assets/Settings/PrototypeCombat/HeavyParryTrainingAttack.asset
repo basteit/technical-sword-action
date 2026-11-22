@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf47ab2d55cf64c4e909a7627d15eb21, type: 3}
+  m_Name: HeavyParryTrainingAttack
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackDefinition
+  attackId: training-heavy-parry
+  windupFrames: 96
+  parryCueLeadFrames: 14
+  activeFrames: 3
+  recoveryFrames: 24
+  cooldownFrames: 32
+  damage: 10
+  knockback: 4.5
+  parryable: 1
+  parryReaction: 1
+  resistHitStunWhileAttacking: 1
+  attackRange: 1.45
+  hitOffset: {x: 0.7, y: 0}
+  hitSize: {x: 1.4, y: 1.3}
+  countermeasure: Heavy parry, then the same quick counter; Dash also avoids this
+    attack.
+  windupClip: {fileID: 0}
