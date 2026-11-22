@@ -30,32 +30,33 @@
   <main>
     <a href="../">← 配布ページへ</a>
     <h1>タイトル画面の調整確認</h1>
-    <p>継ぎ目を細くし、ロゴが現れた直後だけ明るくしました。</p>
+    <p>ロゴを強く発光させ、壁・機器・床に青白い光が回るようにしました。</p>
     <figure>
-      <video id="preview" controls playsinline muted preload="metadata" poster="../assets/title-preview/title-settled.png" aria-label="調整後のタイトル画面。ロゴの登場からモード選択まで">
-        <source src="../assets/title-preview/title-reveal.mp4" type="video/mp4">
-        <a href="../assets/title-preview/title-reveal.mp4">動画を開く</a>
+      <video id="preview" controls playsinline muted preload="metadata" poster="../assets/title-preview/title-highlight-lighting-v3.png" aria-label="発光とライティングを強めたタイトル。ロゴの登場からモード選択まで">
+        <source src="../assets/title-preview/title-reveal-lighting-v3.mp4" type="video/mp4">
+        <a href="../assets/title-preview/title-reveal-lighting-v3.mp4">動画を開く</a>
       </video>
       <figcaption>12秒・無音 ／ 実際のゲーム画面を撮影。スマホでは横向きでも確認できます。</figcaption>
     </figure>
     <div class="actions">
       <button id="replay" type="button">最初から再生</button>
-      <a href="../assets/title-preview/title-reveal.mp4">動画を直接開く</a>
+      <a href="../assets/title-preview/title-reveal-lighting-v3.mp4">動画を直接開く</a>
+      <a href="../assets/title-preview/title-highlight-lighting-v3.png">表示直後の画像</a>
     </div>
     <ul>
-      <li>壁のモニターは5列×3段のまま、縦横の継ぎ目を約半分の幅に調整。</li>
-      <li>ロゴ登場時の光は約2秒で落ち着き、通常時には繰り返しません。</li>
-      <li>部屋の暗さ、弱いぼかし、ゆっくり流れるノイズを保っています。</li>
+      <li>通常時にもロゴの周囲へ光がにじみ、登場時にはさらに強く発光します。</li>
+      <li>表示直後の強い光は約2秒で落ち着き、壁・機器・床への光が残ります。</li>
+      <li>画面の文字に部屋の光が重ならないようにし、細い継ぎ目とゆっくりしたノイズを保っています。</li>
     </ul>
-    <h2>静止画で確認</h2>
+    <h2>通常時の明るさを比較</h2>
     <div class="stills">
       <figure>
-        <img src="../assets/title-preview/title-highlight.png" alt="ロゴ表示直後。白い文字の周囲に光がにじむ" width="1280" height="720" loading="lazy">
-        <figcaption>表示直後</figcaption>
+        <img src="../assets/title-preview/title-settled.png" alt="前回の通常時。部屋の大部分が暗い状態" width="1280" height="720" loading="lazy">
+        <figcaption>前回</figcaption>
       </figure>
       <figure>
-        <img src="../assets/title-preview/title-settled.png" alt="光が落ち着いた通常時。細くした継ぎ目越しにロゴが見える" width="1280" height="720" loading="lazy">
-        <figcaption>光が落ち着いた状態</figcaption>
+        <img src="../assets/title-preview/title-settled-lighting-v3.png" alt="今回の通常時。ロゴが発光し、壁や機器にも青白い光が広がる" width="1280" height="720" loading="lazy">
+        <figcaption>今回：光が落ち着いた後も発光を強めています</figcaption>
       </figure>
     </div>
   </main>

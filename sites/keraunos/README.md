@@ -6,9 +6,9 @@
 
 ## タイトル画面の確認
 
-[スマホ向け確認ページ](https://basteit.github.io/technical-sword-action/title-preview/)に、継ぎ目を細くしたタイトルの12秒・無音動画と、表示直後／通常時の静止画を掲載しています。映像は1280×720・30fpsのH.264 MP4です。
+[スマホ向け確認ページ](https://basteit.github.io/technical-sword-action/title-preview/?v=lighting3)に、発光とライティングを強めたタイトルの12秒・無音動画と、前回／今回の通常時の比較画像を掲載しています。映像は1280×720・30fpsのH.264 MP4です。動画と画像は版ごとのファイル名にして、前回のキャッシュと区別しています。
 
-ゲーム内では `EggTitleRoomProfile` の画面矩形とロゴ強調の時間・強さを調整します。`EggTitlePreviewCapture` はPlayModeで実際のUIを固定の時間刻みで撮影し、原稿と異なる明るさにならないようGame画面と同じ色で出力します。
+ゲーム内では `EggTitleRoomProfile` の画面矩形、ロゴの発光、登場時の強調、部屋の光を調整します。`EggTitlePreviewCapture` はPlayModeで実際のUIを固定の時間刻みで撮影し、原稿と異なる明るさにならないようGame画面と同じ色で出力します。
 
 ## 試遊版の更新
 
