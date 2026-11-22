@@ -30,33 +30,33 @@
   <main>
     <a href="../">← 配布ページへ</a>
     <h1>タイトル画面の調整確認</h1>
-    <p>ロゴを強く発光させ、壁・機器・床に青白い光が回るようにしました。</p>
+    <p>部屋を薄暗くし、ロゴは一度光った後に微弱な発光へ戻します。Unityの通常Game画面を直接撮影しています。</p>
     <figure>
-      <video id="preview" controls playsinline muted preload="metadata" poster="../assets/title-preview/title-highlight-lighting-v3.png" aria-label="発光とライティングを強めたタイトル。ロゴの登場からモード選択まで">
-        <source src="../assets/title-preview/title-reveal-lighting-v3.mp4" type="video/mp4">
-        <a href="../assets/title-preview/title-reveal-lighting-v3.mp4">動画を開く</a>
+      <video id="preview" controls playsinline muted preload="metadata" poster="../assets/title-preview/title-settled-dim-v4.png" aria-label="部屋を暗くし、ロゴの発光を抑えたタイトル。Unity Game画面の録画">
+        <source src="../assets/title-preview/title-reveal-dim-v4.mp4" type="video/mp4">
+        <a href="../assets/title-preview/title-reveal-dim-v4.mp4">動画を開く</a>
       </video>
       <figcaption>12秒・無音 ／ 実際のゲーム画面を撮影。スマホでは横向きでも確認できます。</figcaption>
     </figure>
     <div class="actions">
       <button id="replay" type="button">最初から再生</button>
-      <a href="../assets/title-preview/title-reveal-lighting-v3.mp4">動画を直接開く</a>
-      <a href="../assets/title-preview/title-highlight-lighting-v3.png">表示直後の画像</a>
+      <a href="../assets/title-preview/title-reveal-dim-v4.mp4">動画を直接開く</a>
+      <a href="../assets/title-preview/title-highlight-dim-v4.png">表示直後の画像</a>
     </div>
     <ul>
-      <li>通常時にもロゴの周囲へ光がにじみ、登場時にはさらに強く発光します。</li>
-      <li>表示直後の強い光は約2秒で落ち着き、壁・機器・床への光が残ります。</li>
-      <li>画面の文字に部屋の光が重ならないようにし、細い継ぎ目とゆっくりしたノイズを保っています。</li>
+      <li>ロゴは登場直後に一度だけ光り、約2秒で微弱な発光に落ち着きます。</li>
+      <li>部屋全体と青白い反射を暗くし、薄暗いモニタールームの雰囲気を出しています。</li>
+      <li>右上だけが光る座標のずれを直し、通常表示・接近時の両方を確認しています。</li>
     </ul>
-    <h2>通常時の明るさを比較</h2>
+    <h2>登場直後と通常時</h2>
     <div class="stills">
       <figure>
-        <img src="../assets/title-preview/title-settled.png" alt="前回の通常時。部屋の大部分が暗い状態" width="1280" height="720" loading="lazy">
-        <figcaption>前回</figcaption>
+        <img src="../assets/title-preview/title-highlight-dim-v4.png" alt="ロゴ登場直後。薄暗い部屋の中で一度だけ発光する" width="1280" height="720" loading="lazy">
+        <figcaption>登場直後</figcaption>
       </figure>
       <figure>
-        <img src="../assets/title-preview/title-settled-lighting-v3.png" alt="今回の通常時。ロゴが発光し、壁や機器にも青白い光が広がる" width="1280" height="720" loading="lazy">
-        <figcaption>今回：光が落ち着いた後も発光を強めています</figcaption>
+        <img src="../assets/title-preview/title-settled-dim-v4.png" alt="通常時。ロゴの発光は微弱で、部屋全体は暗い" width="1280" height="720" loading="lazy">
+        <figcaption>通常時：微弱な発光のみ</figcaption>
       </figure>
     </div>
   </main>
